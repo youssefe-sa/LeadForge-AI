@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body, #root {
+  height: 100%;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  background: #F7F6F2;
+  color: #1C1B18;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D0CEC4; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9B9890; }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes growBar {
+  from { width: 0%; }
+}
+
+.animate-fade { animation: fadeIn 350ms ease both; }
+.animate-slide { animation: slideIn 300ms ease both; }
+.animate-pulse { animation: pulse 2s ease-in-out infinite; }
+.animate-spin { animation: spin 1s linear infinite; }
+.animate-grow { animation: growBar 600ms ease both; }
+
+/* DnD styles */
+.drag-over { background: #F0E8DF !important; border: 2px dashed #D4500A !important; }

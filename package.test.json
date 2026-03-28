@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "test:simple": "node --experimental-vm-modules node_modules/jest/bin/jest.js --no-coverage --no-cache"
+  }
+}
