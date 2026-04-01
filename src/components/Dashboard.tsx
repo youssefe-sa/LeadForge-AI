@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
+import * as XLSX from '@e965/xlsx';
 import { v4 as uuidv4 } from 'uuid';
 import { configService } from '../lib/supabase';
 import { Lead, mapColumns, exportLeadsCSV, useCampaigns } from '../lib/supabase-store';
@@ -684,50 +684,43 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
         },
       });
     } else if (ext === 'xlsx' || ext === 'xls') {
-      console.log('Parsing Excel...');
-      console.log('Setting importing to true for Excel...');
       setImporting(true);
       setImportProgress(0);
       setImportStatus('Analyse du fichier Excel...');
+
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          console.log('FileReader complete, parsing Excel...');
           const wb = XLSX.read(e.target?.result, { type: 'binary' });
           const ws = wb.Sheets[wb.SheetNames[0]];
           const data: Record<string, string>[] = XLSX.utils.sheet_to_json(ws, { defval: '' });
-          console.log('Excel data parsed:', data);
+
           if (data.length === 0) { setImporting(false); return; }
-          
+
           setImportTotal(data.length);
           setImportProgress(25);
           setImportStatus('Mapping des données...');
-          
+
           setTimeout(() => {
             const headers = Object.keys(data[0]);
-            console.log('Excel headers:', headers);
             const mappedLeads = mapColumns(data, headers);
-            // Ajouter les informations de campagne aux leads
             const leadsWithCampaign = mappedLeads.map(lead => ({
               ...lead,
               campaign: campaignName.trim(),
               campaignDate: new Date().toISOString(),
-              source: file.name
+              source: file!.name
             }));
-            
+
             setImportProgress(75);
             setImportStatus(`Importation de ${leadsWithCampaign.length} leads...`);
-            
+
             setTimeout(() => {
-              console.log('Mapped leads from Excel:', leadsWithCampaign);
               addLeads(leadsWithCampaign);
               setImportProgress(100);
               setImportStatus('Importation terminée!');
-              
-              // Recharger automatiquement les leads
+
               setTimeout(() => {
                 loadLeads();
-                // Recharger à nouveau pour s'assurer que tous les leads sont là
                 setTimeout(() => {
                   loadLeads();
                   setImporting(false);
@@ -741,10 +734,9 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
               }, 1500);
             }, 1000);
           }, 300);
-        } catch (error) { 
-          console.error('Excel parsing error:', error);
+        } catch (error) {
           setImporting(false);
-          alert('Erreur de parsing Excel: ' + error); 
+          alert('Erreur de parsing Excel: ' + error);
         }
       };
       reader.readAsBinaryString(file!);
