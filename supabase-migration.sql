@@ -117,3 +117,12 @@ INSERT INTO email_templates (id, name, sector, subject, body) VALUES
    'Proposition de site web pour {name}',
    E'Bonjour {name},\n\nJe me permets de vous contacter au sujet de {name}.\n\nJ''ai remarqué que vous pourriez bénéficier d''un site web professionnel pour développer votre activité en ligne.\n\nJ''ai préparé une maquette de site web pour vous : {landingUrl}\n\nAvantages :\n✅ Présence en ligne professionnelle\n✅ Visible sur Google\n✅ Design moderne et responsive\n✅ Prêt en 48h\n\nSi cela vous intéresse, répondez simplement à cet email.\n\nBien cordialement,\nVotre consultant digital')
 ON CONFLICT (id) DO NOTHING;
+
+-- 9. Ajouter les champs de campagne à la table leads
+ALTER TABLE leads 
+ADD COLUMN IF NOT EXISTS campaign TEXT,
+ADD COLUMN IF NOT EXISTS campaign_date TIMESTAMP WITH TIME ZONE;
+
+-- Commentaire sur les nouveaux champs
+COMMENT ON COLUMN leads.campaign IS 'Nom de la campagne d''importation';
+COMMENT ON COLUMN leads.campaign_date IS 'Date de la campagne d''importation';

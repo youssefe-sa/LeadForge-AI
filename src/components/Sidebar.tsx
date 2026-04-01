@@ -85,6 +85,27 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
             borderRadius: 6, 
             border: 'none',
             cursor: 'pointer',
+            background: active === 'campaigns' ? C.accent2 : 'transparent',
+            textAlign: 'left',
+            transition: 'all 0.2s ease',
+          }}
+          onClick={() => onNavigate('campaigns')}
+          onMouseEnter={e => { if (active !== 'campaigns') (e.currentTarget as HTMLElement).style.background = C.surface2; }}
+          onMouseLeave={e => { if (active !== 'campaigns') (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+        >
+          <span style={{ fontSize: 14 }}>📋</span>
+          <span style={{ fontSize: 13, fontWeight: active === 'campaigns' ? 600 : 400, color: active === 'campaigns' ? C.tx : C.tx2 }}>Campagnes d'importation</span>
+        </button>
+        <button 
+          style={{
+            width: '100%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 10,
+            padding: '12px', 
+            borderRadius: 6, 
+            border: 'none',
+            cursor: 'pointer',
             background: active === 'settings' ? C.accent2 : 'transparent',
             textAlign: 'left',
             transition: 'all 0.2s ease',

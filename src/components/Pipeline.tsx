@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lead, exportLeadsCSV } from '../lib/store';
+import { Lead, exportLeadsCSV } from '../lib/supabase-store';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',

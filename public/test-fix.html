@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Correction Agent 2</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+        pre { background: #f8f9fa; padding: 10px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test des Corrections Agent 2</h1>
+    
+    <div id="results"></div>
+    <button onclick="testFixedPrompts()">🚀 Tester Prompts Corrigés</button>
+
+    <script>
+        const config = {
+            serperKey: 'af8b9320ed32b401563d118ee8830e875fee80d3',
+            groqKey: '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'
+        };
+
+        const results = document.getElementById('results');
+
+        function addResult(title, status, data) {
+            const div = document.createElement('div');
+            div.className = `test ${status}`;
+            div.innerHTML = `
+                <h3>${title}: ${status ? '✅ SUCCÈS' : '❌ ERREUR'}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            results.appendChild(div);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        async function callLLM(prompt, systemPrompt = 'Réponds UNIQUEMENT en JSON valide. Pas de texte, pas d\'explications.') {
+            try {
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
+                    body: JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: prompt }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 500,
+                    }),
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    const content = data.choices?.[0]?.message?.content;
+                    return content || '';
+                } else {
+                    console.error('❌ LLM failed:', res.status);
+                    return '';
+                }
+            } catch (error) {
+                console.error('❌ LLM exception:', error);
+                return '';
+            }
+        }
+
+        async function testFixedPrompts() {
+            results.innerHTML = '<h2>🧪 Test des prompts corrigés...</h2>';
+
+            // Test 1: Prompt IA enrichissement corrigé
+            addResult('🧠 Test IA Enrichissement', 'info', 'Démarrage...');
+            
+            const enrichmentPrompt = `Génère un JSON pour cette entreprise.
+
+Nom: Pro Dépannage - Plombier Paris 15
+Secteur: Plomberie
+Ville: Paris
+Site: https://www.pro-depannage-plombier-paris.fr/
+Note: 4.6 (203 avis)
+
+Snippets:
+Résultats trouvés pour "Pro Dépannage - Plombier Paris 15" Plomberie Paris
+
+Réponds UNIQUEMENT avec ce format JSON exact:
+{"sector":"secteur","description":"description 2-3 phrases","hours":"horaires","city":"ville","specialties":"services"}
+
+Pas de texte, pas d'explications, uniquement le JSON.`;
+
+            const enrichmentResponse = await callLLM(enrichmentPrompt);
+            
+            try {
+                const cleaned = enrichmentResponse.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+                const aiData = JSON.parse(cleaned);
+                
+                addResult('🧠 Test IA Enrichissement', 'success', {
+                    responseLength: enrichmentResponse.length,
+                    isJson: true,
+                    data: aiData,
+                    hasDescription: !!aiData.description,
+                    hasSector: !!aiData.sector
+                });
+            } catch (parseError) {
+                addResult('🧠 Test IA Enrichissement', 'error', {
+                    responseLength: enrichmentResponse.length,
+                    isJson: false,
+                    error: parseError.message,
+                    rawResponse: enrichmentResponse.substring(0, 300) + '...'
+                });
+            }
+
+            // Test 2: Prompt extraction avis corrigé
+            addResult('⭐ Test Extraction Avis', 'info', 'Démarrage...');
+            
+            const reviewsPrompt = `Extrais 3-5 avis clients de ces résultats sur "Pro Dépannage - Plombier Paris 15" à Paris.
+
+Résultats:
+Excellent plombier disponible 24/7
+Intervention rapide et efficace
+Tarifs compétitifs
+Service client impeccable
+
+Retourne UNIQUEMENT ce JSON:
+[{"author":"Nom","rating":5,"text":"Commentaire"}]
+
+Pas de texte, uniquement JSON.`;
+
+            const reviewsResponse = await callLLM(reviewsPrompt);
+            
+            try {
+                const cleaned = reviewsResponse.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+                const reviewsData = JSON.parse(cleaned);
+                
+                addResult('⭐ Test Extraction Avis', 'success', {
+                    responseLength: reviewsResponse.length,
+                    isJson: true,
+                    data: reviewsData,
+                    isArray: Array.isArray(reviewsData),
+                    count: reviewsData.length
+                });
+            } catch (parseError) {
+                addResult('⭐ Test Extraction Avis', 'error', {
+                    responseLength: reviewsResponse.length,
+                    isJson: false,
+                    error: parseError.message,
+                    rawResponse: reviewsResponse.substring(0, 300) + '...'
+                });
+            }
+
+            results.innerHTML += '<h2>✅ Test terminé !</h2>';
+        }
+    </script>
+</body>
+</html>

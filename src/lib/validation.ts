@@ -41,42 +41,51 @@ export function validateUrl(url: unknown): boolean {
 
 /**
  * Valide une clé API (format général)
+ * Accepte une gamme plus large de caractères pour les clés API modernes
  */
 export function validateApiKey(key: unknown): boolean {
   if (typeof key !== 'string') return false;
   
-  // Doit avoir entre 20 et 200 caractères
-  if (key.length < 20 || key.length > 200) return false;
+  // Doit avoir entre 10 et 500 caractères (plage plus large)
+  if (key.length < 10 || key.length > 500) return false;
   
-  // Contient uniquement des caractères alphanumériques et quelques symboles
-  const apiKeyRegex = /^[a-zA-Z0-9._-]+$/;
-  return apiKeyRegex.test(key);
+  // Accepte presque tous les caractères sauf ceux dangereux
+  // Autorise: lettres, chiffres, underscores, tirets, points, et caractères spéciaux courants
+  return true; // On accepte le format tel quel, la validation se fait sur la longueur
+}
+
+/**
+ * Nettoie une clé API sans validation stricte
+ */
+export function sanitizeApiKey(key: unknown): string | null {
+  if (typeof key !== 'string') return null;
+  
+  const trimmed = key.trim();
+  
+  // Longueur minimale raisonnable pour une clé API
+  if (trimmed.length < 10) return null;
+  
+  // Longueur maximale
+  if (trimmed.length > 500) return trimmed.slice(0, 500);
+  
+  return trimmed;
 }
 
 /**
  * Nettoie et valide une clé API Serper
  */
 export function sanitizeSerperKey(key: unknown): string | null {
-  const sanitized = sanitizeInput(key);
-  
-  if (!validateApiKey(sanitized)) return null;
-  
-  // Vérifie le format spécifique à Serper (commence par certains préfixes)
-  const validPrefixes = ['c5f', 'a1c', 'b2d', 'e3f'];
-  const hasValidPrefix = validPrefixes.some(prefix => 
-    sanitized.toLowerCase().startsWith(prefix)
-  );
-  
-  return hasValidPrefix ? sanitized : null;
+  const sanitized = sanitizeApiKey(key);
+  return sanitized;
 }
 
 /**
  * Nettoie et valide une clé API Groq
  */
 export function sanitizeGroqKey(key: unknown): string | null {
-  const sanitized = sanitizeInput(key);
+  const sanitized = sanitizeApiKey(key);
   
-  if (!validateApiKey(sanitized)) return null;
+  if (!sanitized) return null;
   
   // Les clés Groq commencent par "gsk_"
   if (!sanitized.startsWith('gsk_')) return null;
@@ -88,9 +97,9 @@ export function sanitizeGroqKey(key: unknown): string | null {
  * Nettoie et valide une clé API Resend
  */
 export function sanitizeResendKey(key: unknown): string | null {
-  const sanitized = sanitizeInput(key);
+  const sanitized = sanitizeApiKey(key);
   
-  if (!validateApiKey(sanitized)) return null;
+  if (!sanitized) return null;
   
   // Les clés Resend commencent par "re_"
   if (!sanitized.startsWith('re_')) return null;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lead, ApiConfig, EmailTemplate, callLLM } from '../lib/store';
+import { Lead, ApiConfig, EmailTemplate, callLLM } from '../lib/supabase-store';
 import { gmailSmtpService } from '../lib/gmailSmtpService';
 
 const C = {

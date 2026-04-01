@@ -956,7 +956,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
                 <h1>${heroTitle}</h1>
                 <p>${heroSubtitle}</p>
                 <a href="#contact" class="btn-hero">${content.ctaText}</a>
-                ${rating > 0 ? `
+                ${rating && rating > 0 ? `
                 <div class="mt-5">
                     <div class="d-flex justify-content-center gap-4">
                         <div class="text-center">

@@ -1,4 +1,4 @@
-import { ApiConfig } from './store';
+import { ApiConfig } from './supabase-store';
 
 export interface EmailData {
   to: string;
@@ -25,11 +25,10 @@ class GmailSmtpService {
 
   isConfigured(): boolean {
     if (!this.config) return false;
-    const passwordClean = this.config.gmailSmtpPassword?.replace(/\s/g, '') || '';
+    const passwordClean = (this.config.gmailSmtpPassword || '').replace(/\s/g, '');
     return !!(
       this.config.gmailSmtpUser &&
-      this.config.gmailSmtpPassword &&
-      passwordClean.length === 16
+      passwordClean.length >= 16
     );
   }
 
@@ -45,20 +44,39 @@ class GmailSmtpService {
     }
 
     try {
-      await this.saveConfigToBackend();
-      
       const url = `${API_URL}/email/send`;
       console.log('📧 [sendEmail] POST to:', url);
+
+      // Construire le payload avec la config SMTP complète
+      const payload = {
+        smtp: {
+          host: this.config?.gmailSmtpHost || 'smtp.gmail.com',
+          port: this.config?.gmailSmtpPort || 587,
+          secure: this.config?.gmailSmtpSecure !== false,
+          user: this.config?.gmailSmtpUser,
+          pass: this.config?.gmailSmtpPassword?.replace(/\s/g, ''), // Enlever les espaces
+        },
+        from: {
+          name: this.config?.gmailSmtpFromName || 'LeadForge AI',
+          email: this.config?.gmailSmtpFromEmail || this.config?.gmailSmtpUser,
+        },
+        to: data.to,
+        subject: data.subject,
+        html: data.html,
+        text: data.text,
+      };
+
+      console.log('📧 [sendEmail] Payload:', { ...payload, smtp: { ...payload.smtp, pass: '***' } });
 
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || `HTTP ${response.status}`);
+        const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue' }));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
       }
 
       const result = await response.json();
@@ -240,15 +258,27 @@ class GmailSmtpService {
     }
 
     try {
-      await this.saveConfigToBackend();
+      const url = `${API_URL}/config/test-smtp`;
+      console.log('📧 [testConnection] POST to:', url);
+
+      const payload = {
+        host: this.config?.gmailSmtpHost || 'smtp.gmail.com',
+        port: this.config?.gmailSmtpPort || 587,
+        secure: this.config?.gmailSmtpSecure !== false,
+        user: this.config?.gmailSmtpUser,
+        pass: this.config?.gmailSmtpPassword?.replace(/\s/g, ''),
+      };
+
+      console.log('📧 [testConnection] Payload:', { ...payload, pass: '***' });
       
-      const response = await fetch(`${API_URL}/config/test-smtp`, {
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ message: 'Echec du test SMTP' }));
         throw new Error(error.message || 'Echec du test SMTP');
       }
 
@@ -258,6 +288,7 @@ class GmailSmtpService {
         message: result.message,
       };
     } catch (error: any) {
+      console.error('📧 [testConnection] ERROR:', error);
       return {
         success: false,
         message: `Erreur de connexion: ${error?.message || 'Inconnue'}`,

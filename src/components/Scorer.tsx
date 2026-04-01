@@ -1,10 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
-  Lead, ApiConfig, calculateScore, callLLM,
+  Lead, ApiConfig, calculateScore,
   enrichWithSerper, fetchSerperReviews, extractReviewsFromSearch,
-  deepSearchEmail, searchLeadImages, generateWebsitePrompt,
+  deepSearchContact, scrapeWebsiteForContact, extractWithLLM,
+  searchLeadImages, generateWebsitePrompt,
   searchUnsplash, searchPexels,
-} from '../lib/store';
+} from '../lib/supabase-store';
+import { testAllApis, formatTestResults } from '../lib/api-test';
+import { eventBus, LeadForgeEvents } from '../lib/events';
+import { apiErrorState } from '../lib/api-error-state';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -36,38 +40,139 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0, name: '', step: '' });
   const [logs, setLogs] = useState<string[]>([]);
+  const addLog = (msg: string) => setLogs(prev => [`[${new Date().toLocaleTimeString('fr-FR')}] ${msg}`, ...prev.slice(0, 199)]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchFilter, setSearchFilter] = useState('');
   const [filterView, setFilterView] = useState<'all' | 'unscored' | 'very_hot' | 'hot' | 'warm' | 'cold'>('all');
   const [filterEmail, setFilterEmail] = useState<'all' | 'with' | 'without'>('all');
   const [filterWebsite, setFilterWebsite] = useState<'all' | 'with' | 'without'>('all');
+  const [filterReviews, setFilterReviews] = useState<'all' | 'with' | 'without'>('all');
   const [currentPage, setCurrentPage] = useState(0);
   const [promptCopied, setPromptCopied] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const itemsPerPage = 20;
 
   const selectedLead = useMemo(() => {
     if (!selectedId) return null;
-    return leads.find(l => l.id === selectedId) || null;
-  }, [selectedId, leads]);
+    const lead = leads.find(l => l.id === selectedId) || null;
+    
+    // Debug: Log toutes les données du lead sélectionné
+    if (lead) {
+      console.log('🔍 Selected Lead Data:', {
+        id: lead.id,
+        name: lead.name,
+        sector: lead.sector,
+        description: lead.description,
+        hours: lead.hours,
+        serperHours: lead.serperHours,
+        googleMapsUrl: lead.googleMapsUrl,
+        website: lead.website,
+        logo: lead.logo,
+        images: lead.images,
+        websiteImages: lead.websiteImages,
+        googleReviewsData: lead.googleReviewsData,
+        googleRating: lead.googleRating,
+        googleReviews: lead.googleReviews,
+        serperCid: lead.serperCid,
+        serperSnippets: lead.serperSnippets,
+        serperType: lead.serperType
+      });
+    }
+    
+    return lead;
+  }, [selectedId, leads, refreshKey]);
 
-  const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.openrouterKey);
+  const hasLLM = !!apiConfig.groqKey;
   const hasSerper = !!apiConfig.serperKey;
-  const hasImages = !!(apiConfig.unsplashKey || apiConfig.pexelsKey);
+  const hasImages = false; // Plus d'APIs images depuis suppression Unsplash/Pexels
 
-  // ENRICHMENT FLOW
+  // ENRICHMENT FLOW — 8 steps
   const enrichLead = async (lead: Lead, setStep: (s: string) => void): Promise<Partial<Lead>> => {
     const updates: Partial<Lead> = {};
+    // Contexte partagé alimenté au fil des steps pour le LLM final
+    const llmContext = {
+      snippets: [] as string[],
+      kgData: {} as Record<string, unknown>,
+      reviews: [] as string[],
+      websiteContent: '',
+    };
 
-    // STEP 1: Serper enrichment
+    // ── STEP 1 — Serper Places (données Google Maps) ──
     if (hasSerper) {
-      setStep('🔍 Recherche Google Maps...');
+      setStep('🗺️ Recherche Google Maps (Places)...');
       try {
         const serperUpdates = await enrichWithSerper(apiConfig.serperKey, lead);
         Object.assign(updates, serperUpdates);
-      } catch { /* ignore */ }
+        // Alimenter le contexte LLM avec les snippets collectés
+        if (serperUpdates.serperSnippets) llmContext.snippets.push(...serperUpdates.serperSnippets);
+        const found = [
+          serperUpdates.phone && `📞 ${serperUpdates.phone}`,
+          serperUpdates.website && `🌐 ${serperUpdates.website}`,
+          serperUpdates.googleRating && `⭐ ${serperUpdates.googleRating}`,
+        ].filter(Boolean);
+        if (found.length) addLog(`✅ Places: ${found.join(' | ')}`);
+        else addLog('ℹ️ Places: aucune donnée supplémentaire');
+      } catch (error) {
+        addLog(`⚠️ Places: échec (${error instanceof Error ? error.message : 'erreur'})`);
+      }
     }
 
-    // STEP 2: Google Reviews
+    // ── STEP 2 — Scraping pages contact du site web ──
+    const currentWebsite = updates.website || lead.website;
+    if (hasSerper && currentWebsite) {
+      setStep('🌐 Scraping pages contact du site web...');
+      try {
+        const siteContact = await scrapeWebsiteForContact(apiConfig.serperKey, currentWebsite, lead.name);
+        if (siteContact.email && !updates.email && !lead.email) {
+          updates.email = siteContact.email;
+          addLog(`✅ Email trouvé via site web : ${siteContact.email}`);
+        }
+        if (siteContact.phone && !updates.phone && !lead.phone) {
+          updates.phone = siteContact.phone;
+          addLog(`✅ Téléphone trouvé via site web : ${siteContact.phone}`);
+        }
+        if (siteContact.services.length > 0) {
+          const existingTags = updates.tags || lead.tags || [];
+          updates.tags = [...new Set([...existingTags, ...siteContact.services])].slice(0, 10);
+          llmContext.websiteContent = siteContact.services.join(' | ');
+          addLog(`✅ Services extraits : ${siteContact.services.slice(0, 3).join(', ')}`);
+        }
+        if (!siteContact.email && !siteContact.phone) addLog('ℹ️ Site web : pas de contact trouvé dans les pages indexées');
+      } catch (error) {
+        addLog(`⚠️ Site web : échec scraping (${error instanceof Error ? error.message : 'erreur'})`);
+      }
+    } else if (!currentWebsite) {
+      addLog('ℹ️ Pas de site web — scraping ignoré');
+    }
+
+    // ── STEP 3 — Deep search contact (email + téléphone) si encore manquants ──
+    const needEmail = !updates.email && !lead.email;
+    const needPhone = !updates.phone && !lead.phone;
+    if (hasSerper && (needEmail || needPhone)) {
+      setStep(`🔍 Deep search ${needEmail ? 'email' : ''}${needEmail && needPhone ? ' + ' : ''}${needPhone ? 'téléphone' : ''}...`);
+      try {
+        const merged = { ...lead, ...updates };
+        const contact = await deepSearchContact(apiConfig.serperKey, merged, apiConfig);
+        if (contact.email && !updates.email) {
+          updates.email = contact.email;
+          addLog(`✅ Email trouvé via deep search : ${contact.email}`);
+        } else if (!contact.email && needEmail) {
+          addLog('⚠️ Email : non trouvé via deep search');
+        }
+        if (contact.phone && !updates.phone) {
+          updates.phone = contact.phone;
+          addLog(`✅ Téléphone trouvé via deep search : ${contact.phone}`);
+        } else if (!contact.phone && needPhone) {
+          addLog('⚠️ Téléphone : non trouvé via deep search');
+        }
+      } catch (error) {
+        addLog(`⚠️ Deep search : échec (${error instanceof Error ? error.message : 'erreur'})`);
+      }
+    } else if (!needEmail && !needPhone) {
+      addLog('✅ Email & téléphone déjà renseignés — deep search ignoré');
+    }
+
+    // ── STEP 4 — Avis Google ──
     if (hasSerper) {
       setStep('⭐ Extraction des avis clients...');
       const merged = { ...lead, ...updates };
@@ -86,28 +191,25 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
           }
         }
       }
-      if (reviews.length > 0) updates.googleReviewsData = reviews.slice(0, 6);
+      if (reviews.length > 0) {
+        updates.googleReviewsData = reviews.slice(0, 6);
+        llmContext.reviews = reviews.map(r => `"${r.text}" — ${r.author}`);
+        addLog(`✅ Avis : ${reviews.length} avis clients extraits`);
+      } else {
+        addLog('ℹ️ Avis : aucun avis trouvé');
+      }
     }
 
-    // STEP 3: Logo & Website Images
+    // ── STEP 5 — Images & Logo ──
     if (hasSerper) {
-      setStep('🖼️ Recherche logo & images du site...');
+      setStep('🖼️ Recherche logo & images...');
       const merged = { ...lead, ...updates };
       const imgResults = await searchLeadImages(apiConfig.serperKey, merged);
-      if (imgResults.logo) updates.logo = imgResults.logo;
-      if (imgResults.websiteImages.length > 0) updates.websiteImages = imgResults.websiteImages;
+      if (imgResults.logo) { updates.logo = imgResults.logo; addLog('✅ Logo trouvé'); }
+      if (imgResults.websiteImages.length > 0) { updates.websiteImages = imgResults.websiteImages; addLog(`✅ ${imgResults.websiteImages.length} image(s) trouvée(s)`); }
     }
 
-    // STEP 4: Deep Email Search
-    const currentEmail = updates.email || lead.email;
-    if (!currentEmail && hasSerper) {
-      setStep('✉️ Recherche email approfondie...');
-      const merged = { ...lead, ...updates };
-      const foundEmail = await deepSearchEmail(apiConfig.serperKey, merged, apiConfig);
-      if (foundEmail) updates.email = foundEmail;
-    }
-
-    // STEP 5: Stock images fallback
+    // ── STEP 6 — Stock images fallback ──
     const currentImages = updates.images || lead.images || [];
     if (currentImages.length < 3 && hasImages) {
       setStep('📸 Recherche images de stock...');
@@ -121,43 +223,34 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       }
     }
 
-    // STEP 6: AI enrichment
+    // ── STEP 7 — LLM unifié (description riche + champs manquants) ──
     if (hasLLM) {
-      setStep('🧠 Enrichissement IA (description, secteur)...');
+      setStep('🧠 Enrichissement IA (analyse complète)...');
       try {
         const merged = { ...lead, ...updates };
-        const snippetContext = (merged.serperSnippets || []).join('\n');
-        const prompt = `Analyse ce lead B2B et enrichis les données manquantes. Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks.
-Lead: ${JSON.stringify({
-  name: merged.name, email: merged.email, phone: merged.phone,
-  sector: merged.sector, city: merged.city, address: merged.address,
-  website: merged.website, googleRating: merged.googleRating,
-  googleReviews: merged.googleReviews,
-})}
-${snippetContext ? `\nInformations web trouvées:\n${snippetContext}` : ''}
+        // Alimenter le Knowledge Graph si dispo dans les snippets serper
+        if (merged.serperSnippets) llmContext.snippets.push(...merged.serperSnippets.filter(s => !llmContext.snippets.includes(s)));
 
-Retourne un JSON avec ces champs (laisse vide "" si tu ne peux pas deviner) :
-{"sector": "secteur d'activité si absent", "description": "description professionnelle de 3-4 phrases basée sur toutes les données disponibles", "hours": "horaires estimés si pertinent", "city": "ville si absente"}`;
+        const llmUpdates = await extractWithLLM(apiConfig, merged, llmContext);
+        const enriched: string[] = [];
 
-        const response = await callLLM(apiConfig, prompt, 'Tu es un expert en analyse de leads B2B. Réponds toujours en JSON valide uniquement.');
-        if (response) {
-          try {
-            const cleaned = response.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
-            const data = JSON.parse(cleaned);
-            if (data.sector && !merged.sector) updates.sector = String(data.sector);
-            if (data.description) updates.description = String(data.description);
-            if (data.hours && !merged.hours) updates.hours = String(data.hours);
-            if (data.city && !merged.city) updates.city = String(data.city);
-          } catch {
-            if (response.length > 20 && response.length < 500) {
-              updates.description = response.replace(/```/g, '').replace(/json/g, '').trim();
-            }
-          }
-        }
-      } catch { /* ignore */ }
+        // N'appliquer que les champs encore vides
+        if (llmUpdates.email && !updates.email && !lead.email) { updates.email = llmUpdates.email; enriched.push('email'); }
+        if (llmUpdates.phone && !updates.phone && !lead.phone) { updates.phone = llmUpdates.phone; enriched.push('téléphone'); }
+        if (llmUpdates.description) { updates.description = llmUpdates.description; enriched.push('description'); }
+        if (llmUpdates.sector && !updates.sector && !lead.sector) { updates.sector = llmUpdates.sector; enriched.push('secteur'); }
+        if (llmUpdates.tags) { updates.tags = llmUpdates.tags; enriched.push('services'); }
+        if (llmUpdates.hours && !updates.hours && !lead.hours) { updates.hours = llmUpdates.hours; enriched.push('horaires'); }
+        if (llmUpdates.city && !updates.city && !lead.city) { updates.city = llmUpdates.city; enriched.push('ville'); }
+
+        if (enriched.length) addLog(`🧠 LLM : ${enriched.join(', ')} enrichi(s)`);
+        else addLog('ℹ️ LLM : tous les champs étaient déjà renseignés');
+      } catch (error) {
+        addLog(`⚠️ LLM : échec (${error instanceof Error ? error.message : 'erreur'})`);
+      }
     }
 
-    // STEP 7: Score
+    // ── STEP 8 — Score & température ──
     setStep('📊 Calcul du score...');
     const finalLead = { ...lead, ...updates };
     const { score, temperature } = calculateScore(finalLead);
@@ -176,12 +269,40 @@ Retourne un JSON avec ces champs (laisse vide "" si tu ne peux pas deviner) :
     const promptLead = { ...lead, ...updates };
     updates.generatedPrompt = generateWebsitePrompt(promptLead);
 
+    console.log('🎯 FINAL UPDATES TO RETURN:', updates);
     return updates;
   };
 
   const scoreAll = async () => {
     const toScore = leads.filter(l => l.stage === 'new' || l.score === 0);
     if (toScore.length === 0) { alert('Tous les leads sont déjà scorés !'); return; }
+
+    // Tester les APIs avant de lancer les agents
+    console.log('🔍 Test des APIs avant le lancement des agents...');
+    const apiTestReport = await testAllApis(apiConfig);
+    
+    if (!apiTestReport.canProceed) {
+      // Émettre un événement pour afficher la notification toast
+      apiTestReport.results
+        .filter(r => r.status === 'error')
+        .forEach(r => {
+          eventBus.emit(LeadForgeEvents.API_ERROR, {
+            type: 'api_error',
+            service: r.service,
+            message: r.message,
+            statusCode: r.statusCode,
+            timestamp: Date.now(),
+          });
+        });
+      
+      // Arrêter les agents
+      apiErrorState.stopAllAgents();
+      
+      setLogs(prev => [...prev, `❌ Arrêt des agents - APIs non fonctionnelles`]);
+      return;
+    }
+
+    console.log('✅ Tests API réussis - Lancement des agents...');
     setProcessing(true);
     setProgress({ current: 0, total: toScore.length, name: '', step: '' });
     setLogs([`🚀 Début de l'enrichissement de ${toScore.length} leads...`]);
@@ -216,6 +337,33 @@ Retourne un JSON avec ces champs (laisse vide "" si tu ne peux pas deviner) :
       alert('Aucun lead non scoré dans les résultats filtrés !'); 
       return; 
     }
+
+    // Tester les APIs avant de lancer les agents
+    console.log('🔍 Test des APIs avant le lancement des agents filtrés...');
+    const apiTestReport = await testAllApis(apiConfig);
+    
+    if (!apiTestReport.canProceed) {
+      // Émettre un événement pour afficher la notification toast
+      apiTestReport.results
+        .filter(r => r.status === 'error')
+        .forEach(r => {
+          eventBus.emit(LeadForgeEvents.API_ERROR, {
+            type: 'api_error',
+            service: r.service,
+            message: r.message,
+            statusCode: r.statusCode,
+            timestamp: Date.now(),
+          });
+        });
+      
+      // Arrêter les agents
+      apiErrorState.stopAllAgents();
+      
+      setLogs(prev => [...prev, `❌ Arrêt des agents - APIs non fonctionnelles`]);
+      return;
+    }
+
+    console.log('✅ Tests API réussis - Lancement des agents filtrés...');
     setProcessing(true);
     setProgress({ current: 0, total: toScore.length, name: '', step: '' });
     setLogs([`🚀 Début de l'enrichissement de ${toScore.length} leads filtrés...`]);
@@ -245,12 +393,43 @@ Retourne un JSON avec ces champs (laisse vide "" si tu ne peux pas deviner) :
   };
 
   const scoreOne = async (lead: Lead) => {
+    // Tester les APIs avant de lancer l'agent
+    console.log('🔍 Test des APIs avant le lancement de l\'agent individuel...');
+    const apiTestReport = await testAllApis(apiConfig);
+    
+    if (!apiTestReport.canProceed) {
+      // Émettre un événement pour afficher la notification toast
+      apiTestReport.results
+        .filter(r => r.status === 'error')
+        .forEach(r => {
+          eventBus.emit(LeadForgeEvents.API_ERROR, {
+            type: 'api_error',
+            service: r.service,
+            message: r.message,
+            statusCode: r.statusCode,
+            timestamp: Date.now(),
+          });
+        });
+      
+      // Arrêter les agents
+      apiErrorState.stopAllAgents();
+      
+      setLogs(prev => [...prev, `❌ Arrêt de l'agent - APIs non fonctionnelles`]);
+      return;
+    }
+
+    console.log('✅ Tests API réussis - Lancement de l\'agent individuel...');
     setProcessing(true);
     const setStep = (step: string) => setProgress({ current: 1, total: 1, name: lead.name, step });
     setStep('Démarrage...');
     setLogs(prev => [...prev, `⚙️ Enrichissement: ${lead.name || lead.email}...`]);
     const updates = await enrichLead(lead, setStep);
-    updateLead(lead.id, updates);
+    console.log('💾 Updates before save:', updates);
+    
+    // CRITIQUE: await updateLead pour garantir que le state est mis à jour
+    await updateLead(lead.id, updates);
+    console.log('✅ updateLead completed, stats will update via useEffect');
+    
     const t = tempMap[updates.temperature || ''];
     const reviewsCount = (updates.googleReviewsData || []).length;
     setLogs(prev => [...prev, `✅ ${lead.name}: Score ${updates.score}/100 — ${t?.label} · ${reviewsCount} avis${updates.logo ? ' · logo' : ''}${updates.email && !lead.email ? ' · email trouvé' : ''}`]);
@@ -291,6 +470,14 @@ Retourne un JSON avec ces champs (laisse vide "" si tu ne peux pas deviner) :
       if (l.website && l.website.trim() !== '') return false;
     }
     
+    // Filtre par avis
+    if (filterReviews === 'with') {
+      if ((l.googleReviewsData || []).length === 0) return false;
+    }
+    if (filterReviews === 'without') {
+      if ((l.googleReviewsData || []).length > 0) return false;
+    }
+    
     return true;
   });
 
@@ -327,19 +514,40 @@ Retourne un JSON avec ces champs (laisse vide "" si tu ne peux pas deviner) :
     handleFilterChange();
   };
 
-  // Stats
-  const scored = leads.filter(l => l.score > 0);
-  const unscored = leads.filter(l => l.score === 0);
-  const byTemp = {
-    very_hot: leads.filter(l => l.temperature === 'very_hot').length,
-    hot: leads.filter(l => l.temperature === 'hot').length,
-    warm: leads.filter(l => l.temperature === 'warm').length,
-    cold: leads.filter(l => l.temperature === 'cold').length,
+  const handleFilterReviewsChange = (value: any) => {
+    setFilterReviews(value);
+    handleFilterChange();
   };
-  const sectorCounts: Record<string, number> = {};
-  leads.forEach(l => { if (l.sector) sectorCounts[l.sector] = (sectorCounts[l.sector] || 0) + 1; });
-  const topSectors = Object.entries(sectorCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const leadsWithReviews = leads.filter(l => (l.googleReviewsData || []).length > 0).length;
+
+  // Stats avec state local pour forcer la mise à jour instantanée
+  const [stats, setStats] = useState({
+    scored: [] as Lead[],
+    unscored: [] as Lead[],
+    byTemp: { very_hot: 0, hot: 0, warm: 0, cold: 0 },
+    topSectors: [] as [string, number][],
+    leadsWithReviews: 0
+  });
+  
+  // Recalculer les stats quand leads change
+  useEffect(() => {
+    const scored = leads.filter(l => l.score > 0);
+    const unscored = leads.filter(l => l.score === 0);
+    const byTemp = {
+      very_hot: leads.filter(l => l.temperature === 'very_hot').length,
+      hot: leads.filter(l => l.temperature === 'hot').length,
+      warm: leads.filter(l => l.temperature === 'warm').length,
+      cold: leads.filter(l => l.temperature === 'cold').length,
+    };
+    const sectorCounts: Record<string, number> = {};
+    leads.forEach(l => { if (l.sector) sectorCounts[l.sector] = (sectorCounts[l.sector] || 0) + 1; });
+    const topSectors = Object.entries(sectorCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const leadsWithReviews = leads.filter(l => (l.googleReviewsData || []).length > 0).length;
+    
+    setStats({ scored, unscored, byTemp, topSectors, leadsWithReviews });
+    console.log('📊 STATS UPDATED:', { scored: scored.length, veryHot: byTemp.very_hot, hot: byTemp.hot });
+  }, [leads]);
+  
+  const { scored, unscored, byTemp, topSectors, leadsWithReviews } = stats;
 
   // Score breakdown helper
   const getScoreBreakdown = (lead: Lead) => {
@@ -397,7 +605,7 @@ Retourne un JSON avec ces champs (laisse vide "" si tu ne peux pas deviner) :
             Scorer & Enrichissement
           </h1>
           <p style={{ color: C.tx3, fontSize: 14 }}>
-            {hasSerper ? '🔍 Serper' : ''}{hasLLM ? ' · 🧠 IA' : ''}{hasImages ? ' · 🖼️ Stock' : ''}
+            {hasSerper ? '🔍 Serper' : ''}{hasLLM ? ' · 🧠 IA (Groq)' : ''}
             {!hasSerper && !hasLLM ? ' ⚠️ Configurez Serper + LLM dans Paramètres' : ' — activés'}
           </p>
         </div>
@@ -584,10 +792,33 @@ Retourne un JSON avec ces champs (laisse vide "" si tu ne peux pas deviner) :
             </button>
           ))}
         </div>
+
+        {/* Séparateur */}
+        <div style={{ width: 1, height: '20px', background: C.border }} />
+
+        {/* Filtres Avis */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ fontSize: 11, color: C.tx3, fontWeight: 600, marginRight: 4 }}>Avis:</span>
+          {(['all', 'with', 'without'] as const).map(f => (
+            <button key={`reviews-${f}`} onClick={() => handleFilterReviewsChange(f)} style={{
+              padding: '4px 8px', 
+              borderRadius: 4, 
+              fontSize: 11, 
+              fontWeight: 500, 
+              cursor: 'pointer',
+              border: `1px solid ${filterReviews === f ? C.amber : C.border}`,
+              background: filterReviews === f ? '#fef3c7' : C.surface,
+              color: filterReviews === f ? C.amber : C.tx2,
+              whiteSpace: 'nowrap',
+            }}>
+              {f === 'all' ? 'Tous' : f === 'with' ? 'Avec' : 'Sans'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Results count and action - seulement si des filtres sont appliqués */}
-      {(filterView !== 'all' || filterEmail !== 'all' || filterWebsite !== 'all' || searchFilter) && (
+      {(filterView !== 'all' || filterEmail !== 'all' || filterWebsite !== 'all' || filterReviews !== 'all' || searchFilter) && (
         <div style={{ 
           display: 'flex', 
           justifyContent: 'space-between', 

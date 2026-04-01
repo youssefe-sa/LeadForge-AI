@@ -3,7 +3,7 @@
 // Bootstrap 5 + Bootstrap Icons + Animate.css + Google Fonts
 // CURATED real Unsplash images (source.unsplash.com is DEAD)
 // ============================================================
-import { Lead, safeStr, proxyImg } from "./store";
+import { Lead, safeStr, proxyImg } from "./supabase-store";
 
 interface SiteContent {
   heroTitle: string;

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ApiConfig, ApiStatus, useApiConfig } from '../lib/store';
-import { sanitizeSerperKey, sanitizeGroqKey, sanitizeInput } from '../lib/validation';
+import { ApiConfig, ApiStatus, useApiConfig } from '../lib/supabase-store';
 import SimpleSerperGenerator from './SimpleSerperGenerator';
 
 const C = {
@@ -13,8 +12,8 @@ const C = {
 interface Props {
   config: ApiConfig;
   updateConfig: (updates: Partial<ApiConfig>) => void;
-  statuses: Record<string, ApiStatus>;
-  setStatus: (id: string, status: ApiStatus) => void;
+  statuses: ApiStatus;
+  setStatus: (id: string, status: 'untested' | 'testing' | 'active' | 'error') => void;
   onClearData: () => void;
 }
 
@@ -41,21 +40,35 @@ interface Section {
 }
 
 export default function Settings({ config, updateConfig, statuses, setStatus, onClearData }: Props) {
+  const [localConfig, setLocalConfig] = useState<ApiConfig>(config);
   const [visibleKeys, setVisibleKeys] = useState<Set<string>>(new Set());
   const [testResults, setTestResults] = useState<Record<string, string>>({});
   const [showSerperManager, setShowSerperManager] = useState(false);
+  const [savingSections, setSavingSections] = useState<Record<string, boolean>>({});
+
+  // Synchroniser le state local avec les props
+  useEffect(() => {
+    setLocalConfig(config);
+  }, [config]);
+
+  // Debug: afficher la configuration
+  useEffect(() => {
+    console.log('Settings - Config actuelle:', JSON.stringify(config, null, 2));
+  }, [config]);
 
   const toggleVisible = (key: string) => {
     setVisibleKeys(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n; });
   };
 
-  // Écouter les mises à jour de configuration API
+  // Écouter les mises à jour de configuration API (ex: depuis le générateur Serper)
   useEffect(() => {
     const handleConfigUpdate = (event: CustomEvent) => {
-      // Log uniquement en développement
       if (process.env.NODE_ENV === 'development') {
         console.log('🔧 API Config updated event received:', event.detail);
       }
+      // Mise à jour locale immédiate
+      setLocalConfig(prev => ({ ...prev, ...event.detail }));
+      // Mise à jour globale (persistance)
       updateConfig(event.detail);
     };
 
@@ -66,57 +79,49 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
     };
   }, [updateConfig]);
 
-  const updateConfigWithValidation = (updates: Partial<ApiConfig>) => {
-    const validatedUpdates: Partial<ApiConfig> = {};
-    
-    // Validation des clés API
-    if (updates.serperKey !== undefined) {
-      const sanitized = sanitizeSerperKey(updates.serperKey);
-      validatedUpdates.serperKey = sanitized || '';
+  const handleLocalChange = (key: keyof ApiConfig, value: string | number | boolean) => {
+    setLocalConfig(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveSection = async (sectionId: string, keys: Array<keyof ApiConfig>) => {
+    setSavingSections(prev => ({ ...prev, [sectionId]: true }));
+    try {
+      const updates: Partial<ApiConfig> = {};
+      keys.forEach(key => {
+        const value = localConfig[key];
+        if (typeof value === 'string') {
+          updates[key] = value.trim() as any;
+        } else {
+          updates[key] = value as any;
+        }
+      });
+      
+      console.log(`💾 Sauvegarde de la section ${sectionId}:`, updates);
+      await updateConfig(updates);
+      
+      // Petit délai pour l'effet visuel
+      setTimeout(() => {
+        setSavingSections(prev => ({ ...prev, [sectionId]: false }));
+      }, 800);
+    } catch (error) {
+      console.error(`❌ Erreur lors de la sauvegarde de ${sectionId}:`, error);
+      setSavingSections(prev => ({ ...prev, [sectionId]: false }));
+      alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
     }
-    
-    if (updates.groqKey !== undefined) {
-      const sanitized = sanitizeGroqKey(updates.groqKey);
-      validatedUpdates.groqKey = sanitized || '';
-    }
-    
-    // Gmail SMTP validation
-    if (updates.gmailSmtpUser !== undefined) {
-      validatedUpdates.gmailSmtpUser = sanitizeInput(updates.gmailSmtpUser);
-    }
-    if (updates.gmailSmtpPassword !== undefined) {
-      validatedUpdates.gmailSmtpPassword = sanitizeInput(updates.gmailSmtpPassword);
-    }
-    if (updates.gmailSmtpFromName !== undefined) {
-      validatedUpdates.gmailSmtpFromName = sanitizeInput(updates.gmailSmtpFromName);
-    }
-    if (updates.gmailSmtpFromEmail !== undefined) {
-      validatedUpdates.gmailSmtpFromEmail = sanitizeInput(updates.gmailSmtpFromEmail);
-    }
-    if (updates.gmailSmtpHost !== undefined) {
-      validatedUpdates.gmailSmtpHost = sanitizeInput(updates.gmailSmtpHost) || 'smtp.gmail.com';
-    }
-    if (updates.gmailSmtpPort !== undefined) {
-      validatedUpdates.gmailSmtpPort = typeof updates.gmailSmtpPort === 'number' ? updates.gmailSmtpPort : 587;
-    }
-    if (updates.gmailSmtpSecure !== undefined) {
-      validatedUpdates.gmailSmtpSecure = !!updates.gmailSmtpSecure;
-    }
-    
-    updateConfig(validatedUpdates);
   };
 
   const testApi = async (section: Section) => {
-    setStatus(section.id, 'testing' as const);
+    setStatus(section.id, 'testing');
     setTestResults(prev => ({ ...prev, [section.id]: 'Test en cours...' }));
     
     try {
-      const result = await section.testFn(config);
+      // Pour le test, on utilise la config locale actuelle (peut-être pas encore sauvegardée)
+      const result = await section.testFn(localConfig);
       setTestResults(prev => ({ ...prev, [section.id]: result.msg }));
-      setStatus(section.id, result.ok ? 'active' as const : 'error' as const);
+      setStatus(section.id, result.ok ? 'active' : 'error');
     } catch (error) {
       setTestResults(prev => ({ ...prev, [section.id]: '❌ Erreur de test' }));
-      setStatus(section.id, 'error' as const);
+      setStatus(section.id, 'error');
     }
   };
 
@@ -231,7 +236,10 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
         background: C.surface, borderRadius: 10, padding: '20px 24px',
         border: `1px solid ${C.border}`, marginBottom: 20,
       }}>
-        <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, marginBottom: 12 }}>🔊 État des APIs</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, margin: 0 }}>🔊 État des APIs</h3>
+          <div style={{ fontSize: 11, color: C.tx3 }}>Auto-synchronisé avec Supabase</div>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
           {Object.entries(statuses).map(([key, status]) => (
             <div key={key} style={{
@@ -248,6 +256,9 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
               </span>
             </div>
           ))}
+          {Object.keys(statuses).length === 0 && (
+            <div style={{ fontSize: 12, color: C.tx3, fontStyle: 'italic' }}>Testez les APIs pour voir leur état</div>
+          )}
         </div>
       </div>
 
@@ -335,8 +346,8 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
                       <input
                         type={field.masked && !visibleKeys.has(field.key) ? 'password' : 'text'}
                         autoComplete="off"
-                        value={config[field.key] || ''}
-                        onChange={e => updateConfigWithValidation({ [field.key]: e.target.value })}
+                        value={String(localConfig[field.key] ?? '')}
+                        onChange={e => handleLocalChange(field.key, e.target.value)}
                         placeholder={field.placeholder}
                         style={{
                           flex: 1, padding: '9px 13px', borderRadius: 6,
@@ -380,6 +391,29 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
                     )}
                   </div>
                 ))}
+
+                {/* Save Button for each section */}
+                <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => handleSaveSection(section.id, section.fields.map(f => f.key))}
+                    disabled={savingSections[section.id]}
+                    style={{
+                      padding: '8px 16px', borderRadius: 6, border: 'none',
+                      background: savingSections[section.id] ? C.tx3 : C.blue,
+                      color: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={e => { if (!savingSections[section.id]) e.currentTarget.style.opacity = '0.9'; }}
+                    onMouseLeave={e => { if (!savingSections[section.id]) e.currentTarget.style.opacity = '1'; }}
+                  >
+                    {savingSections[section.id] ? (
+                      <>⏳ Enregistrement...</>
+                    ) : (
+                      <>💾 Sauvegarder {section.title.split(' ')[0]}</>
+                    )}
+                  </button>
+                </div>
 
                 {/* Gmail SMTP Documentation Guide */}
                 {section.id === 'gmailSmtp' && (

@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, safeStr, proxyImg } from '../lib/store';
+import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, safeStr, proxyImg } from '../lib/supabase-store';
 import { generateProfessionalSite } from '../lib/professionalTemplate';
 import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { generatePremiumSiteHtml } from '../lib/siteTemplate';
@@ -144,7 +144,7 @@ export default function WebsiteGen({ leads, updateLead, apiConfig }: Props) {
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.openrouterKey);
+  const hasLLM = !!apiConfig.groqKey;
   const enriched = leads.filter(l => l.score > 0 && !l.siteGenerated);
   const generated = leads.filter(l => l.siteGenerated);
   const previewLead = useMemo(() => leads.find(l => l.id === previewId) || null, [leads, previewId]);
@@ -450,10 +450,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const content = await generateContent(lead);
       setProgress(p => ({ ...p, step: '🎨 Génération du site premium...' }));
       const html = generatePremiumSiteHtml(lead, content);
+      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || window.location.origin;
       updateLead(lead.id, {
         siteGenerated: true, siteHtml: html,
-        siteUrl: `https://${slug}.leadforge.app`,
-        landingUrl: `https://landing.leadforge.app/${slug}`,
+        siteUrl: `${baseUrl}/api/sites/${lead.id}`,
+        landingUrl: `${baseUrl}/api/sites/${lead.id}`,
         stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
       });
       
@@ -464,10 +465,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       }
       setProgress(p => ({ ...p, step: '🔄 Fallback template...' }));
       const emergencyHtml = generateProfessionalSite(lead);
+      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || window.location.origin;
       updateLead(lead.id, {
         siteGenerated: true, siteHtml: emergencyHtml,
-        siteUrl: `https://${slug}.leadforge.app`,
-        landingUrl: `https://landing.leadforge.app/${slug}`,
+        siteUrl: `${baseUrl}/api/sites/${lead.id}`,
+        landingUrl: `${baseUrl}/api/sites/${lead.id}`,
         stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
       });
     }
@@ -638,10 +640,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const html = generatePremiumSiteHtml(tempLead, content);
       
       // Mettre à jour le site avec la nouvelle palette mais restaurer le nom original
+      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || window.location.origin;
       updateLead(previewLead.id, { 
         siteHtml: html,
-        siteUrl: `https://${originalName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 30)}.leadforge.app`,
-        landingUrl: `https://landing.leadforge.app/${originalName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 30)}`,
+        siteUrl: `${baseUrl}/api/sites/${previewLead.id}`,
+        landingUrl: `${baseUrl}/api/sites/${previewLead.id}`,
       });
       
       // Forcer le rafraîchissement de l'aperçu
