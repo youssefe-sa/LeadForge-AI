@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ApiConfig, ApiStatus, useApiConfig } from '../lib/supabase-store';
+import { ApiConfig, ApiStatus, useApiConfig, LlmProvider } from '../lib/supabase-store';
 import SimpleSerperGenerator from './SimpleSerperGenerator';
 
 const C = {
@@ -329,6 +329,38 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
         border: `1px solid ${C.border}`, marginBottom: 20,
       }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, marginBottom: 12 }}>🔑 Configuration API</h3>
+
+        {/* LLM par défaut */}
+        <div style={{ background: C.bg, borderRadius: 8, padding: 16, border: `2px solid ${C.accent}30`, marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 14, color: C.tx, marginBottom: 3 }}>🧠 LLM principal (priorité 1)</div>
+              <div style={{ fontSize: 12, color: C.tx3 }}>Le modèle utilisé en premier. Les autres servent de fallback automatique.</div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {([
+                { id: 'groq', label: 'Groq', icon: '🚀', color: C.accent, desc: '6K TPM' },
+                { id: 'gemini', label: 'Gemini', icon: '✨', color: '#1A73E8', desc: '1M TPM' },
+                { id: 'nvidia', label: 'NVIDIA', icon: '⚡', color: '#76B900', desc: '40 RPM' },
+                { id: 'openrouter', label: 'OpenRouter', icon: '🔀', color: '#7B3FE4', desc: 'Free' },
+              ] as Array<{id: LlmProvider; label: string; icon: string; color: string; desc: string}>).map(p => {
+                const isActive = (config.defaultLlm || 'groq') === p.id;
+                return (
+                  <button key={p.id} onClick={() => handleLocalChange('defaultLlm', p.id)} style={{
+                    padding: '8px 14px', borderRadius: 6, border: `2px solid ${isActive ? p.color : C.border}`,
+                    background: isActive ? p.color + '18' : C.surface,
+                    cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 72,
+                  }}>
+                    <span style={{ fontSize: 16 }}>{p.icon}</span>
+                    <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? p.color : C.tx2 }}>{p.label}</span>
+                    <span style={{ fontSize: 10, color: C.tx3 }}>{p.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {sections.map(section => (
             <div key={section.id} style={{

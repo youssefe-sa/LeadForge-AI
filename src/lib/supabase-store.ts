@@ -72,11 +72,14 @@ export interface Lead {
   source: string;
 }
 
+export type LlmProvider = 'groq' | 'gemini' | 'nvidia' | 'openrouter';
+
 export interface ApiConfig {
   groqKey: string;
   openrouterKey: string;
   geminiKey: string;
   nvidiaKey: string;
+  defaultLlm: LlmProvider;
   serperKey: string;
   unsplashKey: string;
   pexelsKey: string;
@@ -108,6 +111,7 @@ export const defaultApiConfig: ApiConfig = {
   openrouterKey: '',
   geminiKey: '',
   nvidiaKey: '',
+  defaultLlm: 'groq' as LlmProvider,
   serperKey: '',
   unsplashKey: '',
   pexelsKey: '',
@@ -855,64 +859,65 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
     return data.choices?.[0]?.message?.content?.trim() || '';
   };
 
-  // Primary: Groq llama-3.1-8b-instant (modèle direct, pas de compound routing)
-  if (config.groqKey) {
+  // Appel Groq avec retry
+  const callGroq = async (): Promise<string> => {
+    if (!config.groqKey) return '';
     await enforceRateLimit(truncatedPrompt.length);
-    try {
-      const result = await retryWithBackoff(async () => {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
-          body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
-            messages: [
-              { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-              { role: 'user', content: truncatedPrompt }
-            ],
-            temperature: 0.7,
-            max_tokens: 1024,
-          }),
-        });
-        console.log('🧠 callLLM: Groq response status:', res.status);
-        if (res.ok) {
-          const data = await res.json();
-          const content = data.choices?.[0]?.message?.content;
-          if (content?.trim()) return content;
-          throw { status: 500, message: 'Empty response from LLM' };
-        }
-        const errorText = await res.text();
-        let errorObj: any;
-        try { errorObj = JSON.parse(errorText); } catch { errorObj = { message: errorText }; }
-        const error = { status: res.status, message: errorObj.error?.message || errorText, code: errorObj.error?.code };
-        const apiError = detectApiError(error, 'groq');
-        if (apiError) apiErrorState.recordError(apiError);
-        throw error;
-      }, isRateLimitError, MAX_RETRIES);
-      if (result) return result;
-    } catch (error: any) {
-      console.warn('⚠️ Groq failed, trying fallbacks...', error?.message);
-      if (isRateLimitError(error)) {
-        // Fallback 1: Gemini (1M TPM gratuit)
-        const gemini = await callGemini();
-        if (gemini) { console.log('✅ Gemini fallback success'); return gemini; }
-        // Fallback 2: NVIDIA NIM
-        const nvidia = await callNvidia();
-        if (nvidia) { console.log('✅ NVIDIA NIM fallback success'); return nvidia; }
-        // Fallback 3: OpenRouter
-        const or = await callOpenRouter();
-        if (or) { console.log('✅ OpenRouter fallback success'); return or; }
+    return await retryWithBackoff(async () => {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          messages: [
+            { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+            { role: 'user', content: truncatedPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 1024,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const content = data.choices?.[0]?.message?.content;
+        if (content?.trim()) return content;
+        throw { status: 500, message: 'Empty response from LLM' };
       }
+      const errorText = await res.text();
+      let errorObj: any;
+      try { errorObj = JSON.parse(errorText); } catch { errorObj = { message: errorText }; }
+      const error = { status: res.status, message: errorObj.error?.message || errorText, code: errorObj.error?.code };
+      const apiError = detectApiError(error, 'groq');
+      if (apiError) apiErrorState.recordError(apiError);
       throw error;
+    }, isRateLimitError, MAX_RETRIES);
+  };
+
+  // Ordre des providers selon le choix de l'utilisateur
+  const defaultLlm = config.defaultLlm || 'groq';
+  const providerOrder: Array<() => Promise<string>> = [];
+
+  // Le provider par défaut en premier
+  if (defaultLlm === 'groq')        providerOrder.push(callGroq);
+  else if (defaultLlm === 'gemini') providerOrder.push(() => callGemini());
+  else if (defaultLlm === 'nvidia') providerOrder.push(() => callNvidia());
+  else if (defaultLlm === 'openrouter') providerOrder.push(() => callOpenRouter());
+
+  // Puis les autres en fallback
+  if (defaultLlm !== 'groq')        providerOrder.push(callGroq);
+  if (defaultLlm !== 'gemini')      providerOrder.push(() => callGemini());
+  if (defaultLlm !== 'nvidia')      providerOrder.push(() => callNvidia());
+  if (defaultLlm !== 'openrouter')  providerOrder.push(() => callOpenRouter());
+
+  for (const fn of providerOrder) {
+    try {
+      const result = await fn();
+      if (result) return result;
+    } catch (err: any) {
+      if (!isRateLimitError(err)) throw err;
+      console.warn(`⚠️ LLM rate limit, essai du suivant...`);
     }
   }
-
-  // Pas de Groq — essayer directement dans l'ordre
-  const gemini = await callGemini();
-  if (gemini) return gemini;
-  const nvidia = await callNvidia();
-  if (nvidia) return nvidia;
-  const or = await callOpenRouter();
-  if (or) return or;
 
   console.error('❌ callLLM: No LLM available (configure Gemini, NVIDIA NIM, OpenRouter or Groq)');
   return '';
