@@ -76,6 +76,7 @@ export interface ApiConfig {
   groqKey: string;
   openrouterKey: string;
   geminiKey: string;
+  nvidiaKey: string;
   serperKey: string;
   unsplashKey: string;
   pexelsKey: string;
@@ -106,6 +107,7 @@ export const defaultApiConfig: ApiConfig = {
   groqKey: '', 
   openrouterKey: '',
   geminiKey: '',
+  nvidiaKey: '',
   serperKey: '',
   unsplashKey: '',
   pexelsKey: '',
@@ -786,6 +788,27 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
   console.log('🧠 callLLM: Starting LLM call');
   const truncatedPrompt = prompt.slice(0, 4000);
 
+  // Helper: NVIDIA NIM (40 RPM gratuit, OpenAI-compatible)
+  const callNvidia = async (maxTokens = 1024): Promise<string> => {
+    if (!config.nvidiaKey) return '';
+    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.nvidiaKey}` },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-8b-instruct',
+        messages: [
+          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+          { role: 'user', content: truncatedPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens,
+      }),
+    });
+    if (!res.ok) { console.warn('NVIDIA NIM error:', res.status); return ''; }
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim() || '';
+  };
+
   // Helper: appel Gemini (1M TPM gratuit, OpenAI-compatible)
   const callGemini = async (maxTokens = 1024): Promise<string> => {
     if (!config.geminiKey) return '';
@@ -872,7 +895,10 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
         // Fallback 1: Gemini (1M TPM gratuit)
         const gemini = await callGemini();
         if (gemini) { console.log('✅ Gemini fallback success'); return gemini; }
-        // Fallback 2: OpenRouter
+        // Fallback 2: NVIDIA NIM
+        const nvidia = await callNvidia();
+        if (nvidia) { console.log('✅ NVIDIA NIM fallback success'); return nvidia; }
+        // Fallback 3: OpenRouter
         const or = await callOpenRouter();
         if (or) { console.log('✅ OpenRouter fallback success'); return or; }
       }
@@ -880,13 +906,15 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
     }
   }
 
-  // Pas de Groq — essayer directement Gemini puis OpenRouter
+  // Pas de Groq — essayer directement dans l'ordre
   const gemini = await callGemini();
   if (gemini) return gemini;
+  const nvidia = await callNvidia();
+  if (nvidia) return nvidia;
   const or = await callOpenRouter();
   if (or) return or;
 
-  console.error('❌ callLLM: No LLM available (configure Gemini, OpenRouter or Groq)');
+  console.error('❌ callLLM: No LLM available (configure Gemini, NVIDIA NIM, OpenRouter or Groq)');
   return '';
 }
 
@@ -907,6 +935,26 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
         ],
         temperature: 0.7,
         max_tokens: 8192,
+      }),
+    });
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim() || '';
+  };
+
+  const callNvidiaWeb = async (): Promise<string> => {
+    if (!config.nvidiaKey) return '';
+    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.nvidiaKey}` },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-8b-instruct',
+        messages: [
+          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+          { role: 'user', content: truncatedPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 4096,
       }),
     });
     if (!res.ok) return '';
@@ -971,6 +1019,8 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
       if (isRateLimitError(error)) {
         const gemini = await callGemini();
         if (gemini) { console.log('✅ Website: Gemini fallback success'); return gemini; }
+        const nvidia = await callNvidiaWeb();
+        if (nvidia) { console.log('✅ Website: NVIDIA NIM fallback success'); return nvidia; }
         const or = await callOpenRouter();
         if (or) { console.log('✅ Website: OpenRouter fallback success'); return or; }
       }
@@ -980,6 +1030,8 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
 
   const gemini = await callGemini();
   if (gemini) return gemini;
+  const nvidia = await callNvidiaWeb();
+  if (nvidia) return nvidia;
   const or = await callOpenRouter();
   if (or) return or;
   return '';

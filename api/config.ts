@@ -37,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data, error } = await supabase.from('api_config').select('*').eq('id', 1).single();
     if (error || !data) {
       return res.json({
-        groqKey: '', openrouterKey: '', geminiKey: '', serperKey: '',
+        groqKey: '', openrouterKey: '', geminiKey: '', nvidiaKey: '', serperKey: '',
         gmailSmtpHost: 'smtp.gmail.com', gmailSmtpPort: 587,
         gmailSmtpUser: '', gmailSmtpPassword: '',
         gmailSmtpFromName: '', gmailSmtpFromEmail: '', gmailSmtpSecure: false
@@ -47,6 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       groqKey: data.groq_key || '',
       openrouterKey: data.openrouter_key || '',
       geminiKey: data.gemini_key || '',
+      nvidiaKey: data.nvidia_key || '',
       serperKey: data.serper_key || '',
       gmailSmtpHost: data.gmail_smtp_host || 'smtp.gmail.com',
       gmailSmtpPort: data.gmail_smtp_port || 587,
@@ -70,6 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       groq_key: body.groqKey || null,
       openrouter_key: body.openrouterKey || null,
       gemini_key: body.geminiKey || null,
+      nvidia_key: body.nvidiaKey || null,
       serper_key: body.serperKey || null,
       gmail_smtp_host: body.gmailSmtpHost || 'smtp.gmail.com',
       gmail_smtp_port: body.gmailSmtpPort || 587,

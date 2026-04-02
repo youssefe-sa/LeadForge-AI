@@ -182,6 +182,30 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
       },
     },
     {
+      id: 'nvidia', title: 'NVIDIA NIM', icon: '⚡', color: '#76B900',
+      required: false,
+      agents: ['Agent 1', 'Agent 2', 'Agent 3', 'Agent 4'],
+      shortDesc: 'LLM NVIDIA — 40 RPM gratuit, modèles Llama',
+      longDesc: 'NVIDIA NIM offre Llama 3.1 8B et d\'autres modèles via une API OpenAI-compatible. Gratuit avec 40 requêtes/minute. Utilisé comme fallback si Groq et Gemini sont indisponibles.',
+      whyNeeded: 'OPTIONNEL. 4ème fallback dans la chaîne LLM pour une disponibilité maximale.',
+      freeInfo: '✅ GRATUIT — 40 RPM — Aucune carte bancaire requise.',
+      fields: [
+        { key: 'nvidiaKey', label: 'API Key', masked: true, placeholder: 'nvapi-xxxxxxxxxxxxxxxxxxxx',
+          helpUrl: 'https://build.nvidia.com',
+          helpText: 'build.nvidia.com → Get API Key → Copier → Coller ici' },
+      ],
+      testFn: async (c) => {
+        if (!c.nvidiaKey) return { ok: false, msg: '❌ Aucune clé' };
+        const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+          method: 'POST', headers: { 'Authorization': `Bearer ${c.nvidiaKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'meta/llama-3.1-8b-instruct', messages: [{ role: 'user', content: 'Say OK' }], max_tokens: 10 }),
+        });
+        if (res.ok) return { ok: true, msg: '✅ NVIDIA NIM opérationnel !' };
+        if (res.status === 429) return { ok: true, msg: '✅ Clé valide ! (limite RPM momentanée)' };
+        return { ok: false, msg: `❌ Erreur ${res.status}: Clé invalide` };
+      },
+    },
+    {
       id: 'gemini', title: 'Google Gemini', icon: '✨', color: '#1A73E8',
       required: false,
       agents: ['Agent 1', 'Agent 2', 'Agent 3', 'Agent 4'],
