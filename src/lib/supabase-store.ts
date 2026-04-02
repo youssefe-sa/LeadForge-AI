@@ -791,7 +791,7 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
           body: JSON.stringify({
-            model: 'gemma2-9b-it',
+            model: 'llama-3.1-8b-instant',
             messages: [
               { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
               { role: 'user', content: prompt.slice(0, 4000) }
@@ -869,7 +869,7 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
           body: JSON.stringify({
-            model: 'gemma2-9b-it',
+            model: 'llama-3.1-8b-instant',
             messages: [
               { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
               { role: 'user', content: prompt.slice(0, 4000) }
