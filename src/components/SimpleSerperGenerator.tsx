@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { configService } from '../lib/supabase';
 
 export default function SimpleSerperGenerator({ onClose }: { onClose: () => void }) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -40,13 +41,21 @@ export default function SimpleSerperGenerator({ onClose }: { onClose: () => void
     window.open('https://serper.dev/dashboard', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
   };
 
-  const saveApiKey = () => {
+  const saveApiKey = async () => {
     setIsLoading(true);
     
     // Sauvegarder dans localStorage
     const currentConfig = JSON.parse(localStorage.getItem('apiConfig') || '{}');
     currentConfig.serperKey = apiKey;
     localStorage.setItem('apiConfig', JSON.stringify(currentConfig));
+    
+    // Sauvegarder aussi dans Supabase
+    try {
+      await configService.update({ serperKey: apiKey });
+      console.log('✅ Clé Serper sauvegardée dans Supabase');
+    } catch (err) {
+      console.error('❌ Erreur sauvegarde Supabase:', err);
+    }
     
     // Dispatch event pour synchroniser avec Settings
     window.dispatchEvent(new CustomEvent('apiConfigUpdated', { detail: { serperKey: apiKey } }));
