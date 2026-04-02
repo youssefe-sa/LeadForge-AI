@@ -8,9 +8,7 @@ const C = {
   green: '#1A7A4A', blue: '#1A4FA0', amber: '#B45309', red: '#C0392B',
 };
 
-const API_BASE = import.meta.env.VITE_APP_URL
-  ? `${import.meta.env.VITE_APP_URL}/api`
-  : '/api';
+const API_BASE = '/api';
 
 interface Props {
   leads: Lead[];
