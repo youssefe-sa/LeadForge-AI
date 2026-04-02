@@ -914,8 +914,11 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
       const result = await fn();
       if (result) return result;
     } catch (err: any) {
-      if (!isRateLimitError(err)) throw err;
-      console.warn(`⚠️ LLM rate limit, essai du suivant...`);
+      // CORS / network errors (NVIDIA NIM, etc.) → ne pas re-throw, essayer le suivant
+      const msg = String(err?.message || err).toLowerCase();
+      const isCors = msg.includes('failed to fetch') || msg.includes('cors') || msg.includes('network');
+      if (!isRateLimitError(err) && !isCors) throw err;
+      console.warn(`⚠️ LLM provider indisponible (${isCors ? 'CORS/réseau' : 'rate limit'}), essai du suivant...`);
     }
   }
 
@@ -1021,15 +1024,19 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
       }, isRateLimitError, MAX_RETRIES);
       if (result) return result;
     } catch (error: any) {
-      if (isRateLimitError(error)) {
+      const msg = String(error?.message || error).toLowerCase();
+      const isCors = msg.includes('failed to fetch') || msg.includes('cors') || msg.includes('network');
+      if (isRateLimitError(error) || isCors) {
+        console.warn(`⚠️ Website LLM: ${isCors ? 'CORS/réseau' : 'rate limit'}, fallback...`);
         const gemini = await callGemini();
         if (gemini) { console.log('✅ Website: Gemini fallback success'); return gemini; }
-        const nvidia = await callNvidiaWeb();
+        const nvidia = await callNvidiaWeb().catch(() => '');
         if (nvidia) { console.log('✅ Website: NVIDIA NIM fallback success'); return nvidia; }
         const or = await callOpenRouter();
         if (or) { console.log('✅ Website: OpenRouter fallback success'); return or; }
+      } else {
+        throw error;
       }
-      throw error;
     }
   }
 
