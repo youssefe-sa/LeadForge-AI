@@ -214,7 +214,8 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     if (currentImages.length < 3 && hasImages) {
       setStep('📸 Recherche images de stock...');
       const merged = { ...lead, ...updates };
-      const query = `${merged.sector || merged.name} ${merged.city || 'business'}`;
+      // Inclure le nom du business pour éviter les images identiques entre prospects
+      const query = `${merged.name} ${merged.sector || ''} ${merged.city || ''}`.trim();
       let stockImages: string[] = [];
       if (apiConfig.unsplashKey) stockImages = await searchUnsplash(apiConfig.unsplashKey, query);
       if (stockImages.length === 0 && apiConfig.pexelsKey) stockImages = await searchPexels(apiConfig.pexelsKey, query);

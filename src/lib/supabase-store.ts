@@ -1125,7 +1125,7 @@ export async function enrichWithSerper(apiKey: string, lead: Lead): Promise<Part
           // Données de base
           if (!lead.address) updates.address = safeStr(place.address);
           if (!lead.phone) updates.phone = safeStr(place.phoneNumber || place.phone);
-          if (!lead.website) updates.website = safeStr(place.website);
+          if (!lead.website) updates.website = safeStr(place.website || place.websiteUri || place.domain || place.url);
           if (!lead.googleRating) updates.googleRating = safeNum(place.rating);
           if (!lead.googleReviews) updates.googleReviews = safeNum(place.ratingCount || place.reviewCount);
           if (!lead.sector) updates.sector = safeStr(place.category || place.type);
@@ -1146,11 +1146,21 @@ export async function enrichWithSerper(apiKey: string, lead: Lead): Promise<Part
             if (parts.length >= 2) updates.city = parts[parts.length - 2] || '';
           }
 
-          // Horaires d'ouverture
-          const hours = safeStr(place.hours || place.openingHours);
-          if (hours) {
-            updates.serperHours = hours;
-            if (!lead.hours) updates.hours = hours;
+          // Horaires d'ouverture — gère string ET objet {Monday:..., Tuesday:...}
+          const rawHours = place.hours || place.openingHours || place.openHours || place.workHours;
+          let hoursStr = '';
+          if (rawHours && typeof rawHours === 'object' && !Array.isArray(rawHours)) {
+            hoursStr = Object.entries(rawHours as Record<string, unknown>)
+              .map(([day, val]) => `${day}: ${val}`)
+              .join(' | ');
+          } else if (Array.isArray(rawHours)) {
+            hoursStr = (rawHours as unknown[]).map(h => safeStr(h)).filter(Boolean).join(' | ');
+          } else {
+            hoursStr = safeStr(rawHours);
+          }
+          if (hoursStr && hoursStr !== '[object Object]') {
+            updates.serperHours = hoursStr;
+            if (!lead.hours) updates.hours = hoursStr;
           }
 
           // Logo et images
@@ -1235,10 +1245,16 @@ export async function enrichWithSerper(apiKey: string, lead: Lead): Promise<Part
         const attrs = kgObj.attributes;
         if (attrs && typeof attrs === 'object') {
           const attrsObj = attrs as Record<string, unknown>;
-          const horaires = attrsObj['Horaires'] || attrsObj['Hours'] || attrsObj['Opening hours'] || attrsObj['horaires'];
+          const horaires = attrsObj['Horaires'] || attrsObj['Hours'] || attrsObj['Opening hours'] || attrsObj['horaires']
+            || attrsObj["Heures d'ouverture"] || attrsObj['Opening Hours'] || attrsObj['Business hours'] || attrsObj['Work hours'];
           if (horaires) {
-            updates.serperHours = safeStr(horaires);
-            if (!lead.hours) updates.hours = safeStr(horaires);
+            const hStr = typeof horaires === 'object' && !Array.isArray(horaires)
+              ? Object.entries(horaires as Record<string, unknown>).map(([d, v]) => `${d}: ${v}`).join(' | ')
+              : safeStr(horaires);
+            if (hStr && hStr !== '[object Object]') {
+              updates.serperHours = hStr;
+              if (!lead.hours && !updates.hours) updates.hours = hStr;
+            }
           }
         }
       }
@@ -1475,7 +1491,7 @@ export async function extractWithLLM(
     websiteContent: string;
   }
 ): Promise<Partial<Lead>> {
-  if (!apiConfig.groqKey) return {};
+  if (!apiConfig.groqKey && !apiConfig.geminiKey && !apiConfig.nvidiaKey && !apiConfig.openrouterKey) return {};
 
   const merged = { ...lead };
   const kgStr = Object.keys(context.kgData).length > 0
@@ -1660,22 +1676,15 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
           if (img && typeof img === 'object') {
             const imgObj = img as Record<string, unknown>;
             const url = safeStr(imgObj.imageUrl || imgObj.thumbnailUrl);
-            
-            // Vérifier si c'est probablement un logo (taille, aspect ratio, nom)
-            if (url && url.startsWith('http')) {
-              const isLogo = url.toLowerCase().includes('logo') || 
-                           query.toLowerCase().includes('logo') ||
-                           (imgObj.title && safeStr(imgObj.title).toLowerCase().includes('logo'));
-              
-              if (isLogo && !result.logo) {
-                result.logo = url;
-                console.log(`✅ Logo found: ${url}`);
-                break; // Prendre le premier logo trouvé
-              }
+            // Toutes les requêtes contiennent "logo" → prendre le premier résultat valide
+            if (url && url.startsWith('http') && !result.logo) {
+              result.logo = url;
+              console.log(`✅ Logo found: ${url}`);
+              break;
             }
           }
         }
-        if (result.logo) break; // Arrêter si on a trouvé un logo
+        if (result.logo) break;
       }
     } catch (error) {
       console.error(`❌ Logo search failed for query: ${query}`, error);
@@ -1713,11 +1722,12 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
     }
   }
 
-  // 3. Images professionnelles du secteur
+  // 3. Images professionnelles — spécifiques au business d'abord, secteur ensuite
   if (result.websiteImages.length < 6) {
     try {
       const professionalQueries = [
-        `${lead.sector || lead.name} ${lead.city || ''} professionnel`,
+        `"${lead.name}" ${lead.city || ''} ${lead.sector || ''}`.trim(),
+        `${lead.name} ${lead.sector || ''} ${lead.city || ''} professionnel`.trim(),
         `${lead.sector || lead.name} ${lead.city || ''} travail`,
         `${lead.sector || lead.name} ${lead.city || ''} entreprise`
       ];
@@ -1963,7 +1973,8 @@ export function exportLeadsCSV(leads: Lead[], filename: string = 'leads_export.c
 export async function searchUnsplash(key: string, query: string): Promise<string[]> {
   if (!key) return [];
   try {
-    const res = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=6&client_id=${key}`);
+    const page = Math.floor(Math.random() * 3) + 1;
+    const res = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=6&page=${page}&client_id=${key}`);
     if (res.ok) {
       const data = await res.json();
       return (data.results || []).map((r: { urls: { regular: string } }) => safeStr(r?.urls?.regular)).filter(Boolean);
@@ -1976,7 +1987,8 @@ export async function searchUnsplash(key: string, query: string): Promise<string
 export async function searchPexels(key: string, query: string): Promise<string[]> {
   if (!key) return [];
   try {
-    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=6`, {
+    const page = Math.floor(Math.random() * 3) + 1;
+    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=6&page=${page}`, {
       headers: { 'Authorization': key },
     });
     if (res.ok) {
