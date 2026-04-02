@@ -144,7 +144,7 @@ export default function WebsiteGen({ leads, updateLead, apiConfig }: Props) {
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const hasLLM = !!apiConfig.groqKey;
+  const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.openrouterKey);
   const enriched = leads.filter(l => l.score > 0 && !l.siteGenerated);
   const generated = leads.filter(l => l.siteGenerated);
   const previewLead = useMemo(() => leads.find(l => l.id === previewId) || null, [leads, previewId]);

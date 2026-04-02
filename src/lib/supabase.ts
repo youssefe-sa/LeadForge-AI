@@ -267,6 +267,7 @@ export const configService = {
       return {
         groqKey: '',
         openrouterKey: '',
+        geminiKey: '',
         serperKey: '',
         unsplashKey: '',
         pexelsKey: '',
@@ -283,6 +284,7 @@ export const configService = {
     return {
       groqKey: data.groq_key || '',
       openrouterKey: data.openrouter_key || '',
+      geminiKey: data.gemini_key || '',
       serperKey: data.serper_key || '',
       unsplashKey: data.unsplash_key || '',
       pexelsKey: data.pexels_key || '',
@@ -299,6 +301,8 @@ export const configService = {
   async update(config: any) {
     const row: any = {
       groq_key: config.groqKey || null,
+      openrouter_key: config.openrouterKey || null,
+      gemini_key: config.geminiKey || null,
       serper_key: config.serperKey || null,
       gmail_smtp_host: config.gmailSmtpHost || 'smtp.gmail.com',
       gmail_smtp_port: Number(config.gmailSmtpPort) || 587,

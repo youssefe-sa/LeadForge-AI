@@ -159,16 +159,16 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
     // GROQ
     {
       id: 'groq', title: 'Groq (Llama)', icon: '🚀', color: C.accent,
-      required: true,
+      required: false,
       agents: ['Agent 1', 'Agent 2', 'Agent 3', 'Agent 4'],
-      shortDesc: 'LLM ultra-rapide — Agent principal',
-      longDesc: 'Groq est une plateforme qui offre des modèles LLM (Llama, Mixtral, etc.) avec une vitesse d\'inférence exceptionnelle. Utilisé pour tous les agents IA : analyse de leads, scoring, génération de sites, emails personnalisés.',
-      whyNeeded: 'OBLIGATOIRE. Sans Groq, aucun agent IA ne fonctionne. C\'est le moteur principal de l\'application.',
-      freeInfo: '✅ GRATUIT — Très généreux : ~10 000 requêtes/jour avec modèles Llama 3.1 8B.',
+      shortDesc: 'LLM rapide — Optionnel si Gemini configuré',
+      longDesc: 'Groq offre des modèles LLM très rapides. Si tu as un rate limit, configure Gemini qui a 1M TPM gratuit.',
+      whyNeeded: 'OPTIONNEL si Gemini est configuré. Groq est utilisé en priorité, Gemini en fallback automatique.',
+      freeInfo: '✅ GRATUIT — Tier on_demand : 6K TPM. Active Dev Tier (gratuit) pour 250K TPM.',
       fields: [
         { key: 'groqKey', label: 'API Key', masked: true, placeholder: 'gsk_xxxxxxxxxxxxxxxxxxxx',
           helpUrl: 'https://console.groq.com/keys',
-          helpText: 'console.groq.com → Keys → Create Key → Choisissez Llama 3.1 8B → Copiez la clé' },
+          helpText: 'console.groq.com → Keys → Create Key' },
       ],
       testFn: async (c) => {
         if (!c.groqKey) return { ok: false, msg: '❌ Aucune clé' };
@@ -177,7 +177,30 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
           method: 'POST', headers: { 'Authorization': `Bearer ${c.groqKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: 'Say OK' }], max_tokens: 10 }),
         });
-        if (res.ok) return { ok: true, msg: '✅ Groq opérationnel ! LLM ultra-rapide prêt.' };
+        if (res.ok) return { ok: true, msg: '✅ Groq opérationnel !' };
+        return { ok: false, msg: `❌ Erreur ${res.status}: Clé invalide` };
+      },
+    },
+    {
+      id: 'gemini', title: 'Google Gemini', icon: '✨', color: '#1A73E8',
+      required: false,
+      agents: ['Agent 1', 'Agent 2', 'Agent 3', 'Agent 4'],
+      shortDesc: 'LLM gratuit — 1 Million TPM sans limite !',
+      longDesc: 'Google Gemini 2.0 Flash Lite est gratuit avec 1 million de tokens par minute. C\'est le meilleur choix pour éviter les rate limits. Utilisé automatiquement en fallback si Groq est limité.',
+      whyNeeded: 'RECOMMANDÉ. Résout définitivement les problèmes de rate limit. Clé gratuite en 30 secondes.',
+      freeInfo: '✅ 100% GRATUIT — 1 000 000 TPM — Aucune carte bancaire requise.',
+      fields: [
+        { key: 'geminiKey', label: 'API Key', masked: true, placeholder: 'AIzaSy...',
+          helpUrl: 'https://aistudio.google.com/apikey',
+          helpText: 'aistudio.google.com → Create API Key → Copier → Coller ici' },
+      ],
+      testFn: async (c) => {
+        if (!c.geminiKey) return { ok: false, msg: '❌ Aucune clé' };
+        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+          method: 'POST', headers: { 'Authorization': `Bearer ${c.geminiKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'gemini-2.0-flash-lite', messages: [{ role: 'user', content: 'Say OK' }], max_tokens: 10 }),
+        });
+        if (res.ok) return { ok: true, msg: '✅ Gemini opérationnel ! 1M TPM gratuit actif.' };
         return { ok: false, msg: `❌ Erreur ${res.status}: Clé invalide` };
       },
     },

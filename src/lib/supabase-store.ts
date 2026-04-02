@@ -75,6 +75,7 @@ export interface Lead {
 export interface ApiConfig {
   groqKey: string;
   openrouterKey: string;
+  geminiKey: string;
   serperKey: string;
   unsplashKey: string;
   pexelsKey: string;
@@ -104,6 +105,7 @@ export interface EmailTemplate {
 export const defaultApiConfig: ApiConfig = {
   groqKey: '', 
   openrouterKey: '',
+  geminiKey: '',
   serperKey: '',
   unsplashKey: '',
   pexelsKey: '',
@@ -784,8 +786,29 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
   console.log('🧠 callLLM: Starting LLM call');
   const truncatedPrompt = prompt.slice(0, 4000);
 
-  // Helper: appel OpenRouter avec modèle gratuit
-  const callOpenRouter = async (): Promise<string> => {
+  // Helper: appel Gemini (1M TPM gratuit, OpenAI-compatible)
+  const callGemini = async (maxTokens = 1024): Promise<string> => {
+    if (!config.geminiKey) return '';
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.geminiKey}` },
+      body: JSON.stringify({
+        model: 'gemini-2.0-flash-lite',
+        messages: [
+          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+          { role: 'user', content: truncatedPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens,
+      }),
+    });
+    if (!res.ok) { console.warn('Gemini error:', res.status); return ''; }
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim() || '';
+  };
+
+  // Helper: appel OpenRouter (modèles gratuits)
+  const callOpenRouter = async (maxTokens = 1024): Promise<string> => {
     if (!config.openrouterKey) return '';
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -801,7 +824,7 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
           { role: 'user', content: truncatedPrompt }
         ],
         temperature: 0.7,
-        max_tokens: 1024,
+        max_tokens: maxTokens,
       }),
     });
     if (!res.ok) return '';
@@ -844,27 +867,52 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
       }, isRateLimitError, MAX_RETRIES);
       if (result) return result;
     } catch (error: any) {
-      console.warn('⚠️ Groq failed, trying OpenRouter fallback...', error?.message);
-      // Fallback OpenRouter si rate limit persistant
+      console.warn('⚠️ Groq failed, trying fallbacks...', error?.message);
       if (isRateLimitError(error)) {
-        const fallback = await callOpenRouter();
-        if (fallback) { console.log('✅ OpenRouter fallback success'); return fallback; }
+        // Fallback 1: Gemini (1M TPM gratuit)
+        const gemini = await callGemini();
+        if (gemini) { console.log('✅ Gemini fallback success'); return gemini; }
+        // Fallback 2: OpenRouter
+        const or = await callOpenRouter();
+        if (or) { console.log('✅ OpenRouter fallback success'); return or; }
       }
       throw error;
     }
   }
 
-  // Fallback: OpenRouter
-  const orResult = await callOpenRouter();
-  if (orResult) return orResult;
+  // Pas de Groq — essayer directement Gemini puis OpenRouter
+  const gemini = await callGemini();
+  if (gemini) return gemini;
+  const or = await callOpenRouter();
+  if (or) return or;
 
-  console.error('❌ callLLM: No LLM available');
+  console.error('❌ callLLM: No LLM available (configure Gemini, OpenRouter or Groq)');
   return '';
 }
 
 // --- LLM FOR FULL WEBSITE GENERATION (higher token limit) ---
 export async function callLLMForWebsite(config: ApiConfig, prompt: string, systemPrompt?: string): Promise<string> {
   const truncatedPrompt = prompt.slice(0, 4000);
+
+  const callGemini = async (): Promise<string> => {
+    if (!config.geminiKey) return '';
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.geminiKey}` },
+      body: JSON.stringify({
+        model: 'gemini-2.0-flash-lite',
+        messages: [
+          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+          { role: 'user', content: truncatedPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 8192,
+      }),
+    });
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim() || '';
+  };
 
   const callOpenRouter = async (): Promise<string> => {
     if (!config.openrouterKey) return '';
@@ -882,7 +930,7 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
           { role: 'user', content: truncatedPrompt }
         ],
         temperature: 0.7,
-        max_tokens: 4096,
+        max_tokens: 8192,
       }),
     });
     if (!res.ok) return '';
@@ -921,15 +969,19 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
       if (result) return result;
     } catch (error: any) {
       if (isRateLimitError(error)) {
-        const fallback = await callOpenRouter();
-        if (fallback) { console.log('✅ Website: OpenRouter fallback success'); return fallback; }
+        const gemini = await callGemini();
+        if (gemini) { console.log('✅ Website: Gemini fallback success'); return gemini; }
+        const or = await callOpenRouter();
+        if (or) { console.log('✅ Website: OpenRouter fallback success'); return or; }
       }
       throw error;
     }
   }
 
-  const orResult = await callOpenRouter();
-  if (orResult) return orResult;
+  const gemini = await callGemini();
+  if (gemini) return gemini;
+  const or = await callOpenRouter();
+  if (or) return or;
   return '';
 }
 
