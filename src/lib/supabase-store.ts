@@ -154,7 +154,7 @@ function mapSupabaseLeadToLead(supabaseLead: Database['public']['Tables']['leads
     images: supabaseLead.images || [],
     siteGenerated: supabaseLead.site_generated || false,
     siteUrl: supabaseLead.site_url || '',
-    siteHtml: supabaseLead.site_html || '',
+    siteHtml: (supabaseLead as Record<string, unknown>)['site_html'] as string || '',
     landingUrl: supabaseLead.landing_url || '',
     emailSent: supabaseLead.email_sent || false,
     emailSentDate: supabaseLead.email_sent_date || '',
@@ -222,7 +222,7 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
     temperature: lead.temperature || undefined,
     tags: lead.tags || undefined,
     generated_prompt: lead.generatedPrompt || undefined,
-    site_html: lead.siteHtml || undefined,
+    ...(lead.siteHtml ? { site_html: lead.siteHtml } : {}),
   };
 }
 
@@ -1268,14 +1268,16 @@ const extractPhone = (text: string): string => {
   return match ? match[0].replace(/[\s.\-]/g, ' ').trim() : '';
 };
 
-const snippetsText = (organic: unknown[]): string =>
-  organic.map((x: unknown) => {
+const snippetsText = (organic: unknown[] | undefined): string => {
+  if (!organic || !Array.isArray(organic)) return '';
+  return organic.map((x: unknown) => {
     if (x && typeof x === 'object') {
       const o = x as Record<string, unknown>;
       return `${safeStr(o.snippet)} ${safeStr(o.title)} ${safeStr(o.link)}`;
     }
     return '';
   }).join(' ');
+};
 
 // --- SCRAPE WEBSITE CONTACT PAGES ---
 export async function scrapeWebsiteForContact(
@@ -1292,21 +1294,21 @@ export async function scrapeWebsiteForContact(
   // Stratégie 1 : page contact
   try {
     const r = await serperFetch(serperKey, 'search', { q: `site:${domain} (contact OR "nous contacter" OR "contactez-nous")`, gl: 'fr', hl: 'fr', num: 5 });
-    if (r?.organic) allText.push(snippetsText(r.organic));
+    if (r?.organic && Array.isArray(r.organic)) allText.push(snippetsText(r.organic));
   } catch { /* continue */ }
 
   // Stratégie 2 : pages légales / à propos
   try {
     const r = await serperFetch(serperKey, 'search', { q: `site:${domain} ("mentions légales" OR "about" OR "à propos" OR "qui sommes")`, gl: 'fr', hl: 'fr', num: 5 });
-    if (r?.organic) allText.push(snippetsText(r.organic));
+    if (r?.organic && Array.isArray(r.organic)) allText.push(snippetsText(r.organic));
   } catch { /* continue */ }
 
   // Stratégie 3 : homepage complète indexée
   try {
     const r = await serperFetch(serperKey, 'search', { q: `site:${domain}`, gl: 'fr', hl: 'fr', num: 8 });
-    if (r?.organic) allText.push(snippetsText(r.organic));
-    // Extraire les services depuis les titres de pages
     if (r?.organic && Array.isArray(r.organic)) {
+      allText.push(snippetsText(r.organic));
+      // Extraire les services depuis les titres de pages
       const titles = r.organic.map((x: unknown) => {
         if (x && typeof x === 'object') return safeStr((x as Record<string, unknown>).title);
         return '';
@@ -1422,7 +1424,7 @@ export async function deepSearchContact(
     try {
       const domain = lead.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
       const r = await serperFetch(serperKey, 'search', { q: `site:${domain} email contact "@"`, gl: 'fr', hl: 'fr' });
-      if (r?.organic) {
+      if (r?.organic && Array.isArray(r.organic)) {
         const text = snippetsText(r.organic);
         allSnippets.push(text);
         if (!result.email) result.email = extractEmail(text);
