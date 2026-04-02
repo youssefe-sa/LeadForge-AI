@@ -665,8 +665,8 @@ export function useEmailTemplates() {
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000; // 1 seconde
 const RATE_LIMIT_DELAY_MS = 1000; // Délai minimum entre requêtes (1s)
-const GROQ_TPM_LIMIT = 30000; // Limite tokens par minute Groq (llama3-8b-8192 = 30K TPM)
-const GROQ_TPM_BUFFER = 1000; // Marge de sécurité
+const GROQ_TPM_LIMIT = 6000; // Tier on_demand = 6K TPM (activer Dev Tier pour 250K)
+const GROQ_TPM_BUFFER = 500; // Marge de sécurité
 
 // Timestamp du dernier appel API pour le rate limiting
 let lastApiCallTimestamp = 0;
@@ -745,18 +745,24 @@ async function retryWithBackoff<T>(
         throw error;
       }
       
-      // Vérifier si l'erreur contient un temps d'attente spécifique
+      // Extraire le délai suggéré par l'API (ex: "Please try again in 3.27s")
       const suggestedDelay = extractRetryDelay(lastError);
       
       if (suggestedDelay) {
-        // Utiliser le temps suggéré par l'API + marge de sécurité
-        const delay = suggestedDelay + 500; // Ajouter 500ms de marge
-        console.log(`⏳ Rate limit détecté, attente de ${delay}ms selon suggestion de l'API...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        // Si l'API suggère un délai court (<10s), attendre le reste de la minute pour éviter
+        // de frapper la limite à nouveau immédiatement (TPM = tokens par MINUTE entière)
+        const safeDelay = suggestedDelay < 10000
+          ? Math.max(suggestedDelay + 1000, 62000 - (Date.now() % 60000)) // attendre le reset de la minute
+          : suggestedDelay + 1000;
+        console.log(`⏳ Rate limit Groq — attente ${Math.round(safeDelay/1000)}s pour reset TPM (tentative ${attempt + 1}/${maxRetries})...`);
+        await new Promise(resolve => setTimeout(resolve, safeDelay));
+        // Reset le compteur interne après l'attente
+        tokensUsedInMinute = 0;
+        tokensResetTimestamp = Date.now();
       } else {
-        // Fallback: backoff exponentiel : 1s, 2s, 4s
+        // Fallback: backoff exponentiel
         const delay = BASE_DELAY_MS * Math.pow(2, attempt);
-        console.log(`⏳ Rate limit détecté, retry dans ${delay}ms (tentative ${attempt + 1}/${maxRetries})...`);
+        console.log(`⏳ Retry dans ${delay}ms (tentative ${attempt + 1}/${maxRetries})...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
