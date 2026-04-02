@@ -799,7 +799,7 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.nvidiaKey}` },
       body: JSON.stringify({
-        model: 'meta/llama-3.1-8b-instruct',
+        model: 'meta/llama-3.3-70b-instruct',
         messages: [
           { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
           { role: 'user', content: truncatedPrompt }
@@ -953,7 +953,7 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.nvidiaKey}` },
       body: JSON.stringify({
-        model: 'meta/llama-3.1-8b-instruct',
+        model: 'meta/llama-3.3-70b-instruct',
         messages: [
           { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
           { role: 'user', content: truncatedPrompt }
