@@ -346,7 +346,7 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
               ] as Array<{id: LlmProvider; label: string; icon: string; color: string; desc: string}>).map(p => {
                 const isActive = (config.defaultLlm || 'groq') === p.id;
                 return (
-                  <button key={p.id} onClick={() => handleLocalChange('defaultLlm', p.id)} style={{
+                  <button key={p.id} onClick={() => { handleLocalChange('defaultLlm', p.id); updateConfig({ defaultLlm: p.id }); }} style={{
                     padding: '8px 14px', borderRadius: 6, border: `2px solid ${isActive ? p.color : C.border}`,
                     background: isActive ? p.color + '18' : C.surface,
                     cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 72,
