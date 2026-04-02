@@ -664,8 +664,8 @@ export function useEmailTemplates() {
 // --- RETRY UTILS ---
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000; // 1 seconde
-const RATE_LIMIT_DELAY_MS = 2000; // Délai minimum entre requêtes (2s)
-const GROQ_TPM_LIMIT = 6000; // Limite tokens par minute Groq
+const RATE_LIMIT_DELAY_MS = 1000; // Délai minimum entre requêtes (1s)
+const GROQ_TPM_LIMIT = 30000; // Limite tokens par minute Groq (llama3-8b-8192 = 30K TPM)
 const GROQ_TPM_BUFFER = 1000; // Marge de sécurité
 
 // Timestamp du dernier appel API pour le rate limiting
@@ -791,13 +791,13 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
           body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
+            model: 'llama3-8b-8192',
             messages: [
               { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-              { role: 'user', content: prompt }
+              { role: 'user', content: prompt.slice(0, 4000) }
             ],
             temperature: 0.7,
-            max_tokens: 2048,
+            max_tokens: 1024,
           }),
         });
         
@@ -869,10 +869,10 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
           body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
+            model: 'llama3-8b-8192',
             messages: [
               { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-              { role: 'user', content: prompt }
+              { role: 'user', content: prompt.slice(0, 4000) }
             ],
             temperature: 0.7,
             max_tokens: 1024,
