@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Lead, ApiConfig, EmailTemplate, callLLM } from '../lib/supabase-store';
-import { gmailSmtpService } from '../lib/gmailSmtpService';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -9,11 +8,32 @@ const C = {
   green: '#1A7A4A', blue: '#1A4FA0', amber: '#B45309', red: '#C0392B',
 };
 
+const API_BASE = import.meta.env.VITE_APP_URL
+  ? `${import.meta.env.VITE_APP_URL}/api`
+  : '/api';
+
 interface Props {
   leads: Lead[];
   updateLead: (id: string, updates: Partial<Lead>) => void;
   apiConfig: ApiConfig;
   templates: EmailTemplate[];
+}
+
+async function sendEmailViaApi(payload: {
+  to: string; toName?: string; subject: string; html: string; leadId?: string;
+}): Promise<{ success: boolean; message: string }> {
+  try {
+    const res = await fetch(`${API_BASE}/email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, message: data.message || data.error || 'Erreur serveur' };
+    return { success: true, message: data.message || 'Email envoyé' };
+  } catch (err: unknown) {
+    return { success: false, message: (err as Error).message };
+  }
 }
 
 export default function Outreach({ leads, updateLead, apiConfig, templates }: Props) {
@@ -22,8 +42,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const [logs, setLogs] = useState<string[]>([]);
   const [previewEmail, setPreviewEmail] = useState<{ lead: Lead; subject: string; body: string } | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0]?.id || '');
-  
-  // Test email states
+
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [testEmailSending, setTestEmailSending] = useState(false);
 
@@ -39,7 +58,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       '{city}': lead.city || 'votre ville',
       '{sector}': lead.sector || 'votre secteur',
       '{landingUrl}': lead.landingUrl || lead.siteUrl || '#',
-      '{email}': lead.email,
+      '{email}': lead.email || '',
     };
     let subject = template.subject;
     let body = template.body;
@@ -51,11 +70,9 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   };
 
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
-    // Find best template for sector
     const template = templates.find(t => lead.sector?.toLowerCase().includes(t.sector.toLowerCase())) || templates[templates.length - 1];
     const base = personalizeTemplate(template, lead);
 
-    // If LLM available, personalize further
     if (hasLLM) {
       try {
         const prompt = `Personnalise cet email de prospection B2B. Garde le même format et le lien de la landing page. Réponds UNIQUEMENT en JSON.
@@ -89,21 +106,17 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
 
   const sendOne = async (lead: Lead) => {
     if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
-    if (!lead.email) { alert('Ce lead n\'a pas d\'email'); return; }
+    if (!lead.email) { alert("Ce lead n'a pas d'email"); return; }
 
     const { subject, body } = await generateEmailContent(lead);
-    const htmlBody = body.replace(/\n/g, '<br/>');
-    
-    // Configure Gmail SMTP service
-    gmailSmtpService.setConfig(apiConfig);
-    
-    const result = await gmailSmtpService.sendEmail({
+    const result = await sendEmailViaApi({
       to: lead.email,
       toName: lead.name,
       subject,
-      html: htmlBody,
+      html: body.replace(/\n/g, '<br/>'),
+      leadId: lead.id,
     });
-    
+
     if (result.success) {
       updateLead(lead.id, {
         emailSent: true,
@@ -113,7 +126,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
       });
       setLogs(prev => [...prev, `✅ Email envoyé à ${lead.name} (${lead.email})`]);
     } else {
-      setLogs(prev => [...prev, `❌ Échec d'envoi à ${lead.name} (${lead.email})`]);
+      setLogs(prev => [...prev, `❌ Échec d'envoi à ${lead.name}: ${result.message}`]);
     }
   };
 
@@ -125,21 +138,17 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
     setProgress({ current: 0, total: ready.length, name: '' });
     setLogs(prev => [...prev, `🚀 Début de l'envoi de ${ready.length} emails...`]);
 
-    // Configure Gmail SMTP service
-    gmailSmtpService.setConfig(apiConfig);
-
     for (let i = 0; i < ready.length; i++) {
       const lead = ready[i];
       setProgress({ current: i + 1, total: ready.length, name: lead.name });
 
       const { subject, body } = await generateEmailContent(lead);
-      const htmlBody = body.replace(/\n/g, '<br/>');
-      
-      const result = await gmailSmtpService.sendEmail({
-        to: lead.email,
+      const result = await sendEmailViaApi({
+        to: lead.email!,
         toName: lead.name,
         subject,
-        html: htmlBody,
+        html: body.replace(/\n/g, '<br/>'),
+        leadId: lead.id,
       });
 
       if (result.success) {
@@ -151,10 +160,9 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         });
         setLogs(prev => [...prev, `✅ ${lead.name} — envoyé`]);
       } else {
-        setLogs(prev => [...prev, `❌ ${lead.name} — échec`]);
+        setLogs(prev => [...prev, `❌ ${lead.name} — ${result.message}`]);
       }
 
-      // Rate limit: 1 email per 2 seconds
       if (i < ready.length - 1) await new Promise(r => setTimeout(r, 2000));
     }
 
@@ -162,14 +170,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
     setSending(false);
   };
 
-  // Send test email function
   const sendTestEmail = async () => {
-    if (!hasGmailSmtp) { 
-      alert('Configurez Gmail SMTP dans les Paramètres'); 
-      console.log('Debug hasGmailSmtp:', hasGmailSmtp);
-      console.log('Debug apiConfig:', apiConfig);
-      return; 
-    }
+    if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
     if (!testEmailAddress || !testEmailAddress.includes('@')) {
       alert('Veuillez entrer une adresse email valide');
       return;
@@ -178,64 +180,35 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
     setTestEmailSending(true);
     setLogs(prev => [...prev, `🧪 Envoi d'email test à ${testEmailAddress}...`]);
 
-    // Configure Gmail SMTP service
-    gmailSmtpService.setConfig(apiConfig);
-    
-    // Debug: check if service is configured
-    const isServiceConfigured = gmailSmtpService.isConfigured();
-    console.log('Debug isServiceConfigured:', isServiceConfigured);
-    console.log('Debug apiConfig passed to service:', {
-      gmailSmtpUser: apiConfig.gmailSmtpUser,
-      gmailSmtpPassword: apiConfig.gmailSmtpPassword ? '***' + apiConfig.gmailSmtpPassword.slice(-4) : 'missing',
-      passwordLength: apiConfig.gmailSmtpPassword?.length
-    });
-
-    // Get the first template
     const template = templates.find(t => t.id === selectedTemplate) || templates[0];
-    
-    // Personalize template with test data
     const testLead: Lead = {
-      id: 'test',
-      name: 'Test Prospect',
-      email: testEmailAddress,
-      sector: template?.sector || 'Commerce',
-      city: 'Ville Test',
+      id: 'test', name: 'Test Prospect', email: testEmailAddress,
+      sector: template?.sector || 'Commerce', city: 'Ville Test',
       landingUrl: 'https://example.com',
     } as Lead;
 
     const { subject, body } = personalizeTemplate(template, testLead);
-    const htmlBody = body.replace(/\n/g, '<br/>');
-
-    const result = await gmailSmtpService.sendEmail({
+    const result = await sendEmailViaApi({
       to: testEmailAddress,
       toName: 'Test',
       subject,
-      html: htmlBody,
+      html: body.replace(/\n/g, '<br/>'),
     });
 
-    if (result.success) {
-      setLogs(prev => [...prev, `✅ Email test envoyé à ${testEmailAddress}`]);
-    } else {
-      setLogs(prev => [...prev, `❌ Échec envoi test: ${result.message}`]);
-    }
-
+    setLogs(prev => [...prev, result.success
+      ? `✅ Email test envoyé à ${testEmailAddress}`
+      : `❌ Échec envoi test: ${result.message}`
+    ]);
     setTestEmailSending(false);
   };
 
   return (
     <div className="animate-fade" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
       {/* Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start', 
-        marginBottom: 28,
-        position: 'sticky',
-        top: 0,
-        zIndex: 10,
-        background: C.bg,
-        padding: '20px 0',
-        borderBottom: `1px solid ${C.border}`
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+        marginBottom: 28, position: 'sticky', top: 0, zIndex: 10,
+        background: C.bg, padding: '20px 0', borderBottom: `1px solid ${C.border}`
       }}>
         <div>
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 700, color: C.tx, marginBottom: 4 }}>
@@ -315,7 +288,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         )}
       </div>
 
-      {/* Test Email Section */}
+      {/* Test Email */}
       <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
         <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>🧪 Envoyer un email test</h3>
         <p style={{ fontSize: 13, color: C.tx2, marginBottom: 12 }}>
@@ -328,30 +301,18 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
             onChange={e => setTestEmailAddress(e.target.value)}
             placeholder="votre.email@test.com"
             style={{
-              flex: 1,
-              padding: '10px 14px',
-              borderRadius: 6,
-              border: `1px solid ${C.border}`,
-              fontSize: 13,
-              background: C.surface,
-              color: C.tx,
+              flex: 1, padding: '10px 14px', borderRadius: 6,
+              border: `1px solid ${C.border}`, fontSize: 13,
+              background: C.surface, color: C.tx,
             }}
           />
-          <button
-            onClick={sendTestEmail}
-            disabled={testEmailSending || !hasGmailSmtp}
-            style={{
-              padding: '10px 20px',
-              borderRadius: 6,
-              border: 'none',
-              background: testEmailSending || !hasGmailSmtp ? C.tx3 : C.blue,
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: 14,
-              cursor: testEmailSending || !hasGmailSmtp ? 'default' : 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button onClick={sendTestEmail} disabled={testEmailSending || !hasGmailSmtp} style={{
+            padding: '10px 20px', borderRadius: 6, border: 'none',
+            background: testEmailSending || !hasGmailSmtp ? C.tx3 : C.blue,
+            color: '#fff', fontWeight: 600, fontSize: 14,
+            cursor: testEmailSending || !hasGmailSmtp ? 'default' : 'pointer',
+            whiteSpace: 'nowrap',
+          }}>
             {testEmailSending ? '⏳ Envoi...' : '🧪 Envoyer test'}
           </button>
         </div>
@@ -362,9 +323,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         )}
       </div>
 
-      {/* Ready to send and Sent grid */}
+      {/* Ready / Sent */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-        {/* Ready to send */}
         <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}` }}>
           <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16, color: C.amber }}>📬 Prêts à envoyer ({ready.length})</h3>
           <div style={{ maxHeight: 400, overflowY: 'auto' }}>
@@ -384,7 +344,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
                   }}>👁️</button>
                   <button onClick={() => sendOne(lead)} disabled={!hasGmailSmtp} style={{
                     padding: '4px 10px', borderRadius: 4, border: 'none',
-                    background: hasGmailSmtp ? C.amber : C.tx3, color: '#fff', fontSize: 12, cursor: hasGmailSmtp ? 'pointer' : 'default',
+                    background: hasGmailSmtp ? C.amber : C.tx3, color: '#fff',
+                    fontSize: 12, cursor: hasGmailSmtp ? 'pointer' : 'default',
                   }}>Envoyer</button>
                 </div>
               </div>
@@ -393,7 +354,6 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
           </div>
         </div>
 
-        {/* Sent */}
         <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}` }}>
           <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16, color: C.green }}>✅ Emails envoyés ({sent.length})</h3>
           <div style={{ maxHeight: 400, overflowY: 'auto' }}>
@@ -437,7 +397,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         </div>
       )}
 
-      {/* Email Preview Modal */}
+      {/* Preview Modal */}
       {previewEmail && (
         <>
           <div onClick={() => setPreviewEmail(null)} style={{
@@ -472,8 +432,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
             <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
               <button onClick={() => { sendOne(previewEmail.lead); setPreviewEmail(null); }} disabled={!hasGmailSmtp} style={{
                 flex: 1, padding: '11px 0', borderRadius: 6, border: 'none',
-                background: hasGmailSmtp ? C.amber : C.tx3, color: '#fff', fontWeight: 600, fontSize: 14,
-                cursor: hasGmailSmtp ? 'pointer' : 'default',
+                background: hasGmailSmtp ? C.amber : C.tx3, color: '#fff',
+                fontWeight: 600, fontSize: 14, cursor: hasGmailSmtp ? 'pointer' : 'default',
               }}>📧 Envoyer maintenant</button>
               <button onClick={() => setPreviewEmail(null)} style={{
                 padding: '11px 20px', borderRadius: 6, border: `1px solid ${C.border}`,
