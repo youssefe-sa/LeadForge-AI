@@ -136,6 +136,7 @@ function getCuratedFallback(sector: string, index: number): string {
 export default function WebsiteGen({ leads, updateLead, apiConfig }: Props) {
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0, name: '', step: '' });
+  const [batchDelay, setBatchDelay] = useState(2000);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [showEditor, setShowEditor] = useState(false);
@@ -583,7 +584,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     for (let i = 0; i < enriched.length; i++) {
       setProgress({ current: i + 1, total: enriched.length, name: enriched[i].name, step: '🤖 Génération...' });
       await generateSite(enriched[i]);
-      if (i < enriched.length - 1) await new Promise(r => setTimeout(r, 800));
+      if (i < enriched.length - 1) await new Promise(r => setTimeout(r, batchDelay));
     }
     setGenerating(false);
   };
@@ -688,6 +689,18 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         }}>
           {generating ? `Génération ${progress.current}/${progress.total}...` : `🌐 Générer ${enriched.length} sites`}
         </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 12, color: C.tx3 }}>⏱ Délai entre sites :</span>
+          {[2, 3, 5, 8].map(s => (
+            <button key={s} onClick={() => setBatchDelay(s * 1000)} disabled={generating} style={{
+              padding: '4px 10px', borderRadius: 4, border: `1px solid ${batchDelay === s * 1000 ? C.blue : C.border}`,
+              background: batchDelay === s * 1000 ? C.blue + '22' : C.surface,
+              color: batchDelay === s * 1000 ? C.blue : C.tx2,
+              fontSize: 12, fontWeight: batchDelay === s * 1000 ? 700 : 400,
+              cursor: generating ? 'default' : 'pointer',
+            }}>{s}s</button>
+          ))}
+        </div>
       </div>
 
       {/* Stats */}
