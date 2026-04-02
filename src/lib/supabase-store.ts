@@ -665,7 +665,7 @@ export function useEmailTemplates() {
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000; // 1 seconde
 const RATE_LIMIT_DELAY_MS = 1000; // Délai minimum entre requêtes (1s)
-const GROQ_TPM_LIMIT = 6000; // Tier on_demand = 6K TPM (activer Dev Tier pour 250K)
+const GROQ_TPM_LIMIT = 200000; // compound-beta-mini = No limit (200K buffer)
 const GROQ_TPM_BUFFER = 500; // Marge de sécurité
 
 // Timestamp du dernier appel API pour le rate limiting
@@ -797,7 +797,7 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
           body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
+            model: 'compound-beta-mini',
             messages: [
               { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
               { role: 'user', content: prompt.slice(0, 4000) }
@@ -875,7 +875,7 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
           body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
+            model: 'compound-beta-mini',
             messages: [
               { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
               { role: 'user', content: prompt.slice(0, 4000) }
