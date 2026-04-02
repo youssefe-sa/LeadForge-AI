@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -15,6 +15,12 @@ const agents = [
   { id: 'pipeline', label: 'Pipeline & Analytics', icon: '📈', color: C.red },
 ];
 
+interface LogEntry {
+  timestamp: string;
+  message: string;
+  color: string;
+}
+
 interface Props {
   active: string;
   onNavigate: (id: string) => void;
@@ -23,6 +29,75 @@ interface Props {
 }
 
 export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Props) {
+  const [logs, setLogs] = useState<LogEntry[]>([
+    { timestamp: new Date().toLocaleTimeString(), message: 'Système démarré', color: '#1A7A4A' },
+    { timestamp: new Date().toLocaleTimeString(), message: 'Surveillance active...', color: '#9B9890' },
+    { timestamp: new Date().toLocaleTimeString(), message: `${leadCount} leads chargés`, color: '#D4500A' },
+    { timestamp: new Date().toLocaleTimeString(), message: `${apiCount} APIs connectées`, color: '#1A4FA0' },
+    { timestamp: new Date().toLocaleTimeString(), message: 'Pipeline en cours...', color: '#B45309' },
+  ]);
+  
+  const logContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // Fonction pour scroller automatiquement en bas
+  const scrollToBottom = () => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
+  };
+
+  // Scroller quand les logs changent
+  useEffect(() => {
+    scrollToBottom();
+  }, [logs]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newLog: LogEntry = {
+        timestamp: new Date().toLocaleTimeString(),
+        message: `Vérification automatique - Leads: ${leadCount}, APIs: ${apiCount}`,
+        color: '#9B9890'
+      };
+      
+      setLogs(prevLogs => {
+        const updatedLogs = [...prevLogs, newLog];
+        // Garder seulement les 20 derniers logs
+        return updatedLogs.slice(-20);
+      });
+    }, 5000); // Toutes les 5 secondes
+
+    return () => clearInterval(interval);
+  }, [leadCount, apiCount]);
+
+  useEffect(() => {
+    // Ajouter un log quand le nombre de leads change
+    const newLog: LogEntry = {
+      timestamp: new Date().toLocaleTimeString(),
+      message: `Changement détecté: ${leadCount} leads dans le système`,
+      color: '#D4500A'
+    };
+    setLogs(prevLogs => [...prevLogs.slice(-19), newLog]);
+  }, [leadCount]);
+
+  useEffect(() => {
+    // Ajouter un log quand le nombre d'APIs change
+    const newLog: LogEntry = {
+      timestamp: new Date().toLocaleTimeString(),
+      message: `Mise à jour APIs: ${apiCount} services actifs`,
+      color: '#1A4FA0'
+    };
+    setLogs(prevLogs => [...prevLogs.slice(-19), newLog]);
+  }, [apiCount]);
+
+  useEffect(() => {
+    // Ajouter un log quand la page active change
+    const newLog: LogEntry = {
+      timestamp: new Date().toLocaleTimeString(),
+      message: `Navigation: ${active} activé`,
+      color: '#B45309'
+    };
+    setLogs(prevLogs => [...prevLogs.slice(-19), newLog]);
+  }, [active]);
   return (
     <div style={{
       width: 240, minHeight: '100vh', background: C.surface, borderRight: `1px solid ${C.border}`,
@@ -119,9 +194,48 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
         </button>
       </nav>
 
+      {/* Journal des activités en temps réel */}
+      <div style={{ 
+        padding: '12px', 
+        borderTop: `1px solid ${C.border}`,
+        background: '#1C1B18',
+        borderBottom: `1px solid ${C.border}`
+      }}>
+        <div style={{ 
+          fontSize: 10, 
+          fontWeight: 600, 
+          color: '#9B9890', 
+          textTransform: 'uppercase', 
+          letterSpacing: '1px', 
+          marginBottom: 8,
+          textAlign: 'center'
+        }}>
+          Journal Temps Réel
+        </div>
+        <div 
+          ref={logContainerRef}
+          style={{ 
+            background: '#0A0A09', 
+            borderRadius: 6, 
+            padding: 8, 
+            height: 120, 
+            overflow: 'auto',
+            fontSize: 10,
+            fontFamily: "'DM Mono', monospace",
+            border: '1px solid #333'
+          }}
+        >
+          {logs.map((log, index) => (
+            <div key={index} style={{ color: log.color, marginBottom: 2 }}>
+              [{log.timestamp}] {log.message}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Footer stats */}
-      <div style={{ padding: '16px 20px', borderTop: `1px solid ${C.border}`, fontSize: 12 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+      <div style={{ padding: '10px 16px', borderTop: `1px solid ${C.border}`, fontSize: 11 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
           <span style={{ color: C.tx3 }}>Leads</span>
           <span style={{ fontWeight: 600, color: C.tx, fontFamily: "'DM Mono', monospace" }}>{leadCount}</span>
         </div>
