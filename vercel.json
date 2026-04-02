@@ -1,13 +1,23 @@
 {
-  "installCommand": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "env": {
-    "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
-    "PLAYWRIGHT_BROWSERS_PATH": "0"
+  version: 2,
+  buildCommand: npm run build,
+  outputDirectory: dist,
+  framework: vite,
+  installCommand: npm install,
+  env: {
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1,
+    PLAYWRIGHT_BROWSERS_PATH: 0
   },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/((?!api).*)", "destination": "/index.html" }
+  rewrites: [
+    { source: /api/(.*), destination: /api/$1 },
+    { source: /((?!api).*), destination: /index.html }
+  ],
+  headers: [
+    {
+      source: /(.*),
+      headers: [
+        { key: X-Frame-Options, value: DENY },
+        { key: X-Content-Type-Options, value: nosniff }
+      ]
+    }
   ]
-}
