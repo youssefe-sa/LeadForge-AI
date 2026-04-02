@@ -201,7 +201,9 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
           body: JSON.stringify({ model: 'gemini-2.0-flash-lite', messages: [{ role: 'user', content: 'Say OK' }], max_tokens: 10 }),
         });
         if (res.ok) return { ok: true, msg: '✅ Gemini opérationnel ! 1M TPM gratuit actif.' };
-        return { ok: false, msg: `❌ Erreur ${res.status}: Clé invalide` };
+        if (res.status === 429) return { ok: true, msg: '✅ Clé valide ! (limite de débit momentanée, normal)' };
+        if (res.status === 401 || res.status === 403) return { ok: false, msg: `❌ Clé invalide ou non autorisée` };
+        return { ok: false, msg: `❌ Erreur ${res.status}` };
       },
     },
 
