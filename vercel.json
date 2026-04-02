@@ -1,7 +1,11 @@
 {
-  "installCommand": "npm install",
+  "installCommand": "npm install --ignore-scripts",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "env": {
+    "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
+    "PLAYWRIGHT_BROWSERS_PATH": "0"
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!api).*)", "destination": "/index.html" }
