@@ -782,129 +782,154 @@ function isRateLimitError(error: any): boolean {
 // --- LLM API CALLS ---
 export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: string): Promise<string> {
   console.log('🧠 callLLM: Starting LLM call');
-  console.log('🧠 callLLM: Has Groq key:', !!config.groqKey);
-  console.log('🧠 callLLM: Prompt length:', prompt.length);
-  
-  // Try Groq — user's primary LLM, fast & reliable
+  const truncatedPrompt = prompt.slice(0, 4000);
+
+  // Helper: appel OpenRouter avec modèle gratuit
+  const callOpenRouter = async (): Promise<string> => {
+    if (!config.openrouterKey) return '';
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.openrouterKey}`,
+        'HTTP-Referer': 'https://lead-forge-ai-alpha.vercel.app',
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        messages: [
+          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+          { role: 'user', content: truncatedPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 1024,
+      }),
+    });
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim() || '';
+  };
+
+  // Primary: Groq llama-3.1-8b-instant (modèle direct, pas de compound routing)
   if (config.groqKey) {
-    // Attendre le délai minimum entre requêtes pour éviter le rate limiting
-    await enforceRateLimit(prompt.length);
-    
-    return await retryWithBackoff(async () => {
-      try {
-        console.log('🧠 callLLM: Calling Groq API...');
+    await enforceRateLimit(truncatedPrompt.length);
+    try {
+      const result = await retryWithBackoff(async () => {
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
           body: JSON.stringify({
-            model: 'compound-beta-mini',
+            model: 'llama-3.1-8b-instant',
             messages: [
               { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-              { role: 'user', content: prompt.slice(0, 4000) }
+              { role: 'user', content: truncatedPrompt }
             ],
             temperature: 0.7,
             max_tokens: 1024,
           }),
         });
-        
-        console.log('🧠 callLLM: Groq response status:', res.status, res.statusText);
-        
+        console.log('🧠 callLLM: Groq response status:', res.status);
         if (res.ok) {
           const data = await res.json();
-          console.log('🧠 callLLM: Groq response keys:', Object.keys(data));
           const content = data.choices?.[0]?.message?.content;
-          console.log('🧠 callLLM: Content length:', content?.length || 0);
-          if (content && content.trim()) {
-            console.log('✅ callLLM: Success');
-            return content;
-          }
-          // Si pas de contenu, on considère ça comme un échec retryable
+          if (content?.trim()) return content;
           throw { status: 500, message: 'Empty response from LLM' };
-        } else {
-          const errorText = await res.text();
-          console.error('❌ callLLM: Groq API error:', res.status, errorText);
-          
-          // Parse l'erreur pour voir si c'est un rate limit
-          let errorObj: any;
-          try {
-            errorObj = JSON.parse(errorText);
-          } catch {
-            errorObj = { message: errorText };
-          }
-          
-          const error = { status: res.status, message: errorObj.error?.message || errorText, code: errorObj.error?.code };
-          
-          // Détecter et enregistrer l'erreur API
-          const apiError = detectApiError(error, 'groq');
-          if (apiError) {
-            apiErrorState.recordError(apiError);
-          }
-          
-          throw error;
         }
-      } catch (error) {
-        console.error('❌ callLLM: Groq exception:', error);
-        
-        // Détecter et enregistrer l'erreur API si pas déjà fait
+        const errorText = await res.text();
+        let errorObj: any;
+        try { errorObj = JSON.parse(errorText); } catch { errorObj = { message: errorText }; }
+        const error = { status: res.status, message: errorObj.error?.message || errorText, code: errorObj.error?.code };
         const apiError = detectApiError(error, 'groq');
-        if (apiError) {
-          apiErrorState.recordError(apiError);
-        }
-        
+        if (apiError) apiErrorState.recordError(apiError);
         throw error;
+      }, isRateLimitError, MAX_RETRIES);
+      if (result) return result;
+    } catch (error: any) {
+      console.warn('⚠️ Groq failed, trying OpenRouter fallback...', error?.message);
+      // Fallback OpenRouter si rate limit persistant
+      if (isRateLimitError(error)) {
+        const fallback = await callOpenRouter();
+        if (fallback) { console.log('✅ OpenRouter fallback success'); return fallback; }
       }
-    }, isRateLimitError, MAX_RETRIES);
-  } else {
-    console.error('❌ callLLM: No Groq key available');
+      throw error;
+    }
   }
-  
-  console.log('❌ callLLM: Failed - returning empty string');
+
+  // Fallback: OpenRouter
+  const orResult = await callOpenRouter();
+  if (orResult) return orResult;
+
+  console.error('❌ callLLM: No LLM available');
   return '';
 }
 
 // --- LLM FOR FULL WEBSITE GENERATION (higher token limit) ---
 export async function callLLMForWebsite(config: ApiConfig, prompt: string, systemPrompt?: string): Promise<string> {
-  // Try Groq — user's primary LLM, fast & reliable
+  const truncatedPrompt = prompt.slice(0, 4000);
+
+  const callOpenRouter = async (): Promise<string> => {
+    if (!config.openrouterKey) return '';
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.openrouterKey}`,
+        'HTTP-Referer': 'https://lead-forge-ai-alpha.vercel.app',
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        messages: [
+          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+          { role: 'user', content: truncatedPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 4096,
+      }),
+    });
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim() || '';
+  };
+
   if (config.groqKey) {
-    // Attendre le délai minimum entre requêtes pour éviter le rate limiting
-    await enforceRateLimit(prompt.length);
-    
-    return await retryWithBackoff(async () => {
-      try {
+    await enforceRateLimit(truncatedPrompt.length);
+    try {
+      const result = await retryWithBackoff(async () => {
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
           body: JSON.stringify({
-            model: 'compound-beta-mini',
+            model: 'llama-3.1-8b-instant',
             messages: [
               { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-              { role: 'user', content: prompt.slice(0, 4000) }
+              { role: 'user', content: truncatedPrompt }
             ],
             temperature: 0.7,
-            max_tokens: 1024,
+            max_tokens: 4096,
           }),
         });
         if (res.ok) {
           const data = await res.json();
           const content = data.choices?.[0]?.message?.content;
-          if (content && content.trim()) return content;
+          if (content?.trim()) return content;
           throw { status: 500, message: 'Empty response from LLM' };
-        } else {
-          const errorText = await res.text();
-          let errorObj: any;
-          try {
-            errorObj = JSON.parse(errorText);
-          } catch {
-            errorObj = { message: errorText };
-          }
-          throw { status: res.status, message: errorObj.error?.message || errorText, code: errorObj.error?.code };
         }
-      } catch (error) {
-        throw error;
+        const errorText = await res.text();
+        let errorObj: any;
+        try { errorObj = JSON.parse(errorText); } catch { errorObj = { message: errorText }; }
+        throw { status: res.status, message: errorObj.error?.message || errorText, code: errorObj.error?.code };
+      }, isRateLimitError, MAX_RETRIES);
+      if (result) return result;
+    } catch (error: any) {
+      if (isRateLimitError(error)) {
+        const fallback = await callOpenRouter();
+        if (fallback) { console.log('✅ Website: OpenRouter fallback success'); return fallback; }
       }
-    }, isRateLimitError, MAX_RETRIES);
+      throw error;
+    }
   }
-  
+
+  const orResult = await callOpenRouter();
+  if (orResult) return orResult;
   return '';
 }
 
