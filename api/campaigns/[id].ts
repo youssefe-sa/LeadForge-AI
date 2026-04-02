@@ -3,12 +3,32 @@ import { supabase } from '../_lib/supabase.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { id } = req.query;
   if (!id) return res.status(400).json({ error: 'Missing id' });
+
+  const action = req.query.action as string | undefined;
+
+  // POST /api/campaigns/:id?action=start
+  if (req.method === 'POST' && action === 'start') {
+    const { error } = await supabase.from('campaigns').update({
+      status: 'running', started_at: new Date().toISOString()
+    }).eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json({ message: 'Campaign started', id });
+  }
+
+  // POST /api/campaigns/:id?action=complete
+  if (req.method === 'POST' && action === 'complete') {
+    const { error } = await supabase.from('campaigns').update({
+      status: 'completed', completed_at: new Date().toISOString()
+    }).eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json({ message: 'Campaign completed', id });
+  }
 
   // GET /api/campaigns/:id
   if (req.method === 'GET') {

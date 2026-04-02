@@ -102,7 +102,7 @@ export const leadsApi = {
 
   // Bulk create leads
   async createBulk(leads: LeadInput[]) {
-    return fetchApi<{ message: string; leads: Array<{ id: string } & LeadInput> }>('/leads/bulk', {
+    return fetchApi<{ message: string; leads: Array<{ id: string } & LeadInput> }>('/leads', {
       method: 'POST',
       body: JSON.stringify({ leads }),
     });
@@ -144,7 +144,7 @@ export const configApi = {
 
   // Test SMTP connection
   async testSmtp() {
-    return fetchApi<{ success: boolean; message: string }>('/config/test-smtp', {
+    return fetchApi<{ success: boolean; message: string }>('/config?action=test-smtp', {
       method: 'POST',
     });
   },
@@ -178,7 +178,7 @@ export const emailApi = {
       messageId: string;
       to: string;
       subject: string;
-    }>('/email/send', {
+    }>('/email', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -191,7 +191,7 @@ export const emailApi = {
       summary: { total: number; sent: number; failed: number };
       results: Array<{ to: string; status: string; messageId: string }>;
       errors?: Array<{ to: string; error: string }>;
-    }>('/email/send-batch', {
+    }>('/email?action=batch', {
       method: 'POST',
       body: JSON.stringify({ emails, delayMs }),
     });
@@ -200,11 +200,12 @@ export const emailApi = {
   // Get email logs
   async getLogs(params?: { leadId?: string; limit?: number; offset?: number }) {
     const query = new URLSearchParams();
+    query.set('action', 'logs');
     if (params?.leadId) query.set('leadId', params.leadId);
     if (params?.limit) query.set('limit', params.limit.toString());
     if (params?.offset) query.set('offset', params.offset.toString());
     
-    return fetchApi<{ logs: any[]; count: number }>(`/email/logs?${query}`);
+    return fetchApi<{ logs: any[]; count: number }>(`/email?${query}`);
   },
 };
 
@@ -301,14 +302,14 @@ export const campaignsApi = {
 
   // Start campaign
   async start(id: string) {
-    return fetchApi<{ message: string; id: string }>(`/campaigns/${id}/start`, {
+    return fetchApi<{ message: string; id: string }>(`/campaigns/${id}?action=start`, {
       method: 'POST',
     });
   },
 
   // Complete campaign
   async complete(id: string) {
-    return fetchApi<{ message: string; id: string }>(`/campaigns/${id}/complete`, {
+    return fetchApi<{ message: string; id: string }>(`/campaigns/${id}?action=complete`, {
       method: 'POST',
     });
   },

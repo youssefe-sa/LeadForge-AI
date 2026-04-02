@@ -44,7 +44,7 @@ class GmailSmtpService {
     }
 
     try {
-      const url = `${API_URL}/email/send`;
+      const url = `${API_URL}/email`;
       console.log('📧 [sendEmail] POST to:', url);
 
       // Construire le payload avec la config SMTP complète
@@ -258,7 +258,7 @@ class GmailSmtpService {
     }
 
     try {
-      const url = `${API_URL}/config/test-smtp`;
+      const url = `${API_URL}/config?action=test-smtp`;
       console.log('📧 [testConnection] POST to:', url);
 
       const payload = {
