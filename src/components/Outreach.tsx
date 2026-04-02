@@ -37,6 +37,7 @@ async function sendEmailViaApi(payload: {
 export default function Outreach({ leads, updateLead, apiConfig, templates }: Props) {
   const [sending, setSending] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0, name: '' });
+  const [emailDelay, setEmailDelay] = useState(8000);
   const [logs, setLogs] = useState<string[]>([]);
   const [previewEmail, setPreviewEmail] = useState<{ lead: Lead; subject: string; body: string } | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0]?.id || '');
@@ -161,7 +162,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         setLogs(prev => [...prev, `❌ ${lead.name} — ${result.message}`]);
       }
 
-      if (i < ready.length - 1) await new Promise(r => setTimeout(r, 2000));
+      if (i < ready.length - 1) await new Promise(r => setTimeout(r, emailDelay));
     }
 
     setLogs(prev => [...prev, `🏁 Envoi terminé.`]);
@@ -217,13 +218,27 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
             {hasGmailSmtp ? ' — Gmail SMTP ✅' : ' — ⚠️ Configurez Gmail SMTP dans les Paramètres'}
           </p>
         </div>
-        <button onClick={sendBatch} disabled={sending || ready.length === 0 || !hasGmailSmtp} style={{
-          padding: '10px 20px', borderRadius: 6, border: 'none',
-          background: sending || !hasGmailSmtp ? C.tx3 : C.amber, color: '#fff',
-          fontWeight: 600, fontSize: 14, cursor: sending || !hasGmailSmtp ? 'default' : 'pointer',
-        }}>
-          {sending ? `Envoi ${progress.current}/${progress.total}...` : `📧 Envoyer ${ready.length} emails`}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 12, color: C.tx3 }}>⏱ Délai entre emails :</span>
+            {[2, 3, 5, 8].map(s => (
+              <button key={s} onClick={() => setEmailDelay(s * 1000)} disabled={sending} style={{
+                padding: '4px 10px', borderRadius: 4, border: `1px solid ${emailDelay === s * 1000 ? C.amber : C.border}`,
+                background: emailDelay === s * 1000 ? C.amber + '22' : C.surface,
+                color: emailDelay === s * 1000 ? C.amber : C.tx2,
+                fontSize: 12, fontWeight: emailDelay === s * 1000 ? 700 : 400,
+                cursor: sending ? 'default' : 'pointer',
+              }}>{s}s</button>
+            ))}
+          </div>
+          <button onClick={sendBatch} disabled={sending || ready.length === 0 || !hasGmailSmtp} style={{
+            padding: '10px 20px', borderRadius: 6, border: 'none',
+            background: sending || !hasGmailSmtp ? C.tx3 : C.amber, color: '#fff',
+            fontWeight: 600, fontSize: 14, cursor: sending || !hasGmailSmtp ? 'default' : 'pointer',
+          }}>
+            {sending ? `Envoi ${progress.current}/${progress.total}...` : `📧 Envoyer ${ready.length} emails`}
+          </button>
+        </div>
       </div>
 
       {/* Stats */}

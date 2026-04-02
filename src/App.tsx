@@ -22,7 +22,12 @@ export default function App() {
   // Compter les APIs configurées (non vides)
   const activeApis = [
     config.groqKey,
+    config.openrouterKey,
+    config.geminiKey,
+    config.nvidiaKey,
     config.serperKey,
+    config.unsplashKey,
+    config.pexelsKey,
     config.gmailSmtpUser && config.gmailSmtpPassword
   ].filter(Boolean).length;
 

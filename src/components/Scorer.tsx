@@ -39,6 +39,7 @@ interface Props {
 export default function Scorer({ leads, updateLead, apiConfig }: Props) {
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0, name: '', step: '' });
+  const [enrichmentDelay, setEnrichmentDelay] = useState(2000);
   const [logs, setLogs] = useState<string[]>([]);
   const addLog = (msg: string) => setLogs(prev => [`[${new Date().toLocaleTimeString('fr-FR')}] ${msg}`, ...prev.slice(0, 199)]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -278,6 +279,9 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     const toScore = leads.filter(l => l.stage === 'new' || l.score === 0);
     if (toScore.length === 0) { alert('Tous les leads sont déjà scorés !'); return; }
 
+    // Démarrer l'agent
+    apiErrorState.startAgent('scorer-batch');
+
     // Tester les APIs avant de lancer les agents
     console.log('🔍 Test des APIs avant le lancement des agents...');
     const apiTestReport = await testAllApis(apiConfig);
@@ -300,6 +304,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       apiErrorState.stopAllAgents();
       
       setLogs(prev => [...prev, `❌ Arrêt des agents - APIs non fonctionnelles`]);
+      setProcessing(false);
       return;
     }
 
@@ -309,25 +314,49 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     setLogs([`🚀 Début de l'enrichissement de ${toScore.length} leads...`]);
 
     for (let i = 0; i < toScore.length; i++) {
+      // Vérifier si les agents ont été arrêtés avant chaque traitement
+      if (apiErrorState.shouldStop()) {
+        setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - API error détecté`]);
+        break;
+      }
+
       const lead = toScore[i];
       const setStep = (step: string) => setProgress({ current: i + 1, total: toScore.length, name: lead.name || lead.email, step });
       setStep('Démarrage...');
       setLogs(prev => [...prev, `⚙️ [${i + 1}/${toScore.length}] ${lead.name || lead.email}...`]);
 
-      const updates = await enrichLead(lead, setStep);
-      updateLead(lead.id, updates);
+      try {
+        const updates = await enrichLead(lead, setStep);
+        updateLead(lead.id, updates);
 
-      const reviewsCount = (updates.googleReviewsData || []).length;
-      const imagesCount = (updates.images || []).length;
-      const t = tempMap[updates.temperature || ''];
-      setLogs(prev => [...prev,
-        `✅ ${lead.name}: Score ${updates.score}/100 — ${t?.label} · ${imagesCount} img · ${reviewsCount} avis${updates.logo ? ' · logo ✓' : ''}${updates.email && !lead.email ? ' · email trouvé ✓' : ''}`
-      ]);
+        const reviewsCount = (updates.googleReviewsData || []).length;
+        const imagesCount = (updates.images || []).length;
+        const t = tempMap[updates.temperature || ''];
+        setLogs(prev => [...prev,
+          `✅ ${lead.name}: Score ${updates.score}/100 — ${t?.label} · ${imagesCount} img · ${reviewsCount} avis${updates.logo ? ' · logo ✓' : ''}${updates.email && !lead.email ? ' · email trouvé ✓' : ''}`
+        ]);
+      } catch (error) {
+        setLogs(prev => [...prev, `❌ Erreur lors de l'enrichissement de ${lead.name}: ${error instanceof Error ? error.message : 'erreur inconnue'}`]);
+        
+        // Si l'erreur est due aux crédits épuisés, arrêter le traitement
+        if (error instanceof Error && error.message.includes('credits_exhausted')) {
+          setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - Crédits Serper épuisés`]);
+          break;
+        }
+      }
 
       if (i < toScore.length - 1) {
-        await new Promise(r => setTimeout(r, hasSerper ? 1200 : hasLLM ? 500 : 100));
+        await new Promise(r => setTimeout(r, enrichmentDelay));
+        // Vérifier à nouveau après le délai
+        if (apiErrorState.shouldStop()) {
+          setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - API error détecté`]);
+          break;
+        }
       }
     }
+    
+    // Arrêter l'agent
+    apiErrorState.stopAgent('scorer-batch');
     setLogs(prev => [...prev, `🏁 Enrichissement terminé ! ${toScore.length} leads traités.`]);
     setProcessing(false);
   };
@@ -339,7 +368,10 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       return; 
     }
 
-    // Tester les APIs avant de lancer les agents
+    // Démarrer l'agent
+    apiErrorState.startAgent('scorer-filtered');
+
+    // Tester les APIs avant de lancer les agents filtrés
     console.log('🔍 Test des APIs avant le lancement des agents filtrés...');
     const apiTestReport = await testAllApis(apiConfig);
     
@@ -361,6 +393,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       apiErrorState.stopAllAgents();
       
       setLogs(prev => [...prev, `❌ Arrêt des agents - APIs non fonctionnelles`]);
+      setProcessing(false);
       return;
     }
 
@@ -370,25 +403,49 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     setLogs([`🚀 Début de l'enrichissement de ${toScore.length} leads filtrés...`]);
 
     for (let i = 0; i < toScore.length; i++) {
+      // Vérifier si les agents ont été arrêtés avant chaque traitement
+      if (apiErrorState.shouldStop()) {
+        setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - API error détecté`]);
+        break;
+      }
+
       const lead = toScore[i];
       const setStep = (step: string) => setProgress({ current: i + 1, total: toScore.length, name: lead.name || lead.email, step });
       setStep('Démarrage...');
       setLogs(prev => [...prev, `⚙️ [${i + 1}/${toScore.length}] ${lead.name || lead.email}...`]);
 
-      const updates = await enrichLead(lead, setStep);
-      updateLead(lead.id, updates);
+      try {
+        const updates = await enrichLead(lead, setStep);
+        updateLead(lead.id, updates);
 
-      const reviewsCount = (updates.googleReviewsData || []).length;
-      const imagesCount = (updates.images || []).length;
-      const t = tempMap[updates.temperature || ''];
-      setLogs(prev => [...prev,
-        `✅ ${lead.name}: Score ${updates.score}/100 — ${t?.label} · ${imagesCount} img · ${reviewsCount} avis${updates.logo ? ' · logo ✓' : ''}${updates.email && !lead.email ? ' · email trouvé ✓' : ''}`
-      ]);
+        const reviewsCount = (updates.googleReviewsData || []).length;
+        const imagesCount = (updates.images || []).length;
+        const t = tempMap[updates.temperature || ''];
+        setLogs(prev => [...prev,
+          `✅ ${lead.name}: Score ${updates.score}/100 — ${t?.label} · ${imagesCount} img · ${reviewsCount} avis${updates.logo ? ' · logo ✓' : ''}${updates.email && !lead.email ? ' · email trouvé ✓' : ''}`
+        ]);
+      } catch (error) {
+        setLogs(prev => [...prev, `❌ Erreur lors de l'enrichissement de ${lead.name}: ${error instanceof Error ? error.message : 'erreur inconnue'}`]);
+        
+        // Si l'erreur est due aux crédits épuisés, arrêter le traitement
+        if (error instanceof Error && error.message.includes('credits_exhausted')) {
+          setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - Crédits Serper épuisés`]);
+          break;
+        }
+      }
 
       if (i < toScore.length - 1) {
-        await new Promise(r => setTimeout(r, hasSerper ? 1200 : hasLLM ? 500 : 100));
+        await new Promise(r => setTimeout(r, enrichmentDelay));
+        // Vérifier à nouveau après le délai
+        if (apiErrorState.shouldStop()) {
+          setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - API error détecté`]);
+          break;
+        }
       }
     }
+    
+    // Arrêter l'agent
+    apiErrorState.stopAgent('scorer-filtered');
     setLogs(prev => [...prev, `🏁 Enrichissement terminé ! ${toScore.length} leads filtrés traités.`]);
     setProcessing(false);
   };
@@ -610,14 +667,28 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
             {!hasSerper && !hasLLM ? ' ⚠️ Configurez Serper + LLM dans Paramètres' : ' — activés'}
           </p>
         </div>
-        <button onClick={scoreAll} disabled={processing || leads.length === 0} style={{
-          padding: '10px 20px', borderRadius: 6, border: 'none',
-          background: processing ? C.tx3 : C.green, color: '#fff',
-          fontWeight: 600, fontSize: 14, cursor: processing ? 'default' : 'pointer',
-          opacity: processing ? 0.7 : 1,
-        }}>
-          {processing ? `⚙️ ${progress.current}/${progress.total}...` : `⚡ Enrichir tout (${unscored.length} non scorés)`}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 12, color: C.tx3 }}>⏱ Délai entre enrichissements :</span>
+            {[2, 3, 5, 8].map(s => (
+              <button key={s} onClick={() => setEnrichmentDelay(s * 1000)} disabled={processing} style={{
+                padding: '4px 10px', borderRadius: 4, border: `1px solid ${enrichmentDelay === s * 1000 ? C.green : C.border}`,
+                background: enrichmentDelay === s * 1000 ? C.green + '22' : C.surface,
+                color: enrichmentDelay === s * 1000 ? C.green : C.tx2,
+                fontSize: 12, fontWeight: enrichmentDelay === s * 1000 ? 700 : 400,
+                cursor: processing ? 'default' : 'pointer',
+              }}>{s}s</button>
+            ))}
+          </div>
+          <button onClick={scoreAll} disabled={processing || leads.length === 0} style={{
+            padding: '10px 20px', borderRadius: 6, border: 'none',
+            background: processing ? C.tx3 : C.green, color: '#fff',
+            fontWeight: 600, fontSize: 14, cursor: processing ? 'default' : 'pointer',
+            opacity: processing ? 0.7 : 1,
+          }}>
+            {processing ? `⚙️ ${progress.current}/${progress.total}...` : `⚡ Enrichir tout (${unscored.length} non scorés)`}
+          </button>
+        </div>
       </div>
 
       {/* Stats */}

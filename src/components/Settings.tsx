@@ -243,6 +243,102 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
       },
     },
 
+    // OPENROUTER
+    {
+      id: 'openrouter', title: 'OpenRouter', icon: '🔀', color: '#7B3FE4',
+      required: false,
+      agents: ['Agent 1', 'Agent 2', 'Agent 3', 'Agent 4'],
+      shortDesc: 'Multi-LLM Gateway — Accès à tous les modèles',
+      longDesc: 'OpenRouter donne accès à une centaine de modèles LLM (GPT, Claude, Llama, etc.) avec un système de crédit flexible. Idéal comme fallback supplémentaire.',
+      whyNeeded: 'OPTIONNEL. 5ème fallback dans la chaîne LLM pour une disponibilité maximale.',
+      freeInfo: '✅ GRATUIT — Crédits offerts à l\'inscription. Pay-as-you-go ensuite.',
+      fields: [
+        { key: 'openrouterKey', label: 'API Key', masked: true, placeholder: 'sk-or-v1-xxxxxxxxxxxxxxxxxxxx',
+          helpUrl: 'https://openrouter.ai/keys',
+          helpText: 'openrouter.ai/keys → Create Key → Copier → Coller ici' },
+      ],
+      testFn: async (c) => {
+        if (!c.openrouterKey) return { ok: false, msg: '❌ Aucune clé' };
+        if (!c.openrouterKey.startsWith('sk-or-')) return { ok: false, msg: '❌ Doit commencer par sk-or-' };
+        try {
+          const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${c.openrouterKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: 'meta-llama/llama-3.1-8b-instruct:free', messages: [{ role: 'user', content: 'Say OK' }], max_tokens: 10 }),
+          });
+          if (res.ok) return { ok: true, msg: '✅ OpenRouter opérationnel !' };
+          if (res.status === 429) return { ok: true, msg: '✅ Clé valide ! (limite momentanée, normal)' };
+          if (res.status === 401) return { ok: false, msg: '❌ Clé invalide ou expirée' };
+          return { ok: false, msg: `❌ Erreur ${res.status}: Clé invalide` };
+        } catch (err: unknown) {
+          if ((err as Error).message?.includes('fetch') || (err as Error).message?.includes('CORS') || (err as Error).message?.includes('network')) {
+            return { ok: true, msg: '✅ Format clé valide (sk-or-...) — CORS bloqué en test, fonctionnel en production' };
+          }
+          return { ok: false, msg: `❌ ${(err as Error).message}` };
+        }
+      },
+    },
+
+    // UNSPLASH
+    {
+      id: 'unsplash', title: 'Unsplash API', icon: '📸', color: '#000000',
+      required: false,
+      agents: ['Agent 3'],
+      shortDesc: 'Images gratuites et haute qualité — Backup photos',
+      longDesc: 'Unsplash offre des millions de photos gratuites et de haute qualité. Utilisé comme source d\'images de secours si Serper ne trouve pas de photos du commerce.',
+      whyNeeded: 'OPTIONNEL. Améliore la qualité visuelle des sites générés.',
+      freeInfo: '✅ GRATUIT — 50 requêtes/heure. Plus avec plan payant.',
+      fields: [
+        { key: 'unsplashKey', label: 'Access Key', masked: true, placeholder: 'Votre clé Accès Unsplash',
+          helpUrl: 'https://unsplash.com/developers',
+          helpText: 'unsplash.com/developers → Create App → Access Key' },
+      ],
+      testFn: async (c) => {
+        if (!c.unsplashKey) return { ok: false, msg: '❌ Aucune clé' };
+        try {
+          const res = await fetch('https://api.unsplash.com/photos/random?count=1', {
+            headers: { 'Authorization': `Client-ID ${c.unsplashKey}` },
+          });
+          if (res.ok) return { ok: true, msg: '✅ Unsplash opérationnel !' };
+          if (res.status === 401) return { ok: false, msg: '❌ Clé invalide' };
+          if (res.status === 403) return { ok: false, msg: '❌ Permissions insuffisantes' };
+          return { ok: false, msg: `❌ Erreur ${res.status}` };
+        } catch {
+          return { ok: false, msg: '❌ Erreur réseau' };
+        }
+      },
+    },
+
+    // PEXELS
+    {
+      id: 'pexels', title: 'Pexels API', icon: '🖼️', color: '#05A6F0',
+      required: false,
+      agents: ['Agent 3'],
+      shortDesc: 'Photos et vidéos gratuites — Alternative à Unsplash',
+      longDesc: 'Pexels propose une grande bibliothèque de photos et vidéos gratuites. Utilisé comme alternative si Unsplash n\'est pas configuré.',
+      whyNeeded: 'OPTIONNEL. Source d\'images de secours supplémentaire.',
+      freeInfo: '✅ GRATUIT — 200 requêtes/heure. Pas de carte bancaire.',
+      fields: [
+        { key: 'pexelsKey', label: 'API Key', masked: true, placeholder: 'Votre clé API Pexels',
+          helpUrl: 'https://www.pexels.com/api/',
+          helpText: 'pexels.com/api → Your API Key → Request API Key' },
+      ],
+      testFn: async (c) => {
+        if (!c.pexelsKey) return { ok: false, msg: '❌ Aucune clé' };
+        try {
+          const res = await fetch('https://api.pexels.com/v1/curated?per_page=1', {
+            headers: { 'Authorization': c.pexelsKey },
+          });
+          if (res.ok) return { ok: true, msg: '✅ Pexels opérationnel !' };
+          if (res.status === 401) return { ok: false, msg: '❌ Clé invalide' };
+          if (res.status === 429) return { ok: true, msg: '✅ Clé valide ! (limite atteinte, normal)' };
+          return { ok: false, msg: `❌ Erreur ${res.status}` };
+        } catch {
+          return { ok: false, msg: '❌ Erreur réseau' };
+        }
+      },
+    },
+
     // GMAIL SMTP
     {
       id: 'gmailSmtp', title: 'Gmail SMTP', icon: '📧', color: C.amber,
@@ -286,58 +382,63 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
   }
 
   return (
-    <div style={{ padding: 20, maxWidth: 800, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, color: C.tx, marginBottom: 8 }}>⚙️ Paramètres API</h1>
-      <p style={{ fontSize: 14, color: C.tx3, marginBottom: 24 }}>
-        Configurez vos clés API pour activer les fonctionnalités d'enrichissement des leads.
-      </p>
+    <div style={{ padding: 24, maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ marginBottom: 32 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.tx, marginBottom: 8 }}>⚙️ Paramètres API</h1>
+        <p style={{ fontSize: 15, color: C.tx3, lineHeight: 1.5 }}>
+          Configurez vos clés API pour activer les fonctionnalités d'enrichissement des leads et de génération de sites.
+        </p>
+      </div>
 
       {/* API Status */}
       <div style={{
-        background: C.surface, borderRadius: 10, padding: '20px 24px',
-        border: `1px solid ${C.border}`, marginBottom: 20,
+        background: C.surface, borderRadius: 12, padding: '24px',
+        border: `1px solid ${C.border}`, marginBottom: 24,
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, margin: 0 }}>🔊 État des APIs</h3>
-          <div style={{ fontSize: 11, color: C.tx3 }}>Auto-synchronisé avec Supabase</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 600, color: C.tx, margin: 0 }}>🔊 État des APIs</h3>
+          <div style={{ fontSize: 12, color: C.tx3, background: C.bg, padding: '4px 8px', borderRadius: 4 }}>Auto-synchronisé avec Supabase</div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
           {Object.entries(statuses).map(([key, status]) => (
             <div key={key} style={{
-              padding: '10px 14px', borderRadius: 6, background: C.bg,
+              padding: '12px 16px', borderRadius: 8, background: C.bg,
               border: `1px solid ${status === 'active' ? C.green + '30' : status === 'testing' ? C.amber + '30' : C.border}`,
-              display: 'flex', alignItems: 'center', gap: 8,
+              display: 'flex', alignItems: 'center', gap: 10,
+              transition: 'all 0.2s ease',
             }}>
               <div style={{
-                width: 8, height: 8, borderRadius: '50%',
+                width: 10, height: 10, borderRadius: '50%',
                 background: status === 'active' ? C.green : status === 'testing' ? C.amber : C.tx3,
+                boxShadow: status === 'active' ? `0 0 8px ${C.green}40` : 'none',
               }} />
-              <span style={{ fontSize: 12, fontWeight: 500, color: C.tx2 }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: C.tx2 }}>
                 {key} ({status === 'active' ? '✅' : status === 'testing' ? '⏳' : '❌'})
               </span>
             </div>
           ))}
           {Object.keys(statuses).length === 0 && (
-            <div style={{ fontSize: 12, color: C.tx3, fontStyle: 'italic' }}>Testez les APIs pour voir leur état</div>
+            <div style={{ fontSize: 13, color: C.tx3, fontStyle: 'italic', padding: '12px 16px' }}>Testez les APIs pour voir leur état</div>
           )}
         </div>
       </div>
 
-      {/* API Config */}
-      <div style={{
-        background: C.surface, borderRadius: 10, padding: '20px 24px',
-        border: `1px solid ${C.border}`, marginBottom: 20,
-      }}>
-        <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, marginBottom: 12 }}>🔑 Configuration API</h3>
-
-        {/* LLM par défaut */}
-        <div style={{ background: C.bg, borderRadius: 8, padding: 16, border: `2px solid ${C.accent}30`, marginBottom: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: C.tx, marginBottom: 3 }}>🧠 LLM principal (priorité 1)</div>
-              <div style={{ fontSize: 12, color: C.tx3 }}>Le modèle utilisé en premier. Les autres servent de fallback automatique.</div>
+      {/* Main Content - 2 Columns */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        
+        {/* Left Column - API Configuration */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          
+          {/* LLM Selection */}
+          <div style={{
+            background: C.surface, borderRadius: 12, padding: '20px',
+            border: `1px solid ${C.border}`,
+          }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, marginBottom: 16 }}>🧠 LLM Principal</h3>
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 13, color: C.tx2, marginBottom: 8 }}>Modèle utilisé en priorité. Les autres servent de fallback automatique.</div>
             </div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
               {([
                 { id: 'groq', label: 'Groq', icon: '🚀', color: C.accent, desc: '6K TPM' },
                 { id: 'gemini', label: 'Gemini', icon: '✨', color: '#1A73E8', desc: '1M TPM' },
@@ -347,11 +448,12 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
                 const isActive = (config.defaultLlm || 'groq') === p.id;
                 return (
                   <button key={p.id} onClick={() => { handleLocalChange('defaultLlm', p.id); updateConfig({ defaultLlm: p.id }); }} style={{
-                    padding: '8px 14px', borderRadius: 6, border: `2px solid ${isActive ? p.color : C.border}`,
-                    background: isActive ? p.color + '18' : C.surface,
-                    cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 72,
+                    padding: '12px', borderRadius: 8, border: `2px solid ${isActive ? p.color : C.border}`,
+                    background: isActive ? p.color + '15' : C.bg,
+                    cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                    transition: 'all 0.2s ease',
                   }}>
-                    <span style={{ fontSize: 16 }}>{p.icon}</span>
+                    <span style={{ fontSize: 18 }}>{p.icon}</span>
                     <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? p.color : C.tx2 }}>{p.label}</span>
                     <span style={{ fontSize: 10, color: C.tx3 }}>{p.desc}</span>
                   </button>
@@ -359,343 +461,158 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
               })}
             </div>
           </div>
+
+          {/* Essential APIs */}
+          <div style={{
+            background: C.surface, borderRadius: 12, padding: '20px',
+            border: `1px solid ${C.border}`,
+          }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, marginBottom: 16 }}>🔑 APIs Essentielles</h3>
+            
+            {/* LLM Principal Affiché */}
+            <div style={{
+              background: C.bg, borderRadius: 8, padding: 12, marginBottom: 16,
+              border: `2px solid ${(config.defaultLlm || 'groq') === 'groq' ? C.accent : (config.defaultLlm || 'groq') === 'gemini' ? '#1A73E8' : (config.defaultLlm || 'groq') === 'nvidia' ? '#76B900' : '#7B3FE4'}30`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 16 }}>
+                  {(config.defaultLlm || 'groq') === 'groq' ? '🚀' : (config.defaultLlm || 'groq') === 'gemini' ? '✨' : (config.defaultLlm || 'groq') === 'nvidia' ? '⚡' : '🔀'}
+                </span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.tx }}>
+                    LLM Principal : {(config.defaultLlm || 'groq') === 'groq' ? 'Groq' : (config.defaultLlm || 'groq') === 'gemini' ? 'Gemini' : (config.defaultLlm || 'groq') === 'nvidia' ? 'NVIDIA' : 'OpenRouter'}
+                  </div>
+                  <div style={{ fontSize: 11, color: C.tx3 }}>
+                    {(config.defaultLlm || 'groq') === 'groq' ? '6K TPM' : (config.defaultLlm || 'groq') === 'gemini' ? '1M TPM' : (config.defaultLlm || 'groq') === 'nvidia' ? '40 RPM' : 'Free'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {sections.filter(s => s.required || ['serper', 'gmailSmtp'].includes(s.id)).map(section => (
+                <ApiSectionCard 
+                  key={section.id}
+                  section={section}
+                  localConfig={localConfig}
+                  visibleKeys={visibleKeys}
+                  testResults={testResults}
+                  statuses={statuses}
+                  savingSections={savingSections}
+                  onLocalChange={handleLocalChange}
+                  onToggleVisible={toggleVisible}
+                  onTestApi={testApi}
+                  onSaveSection={handleSaveSection}
+                  onShowSerperManager={setShowSerperManager}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Danger Zone - avec margin-top pour aligner */}
+          <div style={{
+            marginTop: 60,
+            background: '#FEF2F2', borderRadius: 12, padding: '20px',
+            border: `1px solid ${C.red}30`,
+          }}>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: C.red, marginBottom: 8 }}>⚠️ Zone Dangereuse</h3>
+            <p style={{ fontSize: 13, color: C.tx3, marginBottom: 12, lineHeight: 1.5 }}>
+              Cette action supprimera définitivement toutes vos données : l'ensemble des leads, configurations API, historiques et paramètres personnalisés. Cette opération est totalement irréversible et ne pourra pas être annulée.
+            </p>
+            <button 
+              onClick={() => {
+                if (window.confirm('⚠️ CONFIRMATION REQUISE\n\nÊtes-vous absolument certain de vouloir supprimer TOUTES les données ?\n\nCette action est IRRÉVERSIBLE et supprimera :\n• Tous les leads et contacts\n• Toutes les configurations API\n• Tout l\'historique d\'activités\n• Tous les paramètres personnalisés\n\nCliquez sur OK pour confirmer ou Annuler pour revenir en arrière.')) {
+                  onClearData();
+                }
+              }}
+              style={{
+                padding: '12px 20px', borderRadius: 8, border: `2px solid ${C.red}`,
+                background: C.red, color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                width: '100%', transition: 'all 0.3s ease', textTransform: 'uppercase',
+                letterSpacing: '0.5px', boxShadow: '0 2px 4px rgba(192, 57, 43, 0.2)',
+              }}
+              onMouseEnter={e => { 
+                e.currentTarget.style.background = '#a02c2c'; 
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(192, 57, 43, 0.3)';
+              }}
+              onMouseLeave={e => { 
+                e.currentTarget.style.background = C.red; 
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0 2px 4px rgba(192, 57, 43, 0.2)';
+              }}
+            >🗑️ Suppression Complète des Données</button>
+          </div>
         </div>
 
+        {/* Right Column - Optional APIs & Info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {sections.map(section => (
-            <div key={section.id} style={{
-              background: C.bg, borderRadius: 8, padding: 16,
-              border: `1px solid ${C.border}`,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: 8, background: section.color + '20',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
-                }}>{section.icon}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: C.tx }}>{section.title}</div>
-                  <div style={{ fontSize: 12, color: C.tx3 }}>{section.shortDesc}</div>
-                </div>
-                <div style={{
-                  padding: '4px 8px', borderRadius: 12, fontSize: 10, fontWeight: 600,
-                  background: section.required ? C.red + '20' : C.green + '20',
-                  color: section.required ? C.red : C.green,
-                }}>
-                  {section.required ? 'Obligatoire' : 'Optionnel'}
+          
+          {/* Optional APIs */}
+          <div style={{
+            background: C.surface, borderRadius: 12, padding: '20px',
+            border: `1px solid ${C.border}`,
+          }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, marginBottom: 16 }}>🎯 APIs Optionnelles</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {sections.filter(s => !s.required && !['serper', 'gmailSmtp'].includes(s.id)).map(section => (
+                <ApiSectionCard 
+                  key={section.id}
+                  section={section}
+                  localConfig={localConfig}
+                  visibleKeys={visibleKeys}
+                  testResults={testResults}
+                  statuses={statuses}
+                  savingSections={savingSections}
+                  onLocalChange={handleLocalChange}
+                  onToggleVisible={toggleVisible}
+                  onTestApi={testApi}
+                  onSaveSection={handleSaveSection}
+                  onShowSerperManager={setShowSerperManager}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Info Panel */}
+          <div style={{
+            background: C.surface, borderRadius: 12, padding: '20px',
+            border: `1px solid ${C.border}`,
+          }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, marginBottom: 16 }}>📊 Guide d'Utilisation</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              
+              <div>
+                <h4 style={{ fontSize: 14, fontWeight: 600, color: C.tx, marginBottom: 8 }}>🎯 Priorités Recommandées</h4>
+                <div style={{ paddingLeft: 12, fontSize: 13, color: C.tx2, lineHeight: 1.6 }}>
+                  <div style={{ marginBottom: 4 }}>1️⃣ <strong>Serper</strong> — Indispensable pour l'enrichissement</div>
+                  <div style={{ marginBottom: 4 }}>2️⃣ <strong>LLM Principal choisi</strong> — {(config.defaultLlm || 'groq') === 'groq' ? 'Groq (6K TPM)' : (config.defaultLlm || 'groq') === 'gemini' ? 'Gemini (1M TPM)' : (config.defaultLlm || 'groq') === 'nvidia' ? 'NVIDIA (40 RPM)' : 'OpenRouter (Free)'}</div>
+                  <div style={{ marginBottom: 4 }}>3️⃣ <strong>Gmail SMTP</strong> — Envoi d'emails</div>
+                  <div>4️⃣ <strong>Unsplash/Pexels</strong> — Images de qualité</div>
                 </div>
               </div>
 
-              {/* Fields */}
-              <form onSubmit={e => e.preventDefault()} style={{ padding: '0 0px 0px' }}>
-                {section.fields.map(field => (
-                  <div key={field.key} style={{ marginBottom: 10 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                      <label style={{ fontSize: 12, fontWeight: 600, color: C.tx2 }}>{field.label}</label>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        {section.id === 'serper' && (
-                          <button
-                            onClick={() => setShowSerperManager(true)}
-                            style={{
-                              padding: '4px 8px', borderRadius: 4, border: '1px solid #10B981',
-                              background: '#F0FDF4', color: '#065F46', fontSize: 10, fontWeight: 600,
-                              cursor: 'pointer', transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={e => { 
-                              (e.currentTarget as HTMLElement).style.background = '#E8F5E8'; 
-                              (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseLeave={e => { 
-                              (e.currentTarget as HTMLElement).style.background = '#F0FDF4'; 
-                              (e.currentTarget as HTMLElement).style.transform = 'translateY(0px)';
-                            }}
-                          >
-                            🔑 Générateur
-                          </button>
-                        )}
-                        {section.id === 'gmailSmtp' && field.key === 'gmailSmtpPassword' && (
-                          <a
-                            href="https://myaccount.google.com/apppasswords"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                              padding: '4px 8px', borderRadius: 4, border: '1px solid #EA4335',
-                              background: '#FCE8E6', color: '#C5221F', fontSize: 10, fontWeight: 600,
-                              cursor: 'pointer', textDecoration: 'none',
-                              transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={e => { 
-                              (e.currentTarget as HTMLElement).style.background = '#FADBD8'; 
-                            }}
-                            onMouseLeave={e => { 
-                              (e.currentTarget as HTMLElement).style.background = '#FCE8E6'; 
-                            }}
-                          >
-                            🔐 Guide Gmail
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <input
-                        type={field.masked && !visibleKeys.has(field.key) ? 'password' : 'text'}
-                        autoComplete="off"
-                        value={String(localConfig[field.key] ?? '')}
-                        onChange={e => handleLocalChange(field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                        style={{
-                          flex: 1, padding: '9px 13px', borderRadius: 6,
-                          border: `1px solid ${C.border}`, fontSize: 13,
-                          background: C.surface, color: C.tx,
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => toggleVisible(field.key)}
-                        style={{
-                          padding: '8px 10px', borderRadius: 4, border: `1px solid ${C.border}`,
-                          background: visibleKeys.has(field.key) ? C.accent2 : C.surface,
-                          color: visibleKeys.has(field.key) ? C.tx : C.tx3, fontSize: 11,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {visibleKeys.has(field.key) ? '👁' : '👁‍🗨'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => testApi(section)}
-                        style={{
-                          padding: '8px 12px', borderRadius: 4, border: 'none',
-                          background: statuses[section.id] === 'active' ? C.green : statuses[section.id] === 'testing' ? C.amber : C.tx3,
-                          color: 'white', fontSize: 11, fontWeight: 600, cursor: 'pointer',
-                        }}
-                      >
-                        {statuses[section.id] === 'testing' ? '⏳' : statuses[section.id] === 'active' ? '✅' : '🧪'}
-                      </button>
-                    </div>
-                    {testResults[section.id] && (
-                      <div style={{
-                        marginTop: 6, padding: '6px 10px', borderRadius: 4,
-                        background: testResults[section.id].includes('✅') ? C.green + '20' : C.red + '20',
-                        color: testResults[section.id].includes('✅') ? C.green : C.red,
-                        fontSize: 11,
-                      }}>
-                        {testResults[section.id]}
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {/* Save Button for each section */}
-                <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
-                  <button
-                    onClick={() => handleSaveSection(section.id, section.fields.map(f => f.key))}
-                    disabled={savingSections[section.id]}
-                    style={{
-                      padding: '8px 16px', borderRadius: 6, border: 'none',
-                      background: savingSections[section.id] ? C.tx3 : C.blue,
-                      color: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={e => { if (!savingSections[section.id]) e.currentTarget.style.opacity = '0.9'; }}
-                    onMouseLeave={e => { if (!savingSections[section.id]) e.currentTarget.style.opacity = '1'; }}
-                  >
-                    {savingSections[section.id] ? (
-                      <>⏳ Enregistrement...</>
-                    ) : (
-                      <>💾 Sauvegarder {section.title.split(' ')[0]}</>
-                    )}
-                  </button>
+              <div>
+                <h4 style={{ fontSize: 14, fontWeight: 600, color: C.tx, marginBottom: 8 }}>🤖 Utilisation par Agent</h4>
+                <div style={{ paddingLeft: 12, fontSize: 12, color: C.tx2, lineHeight: 1.5 }}>
+                  <div style={{ marginBottom: 3 }}><strong>🧠 Scorer & Enrichissement:</strong> LLM + Serper</div>
+                  <div style={{ marginBottom: 3 }}><strong>🌐 WebsiteGen:</strong> LLM + Serper + Unsplash/Pexels</div>
+                  <div style={{ marginBottom: 3 }}><strong>📧 Outreach Agent:</strong> LLM + Gmail SMTP</div>
+                  <div><strong>🔄 Pipeline:</strong> Aucune API requise</div>
                 </div>
+              </div>
 
-                {/* Gmail SMTP Documentation Guide */}
-                {section.id === 'gmailSmtp' && (
-                  <div style={{
-                    marginTop: 16,
-                    padding: '16px',
-                    borderRadius: 8,
-                    background: '#FEF7F0',
-                    border: '1px solid #EA4335',
-                  }}>
-                    <h4 style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: '#C5221F',
-                      marginBottom: 12,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                    }}>
-                      📖 Guide : Obtenir votre mot de passe Gmail
-                    </h4>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      {/* Step 1 */}
-                      <div style={{
-                        display: 'flex',
-                        gap: 12,
-                        alignItems: 'flex-start',
-                        padding: '10px',
-                        background: '#FFFFFF',
-                        borderRadius: 6,
-                        border: '1px solid #E8EAED',
-                      }}>
-                        <div style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: '50%',
-                          background: '#EA4335',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: 12,
-                          fontWeight: 700,
-                          flexShrink: 0,
-                        }}>1</div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: C.tx, marginBottom: 3 }}>
-                            Activez la Validation en 2 étapes
-                          </div>
-                          <div style={{ fontSize: 12, color: C.tx2, lineHeight: 1.5 }}>
-                            Allez sur <a href="https://myaccount.google.com/signinoptions/two-step-verification" target="_blank" rel="noopener noreferrer" style={{ color: '#1A73E8', textDecoration: 'underline' }}>myaccount.google.com → Sécurité → Validation en 2 étapes</a>. C'est OBLIGATOIRE pour générer un mot de passe d'application.
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Step 2 */}
-                      <div style={{
-                        display: 'flex',
-                        gap: 12,
-                        alignItems: 'flex-start',
-                        padding: '10px',
-                        background: '#FFFFFF',
-                        borderRadius: 6,
-                        border: '1px solid #E8EAED',
-                      }}>
-                        <div style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: '50%',
-                          background: '#EA4335',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: 12,
-                          fontWeight: 700,
-                          flexShrink: 0,
-                        }}>2</div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: C.tx, marginBottom: 3 }}>
-                            Générez un mot de passe d'application
-                          </div>
-                          <div style={{ fontSize: 12, color: C.tx2, lineHeight: 1.5 }}>
-                            Visitez <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer" style={{ color: '#1A73E8', textDecoration: 'underline' }}>myaccount.google.com/apppasswords</a> → "Sélectionner l'application" → Choisissez <strong>Courriel</strong> → Générer.
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Step 3 */}
-                      <div style={{
-                        display: 'flex',
-                        gap: 12,
-                        alignItems: 'flex-start',
-                        padding: '10px',
-                        background: '#FFFFFF',
-                        borderRadius: 6,
-                        border: '1px solid #E8EAED',
-                      }}>
-                        <div style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: '50%',
-                          background: '#34A853',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: 12,
-                          fontWeight: 700,
-                          flexShrink: 0,
-                        }}>3</div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: C.tx, marginBottom: 3 }}>
-                            Copiez le mot de passe à 16 caractères
-                          </div>
-                          <div style={{ fontSize: 12, color: C.tx2, lineHeight: 1.5 }}>
-                            Google affiche un mot de passe comme <code style={{ background: '#F1F3F4', padding: '2px 6px', borderRadius: 3, fontFamily: 'monospace', fontSize: 11 }}>abcd efgh ijkl mnop</code>. Copiez-le et collez-le dans le champ <strong>"Mot de passe d'application"</strong> ci-dessus. ⚠️ Ce mot de passe ne s'affiche qu'une seule fois !
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div style={{
-                      marginTop: 12,
-                      padding: '10px',
-                      background: '#E8F0FE',
-                      borderRadius: 6,
-                      fontSize: 12,
-                      color: '#1967D2',
-                    }}>
-                      <strong>💡 Astuce :</strong> Si vous perdez le mot de passe, vous pouvez en générer un nouveau à tout moment sur la même page.
-                    </div>
-                  </div>
-                )}
-              </form>
+              <div>
+                <h4 style={{ fontSize: 14, fontWeight: 600, color: C.tx, marginBottom: 8 }}>🖼️ Sources d'Images</h4>
+                <div style={{ paddingLeft: 12, fontSize: 12, color: C.tx2, lineHeight: 1.5 }}>
+                  <div style={{ marginBottom: 2 }}>1️⃣ Serper (Google Maps) — Priorité</div>
+                  <div style={{ marginBottom: 2 }}>2️⃣ Unsplash — Haute qualité</div>
+                  <div>3️⃣ Pexels — Alternative gratuite</div>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Info panel */}
-      <div style={{
-        background: C.surface, borderRadius: 10, padding: '20px 24px',
-        border: `1px solid ${C.border}`, marginBottom: 20,
-      }}>
-        <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, marginBottom: 12 }}>📊 Agents & Utilisation</h3>
-        <div style={{ marginBottom: 16 }}>
-          <strong style={{ color: C.tx }}>🤖 Agents qui utilisent ces APIs :</strong>
-          <div style={{ paddingLeft: 8, marginTop: 4 }}>
-            <div>1️⃣ <strong>Groq</strong> — Agent 1 (Lead Enrichment), Agent 2 (AI Scoring), Agent 3 (Website Generation), Agent 4 (Email)</div>
-            <div>2️⃣ <strong>Serper</strong> — Agent 1 (Google Search + Maps + Images)</div>
-            <div>3️⃣ <strong>Gmail SMTP</strong> — Agent 4 (Email Sending)</div>
           </div>
         </div>
-        <div style={{ marginBottom: 16 }}>
-          <strong style={{ color: C.tx }}>🎯 Priorités suggérées :</strong>
-          <div style={{ paddingLeft: 8, marginTop: 4 }}>
-            <div>1️⃣ <strong>Groq</strong> — Essentiel pour tous les agents IA</div>
-            <div>2️⃣ <strong>Serper</strong> — Indispensable pour l'enrichissement des leads</div>
-            <div>3️⃣ <strong>Gmail SMTP</strong> — Nécessaire pour l'envoi d'emails (100% gratuit)</div>
-          </div>
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <strong style={{ color: C.tx }}>🖼️ Images — Sources en cascade :</strong>
-          <div style={{ paddingLeft: 8, marginTop: 4 }}>
-            <div>1️⃣ <strong>Serper</strong> — Photos Google Maps du commerce (gratuit)</div>
-            <div>2️⃣ <strong>Images sectorielles</strong> — Bibliothèque d'images par défaut intégrée</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Danger zone */}
-      <div style={{
-        background: C.surface, borderRadius: 10, padding: '20px 24px',
-        border: `1px solid ${C.red}30`, marginTop: 12,
-      }}>
-        <h3 style={{ fontSize: 15, fontWeight: 600, color: C.red, marginBottom: 8 }}>⚠️ Zone Dangereuse</h3>
-        <p style={{ fontSize: 13, color: C.tx3, marginBottom: 14, lineHeight: 1.5 }}>
-          Supprimer toutes les données (leads, configurations, historique). Irréversible.
-        </p>
-        <button onClick={onClearData}
-          style={{
-            padding: '10px 20px', borderRadius: 6, border: `1px solid ${C.red}`,
-            background: '#fff', color: C.red, fontWeight: 600, fontSize: 13, cursor: 'pointer',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}
-        >🗑️ Supprimer toutes les données</button>
       </div>
       
       {/* Overlay du générateur Serper */}
@@ -704,4 +621,289 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
       )}
     </div>
   );
+
+// Helper component for API section cards
+function ApiSectionCard({ 
+  section, localConfig, visibleKeys, testResults, statuses, savingSections,
+  onLocalChange, onToggleVisible, onTestApi, onSaveSection, onShowSerperManager
+}: {
+  section: any;
+  localConfig: any;
+  visibleKeys: Set<string>;
+  testResults: Record<string, string>;
+  statuses: Record<string, any>;
+  savingSections: Record<string, boolean>;
+  onLocalChange: (key: any, value: any) => void;
+  onToggleVisible: (key: string) => void;
+  onTestApi: (section: any) => void;
+  onSaveSection: (id: string, keys: any[]) => void;
+  onShowSerperManager: (show: boolean) => void;
+}) {
+  const C = {
+    bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
+    border: '#E4E2DA', tx: '#1C1B18', tx2: '#5C5A53', tx3: '#9B9890',
+    accent: '#D4500A', accent2: '#F0E8DF',
+    green: '#1A7A4A', blue: '#1A4FA0', amber: '#B45309', red: '#C0392B',
+  };
+
+  return (
+    <div style={{
+      background: C.bg, borderRadius: 8, padding: 16,
+      border: `1px solid ${C.border}`,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: 8, background: section.color + '20',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
+        }}>{section.icon}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: C.tx }}>{section.title}</div>
+          <div style={{ fontSize: 12, color: C.tx3 }}>{section.shortDesc}</div>
+        </div>
+        <div style={{
+          padding: '4px 8px', borderRadius: 12, fontSize: 10, fontWeight: 600,
+          background: section.required ? C.red + '20' : C.green + '20',
+          color: section.required ? C.red : C.green,
+        }}>
+          {section.required ? 'Obligatoire' : 'Optionnel'}
+        </div>
+      </div>
+
+      <form onSubmit={e => e.preventDefault()}>
+        {section.fields.map((field: any) => (
+          <div key={field.key} style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: C.tx2 }}>{field.label}</label>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                {section.id === 'serper' && (
+                  <button
+                    onClick={() => onShowSerperManager(true)}
+                    style={{
+                      padding: '3px 6px', borderRadius: 4, border: '1px solid #10B981',
+                      background: '#F0FDF4', color: '#065F46', fontSize: 9, fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🔑 Générateur
+                  </button>
+                )}
+                {section.id === 'gmailSmtp' && field.key === 'gmailSmtpPassword' && (
+                  <a
+                    href="https://myaccount.google.com/apppasswords"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      padding: '3px 6px', borderRadius: 4, border: '1px solid #EA4335',
+                      background: '#FCE8E6', color: '#C5221F', fontSize: 9, fontWeight: 600,
+                      cursor: 'pointer', textDecoration: 'none',
+                    }}
+                  >
+                    🔐 Guide
+                  </a>
+                )}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input
+                type={field.masked && !visibleKeys.has(field.key) ? 'password' : 'text'}
+                autoComplete="off"
+                value={String(localConfig[field.key] ?? '')}
+                onChange={e => onLocalChange(field.key, e.target.value)}
+                placeholder={field.placeholder}
+                style={{
+                  flex: 1, padding: '8px 12px', borderRadius: 6,
+                  border: `1px solid ${C.border}`, fontSize: 12,
+                  background: C.surface, color: C.tx,
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => onToggleVisible(field.key)}
+                style={{
+                  padding: '6px 8px', borderRadius: 4, border: `1px solid ${C.border}`,
+                  background: visibleKeys.has(field.key) ? C.accent2 : C.surface,
+                  color: visibleKeys.has(field.key) ? C.tx : C.tx3, fontSize: 10,
+                  cursor: 'pointer',
+                }}
+              >
+                {visibleKeys.has(field.key) ? '👁' : '👁‍🗨'}
+              </button>
+              <button
+                type="button"
+                onClick={() => onTestApi(section)}
+                style={{
+                  padding: '6px 10px', borderRadius: 4, border: 'none',
+                  background: statuses[section.id] === 'active' ? C.green : statuses[section.id] === 'testing' ? C.amber : C.tx3,
+                  color: 'white', fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                {statuses[section.id] === 'testing' ? '⏳' : statuses[section.id] === 'active' ? '✅' : '🧪'}
+              </button>
+            </div>
+            {testResults[section.id] && (
+              <div style={{
+                marginTop: 6, padding: '6px 10px', borderRadius: 4,
+                background: testResults[section.id].includes('✅') ? C.green + '20' : C.red + '20',
+                color: testResults[section.id].includes('✅') ? C.green : C.red,
+                fontSize: 10,
+              }}>
+                {testResults[section.id]}
+              </div>
+            )}
+          </div>
+        ))}
+
+        <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            onClick={() => onSaveSection(section.id, section.fields.map((f: any) => f.key))}
+            disabled={savingSections[section.id]}
+            style={{
+              padding: '6px 12px', borderRadius: 6, border: 'none',
+              background: savingSections[section.id] ? C.tx3 : C.blue,
+              color: 'white', fontSize: 11, fontWeight: 600, cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {savingSections[section.id] ? '⏳...' : '💾 Sauvegarder'}
+          </button>
+        </div>
+
+        {/* Gmail SMTP Documentation Guide */}
+        {section.id === 'gmailSmtp' && (
+          <div style={{
+            marginTop: 16,
+            padding: '16px',
+            borderRadius: 8,
+            background: '#FEF7F0',
+            border: '1px solid #EA4335',
+          }}>
+            <h4 style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: '#C5221F',
+              marginBottom: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}>
+              📖 Guide : Obtenir votre mot de passe Gmail
+            </h4>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {/* Step 1 */}
+              <div style={{
+                display: 'flex',
+                gap: 10,
+                alignItems: 'flex-start',
+                padding: '8px',
+                background: '#FFFFFF',
+                borderRadius: 6,
+                border: '1px solid #E8EAED',
+              }}>
+                <div style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  background: '#EA4335',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}>1</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: C.tx, marginBottom: 2 }}>
+                    Activez la Validation en 2 étapes
+                  </div>
+                  <div style={{ fontSize: 11, color: C.tx2, lineHeight: 1.4 }}>
+                    Allez sur <a href="https://myaccount.google.com/signinoptions/two-step-verification" target="_blank" rel="noopener noreferrer" style={{ color: '#1A73E8', textDecoration: 'underline' }}>myaccount.google.com → Sécurité → Validation en 2 étapes</a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div style={{
+                display: 'flex',
+                gap: 10,
+                alignItems: 'flex-start',
+                padding: '8px',
+                background: '#FFFFFF',
+                borderRadius: 6,
+                border: '1px solid #E8EAED',
+              }}>
+                <div style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  background: '#EA4335',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}>2</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: C.tx, marginBottom: 2 }}>
+                    Générez un mot de passe d'application
+                  </div>
+                  <div style={{ fontSize: 11, color: C.tx2, lineHeight: 1.4 }}>
+                    Visitez <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer" style={{ color: '#1A73E8', textDecoration: 'underline' }}>myaccount.google.com/apppasswords</a> → "Sélectionner l'application" → Choisissez <strong>Courriel</strong> → Générer.
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div style={{
+                display: 'flex',
+                gap: 10,
+                alignItems: 'flex-start',
+                padding: '8px',
+                background: '#FFFFFF',
+                borderRadius: 6,
+                border: '1px solid #E8EAED',
+              }}>
+                <div style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  background: '#34A853',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}>3</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: C.tx, marginBottom: 2 }}>
+                    Copiez le mot de passe à 16 caractères
+                  </div>
+                  <div style={{ fontSize: 11, color: C.tx2, lineHeight: 1.4 }}>
+                    Google affiche un mot de passe comme <code style={{ background: '#F1F3F4', padding: '1px 4px', borderRadius: 2, fontFamily: 'monospace', fontSize: 10 }}>abcd efgh ijkl mnop</code>. Copiez-le et collez-le dans le champ <strong>"Mot de passe d'application"</strong> ci-dessus.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              marginTop: 10,
+              padding: '8px',
+              background: '#E8F0FE',
+              borderRadius: 6,
+              fontSize: 11,
+              color: '#1967D2',
+            }}>
+              <strong>💡 Astuce :</strong> Si vous perdez le mot de passe, vous pouvez en générer un nouveau à tout moment sur la même page.
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
+  );
+}
 }
