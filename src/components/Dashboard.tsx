@@ -94,8 +94,11 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
       clearTimeout(hoverTimeout);
       setHoverTimeout(null);
     }
-    // Afficher immédiatement
-    setHoveredButton(buttonName);
+    // Afficher après un délai de 800ms
+    const timeout = setTimeout(() => {
+      setHoveredButton(buttonName);
+    }, 800);
+    setHoverTimeout(timeout);
   }, [hoverTimeout]);
 
   const handleMouseLeave = useCallback(() => {
@@ -103,7 +106,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
     const timeout = setTimeout(() => {
       setHoveredButton(null);
       setHoverTimeout(null);
-    }, 1000); // 1000ms de délai avant disparition
+    }, 4000); // 4000ms de délai avant disparition
     setHoverTimeout(timeout);
   }, []);
 
