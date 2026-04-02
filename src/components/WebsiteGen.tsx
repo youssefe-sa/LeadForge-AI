@@ -136,7 +136,7 @@ function getCuratedFallback(sector: string, index: number): string {
 export default function WebsiteGen({ leads, updateLead, apiConfig }: Props) {
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0, name: '', step: '' });
-  const [batchDelay, setBatchDelay] = useState(2000);
+  const [batchDelay, setBatchDelay] = useState(8000);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [showEditor, setShowEditor] = useState(false);
@@ -682,24 +682,26 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
             {hasLLM ? ' ✅ IA active' : ' — ⚠️ Ajoutez une clé LLM'}
           </p>
         </div>
-        <button onClick={generateBatch} disabled={generating || enriched.length === 0} style={{
-          padding: '10px 20px', borderRadius: 6, border: 'none',
-          background: generating ? C.tx3 : C.blue, color: '#fff',
-          fontWeight: 600, fontSize: 14, cursor: generating ? 'default' : 'pointer',
-        }}>
-          {generating ? `Génération ${progress.current}/${progress.total}...` : `🌐 Générer ${enriched.length} sites`}
-        </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 12, color: C.tx3 }}>⏱ Délai entre sites :</span>
-          {[2, 3, 5, 8].map(s => (
-            <button key={s} onClick={() => setBatchDelay(s * 1000)} disabled={generating} style={{
-              padding: '4px 10px', borderRadius: 4, border: `1px solid ${batchDelay === s * 1000 ? C.blue : C.border}`,
-              background: batchDelay === s * 1000 ? C.blue + '22' : C.surface,
-              color: batchDelay === s * 1000 ? C.blue : C.tx2,
-              fontSize: 12, fontWeight: batchDelay === s * 1000 ? 700 : 400,
-              cursor: generating ? 'default' : 'pointer',
-            }}>{s}s</button>
-          ))}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 12, color: C.tx3 }}>⏱ Délai entre sites :</span>
+            {[2, 3, 5, 8].map(s => (
+              <button key={s} onClick={() => setBatchDelay(s * 1000)} disabled={generating} style={{
+                padding: '4px 10px', borderRadius: 4, border: `1px solid ${batchDelay === s * 1000 ? C.blue : C.border}`,
+                background: batchDelay === s * 1000 ? C.blue + '22' : C.surface,
+                color: batchDelay === s * 1000 ? C.blue : C.tx2,
+                fontSize: 12, fontWeight: batchDelay === s * 1000 ? 700 : 400,
+                cursor: generating ? 'default' : 'pointer',
+              }}>{s}s</button>
+            ))}
+          </div>
+          <button onClick={generateBatch} disabled={generating || enriched.length === 0} style={{
+            padding: '10px 20px', borderRadius: 6, border: 'none',
+            background: generating ? C.tx3 : C.blue, color: '#fff',
+            fontWeight: 600, fontSize: 14, cursor: generating ? 'default' : 'pointer',
+          }}>
+            {generating ? `Génération ${progress.current}/${progress.total}...` : `🌐 Générer ${enriched.length} sites`}
+          </button>
         </div>
       </div>
 
