@@ -279,7 +279,9 @@ export const configService = {
         gmailSmtpPassword: '',
         gmailSmtpFromName: '',
         gmailSmtpFromEmail: '',
-        gmailSmtpSecure: false
+        gmailSmtpSecure: false,
+        whopDepositLink: '',
+        whopFinalPaymentLink: ''
       };
     }
     
@@ -298,7 +300,9 @@ export const configService = {
       gmailSmtpPassword: data.gmail_smtp_password || '',
       gmailSmtpFromName: data.gmail_smtp_from_name || '',
       gmailSmtpFromEmail: data.gmail_smtp_from_email || '',
-      gmailSmtpSecure: data.gmail_smtp_secure || false
+      gmailSmtpSecure: data.gmail_smtp_secure || false,
+      whopDepositLink: data.whop_deposit_link || '',
+      whopFinalPaymentLink: data.whop_final_payment_link || ''
     };
   },
 
@@ -316,7 +320,9 @@ export const configService = {
       gmail_smtp_password: config.gmailSmtpPassword || null,
       gmail_smtp_from_name: config.gmailSmtpFromName || null,
       gmail_smtp_from_email: config.gmailSmtpFromEmail || null,
-      gmail_smtp_secure: Boolean(config.gmailSmtpSecure)
+      gmail_smtp_secure: Boolean(config.gmailSmtpSecure),
+      whop_deposit_link: config.whopDepositLink || null,
+      whop_final_payment_link: config.whopFinalPaymentLink || null
     };
 
     // Note: openrouter_key, unsplash_key, pexels_key sont exclus car manquants dans la DB actuelle

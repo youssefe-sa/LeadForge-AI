@@ -375,6 +375,45 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
         return { ok: true, msg: '✅ Configuration SMTP valide. Test d\'envoi disponible dans l\'agent Email.' };
       },
     },
+
+    // WHOP PAYMENT
+    {
+      id: 'whopPayment', title: 'Whop Paiements', icon: '💳', color: C.green,
+      required: true,
+      agents: ['Agent 4'],
+      shortDesc: 'Liens de paiement Whop — 46$ dépôt + 100$ final',
+      longDesc: 'Configurez les liens de paiement Whop pour les deux étapes de paiement : 46$ pour commencer (dépôt) et 100$ à la fin (paiement final). Ces liens seront inclus automatiquement dans les emails.',
+      whyNeeded: 'OBLIGATOIRE. Permet aux clients de payer pour les sites web générés. Sans ces liens, aucun paiement ne peut être effectué.',
+      freeInfo: '💰 CONFIGURATION REQUISE — Créez vos produits sur Whop et copiez les liens ici.',
+      fields: [
+        { key: 'whopDepositLink', label: 'Lien paiement 46$ (dépôt)', masked: false, placeholder: 'https://whop.com/products/...',
+          helpUrl: 'https://whop.com/dashboard',
+          helpText: 'whop.com → Dashboard → Products → Copier le lien du produit de 46$' },
+        { key: 'whopFinalPaymentLink', label: 'Lien paiement 100$ (final)', masked: false, placeholder: 'https://whop.com/products/...',
+          helpUrl: 'https://whop.com/dashboard',
+          helpText: 'whop.com → Dashboard → Products → Copier le lien du produit de 100$' },
+      ],
+      testFn: async (c) => {
+        const issues = [];
+        if (!c.whopDepositLink) issues.push('Lien dépôt 46$ manquant');
+        if (!c.whopFinalPaymentLink) issues.push('Lien paiement 100$ manquant');
+        
+        if (issues.length > 0) {
+          return { ok: false, msg: `❌ ${issues.join(', ')}` };
+        }
+        
+        // Validation basique des URLs
+        const urlRegex = /^https:\/\/whop\.com\/products\//;
+        if (!urlRegex.test(c.whopDepositLink)) {
+          return { ok: false, msg: '❌ Lien dépôt invalide (doit commencer par https://whop.com/products/)' };
+        }
+        if (!urlRegex.test(c.whopFinalPaymentLink)) {
+          return { ok: false, msg: '❌ Lien paiement final invalide (doit commencer par https://whop.com/products/)' };
+        }
+        
+        return { ok: true, msg: '✅ Liens de paiement Whop configurés ! 46$ dépôt + 100$ final actifs.' };
+      },
+    },
   ];
 
   if (showSerperManager) {
@@ -490,7 +529,7 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {sections.filter(s => s.required || ['serper', 'gmailSmtp'].includes(s.id)).map(section => (
+              {sections.filter(s => s.required || ['serper', 'gmailSmtp', 'whopPayment'].includes(s.id)).map(section => (
                 <ApiSectionCard 
                   key={section.id}
                   section={section}
@@ -555,7 +594,7 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
           }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, color: C.tx, marginBottom: 16 }}>🎯 APIs Optionnelles</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {sections.filter(s => !s.required && !['serper', 'gmailSmtp'].includes(s.id)).map(section => (
+              {sections.filter(s => !s.required && !['serper', 'gmailSmtp', 'whopPayment'].includes(s.id)).map(section => (
                 <ApiSectionCard 
                   key={section.id}
                   section={section}

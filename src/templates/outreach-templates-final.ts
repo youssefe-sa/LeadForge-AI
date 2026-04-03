@@ -121,27 +121,30 @@ export const salesTemplates: EmailTemplate[] = [
             
             <!-- Tarification -->
             <div style="background-color: #fff3cd; padding: 25px; margin: 30px 0; border: 1px solid #ffeaa7;">
-              <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Investissement</h3>
+              <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">💰 Modalités de paiement</h3>
               <div style="margin-bottom: 20px;">
-                <p style="font-size: 20px; font-weight: 600; margin: 10px 0; color: #2c3e50;">146€ HT - Paiement unique</p>
-                <p style="margin: 5px 0 0 0; font-size: 14px; color: #856404;">
-                  La création de votre site web professionnel est payée une seule fois.
+                <p style="font-size: 18px; font-weight: 600; margin: 10px 0; color: #2c3e50;">Paiement en 2 étapes - Total : 146$</p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-weight: 600; color: #28a745;">🚀 Étape 1 - Dépôt pour commencer</span>
+                    <span style="font-weight: bold; color: #28a745; font-size: 16px;">46$</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 600; color: #007bff;">🎯 Étape 2 - Paiement final à la livraison</span>
+                    <span style="font-weight: bold; color: #007bff; font-size: 16px;">100$</span>
+                  </div>
+                </div>
+                <p style="margin: 15px 0 0 0; font-size: 14px; color: #856404;">
+                  <strong>Commencez maintenant avec seulement 46$</strong> - Le reste sera dû à la livraison de votre site
                 </p>
-                <p style="margin: 10px 0 0 0; font-size: 14px; color: #856404; font-weight: 500;">
-                  Inclut :
-                </p>
+              </div>
+              <div style="padding-top: 15px; border-top: 1px solid #ffeaa7;">
+                <p style="font-size: 16px; font-weight: 500; margin: 0 0 5px 0; color: #856404;">Inclus dans le pack :</p>
                 <ul style="margin: 5px 0 0 20px; font-size: 14px; color: #856404;">
                   <li>1. Hébergement professionnel 1 an inclus</li>
                   <li>2. Nom de domaine professionnel 1 an inclus</li>
                   <li>3. mois gratuits de suivi et maintenance</li>
                 </ul>
-              </div>
-              <div style="padding-top: 15px; border-top: 1px solid #ffeaa7;">
-                <p style="font-size: 16px; font-weight: 500; margin: 0 0 5px 0; color: #856404;">À partir de la 2ème année :</p>
-                <p style="font-size: 18px; font-weight: 600; margin: 0; color: #2c3e50;">46€ HT par an</p>
-                <p style="margin: 5px 0 0 0; font-size: 14px; color: #856404;">
-                  Pour l'hébergement ET le nom de domaine
-                </p>
               </div>
             </div>
             
@@ -153,7 +156,7 @@ export const salesTemplates: EmailTemplate[] = [
                    style="display: inline-block; background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
                   Démarrer le projet
                 </a>
-                <a href="mailto:{{agentEmail}}?subject=Questions projet {{companyName}}&body=Bonjour, j'ai quelques questions sur le projet pour {{companyName}}." 
+                <a href="mailto:{{agentEmail}}?subject=Questions projet {{companyName}}&body=Bonjour {{agentName}}, j'ai quelques questions sur le projet pour {{companyName}}." 
                    style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
                   Plus de questions
                 </a>
@@ -162,13 +165,20 @@ export const salesTemplates: EmailTemplate[] = [
           </div>
           
           <!-- Footer -->
-          <div style="text-align: center; padding-top: 30px; border-top: 1px solid #e0e0e0; font-size: 14px; color: #7f8c8d;">
-            <p style="margin: 0;">
-              Cordialement,<br>
-              <strong>{{agentName}}</strong><br>
-              {{agentName}}<br>
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+              Prêt à transformer votre présence en ligne professionnelle ?
             </p>
+            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+              Contactez-nous pour démarrer votre projet
+            </p>
+          </div>
+          
+          <!-- Signature -->
+          <div style="margin-top: 30px; text-align: left;">
+            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
       </body>
@@ -217,18 +227,18 @@ Notre proposition inclut :
 • Économie garantie : 40% moins cher que les agences traditionnelles
 • Propriété totale : Vous êtes 100% propriétaire de votre site et domaine
 
-Investissement
-146€ HT - Paiement unique
-La création de votre site web professionnel est payée une seule fois.
+💰 Modalités de paiement
+Paiement en 2 étapes - Total : 146$
 
-Inclut :
+🚀 Étape 1 - Dépôt pour commencer : 46$
+🎯 Étape 2 - Paiement final à la livraison : 100$
+
+Commencez maintenant avec seulement 46$ - Le reste sera dû à la livraison de votre site
+
+Inclus dans le pack :
 1. Hébergement professionnel 1 an inclus
 2. Nom de domaine professionnel 1 an inclus
 3. mois gratuits de suivi et maintenance
-
-À partir de la 2ème année :
-46€ HT par an
-Pour l'hébergement ET le nom de domaine
 
 Souhaitez-vous démarrer votre projet ?
 • Démarrer le projet
@@ -343,27 +353,35 @@ LeadForge AI
             
             <!-- Paiement détaillé -->
             <div style="background-color: #fff3cd; padding: 25px; margin: 30px 0; border: 1px solid #ffeaa7;">
-              <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Finaliser votre projet</h3>
+              <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">💰 Modalités de paiement</h3>
               <div style="margin-bottom: 20px;">
-                <p style="font-size: 20px; font-weight: 600; margin: 10px 0; color: #2c3e50;">146€ HT - Paiement unique</p>
-                <p style="margin: 5px 0 0 0; font-size: 14px; color: #856404;">
-                  Investissement unique pour la création complète incluant :
+                <p style="font-size: 18px; font-weight: 600; margin: 10px 0; color: #2c3e50;">Paiement en 2 étapes - Total : 146$</p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-weight: 600; color: #28a745;">🚀 Étape 1 - Dépôt pour commencer</span>
+                    <span style="font-weight: bold; color: #28a745; font-size: 16px;">46$</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 600; color: #007bff;">🎯 Étape 2 - Paiement final à la livraison</span>
+                    <span style="font-weight: bold; color: #007bff; font-size: 16px;">100$</span>
+                  </div>
+                </div>
+                <p style="margin: 15px 0 0 0; font-size: 14px; color: #856404;">
+                  <strong>Commencez maintenant avec seulement 46$</strong> - Le reste sera dû à la livraison de votre site
                 </p>
-                <ul style="margin: 10px 0 0 20px; font-size: 14px; color: #856404;">
-                  <li>Toutes les phases de développement</li>
-                  <li>Hébergement professionnel 1 an</li>
-                  <li>Nom de domaine professionnel 1 an</li>
-                  <li>Suivie et mantenance 3 mois</li>
-                </ul>
               </div>
-                            <div style="padding-top: 15px; border-top: 1px solid #ffeaa7; margin-top: 15px;">
+              <div style="padding-top: 15px; border-top: 1px solid #ffeaa7; margin-top: 15px;">
                 <p style="margin: 0 0 15px 0; font-size: 14px; color: #856404;">
-                  Offre valide {{validityDays}} jours. Paiement 100% sécurisé.
+                  Offre valide {{validityDays}} jours. Paiement 100% sécurisé via Whop.
                 </p>
-                <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Finaliser votre projet :</p>
-                <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                  <a href="{{paymentLink}}" style="color: #007bff; text-decoration: underline;">{{paymentLink}}</a>
-                </p>
+                <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Commencer votre projet (dépôt 46$) :</p>
+                <div style="text-align: center; margin: 20px 0;">
+                  <a href="{{paymentLink}}" 
+                     style="background: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);"
+                     target="_blank">
+                    💳 Payer 46$ pour commencer →
+                  </a>
+                </div>
               </div>
             </div>
             
@@ -384,13 +402,20 @@ LeadForge AI
           </div>
           
           <!-- Footer -->
-          <div style="text-align: center; padding-top: 30px; border-top: 1px solid #e0e0e0; font-size: 14px; color: #7f8c8d;">
-            <p style="margin: 0;">
-              Cordialement,<br>
-              <strong>{{agentName}}</strong><br>
-              {{agentName}}<br>
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+              Prêt à démarrer votre projet professionnel ?
             </p>
+            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+              Validez la maquette ou contactez-nous pour toute modification
+            </p>
+          </div>
+          
+          <!-- Signature -->
+          <div style="margin-top: 30px; text-align: left;">
+            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
       </body>
@@ -441,10 +466,17 @@ Nos garanties exclusives :
 • Propriété totale : Vous êtes 100% propriétaire du code et du domaine
 • Support prioritaire : Assistance dédiée pendant 3 mois
 
-Finaliser votre projet
-146€ HT - Paiement unique
-Investissement unique pour la création complète incluant :
-• Toutes les phases de développement
+💰 Modalités de paiement
+Paiement en 2 étapes - Total : 146$
+
+🚀 Étape 1 - Dépôt pour commencer : 46$
+🎯 Étape 2 - Paiement final à la livraison : 100$
+
+Commencez maintenant avec seulement 46$ - Le reste sera dû à la livraison de votre site
+
+Offre valide {{validityDays}} jours. Paiement 100% sécurisé via Whop.
+Commencer votre projet (dépôt 46$) : {{paymentLink}}
+
 {{agentName}}
 LeadForge AI
 {{agentEmail}}
@@ -453,73 +485,112 @@ LeadForge AI
 
   {
     id: 'email3_confirmation',
-    name: 'Email 3 - Confirmation Paiement',
+    name: 'Email 3 - Confirmation Dépôt',
     category: 'sale',
-    subject: 'Paiement confirmé - Votre projet {{companyName}} démarre',
-    variables: ['firstName', 'companyName', 'invoiceLink', 'paymentLink', 'price', 'agentName', 'agentEmail', 'clientPortalLink', 'deliveryDate'],
+    subject: '🚀 Dépôt confirmé - Votre projet {{companyName}} démarre !',
+    variables: ['firstName', 'companyName', 'invoiceLink', 'price', 'agentName', 'agentEmail', 'deliveryDate'],
     htmlContent: `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Paiement Confirmé</title>
+        <title>LeadForge AI - Dépôt Confirmé</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
           
           <!-- Header -->
           <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
-            <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #28a745;">Paiement confirmé</h1>
-            <p style="margin: 8px 0 0 0; font-size: 14px; color: #7f8c8d;">Bienvenue chez {{agentName}}</p>
+            <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #28a745;">🚀 Dépôt confirmé !</h1>
+            <p style="margin: 8px 0 0 0; font-size: 14px; color: #7f8c8d;">Votre projet {{companyName}} démarre maintenant</p>
           </div>
           
           <!-- Content -->
           <div style="margin-bottom: 30px;">
             <h2 style="color: #2c3e50; margin-bottom: 15px; font-size: 20px;">Bonjour {{firstName}},</h2>
             
-            <!-- Introduction et remerciement -->
-            <div style="margin-bottom: 30px;">
-              <p style="font-size: 16px; margin-bottom: 15px;">
-                <strong>Merci de votre confiance !</strong> Nous sommes particulièrement honorés que vous ayez choisi 
-                {{agentName}} pour la création de votre site web professionnel {{companyName}}. Votre décision 
-                témoigne de la confiance que vous placez dans notre expertise et notre engagement qualité.
+            <!-- Confirmation -->
+            <div style="background-color: #d4edda; padding: 25px; margin: 0 0 30px 0; border: 1px solid #c3e6cb; border-radius: 8px;">
+              <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">✅ Dépôt de 46$ reçu</h3>
+              <p style="font-size: 16px; margin-bottom: 20px; color: #155724;">
+                Nous vous confirmons la bonne réception de votre dépôt de <strong>46$</strong> pour votre projet {{companyName}}. 
+                Votre site web est maintenant officiellement en production avec notre équipe dédiée.
               </p>
-              <p style="font-size: 16px; margin-bottom: 25px;">
-                <strong>Qu'est-ce que cela signifie pour vous ?</strong> Votre paiement de 146€ HT vient d'être confirmé, 
-                et nous vous confirmons que votre projet est maintenant officiellement en production. 
-                Notre équipe va immédiatement commencer à travailler sur votre présence en ligne professionnelle.
+              <p style="margin: 0; font-size: 14px; color: #155724;">
+                <strong>Reste à payer :</strong> 100$ (à la livraison)
+              </p>
+            </div>
+            <!-- Calendrier -->
+            <div style="background-color: #f8f9fa; padding: 25px; margin: 0 0 30px 0; border: 1px solid #e9ecef; border-radius: 8px;">
+              <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 18px;">📅 Votre calendrier de projet</h3>
+              <p style="font-size: 16px; margin-bottom: 15px; color: #2c3e50;">
+                <strong>Livraison prévue le {{deliveryDate}}</strong>
+              </p>
+              <div style="margin-bottom: 20px;">
+                <div style="background: #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                  <div style="font-weight: 600; color: #28a745; margin-bottom: 8px;">📋 Phase 1 - Développement (2 jours)</div>
+                  <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #666;">
+                    <li>Intégration technique et fonctionnalités principales</li>
+                    <li>Optimisation SEO et performances</li>
+                    <li>Tests et validation sur tous appareils</li>
+                  </ul>
+                </div>
+                <div style="background: #e9ecef; padding: 15px; border-radius: 6px;">
+                  <div style="font-weight: 600; color: #007bff; margin-bottom: 8px;">🚀 Phase 2 - Livraison (Jour J)</div>
+                  <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #666;">
+                    <li>Mise en ligne du site sur serveur</li>
+                    <li>Paiement final de 100$</li>
+                    <li>Remise des accès et documentation</li>
+                    <li>Support technique 3 mois activé</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Facture -->
+            <div style="background-color: #fff3cd; padding: 20px; margin: 0 0 30px 0; border: 1px solid #ffeaa7; border-radius: 8px;">
+              <h3 style="color: #856404; margin-top: 0; margin-bottom: 10px; font-size: 16px;">📄 Votre facture de dépôt</h3>
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #856404;">
+                Une facture pour votre dépôt de 46$ est disponible :
+              </p>
+              <p style="margin: 0; font-size: 14px; color: #007bff;">
+                <a href="{{invoiceLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">Télécharger ma facture</a>
               </p>
             </div>
             
-            <!-- Confirmation paiement -->
-            <div style="background-color: #f8f9fa; padding: 25px; margin: 30px 0; border: 1px solid #e9ecef;">
-              <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Confirmation de votre investissement</h3>
-              <p style="font-size: 16px; margin-bottom: 20px;">
-                Nous vous confirmons la bonne réception de votre paiement de 146€ HT pour votre projet {{companyName}}. 
-                Votre site web est maintenant officiellement en production avec notre équipe dédiée.
+            <!-- Support -->
+            <div style="margin-bottom: 30px;">
+              <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">💬 Besoin d'aide ?</h3>
+              <p style="font-size: 16px; margin-bottom: 15px;">
+                Pendant le développement, vous pouvez nous contacter à tout moment pour :
               </p>
-                          
-            <!-- Facture et documents -->
-            <div style="background-color: #d1ecf1; padding: 25px; margin: 30px 0; border: 1px solid #bee5eb;">
-              <h3 style="color: #0c5460; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Vos documents officiels</h3>
-              <div style="margin-bottom: 20px;">
-                <p style="font-size: 16px; font-weight: 500; margin: 0 0 10px 0;">Votre facture est disponible :</p>
-                <p style="margin: 0 0 15px 0; font-size: 14px; color: #007bff;">
-                  <a href="{{invoiceLink}}" style="color: #007bff; text-decoration: underline;">{{invoiceLink}}</a>
-                </p>
-                <p style="margin: 0; font-size: 14px; color: #0c5460;">
-                  Facture N°{{invoiceNumber}} - Montant : 146€ HT - Date : {{invoiceDate}}
-                </p>
-              </div>
-                          </div>
-          <div style="text-align: center; padding-top: 30px; border-top: 1px solid #e0e0e0; font-size: 14px; color: #7f8c8d;">
-            <p style="margin: 0;">
-              Merci de votre confiance,<br>
-              <strong>{{agentName}}</strong><br>
-              {{agentName}}<br>
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+              <ul style="font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                <li>Suivre l'avancement de votre projet</li>
+                <li>Demander des modifications</li>
+                <li>Poser des questions techniques</li>
+                <li>Planifier une visioconférence</li>
+              </ul>
+              <p style="margin: 20px 0 0 0; font-size: 14px; color: #7f8c8d;">
+                Répondez simplement à cet email pour nous contacter
+              </p>
+            </div>
+                <!-- Footer -->
+          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+              Merci de votre confiance - Votre projet est entre de bonnes mains !
             </p>
+            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+              Livraison garantie le {{deliveryDate}}
+            </p>
+          </div>
+          
+          <!-- Signature -->
+          <div style="margin-top: 30px; text-align: left;">
+            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
+          </div>
           </div>
         </div>
       </body>
@@ -528,42 +599,442 @@ LeadForge AI
     textContent: `
 Bonjour {{firstName}},
 
-Merci de votre confiance !
-Nous sommes particulièrement honorés que vous ayez choisi 
-{{agentName}} pour la création de votre site web professionnel {{companyName}}. Votre décision 
-témoigne de la confiance que vous placez dans notre expertise et notre engagement qualité.
+🚀 Dépôt confirmé ! Votre projet {{companyName}} démarre maintenant
 
-Qu'est-ce que cela signifie pour vous ?
-Votre paiement de 146€ HT vient d'être confirmé, 
-et nous vous confirmons que votre projet est maintenant officiellement en production. 
-Notre équipe va immédiatement commencer à travailler sur votre présence en ligne professionnelle.
-
-Confirmation de votre investissement
-Nous vous confirmons la bonne réception de votre paiement de 146€ HT pour votre projet {{companyName}}. 
+✅ Dépôt de 46$ reçu
+Nous vous confirmons la bonne réception de votre dépôt de 46$ pour votre projet {{companyName}}. 
 Votre site web est maintenant officiellement en production avec notre équipe dédiée.
 
+Reste à payer : 100$ (à la livraison)
 
-Votre calendrier de projet - 2 jours ouvrables :
+📅 Votre calendrier de projet
+Livraison prévue le {{deliveryDate}}
 
-📋 Étape 1 - Développement
-• Intégration technique : Développement des fonctionnalités principales
-• Optimisation SEO : Intégration des meilleures pratiques
-• Tests et validation : Vérification sur tous appareils
+📋 Phase 1 - Développement (2 jours)
+• Intégration technique et fonctionnalités principales
+• Optimisation SEO et performances
+• Tests et validation sur tous appareils
 
-🚀 Étape 2 - Livraison
-• Mise en ligne : Déploiement du site sur serveur
-• Documentation : Guides pour gérer votre site
-• Support 3 mois : Assistance prioritaire incluse
-• Support actif : Assistance pendant 90 jours
+🚀 Phase 2 - Livraison (Jour J)
+• Mise en ligne du site sur serveur
+• Paiement final de 100$
+• Remise des accès et documentation
+• Support technique 3 mois activé
 
-Vos documents officiels
-Votre facture est disponible : {{invoiceLink}}
-Facture N°{{invoiceNumber}} - Montant : 146€ HT - Date : {{invoiceDate}}
+📄 Votre facture de dépôt
+Une facture pour votre dépôt de 46$ est disponible : {{invoiceLink}}
 
-Besoin d'aide ou d'informations ?
-• Contacter le support
+💬 Besoin d'aide ?
+Pendant le développement, vous pouvez nous contacter à tout moment pour :
+• Suivre l'avancement de votre projet
+• Demander des modifications
+• Poser des questions techniques
+• Planifier une visioconférence
 
-Merci de votre confiance,
+Répondez simplement à cet email pour nous contacter
+
+Merci de votre confiance - Votre projet est entre de bonnes mains !
+Livraison garantie le {{deliveryDate}}
+
+Cordialement,
+{{agentName}}
+LeadForge AI
+{{agentEmail}}
+   `
+  },
+
+  {
+    id: 'email4_final_payment',
+    name: 'Email 4 - Paiement Final',
+    category: 'sale',
+    subject: '🎉 Votre site {{companyName}} est prêt - Paiement final de 100$',
+    variables: ['firstName', 'companyName', 'websiteLink', 'finalPaymentLink', 'agentName', 'agentEmail', 'deliveryDate'],
+    htmlContent: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LeadForge AI - Votre site est prêt</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          
+          <!-- Header Célébration -->
+          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #28a745;">🎉 Votre site est prêt !</h1>
+            <p style="margin: 8px 0 0 0; font-size: 16px; color: #7f8c8d;">{{companyName}} - Livraison prévue le {{deliveryDate}}</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="margin-bottom: 30px;">
+            <h2 style="color: #2c3e50; margin-bottom: 15px; font-size: 20px;">Bonjour {{firstName}},</h2>
+            
+            <!-- Bonne nouvelle -->
+            <div style="background-color: #d4edda; padding: 25px; margin: 0 0 30px 0; border: 1px solid #c3e6cb; border-radius: 8px;">
+              <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">🚀 Excellente nouvelle !</h3>
+              <p style="font-size: 16px; margin-bottom: 20px; color: #155724;">
+                Votre site web professionnel pour <strong>{{companyName}}</strong> est maintenant terminé et prêt à être mis en ligne !
+              </p>
+              <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site :</p>
+              <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+              </p>
+            </div>
+            
+            <!-- Paiement final -->
+            <div style="background-color: #fff3cd; padding: 25px; margin: 0 0 30px 0; border: 1px solid #ffeaa7; border-radius: 8px;">
+              <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">💳 Dernière étape : Paiement final</h3>
+              <p style="font-size: 16px; margin-bottom: 20px; color: #856404;">
+                Pour finaliser la livraison et débloquer l'accès complet à votre site, 
+                il vous reste le paiement final de <strong>100$</strong>.
+              </p>
+              <p style="margin: 0 0 20px 0; font-size: 14px; color: #856404;">
+                Une fois le paiement effectué, votre site sera immédiatement mis en ligne et accessible à vos clients.
+              </p>
+              <div style="text-align: center; margin: 25px 0;">
+                <a href="{{finalPaymentLink}}" 
+                   style="background: #28a745; color: white; padding: 18px 35px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);"
+                   target="_blank">
+                  💳 Payer 100$ - Finaliser le projet →
+                </a>
+              </div>
+            </div>
+            
+            <!-- Livraison -->
+            <div style="margin-bottom: 30px;">
+              <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">📦 Après le paiement</h3>
+              <p style="font-size: 16px; margin-bottom: 15px;">
+                Dès que votre paiement sera confirmé :
+              </p>
+              <ul style="font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                <li>🚀 Votre site sera mis en ligne immédiatement</li>
+                <li>📧 Vous recevrez les accès administrateur</li>
+                <li>📚 Documentation complète fournie</li>
+                <li>🛡️ Support technique 3 mois inclus</li>
+              </ul>
+            </div>
+            
+            <!-- Urgence -->
+            <div style="background-color: #f8d7da; padding: 20px; margin: 30px 0; border: 1px solid #f5c6cb; border-radius: 8px;">
+              <p style="margin: 0; font-size: 15px; color: #721c24; text-align: center;">
+                <strong>⏰ Votre site est prêt - Finalisez maintenant pour la livraison immédiate !</strong>
+              </p>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+              Questions sur votre site ? Répondez simplement à cet email
+            </p>
+            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+              Livraison garantie sous 24h après paiement final
+            </p>
+          </div>
+          
+          <!-- Signature -->
+          <div style="margin-top: 30px; text-align: left;">
+            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    textContent: `
+Bonjour {{firstName}},
+
+🎉 Votre site web professionnel pour {{companyName}} est maintenant terminé !
+
+Découvrez votre site ici : {{websiteLink}}
+
+💳 Dernière étape : Paiement final de 100$
+
+Pour finaliser la livraison et débloquer l'accès complet à votre site, 
+il vous reste le paiement final de 100$.
+
+Payer maintenant : {{finalPaymentLink}}
+
+Une fois le paiement effectué :
+🚀 Votre site sera mis en ligne immédiatement
+📧 Vous recevrez les accès administrateur  
+📚 Documentation complète fournie
+🛡️ Support technique 3 mois inclus
+
+⏰ Votre site est prêt - Finalisez maintenant pour la livraison immédiate !
+
+Questions sur votre site ? Répondez simplement à cet email
+Livraison garantie sous 24h après paiement final
+
+Cordialement,
+{{agentName}}
+LeadForge AI
+{{agentEmail}}
+    `
+  },
+
+  {
+    id: 'email5_final_payment_confirmation',
+    name: 'Email 5 - Confirmation Paiement Final',
+    category: 'sale',
+    subject: '✅ Paiement final confirmé - Votre site {{companyName}} est maintenant en ligne !',
+    variables: ['firstName', 'companyName', 'websiteLink', 'invoiceLink', 'agentName', 'agentEmail'],
+    htmlContent: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LeadForge AI - Paiement Final Confirmé</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          
+          <!-- Header -->
+          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #28a745;">✅ Paiement final confirmé !</h1>
+            <p style="margin: 8px 0 0 0; font-size: 16px; color: #7f8c8d;">Votre site {{companyName}} est maintenant en ligne</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="margin-bottom: 30px;">
+            <h2 style="color: #2c3e50; margin-bottom: 15px; font-size: 20px;">Bonjour {{firstName}},</h2>
+            
+            <!-- Confirmation -->
+            <div style="background-color: #d4edda; padding: 25px; margin: 0 0 30px 0; border: 1px solid #c3e6cb; border-radius: 8px;">
+              <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">🎉 Projet complété avec succès !</h3>
+              <p style="font-size: 16px; margin-bottom: 20px; color: #155724;">
+                Nous vous confirmons la bonne réception de votre paiement final de <strong>100$</strong>. 
+                Votre site web {{companyName}} est maintenant officiellement en ligne et accessible à vos clients !
+              </p>
+              <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site en ligne :</p>
+              <p style="margin: 0; font-size: 14px; color: #007bff;">
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+              </p>
+            </div>
+            
+            <!-- Facture -->
+            <div style="background-color: #fff3cd; padding: 20px; margin: 0 0 30px 0; border: 1px solid #ffeaa7; border-radius: 8px;">
+              <h3 style="color: #856404; margin-top: 0; margin-bottom: 10px; font-size: 16px;">📄 Votre facture finale</h3>
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #856404;">
+                Une facture pour le paiement final de 100$ est disponible :
+              </p>
+              <p style="margin: 0; font-size: 14px; color: #007bff;">
+                <a href="{{invoiceLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">Télécharger ma facture finale</a>
+              </p>
+            </div>
+            
+            <!-- Prochaines étapes -->
+            <div style="margin-bottom: 30px;">
+              <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">📋 Prochaines étapes</h3>
+              <p style="font-size: 16px; margin-bottom: 15px;">
+                Vous recevrez très prochainement un email avec :
+              </p>
+              <ul style="font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                <li>🔐 Vos accès administrateur au site</li>
+                <li>📚 La documentation complète</li>
+                <li>🛠️ Les guides de gestion</li>
+                <li>📞 Informations sur votre support technique</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+              Félicitations ! Votre présence en ligne professionnelle est maintenant active
+            </p>
+            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+              Support technique 3 mois inclus - Nous sommes là pour vous
+            </p>
+          </div>
+          
+          <!-- Signature -->
+          <div style="margin-top: 30px; text-align: left;">
+            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    textContent: `
+Bonjour {{firstName}},
+
+✅ Paiement final confirmé ! Votre site {{companyName}} est maintenant en ligne
+
+🎉 Projet complété avec succès !
+Nous vous confirmons la bonne réception de votre paiement final de 100$. 
+Votre site web {{companyName}} est maintenant officiellement en ligne et accessible à vos clients !
+
+Découvrez votre site en ligne : {{websiteLink}}
+
+📄 Votre facture finale
+Une facture pour le paiement final de 100$ est disponible : {{invoiceLink}}
+
+📋 Prochaines étapes
+Vous recevrez très prochainement un email avec :
+🔐 Vos accès administrateur au site
+📚 La documentation complète
+🛠️ Les guides de gestion
+📞 Informations sur votre support technique
+
+Félicitations ! Votre présence en ligne professionnelle est maintenant active
+Support technique 3 mois inclus - Nous sommes là pour vous
+
+Cordialement,
+{{agentName}}
+LeadForge AI
+{{agentEmail}}
+    `
+  },
+
+  {
+    id: 'email6_delivery_documentation',
+    name: 'Email 6 - Livraison et Documentation',
+    category: 'sale',
+    subject: '🔐 Accès et documentation pour votre site {{companyName}}',
+    variables: ['firstName', 'companyName', 'websiteLink', 'adminLink', 'adminUsername', 'adminPassword', 'documentationLink', 'agentName', 'agentEmail'],
+    htmlContent: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LeadForge AI - Livraison et Documentation</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          
+          <!-- Header -->
+          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #007bff;">🔐 Livraison complète</h1>
+            <p style="margin: 8px 0 0 0; font-size: 16px; color: #7f8c8d;">Accès et documentation pour {{companyName}}</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="margin-bottom: 30px;">
+            <h2 style="color: #2c3e50; margin-bottom: 15px; font-size: 20px;">Bonjour {{firstName}},</h2>
+            
+            <!-- Accès -->
+            <div style="background-color: #d1ecf1; padding: 25px; margin: 0 0 30px 0; border: 1px solid #bee5eb; border-radius: 8px;">
+              <h3 style="color: #0c5460; margin-top: 0; margin-bottom: 15px; font-size: 18px;">🔑 Vos accès administrateur</h3>
+              <p style="font-size: 16px; margin-bottom: 20px; color: #0c5460;">
+                Voici vos identifiants pour gérer votre site {{companyName}} :
+              </p>
+              <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;"><strong>URL d'administration :</strong></p>
+                <p style="margin: 0 0 15px 0; font-size: 14px; color: #007bff;">
+                  <a href="{{adminLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{adminLink}}</a>
+                </p>
+                <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;"><strong>Nom d'utilisateur :</strong></p>
+                <p style="margin: 0 0 15px 0; font-size: 14px; font-weight: 600; color: #2c3e50;">{{adminUsername}}</p>
+                <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;"><strong>Mot de passe :</strong></p>
+                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #2c3e50;">{{adminPassword}}</p>
+              </div>
+              <p style="margin: 0; font-size: 12px; color: #0c5460;">
+                🔒 Conservez ces identifiants en sécurité et changez le mot de passe lors de votre première connexion
+              </p>
+            </div>
+            
+            <!-- Documentation -->
+            <div style="background-color: #fff3cd; padding: 20px; margin: 0 0 30px 0; border: 1px solid #ffeaa7; border-radius: 8px;">
+              <h3 style="color: #856404; margin-top: 0; margin-bottom: 10px; font-size: 16px;">📚 Documentation complète</h3>
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #856404;">
+                Accédez à notre documentation détaillée pour gérer votre site :
+              </p>
+              <p style="margin: 0; font-size: 14px; color: #007bff;">
+                <a href="{{documentationLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">Consulter la documentation</a>
+              </p>
+            </div>
+            
+            <!-- Support -->
+            <div style="margin-bottom: 30px;">
+              <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">🛡️ Votre support technique</h3>
+              <p style="font-size: 16px; margin-bottom: 15px;">
+                Votre support technique prioritaire est actif pendant 3 mois :
+              </p>
+              <ul style="font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                <li>📧 Assistance par email (réponse sous 24h)</li>
+                <li>🐛 Correction des bugs et problèmes techniques</li>
+                <li>📈 Optimisation des performances</li>
+                <li>🔧 Mises à jour de sécurité</li>
+                <li>📞 Conseil et accompagnement</li>
+              </ul>
+              <p style="margin: 20px 0 0 0; font-size: 14px; color: #7f8c8d;">
+                Pour toute question, contactez-nous : {{agentEmail}}
+              </p>
+            </div>
+            
+            <!-- Site en ligne -->
+            <div style="background-color: #d4edda; padding: 20px; margin: 0 0 30px 0; border: 1px solid #c3e6cb; border-radius: 8px;">
+              <h3 style="color: #155724; margin-top: 0; margin-bottom: 10px; font-size: 16px;">🌐 Votre site en ligne</h3>
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #155724;">
+                Votre site est accessible à l'adresse :
+              </p>
+              <p style="margin: 0; font-size: 14px; color: #007bff;">
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+              </p>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+              Merci de votre confiance - Nous sommes fiers de vous accompagner
+            </p>
+            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+              Support prioritaire 3 mois - Disponible 7j/7
+            </p>
+          </div>
+          
+          <!-- Signature -->
+          <div style="margin-top: 30px; text-align: left;">
+            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    textContent: `
+Bonjour {{firstName}},
+
+🔐 Livraison complète - Accès et documentation pour {{companyName}}
+
+🔑 Vos accès administrateur
+Voici vos identifiants pour gérer votre site {{companyName}} :
+
+URL d'administration : {{adminLink}}
+Nom d'utilisateur : {{adminUsername}}
+Mot de passe : {{adminPassword}}
+
+🔒 Conservez ces identifiants en sécurité et changez le mot de passe lors de votre première connexion
+
+📚 Documentation complète
+Accédez à notre documentation détaillée pour gérer votre site : {{documentationLink}}
+
+🛡️ Votre support technique
+Votre support technique prioritaire est actif pendant 3 mois :
+📧 Assistance par email (réponse sous 24h)
+🐛 Correction des bugs et problèmes techniques
+📈 Optimisation des performances
+🔧 Mises à jour de sécurité
+📞 Conseil et accompagnement
+
+Pour toute question, contactez-nous : {{agentEmail}}
+
+🌐 Votre site en ligne
+Votre site est accessible à l'adresse : {{websiteLink}}
+
+Merci de votre confiance - Nous sommes fiers de vous accompagner
+Support prioritaire 3 mois - Disponible 7j/7
+
+Cordialement,
 {{agentName}}
 LeadForge AI
 {{agentEmail}}
@@ -578,7 +1049,7 @@ export const reminderTemplates: EmailTemplate[] = [
     name: 'Rappel 1 - Après Email 1',
     category: 'reminder',
     subject: 'Suivi : Votre site web {{companyName}} vous attend',
-    variables: ['firstName', 'companyName', 'websiteLink', 'agentName', 'agentEmail'],
+    variables: ['firstName', 'companyName', 'websiteLink', 'paymentLink', 'price', 'agentName', 'agentEmail'],
     htmlContent: `
       <!DOCTYPE html>
       <html>
@@ -632,11 +1103,11 @@ export const reminderTemplates: EmailTemplate[] = [
               <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Pourquoi choisir {{agentName}} ?</h3>
               
               <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">💰 Économie de 40% garantie</h4>
+                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">💰 Paiement en 2 étapes - Total : 146$</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Prix transparent</strong> : 146€ HT contre 350€ HT minimum chez les agences traditionnelles</li>
-                  <li style="margin-bottom: 12px;"><strong>Pas de frais cachés</strong> : Hébergement et domaine inclus la première année</li>
-                  <li style="margin-bottom: 0;"><strong>Maintenance économique</strong> : 46€ HT par an uniquement pour l'hébergement</li>
+                  <li style="margin-bottom: 12px;"><strong>Dépôt pour commencer</strong> : Seulement 46$ pour lancer votre projet</li>
+                  <li style="margin-bottom: 12px;"><strong>Paiement final à la livraison</strong> : 100$ lorsque votre site est prêt</li>
+                  <li style="margin-bottom: 0;"><strong>Pas de frais cachés</strong> : Hébergement et domaine inclus la première année</li>
                 </ul>
               </div>
               
@@ -697,8 +1168,13 @@ export const reminderTemplates: EmailTemplate[] = [
             
             <!-- Appel à l'action -->
             <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 20px; font-size: 16px;">Prêt à discuter de votre projet ?</p>
+              <p style="margin-bottom: 20px; font-size: 16px;">Prêt à démarrer votre projet ?</p>
               <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="{{paymentLink}}" 
+                   style="display: inline-block; background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;"
+                   target="_blank">
+                  Commencer avec 46$
+                </a>
                 <a href="mailto:{{agentEmail}}?subject=Questions {{companyName}}" 
                    style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
                   Discuter du projet
@@ -708,13 +1184,20 @@ export const reminderTemplates: EmailTemplate[] = [
           </div>
           
           <!-- Footer -->
-          <div style="text-align: center; padding-top: 30px; border-top: 1px solid #e0e0e0; font-size: 14px; color: #7f8c8d;">
-            <p style="margin: 0;">
-              Cordialement,<br>
-              <strong>{{agentName}}</strong><br>
-              {{agentName}}<br>
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+              Votre projet professionnel vous attend - Commencez avec seulement 46$
             </p>
+            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+              Nous sommes là pour répondre à toutes vos questions
+            </p>
+          </div>
+          
+          <!-- Signature -->
+          <div style="margin-top: 30px; text-align: left;">
+            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
       </body>
@@ -775,8 +1258,27 @@ Absolument ! Nous vous formons pendant 2 heures et vous fournissons un accès co
 "Et si je ne suis pas satisfait ?"
 Notre garantie satisfaction 30 jours vous protège : remboursement complet sans condition si vous n'êtes pas satisfait.
 
-Prêt à discuter de votre projet ?
+💰 Paiement en 2 étapes - Total : 146$
+🚀 Étape 1 - Dépôt pour commencer : 46$
+🎯 Étape 2 - Paiement final à la livraison : 100$
+Commencez maintenant avec seulement 46$ - Le reste sera dû à la livraison de votre site
+
+Questions fréquentes :
+"Que se passe-t-il après le paiement ?"
+Nous vous contactons sous 24h pour valider les détails, puis nous commençons immédiatement le développement selon notre processus 4 étapes.
+
+"Puis-je modifier mon site après la livraison ?"
+Absolument ! Nous vous formons pendant 2 heures et vous fournissons un accès complet pour gérer votre site en autonomie.
+
+"Et si je ne suis pas satisfait ?"
+Notre garantie satisfaction 30 jours vous protège : remboursement complet sans condition si vous n'êtes pas satisfait.
+
+Prêt à démarrer votre projet ?
+• Commencer avec 46$
 • Discuter du projet
+
+Votre projet professionnel vous attend - Commencez avec seulement 46$
+Nous sommes là pour répondre à toutes vos questions
 
 Cordialement,
 {{agentName}}
@@ -839,21 +1341,6 @@ LeadForge AI
               </p>
             </div>
             
-            <!-- Impact détaillé de la perte -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Ce que vous risquez de perdre concrètement</h3>
-              
-              <div style="margin-bottom: 25px;">
-                <h4 style="color: #dc3545; margin-bottom: 10px; font-size: 16px;">💸 Impact financier immédiat</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Perte de 204€</strong> : Le même site coûtera 350€ HT au lieu de 146€ HT après expiration</li>
-                  <li style="margin-bottom: 12px;"><strong>Hébergement payant</strong> : Plus d'hébergement gratuit la première année (+60€)</li>
-                  <li style="margin-bottom: 0;"><strong>Domaine facturé</strong> : Le nom de domaine ne sera plus inclus (+20€)</li>
-                </ul>
-              </div>
-              
-              <div style="margin-bottom: 25px;">
-n                <h4 style="color: #dc3545; margin-bottom: 10px; font-size: 16px;">⏰ Impact temporel</h4>
                 <ul style="padding-left: 20px; margin: 0;">
                   <li style="margin-bottom: 12px;"><strong>Attente 3-4 semaines</strong> : Au lieu de 2 jours avec notre offre express</li>
                   <li style="margin-bottom: 12px;"><strong>Perte d'opportunités</strong> : Chaque semaine sans site = clients potentiels perdus</li>
@@ -868,35 +1355,6 @@ n                <h4 style="color: #dc3545; margin-bottom: 10px; font-size: 16px
                   <li style="margin-bottom: 12px;"><strong>Risque financier</strong> : Engagement sans possibilité de remboursement</li>
                   <li style="margin-bottom: 0;"><strong>Support limité</strong> : Assistance standard au lieu du support prioritaire</li>
                 </ul>
-              </div>
-            </div>
-            
-            <!-- Comparaison avant/après -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Comparaison : Maintenant vs Plus tard</h3>
-              <div style="background-color: #f8f9fa; padding: 20px; margin: 15px 0; border: 1px solid #e9ecef;">
-                <p style="margin: 0 0 10px 0; font-weight: 500; color: #28a745;">✅ AVEC L'OFFRE ACTUELLE (expire le {{expiryDate}})</p>
-                <ul style="margin: 0; padding-left: 20px; font-size: 14px;">
-                  <li>Investissement : 146€ HT (économie de 204€)</li>
-                  <li>Livraison : 2 jours ouvrés</li>
-                  <li>Hébergement : 1 an gratuit</li>
-                  <li>Domaine : Inclus gratuitement</li>
-                  <li>Garantie : 30 jours satisfaction</li>
-                  <li>Support : Prioritaire 3 mois</li>
-                </ul>
-              </div>
-              <div style="background-color: #fff3cd; padding: 20px; margin: 15px 0; border: 1px solid #ffeaa7;">
-                <p style="margin: 0 0 10px 0; font-weight: 500; color: #856404;">❌ APRÈS EXPIRATION (à partir du {{expiryDate}})</p>
-                <ul style="margin: 0; padding-left: 20px; font-size: 14px;">
-                  <li>Investissement : 350€ HT minimum</li>
-                  <li>Livraison : 3-4 semaines standard</li>
-                  <li>Hébergement : 60€ HT par an</li>
-                  <li>Domaine : 20€ HT par an</li>
-                  <li>Garantie : Standard 14 jours</li>
-                  <li>Support : Standard 30 jours</li>
-                </ul>
-              </div>
-            </div>
             
             <!-- Témoignage d'urgence -->
             <div style="margin: 30px 0;">
@@ -926,13 +1384,20 @@ n                <h4 style="color: #dc3545; margin-bottom: 10px; font-size: 16px
           </div>
           
           <!-- Footer -->
-          <div style="text-align: center; padding-top: 30px; border-top: 1px solid #e0e0e0; font-size: 14px; color: #7f8c8d;">
-            <p style="margin: 0;">
-              Cordialement,<br>
-              <strong>{{agentName}}</strong><br>
-              {{agentName}}<br>
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+              Cette offre exceptionnelle expire bientôt - Agissez maintenant
             </p>
+            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+              Votre projet professionnel mérite cette opportunité unique
+            </p>
+          </div>
+          
+          <!-- Signature -->
+          <div style="margin-top: 30px; text-align: left;">
+            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
       </body>
@@ -1000,6 +1465,143 @@ et attendre 3 semaines au lieu de 7 jours. Ne faites pas ma même erreur !"
 Ne laissez pas cette opportunité vous échapper !
 • Payer maintenant
 • Contacter d'urgence
+
+Cordialement,
+{{agentName}}
+LeadForge AI
+{{agentEmail}}
+    `
+  },
+
+  {
+    id: 'reminder3_final_payment',
+    name: 'Rappel 3 - Paiement Final',
+    category: 'reminder',
+    subject: '🎉 Votre site {{companyName}} est prêt - Finalisez avec le paiement de 100$',
+    variables: ['firstName', 'companyName', 'websiteLink', 'finalPaymentLink', 'agentName', 'agentEmail'],
+    htmlContent: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LeadForge AI - Paiement Final</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          
+          <!-- Header -->
+          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #007bff;">🎉 Votre site est prêt !</h1>
+            <p style="margin: 8px 0 0 0; font-size: 14px; color: #7f8c8d;">{{companyName}} - Dernière étape avant la mise en ligne</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="margin-bottom: 30px;">
+            <h2 style="color: #2c3e50; margin-bottom: 15px; font-size: 20px;">Bonjour {{firstName}},</h2>
+            
+            <!-- Bonne nouvelle -->
+            <div style="background-color: #d4edda; padding: 25px; margin: 0 0 30px 0; border: 1px solid #c3e6cb; border-radius: 8px;">
+              <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">🚀 Excellente nouvelle !</h3>
+              <p style="font-size: 16px; margin-bottom: 20px; color: #155724;">
+                Votre site web professionnel pour <strong>{{companyName}}</strong> est maintenant terminé et prêt à être mis en ligne !
+              </p>
+              <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site :</p>
+              <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+              </p>
+            </div>
+            
+            <!-- Paiement final -->
+            <div style="background-color: #fff3cd; padding: 25px; margin: 0 0 30px 0; border: 1px solid #ffeaa7; border-radius: 8px;">
+              <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">💳 Dernière étape : Paiement final</h3>
+              <p style="font-size: 16px; margin-bottom: 20px; color: #856404;">
+                Pour finaliser la livraison et débloquer l'accès complet à votre site, 
+                il vous reste le paiement final de <strong>100$</strong>.
+              </p>
+              <p style="margin: 0 0 20px 0; font-size: 14px; color: #856404;">
+                Une fois le paiement effectué, votre site sera immédiatement mis en ligne et accessible à vos clients.
+              </p>
+              <div style="text-align: center; margin: 25px 0;">
+                <a href="{{finalPaymentLink}}" 
+                   style="background: #28a745; color: white; padding: 18px 35px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);"
+                   target="_blank">
+                  💳 Payer 100$ - Finaliser le projet →
+                </a>
+              </div>
+            </div>
+            
+            <!-- Ce que vous recevrez -->
+            <div style="margin-bottom: 30px;">
+              <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">📦 Après le paiement</h3>
+              <p style="font-size: 16px; margin-bottom: 15px;">
+                Dès que votre paiement sera confirmé :
+              </p>
+              <ul style="font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                <li>🚀 Votre site sera mis en ligne immédiatement</li>
+                <li>📧 Vous recevrez les accès administrateur</li>
+                <li>📚 Documentation complète fournie</li>
+                <li>🛡️ Support technique 3 mois inclus</li>
+              </ul>
+            </div>
+            
+            <!-- Urgence -->
+            <div style="background-color: #f8d7da; padding: 20px; margin: 30px 0; border: 1px solid #f5c6cb; border-radius: 8px;">
+              <p style="margin: 0; font-size: 15px; color: #721c24; text-align: center;">
+                <strong>⏰ Votre site est prêt - Finalisez maintenant pour la livraison immédiate !</strong>
+              </p>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+              Votre présence en ligne professionnelle est à un clic de distance
+            </p>
+            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+              Finalisez maintenant et soyez en ligne dans les 24h
+            </p>
+          </div>
+          
+          <!-- Signature -->
+          <div style="margin-top: 30px; text-align: left;">
+            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    textContent: `
+Bonjour {{firstName}},
+
+🎉 Votre site est prêt ! {{companyName}} - Dernière étape avant la mise en ligne
+
+🚀 Excellente nouvelle !
+Votre site web professionnel pour {{companyName}} est maintenant terminé et prêt à être mis en ligne !
+
+Découvrez votre site : {{websiteLink}}
+
+💳 Dernière étape : Paiement final
+Pour finaliser la livraison et débloquer l'accès complet à votre site, 
+il vous reste le paiement final de 100$.
+
+Payer maintenant : {{finalPaymentLink}}
+
+Une fois le paiement effectué, votre site sera immédiatement mis en ligne et accessible à vos clients.
+
+📦 Après le paiement
+Dès que votre paiement sera confirmé :
+🚀 Votre site sera mis en ligne immédiatement
+📧 Vous recevrez les accès administrateur
+📚 Documentation complète fournie
+🛡️ Support technique 3 mois inclus
+
+⏰ Votre site est prêt - Finalisez maintenant pour la livraison immédiate !
+
+Votre présence en ligne professionnelle est à un clic de distance
+Finalisez maintenant et soyez en ligne dans les 24h
 
 Cordialement,
 {{agentName}}

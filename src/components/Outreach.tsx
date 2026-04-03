@@ -100,13 +100,16 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
     return { subject, htmlContent, textContent };
   };
 
-  const personalizeTemplate = (template: EmailTemplate, lead: Lead) => {
+  const personalizeTemplate = (template: EmailTemplate, lead: Lead, apiConfig: ApiConfig) => {
     const replacements: Record<string, string> = {
       '{name}': lead.name,
       '{city}': lead.city || 'votre ville',
       '{sector}': lead.sector || 'votre secteur',
       '{landingUrl}': lead.landingUrl || lead.siteUrl || '#',
       '{email}': lead.email || '',
+      // Variables de paiement Whop
+      '{paymentLink}': apiConfig.whopDepositLink || '#',
+      '{finalPaymentLink}': apiConfig.whopFinalPaymentLink || '#',
     };
     let subject = template.subject;
     let body = template.textContent || template.subject; // Utiliser textContent comme fallback
@@ -120,7 +123,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
     const allTemplates = [...salesTemplates, ...reminderTemplates];
     const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
-    const base = personalizeTemplate(template, lead);
+    const base = personalizeTemplate(template, lead, apiConfig);
 
     if (hasLLM) {
       try {
@@ -330,7 +333,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
       landingUrl: 'https://example.com',
     } as Lead;
 
-    const { subject, body } = personalizeTemplate(template, testLead);
+    const { subject, body } = personalizeTemplate(template, testLead, apiConfig);
     const result = await sendEmailViaApi({
       to: testEmailAddress,
       toName: 'Test',
@@ -456,7 +459,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
               ))}
             </div>
             <div style={{ fontSize: 12, color: C.tx2, lineHeight: 1.4 }}>
-              <strong>Workflow:</strong> Email 1 → (3j) Rappel → Email 2 → (5j) Rappel → Email 3
+              <strong>Workflow:</strong> Email 1 → (3j) Rappel 1 → Email 2 → (5j) Rappel 2 → Email 3 → Email 4 → (après Email 4) Rappel 3 → Email 5 → Email 6
             </div>
           </div>
         )}
@@ -504,7 +507,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
             ))}
           </div>
           <div style={{ fontSize: 11, color: C.tx3, fontStyle: 'italic' }}>
-            Email 1: Présentation → Email 2: Devis/Paiement → Email 3: Confirmation
+            Email 1: Présentation → Email 2: Devis/Paiement → Email 3: Confirmation Dépôt → Email 4: Paiement Final → Email 5: Confirmation Final → Email 6: Livraison
           </div>
         </div>
 
@@ -525,7 +528,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
             ))}
           </div>
           <div style={{ fontSize: 11, color: C.tx3, fontStyle: 'italic' }}>
-            Rappel 1: 3 jours après Email 1 → Rappel 2: 2 jours avant expiration
+            Rappel 1: 3 jours après Email 1 → Rappel 2: 2 jours avant expiration → Rappel 3: 3 jours après Email 4 (paiement final)
           </div>
         </div>
 
