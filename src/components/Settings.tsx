@@ -438,7 +438,7 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
             <div style={{ marginBottom: 12 }}>
               <div style={{ fontSize: 13, color: C.tx2, marginBottom: 8 }}>Modèle utilisé en priorité. Les autres servent de fallback automatique.</div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
               {([
                 { id: 'groq', label: 'Groq', icon: '🚀', color: C.accent, desc: '6K TPM' },
                 { id: 'gemini', label: 'Gemini', icon: '✨', color: '#1A73E8', desc: '1M TPM' },

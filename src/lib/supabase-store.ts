@@ -104,12 +104,11 @@ export interface ApiStatus {
 export interface EmailTemplate {
   id: string;
   name: string;
-  category: string;
   subject: string;
-  body: string;
   htmlContent: string;
   textContent: string;
   variables: string[];
+  category: 'sale' | 'reminder';
 }
 
 // --- DEFAULTS ---
@@ -136,31 +135,28 @@ export const defaultEmailTemplates: EmailTemplate[] = [
   { 
     id: '1', 
     name: 'Restaurant - Premier contact', 
-    category: 'original',
     subject: 'Un site web professionnel pour {name}',
-    body: 'Bonjour,\n\nJe me permets de vous contacter car j\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web professionnel.\n\nJ\'ai pris l\'initiative de créer une maquette de site web spécialement conçue pour votre restaurant. Vous pouvez la découvrir ici :\n\n{landingUrl}\n\nCe site inclut :\n- Menu en ligne avec photos\n- Réservation en ligne\n- Avis Google intégrés\n- Optimisé pour Google (SEO local)\n\nLe site est prêt à être mis en ligne. Si cela vous intéresse, n\'hésitez pas à me répondre.\n\nCordialement',
+    category: 'sale',
     htmlContent: '',
-    textContent: '',
+    textContent: 'Bonjour,\n\nJe me permets de vous contacter car j\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web professionnel.\n\nJ\'ai pris l\'initiative de créer une maquette de site web spécialement conçue pour votre restaurant. Vous pouvez la découvrir ici :\n\n{landingUrl}\n\nCe site inclut :\n- Menu en ligne avec photos\n- Réservation en ligne\n- Avis Google intégrés\n- Optimisé pour Google (SEO local)\n\nLe site est prêt à être mis en ligne. Si cela vous intéresse, n\'hésitez pas à me répondre.\n\nCordialement',
     variables: ['name', 'city', 'landingUrl']
   },
   { 
     id: '2', 
     name: 'Commerce - Premier contact', 
-    category: 'original',
     subject: 'Votre boutique {name} mérite un site web moderne',
-    body: 'Bonjour,\n\nJe vous contacte car j\'ai vu que {name} à {city} n\'a pas de site web.\n\nJ\'ai créé un site web professionnel pour votre commerce :\n\n{landingUrl}\n\n- Catalogue produits\n- Horaires et localisation\n- Visible sur Google\n\nRépondez à cet email pour en discuter.\n\nCordialement',
+    category: 'sale',
     htmlContent: '',
-    textContent: '',
+    textContent: 'Bonjour,\n\nJe vous contacte car j\'ai vu que {name} à {city} n\'a pas de site web.\n\nJ\'ai créé un site web professionnel pour votre commerce :\n\n{landingUrl}\n\n- Catalogue produits\n- Horaires et localisation\n- Visible sur Google\n\nRépondez à cet email pour en discuter.\n\nCordialement',
     variables: ['name', 'city', 'landingUrl']
   },
   { 
     id: '3', 
     name: 'Générique - Premier contact', 
-    category: 'original',
     subject: 'Un site web professionnel pour {name}',
-    body: 'Bonjour,\n\nJ\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web.\n\nJ\'ai créé un site web professionnel spécialement pour vous :\n\n{landingUrl}\n\n- Design moderne et professionnel\n- Optimisé pour mobile\n- Visible sur Google\n\nDécouvrez-le et n\'hésitez pas à me contacter.\n\nCordialement',
+    category: 'sale',
     htmlContent: '',
-    textContent: '',
+    textContent: 'Bonjour,\n\nJ\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web.\n\nJ\'ai créé un site web professionnel spécialement pour vous :\n\n{landingUrl}\n\n- Design moderne et professionnel\n- Optimisé pour mobile\n- Visible sur Google\n\nDécouvrez-le et n\'hésitez pas à me contacter.\n\nCordialement',
     variables: ['name', 'city', 'landingUrl']
   },
 ];
@@ -645,12 +641,11 @@ export function useEmailTemplates() {
         setTemplates(supabaseTemplates.map(t => ({
           id: t.id,
           name: t.name,
-          category: t.category || 'original',
+          category: (t.sector === 'sale' || t.sector === 'reminder') ? t.sector as 'sale' | 'reminder' : 'sale', // sector -> category
           subject: t.subject,
-          body: t.body,
-          htmlContent: t.htmlContent || '',
-          textContent: t.textContent || '',
-          variables: t.variables || [],
+          htmlContent: '', // La base de données n'a pas htmlContent
+          textContent: t.body || '', // body -> textContent
+          variables: [], // La base de données n'a pas variables
         })));
       }
     } catch (err) {
@@ -670,7 +665,14 @@ export function useEmailTemplates() {
     setError(null);
     
     try {
-      await templatesService.create(template);
+      // Convertir EmailTemplate vers le format de la base de données
+      const dbTemplate = {
+        name: template.name,
+        sector: template.category === 'sale' ? 'sale' : 'reminder', // category -> sector
+        subject: template.subject,
+        body: template.textContent, // textContent -> body
+      };
+      await templatesService.create(dbTemplate);
       await loadTemplates();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add template');
