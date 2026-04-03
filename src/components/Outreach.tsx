@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Lead, ApiConfig, EmailTemplate, callLLM } from '../lib/supabase-store';
+import { salesTemplates, reminderTemplates, getTemplateById } from '../templates/outreach-templates-final';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -40,16 +41,61 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const [emailDelay, setEmailDelay] = useState(8000);
   const [logs, setLogs] = useState<string[]>([]);
   const [previewEmail, setPreviewEmail] = useState<{ lead: Lead; subject: string; body: string } | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState(templates[0]?.id || '');
+  const [selectedTemplate, setSelectedTemplate] = useState(salesTemplates[0]?.id || '');
 
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [testEmailSending, setTestEmailSending] = useState(false);
+
+  // Nouveaux états pour workflow et paiement
+  const [workflowMode, setWorkflowMode] = useState<'manual' | 'automated'>('manual');
+  const [selectedWorkflowTemplate, setSelectedWorkflowTemplate] = useState('email1_presentation');
+  const [paymentLinks, setPaymentLinks] = useState<Record<string, { link: string; amount: number; created: string }>>({});
+  const [devisLinks, setDevisLinks] = useState<Record<string, string>>({});
+  const [invoiceLinks, setInvoiceLinks] = useState<Record<string, string>>({});
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
 
   const hasGmailSmtp = !!(apiConfig.gmailSmtpUser && apiConfig.gmailSmtpPassword);
   const hasLLM = !!(apiConfig.groqKey || apiConfig.openrouterKey);
 
   const ready = leads.filter(l => l.siteGenerated && !l.emailSent && l.email);
   const sent = leads.filter(l => l.emailSent);
+
+  // Fonction de personnalisation pour nouveaux templates
+  const personalizeOutreachTemplate = (templateId: string, lead: Lead) => {
+    const template = getTemplateById(templateId);
+    if (!template) return { subject: '', htmlContent: '', textContent: '' };
+
+    const variables: Record<string, string> = {
+      firstName: lead.name,
+      companyName: lead.name,
+      websiteLink: lead.landingUrl || lead.siteUrl || '#',
+      price: '299', // Prix par défaut
+      agentName: apiConfig.gmailSmtpFromName || 'LeadForge AI',
+      agentEmail: apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai',
+      amount: '299',
+      validityDays: '7',
+      deliveryDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+      devisLink: devisLinks[lead.id] || '#',
+      paymentLink: paymentLinks[lead.id]?.link || '#',
+      invoiceLink: invoiceLinks[lead.id] || '#',
+      clientPortalLink: `https://leadforge.ai/client/${lead.id}`
+    };
+
+    let subject = template.subject;
+    let htmlContent = template.htmlContent;
+    let textContent = template.textContent;
+
+    // Remplacer les variables {{variable}}
+    for (const [key, val] of Object.entries(variables)) {
+      const regex = new RegExp(`{{${key}}}`, 'g');
+      subject = subject.replace(regex, val);
+      htmlContent = htmlContent.replace(regex, val);
+      textContent = textContent.replace(regex, val);
+    }
+
+    return { subject, htmlContent, textContent };
+  };
 
   const personalizeTemplate = (template: EmailTemplate, lead: Lead) => {
     const replacements: Record<string, string> = {
@@ -101,6 +147,99 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
   const previewForLead = async (lead: Lead) => {
     const { subject, body } = await generateEmailContent(lead);
     setPreviewEmail({ lead, subject, body });
+  };
+
+  // Envoyer un email avec nouveau template
+  const sendWorkflowEmail = async (lead: Lead, templateId: string) => {
+    if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
+    if (!lead.email) { alert("Ce lead n'a pas d'email"); return; }
+
+    const { subject, htmlContent } = personalizeOutreachTemplate(templateId, lead);
+    const result = await sendEmailViaApi({
+      to: lead.email,
+      toName: lead.name,
+      subject,
+      html: htmlContent,
+      leadId: lead.id,
+    });
+
+    if (result.success) {
+      updateLead(lead.id, {
+        emailSent: true,
+        emailSentDate: new Date().toISOString(),
+        stage: 'email_sent',
+        lastContact: new Date().toISOString(),
+      });
+      setLogs(prev => [...prev, `✅ ${templateId} envoyé à ${lead.name} (${lead.email})`]);
+      
+      // Logique workflow selon template
+      if (templateId === 'email1_presentation') {
+        // Programmer rappel 3 jours après
+        setTimeout(() => {
+          sendWorkflowEmail(lead, 'reminder1_after_email1');
+        }, 3 * 24 * 60 * 60 * 1000);
+      }
+    } else {
+      setLogs(prev => [...prev, `❌ Échec d'envoi ${templateId} à ${lead.name}: ${result.message}`]);
+    }
+  };
+
+  // Générer lien de paiement Whop (simulation)
+  const generatePaymentLink = async (lead: Lead, amount: number = 299) => {
+    const paymentLink = `https://whop.com/pay/leadforge-${lead.id}-${Date.now()}`;
+    
+    setPaymentLinks(prev => ({
+      ...prev,
+      [lead.id]: { link: paymentLink, amount, created: new Date().toISOString() }
+    }));
+    
+    setLogs(prev => [...prev, `💳 Lien paiement généré pour ${lead.name}: ${paymentLink}`]);
+    
+    return paymentLink;
+  };
+
+  // Générer lien de devis (simulation)
+  const generateDevisLink = async (lead: Lead) => {
+    const devisLink = `https://leadforge.ai/devis/${lead.id}-${Date.now()}.pdf`;
+    
+    setDevisLinks(prev => ({
+      ...prev,
+      [lead.id]: devisLink
+    }));
+    
+    setLogs(prev => [...prev, `📄 Lien devis généré pour ${lead.name}: ${devisLink}`]);
+    
+    return devisLink;
+  };
+
+  // Envoyer Email 2 avec devis et paiement
+  const sendEmail2WithPayment = async (lead: Lead) => {
+    const devisLink = await generateDevisLink(lead);
+    const paymentLink = await generatePaymentLink(lead);
+    
+    await sendWorkflowEmail(lead, 'email2_devis');
+    
+    // Programmer rappel expiration 2 jours avant fin
+    setTimeout(() => {
+      sendWorkflowEmail(lead, 'reminder2_before_expiry');
+    }, 5 * 24 * 60 * 60 * 1000); // 5 jours (7-2)
+  };
+
+  // Envoyer Email 3 après paiement
+  const sendEmail3Confirmation = async (lead: Lead) => {
+    const invoiceLink = `https://leadforge.ai/invoice/${lead.id}-${Date.now()}.pdf`;
+    
+    setInvoiceLinks(prev => ({
+      ...prev,
+      [lead.id]: invoiceLink
+    }));
+    
+    await sendWorkflowEmail(lead, 'email3_confirmation');
+    
+    updateLead(lead.id, {
+      stage: 'converted',
+      revenue: 299
+    });
   };
 
   const sendOne = async (lead: Lead) => {
@@ -276,29 +415,187 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         </div>
       )}
 
+      {/* Workflow Mode */}
+      <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>🚀 Mode Workflow</h3>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          <button onClick={() => setWorkflowMode('manual')} style={{
+            padding: '8px 16px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
+            border: `1px solid ${workflowMode === 'manual' ? C.accent : C.border}`,
+            background: workflowMode === 'manual' ? C.accent2 : C.surface,
+            color: workflowMode === 'manual' ? C.accent : C.tx2, fontWeight: 500,
+          }}>📧 Manuel</button>
+          <button onClick={() => setWorkflowMode('automated')} style={{
+            padding: '8px 16px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
+            border: `1px solid ${workflowMode === 'automated' ? C.accent : C.border}`,
+            background: workflowMode === 'automated' ? C.accent2 : C.surface,
+            color: workflowMode === 'automated' ? C.accent : C.tx2, fontWeight: 500,
+          }}>🤖 Automatisé</button>
+        </div>
+        
+        {workflowMode === 'automated' && (
+          <div style={{ background: C.bg, padding: '14px', borderRadius: 6, fontSize: 13 }}>
+            <h4 style={{ fontWeight: 600, marginBottom: 8 }}>📋 Templates Workflow</h4>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+              {salesTemplates.map(t => (
+                <button key={t.id} onClick={() => setSelectedWorkflowTemplate(t.id)} style={{
+                  padding: '6px 12px', borderRadius: 4, fontSize: 12, cursor: 'pointer',
+                  border: `1px solid ${selectedWorkflowTemplate === t.id ? C.accent : C.border}`,
+                  background: selectedWorkflowTemplate === t.id ? C.accent2 : C.surface,
+                  color: selectedWorkflowTemplate === t.id ? C.accent : C.tx2,
+                }}>{t.name.split(' - ')[1]}</button>
+              ))}
+            </div>
+            <div style={{ fontSize: 12, color: C.tx2, lineHeight: 1.4 }}>
+              <strong>Workflow:</strong> Email 1 → (3j) Rappel → Email 2 → (5j) Rappel → Email 3
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Templates */}
       <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
         <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>📋 Templates d'email</h3>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {templates.map(t => (
-            <button key={t.id} onClick={() => setSelectedTemplate(t.id)} style={{
-              padding: '8px 14px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
-              border: `1px solid ${selectedTemplate === t.id ? C.amber : C.border}`,
-              background: selectedTemplate === t.id ? '#fff7ed' : C.surface,
-              color: selectedTemplate === t.id ? C.amber : C.tx2, fontWeight: 500,
-            }}>{t.name}</button>
-          ))}
-        </div>
-        {templates.find(t => t.id === selectedTemplate) && (
-          <div style={{ marginTop: 14, padding: '14px', background: C.bg, borderRadius: 6, fontSize: 13 }}>
-            <div style={{ fontWeight: 600, marginBottom: 6 }}>
-              Sujet: {templates.find(t => t.id === selectedTemplate)?.subject}
-            </div>
-            <pre style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: C.tx2, whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
-              {templates.find(t => t.id === selectedTemplate)?.body}
-            </pre>
+        
+        
+        {/* Templates de VENTE */}
+        <div style={{ marginBottom: 20 }}>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: C.green, marginBottom: 10 }}>� Templates de VENTE</h4>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+            {salesTemplates.map(t => (
+              <button key={t.id} onClick={() => setSelectedTemplate(t.id)} style={{
+                padding: '8px 14px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
+                border: `1px solid ${selectedTemplate === t.id ? C.green : C.border}`,
+                background: selectedTemplate === t.id ? '#e8f5e9' : C.surface,
+                color: selectedTemplate === t.id ? C.green : C.tx2, fontWeight: 500,
+              }}>
+                <span style={{ marginRight: 4 }}>{t.category === 'sale' ? '💰' : '⏰'}</span>
+                {t.name.split(' - ')[1]}
+              </button>
+            ))}
           </div>
-        )}
+          <div style={{ fontSize: 11, color: C.tx3, fontStyle: 'italic' }}>
+            Email 1: Présentation → Email 2: Devis/Paiement → Email 3: Confirmation
+          </div>
+        </div>
+
+        {/* Templates de RAPPEL */}
+        <div>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: C.blue, marginBottom: 10 }}>⏰ Templates de RAPPEL</h4>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+            {reminderTemplates.map(t => (
+              <button key={t.id} onClick={() => setSelectedTemplate(t.id)} style={{
+                padding: '8px 14px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
+                border: `1px solid ${selectedTemplate === t.id ? C.blue : C.border}`,
+                background: selectedTemplate === t.id ? '#e3f2fd' : C.surface,
+                color: selectedTemplate === t.id ? C.blue : C.tx2, fontWeight: 500,
+              }}>
+                <span style={{ marginRight: 4 }}>⏰</span>
+                {t.name.split(' - ')[1]}
+              </button>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: C.tx3, fontStyle: 'italic' }}>
+            Rappel 1: 3 jours après Email 1 → Rappel 2: 2 jours avant expiration
+          </div>
+        </div>
+
+        {/* Preview du template sélectionné */}
+        {(() => {
+          const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+          const selected = allTemplates.find(t => t.id === selectedTemplate);
+          if (!selected) return null;
+          
+          return (
+            <div style={{ marginTop: 14, padding: '14px', background: C.bg, borderRadius: 6, fontSize: 13 }}>
+              <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                Sujet: {selected.subject}
+              </div>
+              
+              {/* Template HTML - Affichage complet du contenu texte */}
+              {selected.htmlContent ? (
+                <div>
+                  <div style={{ marginBottom: 8, fontSize: 11, color: C.tx3 }}>
+                    💡 Template HTML moderne avec design professionnel
+                  </div>
+                  <div style={{ 
+                    background: '#fff', 
+                    padding: '12px', 
+                    borderRadius: 6, 
+                    border: '1px solid #e9ecef',
+                    maxHeight: '300px',
+                    overflowY: 'auto'
+                  }}>
+                    <pre style={{ 
+                      fontFamily: "'DM Mono', monospace", 
+                      fontSize: 11, 
+                      color: C.tx2, 
+                      whiteSpace: 'pre-wrap', 
+                      lineHeight: 1.4,
+                      margin: 0
+                    }}>
+                      {selected.htmlContent.replace(/<[^>]*>/g, '\n').replace(/\n\s*\n/g, '\n').trim()}
+                    </pre>
+                  </div>
+                  <div style={{ marginTop: 8, fontSize: 10, color: C.tx3 }}>
+                    📧 Contenu HTML complet (balises retirées pour la lisibilité)
+                  </div>
+                </div>
+              ) : (
+                /* Template texte classique */
+                <pre style={{ 
+                  fontFamily: "'DM Mono', monospace", 
+                  fontSize: 12, 
+                  color: C.tx2, 
+                  whiteSpace: 'pre-wrap', 
+                  lineHeight: 1.5,
+                  background: '#fff',
+                  padding: '12px',
+                  borderRadius: 6,
+                  border: '1px solid #e9ecef'
+                }}>
+                  {selected.body}
+                </pre>
+              )}
+              
+              {/* Variables du template */}
+              {selected.variables && selected.variables.length > 0 && (
+                <div style={{ marginTop: 12, padding: '8px', background: '#f8f9fa', borderRadius: 4 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: C.tx3, marginBottom: 4 }}>
+                    🔄 Variables utilisées:
+                  </div>
+                  <div style={{ fontSize: 10, color: C.tx2, fontFamily: "'DM Mono', monospace" }}>
+                    {selected.variables.map(v => `{{${v}}}`).join(', ')}
+                  </div>
+                </div>
+              )}
+
+              {/* Bouton visualisation HTML */}
+              {selected.htmlContent && (
+                <div style={{ marginTop: 12 }}>
+                  <button 
+                    onClick={() => setShowEmailPreview(true)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: 6,
+                      border: '1px solid #D4500A',
+                      background: '#D4500A',
+                      color: '#fff',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6
+                    }}
+                  >
+                    👁️ Visualiser l'email HTML
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Test Email */}
@@ -355,11 +652,31 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
                     padding: '4px 10px', borderRadius: 4, border: `1px solid ${C.border}`,
                     background: C.surface, fontSize: 12, cursor: 'pointer', color: C.blue,
                   }}>👁️</button>
-                  <button onClick={() => sendOne(lead)} disabled={!hasGmailSmtp} style={{
-                    padding: '4px 10px', borderRadius: 4, border: 'none',
-                    background: hasGmailSmtp ? C.amber : C.tx3, color: '#fff',
-                    fontSize: 12, cursor: hasGmailSmtp ? 'pointer' : 'default',
-                  }}>Envoyer</button>
+                  {workflowMode === 'automated' ? (
+                    <>
+                      <button onClick={() => sendWorkflowEmail(lead, 'email1_presentation')} disabled={!hasGmailSmtp} style={{
+                        padding: '4px 10px', borderRadius: 4, border: 'none',
+                        background: hasGmailSmtp ? C.blue : C.tx3, color: '#fff',
+                        fontSize: 12, cursor: hasGmailSmtp ? 'pointer' : 'default',
+                      }}>📧</button>
+                      <button onClick={() => sendEmail2WithPayment(lead)} disabled={!hasGmailSmtp} style={{
+                        padding: '4px 10px', borderRadius: 4, border: 'none',
+                        background: hasGmailSmtp ? C.green : C.tx3, color: '#fff',
+                        fontSize: 12, cursor: hasGmailSmtp ? 'pointer' : 'default',
+                      }}>💳</button>
+                      <button onClick={() => sendEmail3Confirmation(lead)} disabled={!hasGmailSmtp} style={{
+                        padding: '4px 10px', borderRadius: 4, border: 'none',
+                        background: hasGmailSmtp ? C.accent : C.tx3, color: '#fff',
+                        fontSize: 12, cursor: hasGmailSmtp ? 'pointer' : 'default',
+                      }}>🎉</button>
+                    </>
+                  ) : (
+                    <button onClick={() => sendOne(lead)} disabled={!hasGmailSmtp} style={{
+                      padding: '4px 10px', borderRadius: 4, border: 'none',
+                      background: hasGmailSmtp ? C.amber : C.tx3, color: '#fff',
+                      fontSize: 12, cursor: hasGmailSmtp ? 'pointer' : 'default',
+                    }}>Envoyer</button>
+                  )}
                 </div>
               </div>
             ))}
@@ -410,6 +727,29 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         </div>
       )}
 
+      {/* Payment Links Status */}
+      {Object.keys(paymentLinks).length > 0 && (
+        <div style={{ background: C.surface, borderRadius: 8, padding: '16px 20px', border: `1px solid ${C.border}`, marginTop: 20 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>💳 Liens de paiement actifs</h3>
+          <div style={{ fontSize: 12, fontFamily: "'DM Mono', monospace" }}>
+            {Object.entries(paymentLinks).map(([leadId, data]) => {
+              const lead = leads.find(l => l.id === leadId);
+              return (
+                <div key={leadId} style={{ padding: '8px 0', borderBottom: `1px solid ${C.border}` }}>
+                  <div style={{ fontWeight: 500, marginBottom: 4 }}>{lead?.name || leadId}</div>
+                  <div style={{ color: C.tx2, fontSize: 11 }}>
+                    Montant: {data.amount}€ | Créé: {new Date(data.created).toLocaleDateString('fr-FR')}
+                  </div>
+                  <div style={{ color: C.blue, fontSize: 10, wordBreak: 'break-all' }}>
+                    {data.link}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Preview Modal */}
       {previewEmail && (
         <>
@@ -456,6 +796,57 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
           </div>
         </>
       )}
+
+      {/* HTML Email Preview Modal */}
+      {showEmailPreview && (() => {
+        const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+        const selected = allTemplates.find(t => t.id === selectedTemplate);
+        if (!selected || !selected.htmlContent) return null;
+
+        return (
+          <>
+            <div onClick={() => setShowEmailPreview(false)} style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(0,0,0,0.5)', zIndex: 199,
+            }} />
+            <div style={{
+              position: 'fixed', top: '5%', left: '5%', right: '5%', bottom: '5%',
+              background: '#fff', borderRadius: 12,
+              zIndex: 200, overflow: 'hidden',
+              boxShadow: '0 25px 80px rgba(0,0,0,0.3)',
+            }}>
+              {/* Header */}
+              <div style={{
+                background: '#f8f9fa', padding: '16px 20px',
+                borderBottom: '1px solid #dee2e6',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+              }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#495057' }}>
+                    👁️ Visualisation Email HTML
+                  </h3>
+                  <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#6c757d' }}>
+                    {selected.name} - {selected.subject}
+                  </p>
+                </div>
+                <button onClick={() => setShowEmailPreview(false)} style={{
+                  width: 32, height: 32, borderRadius: 6, border: '1px solid #dee2e6',
+                  background: '#fff', fontSize: 16, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>✕</button>
+              </div>
+
+              {/* Email Content */}
+              <div style={{
+                height: 'calc(100% - 60px)', overflow: 'auto',
+                background: '#f4f4f4'
+              }}>
+                <div dangerouslySetInnerHTML={{ __html: selected.htmlContent }} />
+              </div>
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 }
