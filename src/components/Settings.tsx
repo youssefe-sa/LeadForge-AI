@@ -550,14 +550,10 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
 
           {/* Danger Zone - avec margin-top pour aligner */}
           <div style={{
-            marginTop: 60,
+            marginTop: 0,
             background: '#FEF2F2', borderRadius: 12, padding: '20px',
             border: `1px solid ${C.red}30`,
           }}>
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: C.red, marginBottom: 8 }}>⚠️ Zone Dangereuse</h3>
-            <p style={{ fontSize: 13, color: C.tx3, marginBottom: 12, lineHeight: 1.5 }}>
-              Cette action supprimera définitivement toutes vos données : l'ensemble des leads, configurations API, historiques et paramètres personnalisés. Cette opération est totalement irréversible et ne pourra pas être annulée.
-            </p>
             <button 
               onClick={() => {
                 if (window.confirm('⚠️ CONFIRMATION REQUISE\n\nÊtes-vous absolument certain de vouloir supprimer TOUTES les données ?\n\nCette action est IRRÉVERSIBLE et supprimera :\n• Tous les leads et contacts\n• Toutes les configurations API\n• Tout l\'historique d\'activités\n• Tous les paramètres personnalisés\n\nCliquez sur OK pour confirmer ou Annuler pour revenir en arrière.')) {
