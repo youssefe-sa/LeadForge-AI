@@ -192,6 +192,15 @@ app.post('/api/email/send-bulk', async (req, res) => {
   }
 });
 
+// Gestion d'erreurs globale
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Email server running on port ${PORT}`);
   console.log(`📧 SMTP endpoints:`);

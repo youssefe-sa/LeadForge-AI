@@ -166,17 +166,18 @@ export const defaultEmailTemplates: EmailTemplate[] = [
 ];
 
 // --- MAPPING HELPERS ---
-function mapSupabaseLeadToLead(supabaseLead: Database['public']['Tables']['leads']['Row']): Lead {
+function mapSupabaseLeadToLead(supabaseLead: Database['public']['Tables']['leads']['Row'] | any): Lead {
   return {
     id: supabaseLead.id,
     name: supabaseLead.name || '',
     email: supabaseLead.email || '',
     phone: supabaseLead.phone || '',
     sector: supabaseLead.sector || '',
-    siteClicked: supabaseLead.siteClicked || false,
-    paymentClicked: supabaseLead.paymentClicked || false,
-    devisClicked: supabaseLead.devisClicked || false,
-    invoiceClicked: supabaseLead.invoiceClicked || false,
+    // Utiliser les noms de colonnes corrects depuis Supabase avec fallback
+    siteClicked: (supabaseLead as any).site_clicked || false,
+    paymentClicked: (supabaseLead as any).payment_clicked || false,
+    devisClicked: (supabaseLead as any).devis_clicked || false,
+    invoiceClicked: (supabaseLead as any).invoice_clicked || false,
     city: supabaseLead.city || '',
     address: supabaseLead.address || '',
     website: supabaseLead.website || '',
@@ -219,7 +220,7 @@ function mapSupabaseLeadToLead(supabaseLead: Database['public']['Tables']['leads
   };
 }
 
-function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads']['Update'] {
+function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads']['Update'] | any {
   return {
     name: lead.name,
     email: lead.email || undefined,
@@ -237,10 +238,11 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
     notes: lead.notes || undefined,
     site_generated: lead.siteGenerated,
     site_url: lead.siteUrl || undefined,
-    siteClicked: lead.siteClicked,
-    paymentClicked: lead.paymentClicked,
-    devisClicked: lead.devisClicked,
-    invoiceClicked: lead.invoiceClicked,
+    // Utiliser les noms de colonnes corrects pour Supabase
+    site_clicked: lead.siteClicked,
+    payment_clicked: lead.paymentClicked,
+    devis_clicked: lead.devisClicked,
+    invoice_clicked: lead.invoiceClicked,
     landing_url: lead.landingUrl || undefined,
     email_sent: lead.emailSent,
     email_sent_date: lead.emailSentDate || undefined,
