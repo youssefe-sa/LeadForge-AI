@@ -82,9 +82,10 @@ export const salesTemplates: EmailTemplate[] = [
                 <ul style="padding-left: 20px; margin: 0;">
                   <li style="margin-bottom: 12px;"><strong>Design sur mesure</strong> : Création unique adaptée à votre image et votre secteur d'activité</li>
                   <li style="margin-bottom: 12px;"><strong>Responsive design</strong> : Affichage parfait sur ordinateur, tablette et smartphone</li>
-                  <li style="margin-bottom: 12px;"><strong>5 pages essentielles</strong> : Accueil, Présentation, Services, Contact, Blog/Galerie</li>
+                  <li style="margin-bottom: 12px;"><strong>Pages essentielles</strong> : Accueil, Présentation, Services, Contact...</li>
                   <li style="margin-bottom: 12px;"><strong>Formulaire de contact</strong> : Vos clients peuvent vous contacter directement depuis le site</li>
-                  <li style="margin-bottom: 0;"><strong>Intégration réseaux sociaux</strong> : Liens vers vos profils Facebook, Instagram, LinkedIn...</li>
+                  <li style="margin-bottom: 12px;"><strong>WhatsApp intégré</strong> : Vos clients peuvent vous contacter directement via WhatsApp</li>
+                  <li style="margin-bottom: 0;"><strong>Chatbot intelligent</strong> : Assistant 24/7 pour répondre aux questions de vos visiteurs</li>
                 </ul>
               </div>
               
@@ -101,7 +102,6 @@ export const salesTemplates: EmailTemplate[] = [
               <div style="margin-bottom: 25px;">
                 <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">🎯 Formation et Support</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Formation personnalisée</strong> : 2 heures pour apprendre à gérer votre site</li>
                   <li style="margin-bottom: 12px;"><strong>Documentation complète</strong> : Guides détaillés pour toutes les fonctionnalités</li>
                   <li style="margin-bottom: 12px;"><strong>Support prioritaire</strong> : Assistance par email et téléphone pendant 3 mois</li>
                   <li style="margin-bottom: 0;"><strong>Mises à jour incluses</strong> : Maintenance et sécurité garanties</li>
@@ -112,7 +112,7 @@ export const salesTemplates: EmailTemplate[] = [
                 <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">🏆 Avantages Exclusifs</h4>
                 <ul style="padding-left: 20px; margin: 0;">
                   <li style="margin-bottom: 12px;"><strong>Garantie satisfaction</strong> : Remboursement complet si pas satisfait sous 30 jours</li>
-                  <li style="margin-bottom: 12px;"><strong>Livraison rapide</strong> : Site web prêt en 7 jours ouvrés</li>
+                  <li style="margin-bottom: 12px;"><strong>Livraison rapide</strong> : Site web prêt en 2 jours ouvrés</li>
                   <li style="margin-bottom: 12px;"><strong>Économie garantie</strong> : 40% moins cher que les agences traditionnelles</li>
                   <li style="margin-bottom: 0;"><strong>Propriété totale</strong> : Vous êtes 100% propriétaire de votre site et domaine</li>
                 </ul>
@@ -123,21 +123,24 @@ export const salesTemplates: EmailTemplate[] = [
             <div style="background-color: #fff3cd; padding: 25px; margin: 30px 0; border: 1px solid #ffeaa7;">
               <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Investissement</h3>
               <div style="margin-bottom: 20px;">
-                <p style="font-size: 20px; font-weight: 600; margin: 10px 0; color: #2c3e50;">206€ HT - Paiement unique</p>
+                <p style="font-size: 20px; font-weight: 600; margin: 10px 0; color: #2c3e50;">146€ HT - Paiement unique</p>
                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #856404;">
-                  La création de votre site web professionnel est payée une seule fois et inclut :
+                  La création de votre site web professionnel est payée une seule fois.
                 </p>
-                <ul style="margin: 10px 0 0 20px; font-size: 14px; color: #856404;">
-                  <li>Hébergement professionnel 1 an inclus</li>
-                  <li>Nom de domaine .fr ou .com inclus</li>
-                  <li>3 mois gratuits de suivi et maintenance</li>
+                <p style="margin: 10px 0 0 0; font-size: 14px; color: #856404; font-weight: 500;">
+                  Inclut :
+                </p>
+                <ul style="margin: 5px 0 0 20px; font-size: 14px; color: #856404;">
+                  <li>1. Hébergement professionnel 1 an inclus</li>
+                  <li>2. Nom de domaine professionnel 1 an inclus</li>
+                  <li>3. mois gratuits de suivi et maintenance</li>
                 </ul>
               </div>
               <div style="padding-top: 15px; border-top: 1px solid #ffeaa7;">
                 <p style="font-size: 16px; font-weight: 500; margin: 0 0 5px 0; color: #856404;">À partir de la 2ème année :</p>
                 <p style="font-size: 18px; font-weight: 600; margin: 0; color: #2c3e50;">46€ HT par an</p>
                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #856404;">
-                  Uniquement pour l'hébergement (le nom de domaine reste à vous gratuitement)
+                  Pour l'hébergement ET le nom de domaine
                 </p>
               </div>
             </div>
@@ -200,9 +203,10 @@ Notre proposition inclut :
 🌐 Site Web Professionnel Complet
 • Design sur mesure : Création unique adaptée à votre image et votre secteur d'activité
 • Responsive design : Affichage parfait sur ordinateur, tablette et smartphone
-• 5 pages essentielles : Accueil, Présentation, Services, Contact, Blog/Galerie
+• Pages essentielles : Accueil, Présentation, Services, Contact...
 • Formulaire de contact : Vos clients peuvent vous contacter directement depuis le site
-• Intégration réseaux sociaux : Liens vers vos profils Facebook, Instagram, LinkedIn...
+• WhatsApp intégré : Vos clients peuvent vous contacter directement via WhatsApp
+• Chatbot intelligent : Assistant 24/7 pour répondre aux questions de vos visiteurs
 
 🚀 Optimisation et Performance
 • SEO optimisé : Référencement naturel pour apparaître dans Google
@@ -211,27 +215,28 @@ Notre proposition inclut :
 • Analytics intégré : Suivi des visiteurs et statistiques de performance
 
 🎯 Formation et Support
-• Formation personnalisée : 2 heures pour apprendre à gérer votre site
 • Documentation complète : Guides détaillés pour toutes les fonctionnalités
 • Support prioritaire : Assistance par email et téléphone pendant 3 mois
 • Mises à jour incluses : Maintenance et sécurité garanties
 
 🏆 Avantages Exclusifs
 • Garantie satisfaction : Remboursement complet si pas satisfait sous 30 jours
-• Livraison rapide : Site web prêt en 7 jours ouvrés
+• Livraison rapide : Site web prêt en 2 jours ouvrés
 • Économie garantie : 40% moins cher que les agences traditionnelles
 • Propriété totale : Vous êtes 100% propriétaire de votre site et domaine
 
 Investissement
-206€ HT - Paiement unique
-La création de votre site web professionnel est payée une seule fois et inclut :
-• Hébergement professionnel 1 an inclus
-• Nom de domaine .fr ou .com inclus
-• 3 mois gratuits de suivi et maintenance
+146€ HT - Paiement unique
+La création de votre site web professionnel est payée une seule fois.
+
+Inclut :
+1. Hébergement professionnel 1 an inclus
+2. Nom de domaine professionnel 1 an inclus
+3. mois gratuits de suivi et maintenance
 
 À partir de la 2ème année :
 46€ HT par an
-Uniquement pour l'hébergement (le nom de domaine reste à vous gratuitement)
+Pour l'hébergement ET le nom de domaine
 
 Souhaitez-vous démarrer votre projet ?
 • Démarrer le projet
@@ -301,42 +306,32 @@ LeadForge AI
             
             <!-- Processus détaillé -->
             <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Notre processus de réalisation</h3>
+              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Notre processus de réalisation en 2 jours ouvrables</h3>
               
               <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">📋 Phase 1 - Validation (24h)</h4>
+                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">📋 Jour 1 - Phase 1 & 2</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Analyse approfondie</strong> : Validation de vos besoins et spécifications techniques</li>
-                  <li style="margin-bottom: 12px;"><strong>Définition des objectifs</strong> : KPIs et indicateurs de succès clairs</li>
-                  <li style="margin-bottom: 0;"><strong>Validation du cahier des charges</strong> : Accord mutuel sur le périmètre du projet</li>
+                  <li style="margin-bottom: 12px;"><strong>Validation rapide</strong> : Analyse de vos besoins et validation du cahier des charges</li>
+                  <li style="margin-bottom: 12px;"><strong>Validation maquette</strong> : La maquette visuelle est déjà prête (envoyée dans l'email 1), juste besoin de votre validation</li>
+                  <li style="margin-bottom: 0;"><strong>Demandes de modifications</strong> : Si besoin, nous ajustons la maquette selon vos retours</li>
                 </ul>
               </div>
               
               <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">🎨 Phase 2 - Design (48h)</h4>
+                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">💻 Jour 2 - Phase 3 & 4</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Maquette visuelle</strong> : Création du design sur mesure selon votre charte graphique</li>
-                  <li style="margin-bottom: 12px;"><strong>Expérience utilisateur</strong> : Optimisation des parcours et interactions</li>
-                  <li style="margin-bottom: 0;"><strong>Validation design</strong> : Votre approbation avant développement</li>
-                </ul>
-              </div>
-              
-              <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">💻 Phase 3 - Développement (72h)</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Intégration technique</strong> : Développement des fonctionnalités principales</li>
+                  <li style="margin-bottom: 12px;"><strong>Développement rapide</strong> : Intégration technique et fonctionnalités principales</li>
                   <li style="margin-bottom: 12px;"><strong>Optimisation SEO</strong> : Intégration des meilleures pratiques de référencement</li>
-                  <li style="margin-bottom: 12px;"><strong>Tests et validation</strong> : Vérification croisée sur tous appareils</li>
-                  <li style="margin-bottom: 0;"><strong>Pré-lancement</strong> : Configuration technique finale</li>
+                  <li style="margin-bottom: 12px;"><strong>Tests et validation</strong> : Vérification sur tous appareils</li>
+                  <li style="margin-bottom: 0;"><strong>Mise en ligne</strong> : Déploiement immédiat du site</li>
                 </ul>
               </div>
               
               <div style="margin-bottom: 0;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">🚀 Phase 4 - Livraison ({{deliveryDate}})</h4>
+                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">🚀 Après Livraison - Support ({{deliveryDate}})</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Mise en ligne</strong> : Déploiement du site sur serveur de production</li>
-                  <li style="margin-bottom: 12px;"><strong>Formation personnalisée</strong> : 2 heures pour gérer votre site en autonomie</li>
-                  <li style="margin-bottom: 12px;"><strong>Support initial</strong> : Accompagnement pendant 30 jours</li>
+                  <li style="margin-bottom: 12px;"><strong>Documentation complète</strong> : Guides détaillés pour gérer votre site</li>
+                  <li style="margin-bottom: 12px;"><strong>Support prioritaire</strong> : Assistance par email et téléphone pendant 3 mois</li>
                   <li style="margin-bottom: 0;"><strong>Monitoring</strong> : Suivi des performances et optimisation continue</li>
                 </ul>
               </div>
@@ -358,26 +353,18 @@ LeadForge AI
             <div style="background-color: #fff3cd; padding: 25px; margin: 30px 0; border: 1px solid #ffeaa7;">
               <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Finaliser votre projet</h3>
               <div style="margin-bottom: 20px;">
-                <p style="font-size: 20px; font-weight: 600; margin: 10px 0; color: #2c3e50;">206€ HT - Paiement unique</p>
+                <p style="font-size: 20px; font-weight: 600; margin: 10px 0; color: #2c3e50;">146€ HT - Paiement unique</p>
                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #856404;">
                   Investissement unique pour la création complète incluant :
                 </p>
                 <ul style="margin: 10px 0 0 20px; font-size: 14px; color: #856404;">
                   <li>Toutes les phases de développement</li>
                   <li>Hébergement professionnel 1 an</li>
-                  <li>Nom de domaine .fr ou .com</li>
-                  <li>Formation et support 3 mois</li>
+                  <li>Nom de domaine professionnel 1 an</li>
+                  <li>Suivie et mantenance 3 mois</li>
                 </ul>
               </div>
-              <div style="padding-top: 15px; border-top: 1px solid #ffeaa7;">
-                <p style="font-size: 16px; font-weight: 500; margin: 0 0 5px 0; color: #856404;">Options de paiement flexibles :</p>
-                <ul style="margin: 10px 0 0 20px; font-size: 14px; color: #856404;">
-                  <li>1 paiement de 206€ HT</li>
-                  <li>3 paiements de 68,67€ HT sans frais</li>
-                  <li>6 paiements de 34,33€ HT sans frais</li>
-                </ul>
-              </div>
-              <div style="padding-top: 15px; border-top: 1px solid #ffeaa7; margin-top: 15px;">
+                            <div style="padding-top: 15px; border-top: 1px solid #ffeaa7; margin-top: 15px;">
                 <p style="margin: 0 0 15px 0; font-size: 14px; color: #856404;">
                   Offre valide {{validityDays}} jours. Paiement 100% sécurisé.
                 </p>
@@ -394,11 +381,11 @@ LeadForge AI
               <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                 <a href="mailto:{{agentEmail}}?subject=Questions devis {{companyName}}" 
                    style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-                  Poser une question
+                  Demander de changement
                 </a>
-                <a href="tel:+33612345678" 
+                <a href="mailto:{{agentEmail}}?subject=Validation maquette {{companyName}}" 
                    style="display: inline-block; background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-                  Nous appeler
+                  Valider La maquette
                 </a>
               </div>
             </div>
@@ -437,28 +424,22 @@ Nous avons analysé vos besoins spécifiques pour créer une solution parfaiteme
 
 Votre devis complet : {{devisLink}}
 
-Notre processus de réalisation :
+Notre processus de réalisation en 2 jours ouvrables :
 
-📋 Phase 1 - Validation (24h)
-• Analyse approfondie : Validation de vos besoins et spécifications techniques
-• Définition des objectifs : KPIs et indicateurs de succès clairs
-• Validation du cahier des charges : Accord mutuel sur le périmètre du projet
+📋 Jour 1 - Phase 1 & 2
+• Validation rapide : Analyse de vos besoins et validation du cahier des charges
+• Validation maquette : La maquette visuelle est déjà prête (envoyée dans l'email 1), juste besoin de votre validation
+• Demandes de modifications : Si besoin, nous ajustons la maquette selon vos retours
 
-🎨 Phase 2 - Design (48h)
-• Maquette visuelle : Création du design sur mesure selon votre charte graphique
-• Expérience utilisateur : Optimisation des parcours et interactions
-• Validation design : Votre approbation avant développement
-
-💻 Phase 3 - Développement (72h)
-• Intégration technique : Développement des fonctionnalités principales
+💻 Jour 2 - Phase 3 & 4
+• Développement rapide : Intégration technique et fonctionnalités principales
 • Optimisation SEO : Intégration des meilleures pratiques de référencement
-• Tests et validation : Vérification croisée sur tous appareils
-• Pré-lancement : Configuration technique finale
+• Tests et validation : Vérification sur tous appareils
+• Mise en ligne : Déploiement immédiat du site
 
-🚀 Phase 4 - Livraison ({{deliveryDate}})
-• Mise en ligne : Déploiement du site sur serveur de production
-• Formation personnalisée : 2 heures pour gérer votre site en autonomie
-• Support initial : Accompagnement pendant 30 jours
+🚀 Après Livraison - Support ({{deliveryDate}})
+• Documentation complète : Guides détaillés pour gérer votre site
+• Support prioritaire : Assistance par email et téléphone pendant 3 mois
 • Monitoring : Suivi des performances et optimisation continue
 
 Nos garanties exclusives :
@@ -469,26 +450,9 @@ Nos garanties exclusives :
 • Support prioritaire : Assistance dédiée pendant 3 mois
 
 Finaliser votre projet
-206€ HT - Paiement unique
+146€ HT - Paiement unique
 Investissement unique pour la création complète incluant :
 • Toutes les phases de développement
-• Hébergement professionnel 1 an
-• Nom de domaine .fr ou .com
-• Formation et support 3 mois
-
-Options de paiement flexibles :
-• 1 paiement de 206€ HT
-• 3 paiements de 68,67€ HT sans frais
-• 6 paiements de 34,33€ HT sans frais
-
-Offre valide {{validityDays}} jours. Paiement 100% sécurisé.
-Finaliser votre projet : {{paymentLink}}
-
-Des questions sur votre devis ?
-• Poser une question
-• Nous appeler
-
-Cordialement,
 {{agentName}}
 LeadForge AI
 {{agentEmail}}
@@ -530,7 +494,7 @@ LeadForge AI
                 témoigne de la confiance que vous placez dans notre expertise et notre engagement qualité.
               </p>
               <p style="font-size: 16px; margin-bottom: 25px;">
-                <strong>Qu'est-ce que cela signifie pour vous ?</strong> Votre paiement de 206€ HT vient d'être confirmé, 
+                <strong>Qu'est-ce que cela signifie pour vous ?</strong> Votre paiement de 146€ HT vient d'être confirmé, 
                 et nous vous confirmons que votre projet est maintenant officiellement en production. 
                 Notre équipe va immédiatement commencer à travailler sur votre présence en ligne professionnelle.
               </p>
@@ -540,70 +504,10 @@ LeadForge AI
             <div style="background-color: #f8f9fa; padding: 25px; margin: 30px 0; border: 1px solid #e9ecef;">
               <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Confirmation de votre investissement</h3>
               <p style="font-size: 16px; margin-bottom: 20px;">
-                Nous vous confirmons la bonne réception de votre paiement de 206€ HT pour votre projet {{companyName}}. 
+                Nous vous confirmons la bonne réception de votre paiement de 146€ HT pour votre projet {{companyName}}. 
                 Votre site web est maintenant officiellement en production avec notre équipe dédiée.
               </p>
-              <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Accédez à votre espace client :</p>
-              <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="{{clientPortalLink}}" style="color: #007bff; text-decoration: underline;">{{clientPortalLink}}</a>
-              </p>
-            </div>
-            
-            <!-- Prochaines étapes détaillées -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Votre calendrier de projet</h3>
-              
-              <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">📞 Étape 1 - Contact sous 24h</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Appel personnel</strong> : Notre chef de projet vous contacte pour valider les détails</li>
-                  <li style="margin-bottom: 12px;"><strong>Validation technique</strong> : Confirmation des spécifications et préférences</li>
-                  <li style="margin-bottom: 0;"><strong>Planning détaillé</strong> : Calendrier précis avec dates de livraison</li>
-                </ul>
-              </div>
-              
-              <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">🎨 Étape 2 - Design (48h)</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Maquette visuelle</strong> : Création du design selon votre identité</li>
-                  <li style="margin-bottom: 12px;"><strong>Présentation design</strong> : Review et ajustements avec votre feedback</li>
-                  <li style="margin-bottom: 0;"><strong>Validation finale</strong> : Accord sur le design avant développement</li>
-                </ul>
-              </div>
-              
-              <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">💻 Étape 3 - Développement (72h)</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Développement technique</strong> : Intégration complète des fonctionnalités</li>
-                  <li style="margin-bottom: 12px;"><strong>Optimisation SEO</strong> : Configuration pour référencement naturel</li>
-                  <li style="margin-bottom: 12px;"><strong>Tests qualité</strong> : Vérification sur tous appareils et navigateurs</li>
-                  <li style="margin-bottom: 0;"><strong>Pré-lancement</strong> : Configuration finale et tests de performance</li>
-                </ul>
-              </div>
-              
-              <div style="margin-bottom: 0;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">🚀 Étape 4 - Livraison ({{deliveryDate}})</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Mise en ligne</strong> : Déploiement officiel de votre site web</li>
-                  <li style="margin-bottom: 12px;"><strong>Formation personnalisée</strong> : 2 heures pour maîtriser votre site</li>
-                  <li style="margin-bottom: 12px;"><strong>Documentation complète</strong> : Guides pour gestion autonome</li>
-                  <li style="margin-bottom: 0;"><strong>Support actif</strong> : Assistance pendant 90 jours</li>
-                </ul>
-              </div>
-            </div>
-            
-            <!-- Espace client et suivi -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Votre espace client dédié</h3>
-              <ul style="padding-left: 20px; margin: 0;">
-                <li style="margin-bottom: 12px;"><strong>Suivi en temps réel</strong> : Progression du projet visible 24/7</li>
-                <li style="margin-bottom: 12px;"><strong>Communication directe</strong> : Échange avec votre chef de projet</li>
-                <li style="margin-bottom: 12px;"><strong>Documents partagés</strong> : Devis, factures, maquettes accessibles</li>
-                <li style="margin-bottom: 12px;"><strong>Historique complet</strong> : Toutes les interactions et livraisons</li>
-                <li style="margin-bottom: 0;"><strong>Support intégré</strong> : Accès direct à l'assistance technique</li>
-              </ul>
-            </div>
-            
+                          
             <!-- Facture et documents -->
             <div style="background-color: #d1ecf1; padding: 25px; margin: 30px 0; border: 1px solid #bee5eb;">
               <h3 style="color: #0c5460; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Vos documents officiels</h3>
@@ -613,33 +517,10 @@ LeadForge AI
                   <a href="{{invoiceLink}}" style="color: #007bff; text-decoration: underline;">{{invoiceLink}}</a>
                 </p>
                 <p style="margin: 0; font-size: 14px; color: #0c5460;">
-                  Facture N°{{invoiceNumber}} - Montant : 206€ HT - Date : {{invoiceDate}}
+                  Facture N°{{invoiceNumber}} - Montant : 146€ HT - Date : {{invoiceDate}}
                 </p>
               </div>
-              <div style="padding-top: 15px; border-top: 1px solid #bee5eb;">
-                <p style="font-size: 14px; color: #0c5460; margin: 0;">
-                  Tous vos documents sont également disponibles dans votre espace client pour téléchargement à tout moment.
-                </p>
-              </div>
-            </div>
-            
-            <!-- Appel à l'action -->
-            <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 20px; font-size: 16px;">Besoin d'aide ou d'informations ?</p>
-              <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="mailto:{{agentEmail}}?subject=Support {{companyName}}" 
-                   style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-                  Contacter le support
-                </a>
-                <a href="tel:+33612345678" 
-                   style="display: inline-block; background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-                  Nous appeler
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Footer -->
+                          </div>
           <div style="text-align: center; padding-top: 30px; border-top: 1px solid #e0e0e0; font-size: 14px; color: #7f8c8d;">
             <p style="margin: 0;">
               Merci de votre confiance,<br>
@@ -661,56 +542,34 @@ Nous sommes particulièrement honorés que vous ayez choisi
 témoigne de la confiance que vous placez dans notre expertise et notre engagement qualité.
 
 Qu'est-ce que cela signifie pour vous ?
-Votre paiement de 206€ HT vient d'être confirmé, 
+Votre paiement de 146€ HT vient d'être confirmé, 
 et nous vous confirmons que votre projet est maintenant officiellement en production. 
 Notre équipe va immédiatement commencer à travailler sur votre présence en ligne professionnelle.
 
 Confirmation de votre investissement
-Nous vous confirmons la bonne réception de votre paiement de 206€ HT pour votre projet {{companyName}}. 
+Nous vous confirmons la bonne réception de votre paiement de 146€ HT pour votre projet {{companyName}}. 
 Votre site web est maintenant officiellement en production avec notre équipe dédiée.
 
-Accédez à votre espace client : {{clientPortalLink}}
 
-Votre calendrier de projet :
+Votre calendrier de projet - 2 jours ouvrables :
 
-📞 Étape 1 - Contact sous 24h
-• Appel personnel : Notre chef de projet vous contacte pour valider les détails
-• Validation technique : Confirmation des spécifications et préférences
-• Planning détaillé : Calendrier précis avec dates de livraison
+📋 Étape 1 - Développement
+• Intégration technique : Développement des fonctionnalités principales
+• Optimisation SEO : Intégration des meilleures pratiques
+• Tests et validation : Vérification sur tous appareils
 
-🎨 Étape 2 - Design (48h)
-• Maquette visuelle : Création du design selon votre identité
-• Présentation design : Review et ajustements avec votre feedback
-• Validation finale : Accord sur le design avant développement
-
-💻 Étape 3 - Développement (72h)
-• Développement technique : Intégration complète des fonctionnalités
-• Optimisation SEO : Configuration pour référencement naturel
-• Tests qualité : Vérification sur tous appareils et navigateurs
-• Pré-lancement : Configuration finale et tests de performance
-
-🚀 Étape 4 - Livraison ({{deliveryDate}})
-• Mise en ligne : Déploiement officiel de votre site web
-• Formation personnalisée : 2 heures pour maîtriser votre site
-• Documentation complète : Guides pour gestion autonome
+🚀 Étape 2 - Livraison
+• Mise en ligne : Déploiement du site sur serveur
+• Documentation : Guides pour gérer votre site
+• Support 3 mois : Assistance prioritaire incluse
 • Support actif : Assistance pendant 90 jours
-
-Votre espace client dédié :
-• Suivi en temps réel : Progression du projet visible 24/7
-• Communication directe : Échange avec votre chef de projet
-• Documents partagés : Devis, factures, maquettes accessibles
-• Historique complet : Toutes les interactions et livraisons
-• Support intégré : Accès direct à l'assistance technique
 
 Vos documents officiels
 Votre facture est disponible : {{invoiceLink}}
-Facture N°{{invoiceNumber}} - Montant : 206€ HT - Date : {{invoiceDate}}
-
-Tous vos documents sont également disponibles dans votre espace client pour téléchargement à tout moment.
+Facture N°{{invoiceNumber}} - Montant : 146€ HT - Date : {{invoiceDate}}
 
 Besoin d'aide ou d'informations ?
 • Contacter le support
-• Nous appeler
 
 Merci de votre confiance,
 {{agentName}}
@@ -783,16 +642,16 @@ export const reminderTemplates: EmailTemplate[] = [
               <div style="margin-bottom: 25px;">
                 <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">💰 Économie de 40% garantie</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Prix transparent</strong> : 206€ HT contre 350€ HT minimum chez les agences traditionnelles</li>
+                  <li style="margin-bottom: 12px;"><strong>Prix transparent</strong> : 146€ HT contre 350€ HT minimum chez les agences traditionnelles</li>
                   <li style="margin-bottom: 12px;"><strong>Pas de frais cachés</strong> : Hébergement et domaine inclus la première année</li>
                   <li style="margin-bottom: 0;"><strong>Maintenance économique</strong> : 46€ HT par an uniquement pour l'hébergement</li>
                 </ul>
               </div>
               
               <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">⚡ Livraison express 7 jours</h4>
+                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">⚡ Livraison express 2 jours</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Rapidité exceptionnelle</strong> : Site web prêt en 7 jours ouvrés</li>
+                  <li style="margin-bottom: 12px;"><strong>Rapidité exceptionnelle</strong> : Site web prêt en 2 jours ouvrés</li>
                   <li style="margin-bottom: 12px;"><strong>Processus optimisé</strong> : Méthodologie éprouvée sans compromis sur la qualité</li>
                   <li style="margin-bottom: 0;"><strong>Avantage concurrentiel</strong> : Soyez en ligne avant vos concurrents</li>
                 </ul>
@@ -848,13 +707,9 @@ export const reminderTemplates: EmailTemplate[] = [
             <div style="text-align: center; margin: 40px 0;">
               <p style="margin-bottom: 20px; font-size: 16px;">Prêt à discuter de votre projet ?</p>
               <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="mailto:{{agentEmail}}?subject=Suite proposition {{companyName}}" 
-                   style="display: inline-block; background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-                  Discuter du projet
-                </a>
-                <a href="tel:+33612345678" 
+                <a href="mailto:{{agentEmail}}?subject=Questions {{companyName}}" 
                    style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-                  Nous appeler
+                  Discuter du projet
                 </a>
               </div>
             </div>
@@ -895,12 +750,12 @@ Découvrez votre futur site : {{websiteLink}}
 Pourquoi choisir {{agentName}} ?
 
 💰 Économie de 40% garantie
-• Prix transparent : 206€ HT contre 350€ HT minimum chez les agences traditionnelles
+• Prix transparent : 146€ HT contre 350€ HT minimum chez les agences traditionnelles
 • Pas de frais cachés : Hébergement et domaine inclus la première année
 • Maintenance économique : 46€ HT par an uniquement pour l'hébergement
 
-⚡ Livraison express 7 jours
-• Rapidité exceptionnelle : Site web prêt en 7 jours ouvrés
+⚡ Livraison express 2 jours
+• Rapidité exceptionnelle : Site web prêt en 2 jours ouvrés
 • Processus optimisé : Méthodologie éprouvée sans compromis sur la qualité
 • Avantage concurrentiel : Soyez en ligne avant vos concurrents
 
@@ -930,7 +785,6 @@ Notre garantie satisfaction 30 jours vous protège : remboursement complet sans 
 
 Prêt à discuter de votre projet ?
 • Discuter du projet
-• Nous appeler
 
 Cordialement,
 {{agentName}}
@@ -1000,7 +854,7 @@ LeadForge AI
               <div style="margin-bottom: 25px;">
                 <h4 style="color: #dc3545; margin-bottom: 10px; font-size: 16px;">💸 Impact financier immédiat</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Perte de 144€</strong> : Le même site coûtera 350€ HT au lieu de 206€ HT après expiration</li>
+                  <li style="margin-bottom: 12px;"><strong>Perte de 204€</strong> : Le même site coûtera 350€ HT au lieu de 146€ HT après expiration</li>
                   <li style="margin-bottom: 12px;"><strong>Hébergement payant</strong> : Plus d'hébergement gratuit la première année (+60€)</li>
                   <li style="margin-bottom: 0;"><strong>Domaine facturé</strong> : Le nom de domaine ne sera plus inclus (+20€)</li>
                 </ul>
@@ -1009,7 +863,7 @@ LeadForge AI
               <div style="margin-bottom: 25px;">
 n                <h4 style="color: #dc3545; margin-bottom: 10px; font-size: 16px;">⏰ Impact temporel</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Attente 3-4 semaines</strong> : Au lieu de 7 jours avec notre offre express</li>
+                  <li style="margin-bottom: 12px;"><strong>Attente 3-4 semaines</strong> : Au lieu de 2 jours avec notre offre express</li>
                   <li style="margin-bottom: 12px;"><strong>Perte d'opportunités</strong> : Chaque semaine sans site = clients potentiels perdus</li>
                   <li style="margin-bottom: 0;"><strong>Concurrence avancée</strong> : Vos concurrents pourraient déjà être en ligne</li>
                 </ul>
@@ -1031,8 +885,8 @@ n                <h4 style="color: #dc3545; margin-bottom: 10px; font-size: 16px
               <div style="background-color: #f8f9fa; padding: 20px; margin: 15px 0; border: 1px solid #e9ecef;">
                 <p style="margin: 0 0 10px 0; font-weight: 500; color: #28a745;">✅ AVEC L'OFFRE ACTUELLE (expire le {{expiryDate}})</p>
                 <ul style="margin: 0; padding-left: 20px; font-size: 14px;">
-                  <li>Investissement : 206€ HT (économie de 144€)</li>
-                  <li>Livraison : 7 jours ouvrés</li>
+                  <li>Investissement : 146€ HT (économie de 204€)</li>
+                  <li>Livraison : 2 jours ouvrés</li>
                   <li>Hébergement : 1 an gratuit</li>
                   <li>Domaine : Inclus gratuitement</li>
                   <li>Garantie : 30 jours satisfaction</li>
@@ -1057,7 +911,7 @@ n                <h4 style="color: #dc3545; margin-bottom: 10px; font-size: 16px
               <div style="background-color: #f8f9fa; padding: 20px; border-left: 4px solid #dc3545;">
                 <p style="margin: 0 0 10px 0; font-style: italic; font-size: 14px;">
                   "J'ai hésité et perdu l'offre spéciale. J'ai dû payer 150€ de plus pour le même site, 
-                  et attendre 3 semaines au lieu de 7 jours. Ne faites pas ma même erreur !"
+                  et attendre 3 semaines au lieu de 2 jours. Ne faites pas ma même erreur !"
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #7f8c8d;">- Alexandre P., Restaurant (regrette son attente)</p>
               </div>
@@ -1114,7 +968,7 @@ Finaliser maintenant : {{paymentLink}}
 Ce que vous risquez de perdre concrètement :
 
 💸 Impact financier immédiat
-• Perte de 144€ : Le même site coûtera 350€ HT au lieu de 206€ HT après expiration
+• Perte de 204€ : Le même site coûtera 350€ HT au lieu de 146€ HT après expiration
 • Hébergement payant : Plus d'hébergement gratuit la première année (+60€)
 • Domaine facturé : Le nom de domaine ne sera plus inclus (+20€)
 
@@ -1131,8 +985,8 @@ Ce que vous risquez de perdre concrètement :
 Comparaison : Maintenant vs Plus tard
 
 ✅ AVEC L'OFFRE ACTUELLE (expire le {{expiryDate}})
-• Investissement : 206€ HT (économie de 144€)
-• Livraison : 7 jours ouvrés
+• Investissement : 146€ HT (économie de 204€)
+• Livraison : 2 jours ouvrés
 • Hébergement : 1 an gratuit
 • Domaine : Inclus gratuitement
 • Garantie : 30 jours satisfaction

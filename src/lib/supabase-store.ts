@@ -54,6 +54,10 @@ export interface Lead {
   emailSentDate: string;
   emailOpened: boolean;
   emailClicked: boolean;
+  siteClicked: boolean;
+  paymentClicked: boolean;
+  devisClicked: boolean;
+  invoiceClicked: boolean;
   lastContact: string;
   followUps: number;
   revenue: number;
@@ -100,9 +104,12 @@ export interface ApiStatus {
 export interface EmailTemplate {
   id: string;
   name: string;
-  sector: string;
+  category: string;
   subject: string;
   body: string;
+  htmlContent: string;
+  textContent: string;
+  variables: string[];
 }
 
 // --- DEFAULTS ---
@@ -126,15 +133,36 @@ export const defaultApiConfig: ApiConfig = {
 };
 
 export const defaultEmailTemplates: EmailTemplate[] = [
-  { id: '1', name: 'Restaurant - Premier contact', sector: 'Restaurant',
+  { 
+    id: '1', 
+    name: 'Restaurant - Premier contact', 
+    category: 'original',
     subject: 'Un site web professionnel pour {name}',
-    body: 'Bonjour,\n\nJe me permets de vous contacter car j\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web professionnel.\n\nJ\'ai pris l\'initiative de créer une maquette de site web spécialement conçue pour votre restaurant. Vous pouvez la découvrir ici :\n\n{landingUrl}\n\nCe site inclut :\n- Menu en ligne avec photos\n- Réservation en ligne\n- Avis Google intégrés\n- Optimisé pour Google (SEO local)\n\nLe site est prêt à être mis en ligne. Si cela vous intéresse, n\'hésitez pas à me répondre.\n\nCordialement' },
-  { id: '2', name: 'Commerce - Premier contact', sector: 'Commerce',
+    body: 'Bonjour,\n\nJe me permets de vous contacter car j\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web professionnel.\n\nJ\'ai pris l\'initiative de créer une maquette de site web spécialement conçue pour votre restaurant. Vous pouvez la découvrir ici :\n\n{landingUrl}\n\nCe site inclut :\n- Menu en ligne avec photos\n- Réservation en ligne\n- Avis Google intégrés\n- Optimisé pour Google (SEO local)\n\nLe site est prêt à être mis en ligne. Si cela vous intéresse, n\'hésitez pas à me répondre.\n\nCordialement',
+    htmlContent: '',
+    textContent: '',
+    variables: ['name', 'city', 'landingUrl']
+  },
+  { 
+    id: '2', 
+    name: 'Commerce - Premier contact', 
+    category: 'original',
     subject: 'Votre boutique {name} mérite un site web moderne',
-    body: 'Bonjour,\n\nJe vous contacte car j\'ai vu que {name} à {city} n\'a pas de site web.\n\nJ\'ai créé un site web professionnel pour votre commerce :\n\n{landingUrl}\n\n- Catalogue produits\n- Horaires et localisation\n- Visible sur Google\n\nRépondez à cet email pour en discuter.\n\nCordialement' },
-  { id: '3', name: 'Générique - Premier contact', sector: 'Autre',
+    body: 'Bonjour,\n\nJe vous contacte car j\'ai vu que {name} à {city} n\'a pas de site web.\n\nJ\'ai créé un site web professionnel pour votre commerce :\n\n{landingUrl}\n\n- Catalogue produits\n- Horaires et localisation\n- Visible sur Google\n\nRépondez à cet email pour en discuter.\n\nCordialement',
+    htmlContent: '',
+    textContent: '',
+    variables: ['name', 'city', 'landingUrl']
+  },
+  { 
+    id: '3', 
+    name: 'Générique - Premier contact', 
+    category: 'original',
     subject: 'Un site web professionnel pour {name}',
-    body: 'Bonjour,\n\nJ\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web.\n\nJ\'ai créé un site web professionnel spécialement pour vous :\n\n{landingUrl}\n\n- Design moderne et professionnel\n- Optimisé pour mobile\n- Visible sur Google\n\nDécouvrez-le et n\'hésitez pas à me contacter.\n\nCordialement' },
+    body: 'Bonjour,\n\nJ\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web.\n\nJ\'ai créé un site web professionnel spécialement pour vous :\n\n{landingUrl}\n\n- Design moderne et professionnel\n- Optimisé pour mobile\n- Visible sur Google\n\nDécouvrez-le et n\'hésitez pas à me contacter.\n\nCordialement',
+    htmlContent: '',
+    textContent: '',
+    variables: ['name', 'city', 'landingUrl']
+  },
 ];
 
 // --- MAPPING HELPERS ---
@@ -145,6 +173,10 @@ function mapSupabaseLeadToLead(supabaseLead: Database['public']['Tables']['leads
     email: supabaseLead.email || '',
     phone: supabaseLead.phone || '',
     sector: supabaseLead.sector || '',
+    siteClicked: supabaseLead.siteClicked || false,
+    paymentClicked: supabaseLead.paymentClicked || false,
+    devisClicked: supabaseLead.devisClicked || false,
+    invoiceClicked: supabaseLead.invoiceClicked || false,
     city: supabaseLead.city || '',
     address: supabaseLead.address || '',
     website: supabaseLead.website || '',
@@ -205,6 +237,10 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
     notes: lead.notes || undefined,
     site_generated: lead.siteGenerated,
     site_url: lead.siteUrl || undefined,
+    siteClicked: lead.siteClicked,
+    paymentClicked: lead.paymentClicked,
+    devisClicked: lead.devisClicked,
+    invoiceClicked: lead.invoiceClicked,
     landing_url: lead.landingUrl || undefined,
     email_sent: lead.emailSent,
     email_sent_date: lead.emailSentDate || undefined,
@@ -607,9 +643,12 @@ export function useEmailTemplates() {
         setTemplates(supabaseTemplates.map(t => ({
           id: t.id,
           name: t.name,
-          sector: t.sector,
+          category: t.category || 'original',
           subject: t.subject,
           body: t.body,
+          htmlContent: t.htmlContent || '',
+          textContent: t.textContent || '',
+          variables: t.variables || [],
         })));
       }
     } catch (err) {

@@ -69,17 +69,20 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       firstName: lead.name,
       companyName: lead.name,
       websiteLink: lead.landingUrl || lead.siteUrl || '#',
-      price: '299', // Prix par défaut
+      price: '146', // Prix par défaut
       agentName: apiConfig.gmailSmtpFromName || 'LeadForge AI',
       agentEmail: apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai',
-      amount: '299',
+      amount: '146',
       validityDays: '7',
-      deliveryDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+      deliveryDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
       expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
       devisLink: devisLinks[lead.id] || '#',
       paymentLink: paymentLinks[lead.id]?.link || '#',
       invoiceLink: invoiceLinks[lead.id] || '#',
-      clientPortalLink: `https://leadforge.ai/client/${lead.id}`
+      invoiceNumber: `INV-${lead.id}-${Date.now()}`,
+      invoiceDate: new Date().toLocaleDateString('fr-FR'),
+      sector: lead.sector || 'votre secteur',
+      city: lead.city || 'votre ville'
     };
 
     let subject = template.subject;
@@ -185,7 +188,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
   };
 
   // Générer lien de paiement Whop (simulation)
-  const generatePaymentLink = async (lead: Lead, amount: number = 299) => {
+  const generatePaymentLink = async (lead: Lead, amount: number = 146) => {
     const paymentLink = `https://whop.com/pay/leadforge-${lead.id}-${Date.now()}`;
     
     setPaymentLinks(prev => ({
@@ -238,7 +241,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
     
     updateLead(lead.id, {
       stage: 'converted',
-      revenue: 299
+      revenue: 146
     });
   };
 
@@ -381,19 +384,23 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
-          { label: 'Emails Envoyés', value: sent.length, color: C.green },
           { label: 'Prêts à Envoyer', value: ready.length, color: C.amber },
+          { label: 'Emails Envoyés', value: sent.length, color: C.green },
           { label: 'Ouverts', value: leads.filter(l => l.emailOpened).length, color: C.blue },
-          { label: 'Cliqués', value: leads.filter(l => l.emailClicked).length, color: C.accent },
+          { label: 'Non Ouverts', value: leads.filter(l => l.emailSent && !l.emailOpened).length, color: '#6c757d' },
+          { label: 'Lien Site Cliqués', value: leads.filter(l => l.siteClicked).length, color: '#17a2b8' },
+          { label: 'Lien Paiement Cliqués', value: leads.filter(l => l.paymentClicked).length, color: '#28a745' },
+          { label: 'Devis Cliqués', value: leads.filter(l => l.devisClicked).length, color: '#ffc107' },
+          { label: 'Facture Cliqués', value: leads.filter(l => l.invoiceClicked).length, color: '#dc3545' },
         ].map((s, i) => (
           <div key={i} style={{
-            background: C.surface, borderRadius: 8, padding: '20px 22px',
+            background: C.surface, borderRadius: 8, padding: '16px 12px',
             borderLeft: `3px solid ${s.color}`, boxShadow: '0 1px 3px rgba(28,27,24,0.06)',
           }}>
-            <div style={{ fontSize: 12, color: C.tx3, fontWeight: 500, marginBottom: 6 }}>{s.label}</div>
-            <div style={{ fontSize: 32, fontWeight: 700, fontFamily: "'Fraunces', serif", color: C.tx }}>{s.value}</div>
+            <div style={{ fontSize: 10, color: C.tx3, fontWeight: 500, marginBottom: 4 }}>{s.label}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "'Fraunces', serif", color: C.tx }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -565,7 +572,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
                     🔄 Variables utilisées:
                   </div>
                   <div style={{ fontSize: 10, color: C.tx2, fontFamily: "'DM Mono', monospace" }}>
-                    {selected.variables.map(v => `{{${v}}}`).join(', ')}
+                    {selected.variables.map((v: string) => `{{${v}}}`).join(', ')}
                   </div>
                 </div>
               )}
