@@ -109,7 +109,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       '{email}': lead.email || '',
     };
     let subject = template.subject;
-    let body = template.body;
+    let body = template.textContent || template.subject; // Utiliser textContent comme fallback
     for (const [key, val] of Object.entries(replacements)) {
       subject = subject.split(key).join(val);
       body = body.split(key).join(val);
@@ -118,7 +118,8 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   };
 
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
-    const template = templates.find(t => lead.sector?.toLowerCase().includes(t.sector.toLowerCase())) || templates[templates.length - 1];
+    const allTemplates = [...salesTemplates, ...reminderTemplates];
+    const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
     const base = personalizeTemplate(template, lead);
 
     if (hasLLM) {
@@ -321,10 +322,11 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
     setTestEmailSending(true);
     setLogs(prev => [...prev, `🧪 Envoi d'email test à ${testEmailAddress}...`]);
 
-    const template = templates.find(t => t.id === selectedTemplate) || templates[0];
+    const allTemplates = [...salesTemplates, ...reminderTemplates];
+    const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
     const testLead: Lead = {
       id: 'test', name: 'Test Prospect', email: testEmailAddress,
-      sector: template?.sector || 'Commerce', city: 'Ville Test',
+      sector: 'Commerce', city: 'Ville Test',
       landingUrl: 'https://example.com',
     } as Lead;
 
@@ -462,7 +464,27 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
 
       {/* Templates */}
       <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>📋 Templates d'email</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <h3 style={{ fontSize: 15, fontWeight: 600, margin: 0 }}>📋 Templates d'email</h3>
+          <button 
+            onClick={() => setShowEmailPreview(true)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 6,
+              border: '1px solid #D4500A',
+              background: '#D4500A',
+              color: '#fff',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6
+            }}
+          >
+            👁️ Visualiser l'email HTML
+          </button>
+        </div>
         
         
         {/* Templates de VENTE */}
@@ -561,7 +583,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
                   borderRadius: 6,
                   border: '1px solid #e9ecef'
                 }}>
-                  {selected.body}
+                  {selected.textContent}
                 </pre>
               )}
               
@@ -577,30 +599,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
                 </div>
               )}
 
-              {/* Bouton visualisation HTML */}
-              {selected.htmlContent && (
-                <div style={{ marginTop: 12 }}>
-                  <button 
-                    onClick={() => setShowEmailPreview(true)}
-                    style={{
-                      padding: '8px 16px',
-                      borderRadius: 6,
-                      border: '1px solid #D4500A',
-                      background: '#D4500A',
-                      color: '#fff',
-                      fontSize: 12,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6
-                    }}
-                  >
-                    👁️ Visualiser l'email HTML
-                  </button>
-                </div>
-              )}
-            </div>
+                          </div>
           );
         })()}
       </div>

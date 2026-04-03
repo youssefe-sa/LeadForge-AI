@@ -18,7 +18,7 @@ export const salesTemplates: EmailTemplate[] = [
     id: 'email1_presentation',
     name: 'Email 1 - Présentation Site Web',
     category: 'sale',
-    subject: 'Votre site web professionnel {{companyName}} est prêt',
+    subject: '🚀 {{companyName}} - Votre site web professionnel est prêt',
     variables: ['firstName', 'companyName', 'websiteLink', 'price', 'agentName', 'agentEmail'],
     htmlContent: `
       <!DOCTYPE html>
@@ -41,6 +41,19 @@ export const salesTemplates: EmailTemplate[] = [
           <div style="margin-bottom: 30px;">
             <h2 style="color: #2c3e50; margin-bottom: 15px; font-size: 20px;">Bonjour {{firstName}},</h2>
             
+            <!-- L'offre - Positionnée en haut pour donner de la valeur -->
+            <div style="background-color: #f8f9fa; padding: 25px; margin: 0 0 30px 0; border: 1px solid #e9ecef;">
+              <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Notre proposition pour {{companyName}}</h3>
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Nous avons finalisé le développement de votre site web professionnel pour <strong>{{companyName}}</strong>. 
+                Notre équipe a créé une présence en ligne optimisée pour générer des conversions.
+              </p>
+              <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Votre site web est prêt :</p>
+              <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">{{websiteLink}}</a>
+              </p>
+            </div>
+            
             <!-- Introduction de notre service -->
             <div style="margin-bottom: 30px;">
               <p style="font-size: 16px; margin-bottom: 15px;">
@@ -57,19 +70,6 @@ export const salesTemplates: EmailTemplate[] = [
               <p style="font-size: 16px; margin-bottom: 25px;">
                 <strong>Notre approche</strong> : Nous analysons votre marché, comprenons vos objectifs, et créons un site web 
                 qui non seulement représente votre entreprise mais surtout qui génère des résultats concrets.
-              </p>
-            </div>
-            
-            <!-- L'offre -->
-            <div style="background-color: #f8f9fa; padding: 25px; margin: 30px 0; border: 1px solid #e9ecef;">
-              <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Notre proposition pour {{companyName}}</h3>
-              <p style="font-size: 16px; margin-bottom: 20px;">
-                Nous avons finalisé le développement de votre site web professionnel pour <strong>{{companyName}}</strong>. 
-                Notre équipe a créé une présence en ligne optimisée pour générer des conversions.
-              </p>
-              <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Votre site web est prêt :</p>
-              <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">{{websiteLink}}</a>
               </p>
             </div>
             
@@ -177,26 +177,18 @@ export const salesTemplates: EmailTemplate[] = [
     textContent: `
 Bonjour {{firstName}},
 
-Qui sommes-nous ?
-{{agentName}} est une agence web spécialisée dans la création de sites web professionnels 
-pour les entreprises qui souhaitent se développer en ligne. Notre mission est de rendre le web accessible 
-à tous les entrepreneurs avec des solutions performantes et abordables.
-
-Pourquoi cette initiative ?
-Nous avons remarqué que de nombreuses entreprises comme la vôtre 
-méritent une présence en ligne professionnelle mais sont souvent découragées par les coûts élevés des agences 
-traditionnelles. C'est pourquoi nous avons créé une solution adaptée : des sites web de qualité professionnelle 
-à un prix accessible, avec un accompagnement personnalisé.
-
-Notre approche :
-Nous analysons votre marché, comprenons vos objectifs, et créons un site web 
-qui non seulement représente votre entreprise mais surtout qui génère des résultats concrets.
-
 Notre proposition pour {{companyName}}
-Nous avons finalisé le développement de votre site web professionnel pour {{companyName}}. 
-Notre équipe a créé une présence en ligne optimisée pour générer des conversions.
 
-Votre site web est prêt : {{websiteLink}}
+Nous avons finalisé le développement de votre site web professionnel pour {{companyName}}. Notre équipe a créé une présence en ligne optimisée pour générer des conversions.
+
+Votre site web est prêt :
+{{websiteLink}}
+
+Qui sommes-nous ? {{agentName}} est une agence web spécialisée dans la création de sites web professionnels pour les entreprises qui souhaitent se développer en ligne. Notre mission est de rendre le web accessible à tous les entrepreneurs avec des solutions performantes et abordables.
+
+Pourquoi cette initiative ? Nous avons remarqué que de nombreuses entreprises comme la vôtre méritent une présence en ligne professionnelle mais sont souvent découragées par les coûts élevés des agences traditionnelles. C'est pourquoi nous avons créé une solution adaptée : des sites web de qualité professionnelle à un prix accessible, avec un accompagnement personnalisé.
+
+Notre approche : Nous analysons votre marché, comprenons vos objectifs, et créons un site web qui non seulement représente votre entreprise mais surtout qui génère des résultats concrets.
 
 Notre proposition inclut :
 
