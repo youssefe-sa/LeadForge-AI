@@ -841,25 +841,21 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
   console.log('🧠 callLLM: Starting LLM call');
   const truncatedPrompt = prompt.slice(0, 4000);
 
-  // Helper: NVIDIA NIM (40 RPM gratuit, OpenAI-compatible)
+  // Helper: NVIDIA NIM via API route (contourne CORS)
   const callNvidia = async (maxTokens = 1024): Promise<string> => {
     if (!config.nvidiaKey) return '';
-    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+    const res = await fetch('/api/nvidia', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.nvidiaKey}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'meta/llama-3.3-70b-instruct',
-        messages: [
-          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-          { role: 'user', content: truncatedPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: maxTokens,
+        prompt: truncatedPrompt,
+        systemPrompt: systemPrompt || 'You are a helpful assistant.',
+        maxTokens,
       }),
     });
     if (!res.ok) { console.warn('NVIDIA NIM error:', res.status); return ''; }
     const data = await res.json();
-    return data.choices?.[0]?.message?.content?.trim() || '';
+    return data.result || '';
   };
 
   // Helper: appel Gemini (1M TPM gratuit, OpenAI-compatible)
@@ -999,24 +995,21 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
     return data.choices?.[0]?.message?.content?.trim() || '';
   };
 
+  // Helper: NVIDIA NIM via API route pour website (contourne CORS)
   const callNvidiaWeb = async (): Promise<string> => {
     if (!config.nvidiaKey) return '';
-    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+    const res = await fetch('/api/nvidia-website', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.nvidiaKey}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'meta/llama-3.3-70b-instruct',
-        messages: [
-          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-          { role: 'user', content: truncatedPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 4096,
+        prompt: truncatedPrompt,
+        systemPrompt: systemPrompt || 'You are a helpful assistant.',
+        maxTokens: 4096,
       }),
     });
     if (!res.ok) return '';
     const data = await res.json();
-    return data.choices?.[0]?.message?.content?.trim() || '';
+    return data.result || '';
   };
 
   const callOpenRouter = async (): Promise<string> => {
@@ -1043,7 +1036,9 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
     return data.choices?.[0]?.message?.content?.trim() || '';
   };
 
-  if (config.groqKey) {
+  // Helper: appel Groq pour website
+  const callGroq = async (): Promise<string> => {
+    if (!config.groqKey) return '';
     await enforceRateLimit(truncatedPrompt.length);
     try {
       const result = await retryWithBackoff(async () => {
@@ -1062,32 +1057,17 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
         });
         if (res.ok) {
           const data = await res.json();
-          const content = data.choices?.[0]?.message?.content;
-          if (content?.trim()) return content;
-          throw { status: 500, message: 'Empty response from LLM' };
+          return data.choices?.[0]?.message?.content?.trim() || '';
+        } else {
+          throw new Error(`Groq error: ${res.status}`);
         }
-        const errorText = await res.text();
-        let errorObj: any;
-        try { errorObj = JSON.parse(errorText); } catch { errorObj = { message: errorText }; }
-        throw { status: res.status, message: errorObj.error?.message || errorText, code: errorObj.error?.code };
-      }, isRateLimitError, MAX_RETRIES);
-      if (result) return result;
+      });
+      return result;
     } catch (error: any) {
-      const msg = String(error?.message || error).toLowerCase();
-      const isCors = msg.includes('failed to fetch') || msg.includes('cors') || msg.includes('network');
-      if (isRateLimitError(error) || isCors) {
-        console.warn(`⚠️ Website LLM: ${isCors ? 'CORS/réseau' : 'rate limit'}, fallback...`);
-        const gemini = await callGemini();
-        if (gemini) { console.log('✅ Website: Gemini fallback success'); return gemini; }
-        const nvidia = await callNvidiaWeb().catch(() => '');
-        if (nvidia) { console.log('✅ Website: NVIDIA NIM fallback success'); return nvidia; }
-        const or = await callOpenRouter();
-        if (or) { console.log('✅ Website: OpenRouter fallback success'); return or; }
-      } else {
-        throw error;
-      }
+      if (isRateLimitError(error)) throw error;
+      return '';
     }
-  }
+  };
 
   const defaultLlm = config.defaultLlm || 'groq';
   const providerOrder: Array<() => Promise<string>> = [];
