@@ -1,10 +1,4 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -12,23 +6,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { prompt, systemPrompt, maxTokens = 8192 } = req.body;
+    const { prompt, systemPrompt, maxTokens = 8192, nvidiaKey } = req.body;
 
-    // Récupérer la configuration NVIDIA depuis Supabase
-    const { data: config } = await supabase
-      .from('api_config')
-      .select('nvidia_key')
-      .single();
-
-    if (!config?.nvidia_key) {
-      return res.status(400).json({ error: 'NVIDIA key not configured' });
+    if (!nvidiaKey) {
+      return res.status(400).json({ error: 'NVIDIA key not provided' });
     }
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt not provided' });
+    }
+
+    console.log('🔧 NVIDIA Website API Route: Processing request', { 
+      promptLength: prompt.length, 
+      hasSystemPrompt: !!systemPrompt,
+      maxTokens 
+    });
 
     // Appeler l'API NVIDIA depuis le serveur (pas de CORS)
     const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${config.nvidia_key}`,
+        'Authorization': `Bearer ${nvidiaKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -42,18 +40,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }),
     });
 
+    console.log('🔧 NVIDIA Website API Route: Response status', response.status);
+
     if (!response.ok) {
       const error = await response.text();
+      console.error('🔧 NVIDIA Website API Route: API error', { status: response.status, error });
       return res.status(response.status).json({ error: 'NVIDIA API error', details: error });
     }
 
     const data = await response.json();
     const result = data.choices?.[0]?.message?.content?.trim() || '';
 
+    console.log('🔧 NVIDIA Website API Route: Success', { resultLength: result.length });
+
     return res.status(200).json({ result });
 
   } catch (error: any) {
-    console.error('NVIDIA proxy error:', error);
+    console.error('🔧 NVIDIA Website API Route: Internal error', error);
     return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }

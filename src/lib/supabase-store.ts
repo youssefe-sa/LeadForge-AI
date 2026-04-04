@@ -851,6 +851,7 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
         prompt: truncatedPrompt,
         systemPrompt: systemPrompt || 'You are a helpful assistant.',
         maxTokens,
+        nvidiaKey: config.nvidiaKey,
       }),
     });
     if (!res.ok) { console.warn('NVIDIA NIM error:', res.status); return ''; }
@@ -1005,6 +1006,7 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
         prompt: truncatedPrompt,
         systemPrompt: systemPrompt || 'You are a helpful assistant.',
         maxTokens: 4096,
+        nvidiaKey: config.nvidiaKey,
       }),
     });
     if (!res.ok) return '';
@@ -1061,7 +1063,7 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
         } else {
           throw new Error(`Groq error: ${res.status}`);
         }
-      });
+      }, isRateLimitError, MAX_RETRIES);
       return result;
     } catch (error: any) {
       if (isRateLimitError(error)) throw error;
