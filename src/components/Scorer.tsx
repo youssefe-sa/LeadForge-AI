@@ -83,7 +83,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     return lead;
   }, [selectedId, leads, refreshKey]);
 
-  const hasLLM = !!apiConfig.groqKey;
+  const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.nvidiaKey || apiConfig.openrouterKey);
   const hasSerper = !!apiConfig.serperKey;
   const hasImages = false; // Plus d'APIs images depuis suppression Unsplash/Pexels
 
@@ -663,7 +663,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
             Scorer & Enrichissement
           </h1>
           <p style={{ color: C.tx3, fontSize: 14 }}>
-            {hasSerper ? '🔍 Serper' : ''}{hasLLM ? ' · 🧠 IA (Groq)' : ''}
+            {hasSerper ? '🔍 Serper' : ''}{hasLLM ? ` · 🧠 IA (${apiConfig.defaultLlm === 'groq' ? 'Groq' : apiConfig.defaultLlm === 'gemini' ? 'Gemini' : apiConfig.defaultLlm === 'nvidia' ? 'NVIDIA' : apiConfig.defaultLlm === 'openrouter' ? 'OpenRouter' : 'IA'})` : ''}
             {!hasSerper && !hasLLM ? ' ⚠️ Configurez Serper + LLM dans Paramètres' : ' — activés'}
           </p>
         </div>

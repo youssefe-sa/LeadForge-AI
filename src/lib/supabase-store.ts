@@ -891,7 +891,7 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${config.openrouterKey}`,
-        'HTTP-Referer': 'https://lead-forge-ai-alpha.vercel.app',
+        'HTTP-Referer': 'https://siteup-services.vercel.app',
       },
       body: JSON.stringify({
         model: 'meta-llama/llama-3.1-8b-instruct:free',
@@ -1026,7 +1026,7 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${config.openrouterKey}`,
-        'HTTP-Referer': 'https://lead-forge-ai-alpha.vercel.app',
+        'HTTP-Referer': 'https://siteup-services.vercel.app',
       },
       body: JSON.stringify({
         model: 'meta-llama/llama-3.1-8b-instruct:free',
@@ -1089,17 +1089,41 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
     }
   }
 
-  const gemini = await callGemini();
-  if (gemini) return gemini;
-  const nvidia = await callNvidiaWeb();
-  if (nvidia) return nvidia;
-  const or = await callOpenRouter();
-  if (or) return or;
+  const defaultLlm = config.defaultLlm || 'groq';
+  const providerOrder: Array<() => Promise<string>> = [];
+
+  // Le provider par défaut en premier
+  if (defaultLlm === 'groq')        providerOrder.push(callGroq);
+  else if (defaultLlm === 'gemini') providerOrder.push(() => callGemini());
+  else if (defaultLlm === 'nvidia') providerOrder.push(() => callNvidiaWeb());
+  else if (defaultLlm === 'openrouter') providerOrder.push(() => callOpenRouter());
+
+  // Puis les autres en fallback
+  if (defaultLlm !== 'groq')        providerOrder.push(callGroq);
+  if (defaultLlm !== 'gemini')      providerOrder.push(() => callGemini());
+  if (defaultLlm !== 'nvidia')      providerOrder.push(() => callNvidiaWeb());
+  if (defaultLlm !== 'openrouter')  providerOrder.push(() => callOpenRouter());
+
+  for (const fn of providerOrder) {
+    try {
+      const result = await fn();
+      if (result) return result;
+    } catch (err: any) {
+      // CORS / network errors (NVIDIA NIM, etc.) → ne pas re-throw, essayer le suivant
+      const msg = String(err?.message || err).toLowerCase();
+      const isCors = msg.includes('failed to fetch') || msg.includes('cors') || msg.includes('network');
+      if (!isRateLimitError(err) && !isCors) throw err;
+      console.warn(`⚠️ Website LLM provider indisponible (${isCors ? 'CORS/réseau' : 'rate limit'}), essai du suivant...`);
+    }
+  }
+
+  console.error('❌ callLLMForWebsite: No LLM available (configurez une clé API)');
   return '';
 }
 
 // --- SERPER API ---
 async function serperFetch(apiKey: string, endpoint: string, body: Record<string, unknown>): Promise<Record<string, unknown> | null> {
+  // ... (rest of the code remains the same)
   if (!apiKey) {
     console.error('❌ serperFetch: No API key provided');
     return null;
