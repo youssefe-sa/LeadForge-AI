@@ -14,9 +14,6 @@
 | `websiteLink` | `lead.siteUrl || '#'` | Lien vers le site web (depuis site_url table leads) | Email 1, Rappel 1, Rappel 3, Email 4, Email 5, Email 6 |
 | `agentName` | `apiConfig.gmailSmtpFromName || 'Solutions Web'` | Nom de l'agent (depuis Supabase) | Tous les emails |
 | `agentEmail` | `apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai'` | Email de l'agent (depuis Supabase) | Tous les emails |
-| `city` | `lead.city || 'votre ville'` | Ville du lead | Tous les emails |
-| `sector` | `lead.sector || 'votre secteur'` | Secteur d'activité | Tous les emails |
-| `email` | `lead.email || ''` | Email du lead | Tous les emails |
 
 ---
 
@@ -37,44 +34,86 @@
 |----------|-------------------|-------------|-------------|
 | `validityDays` | `'7'` | Jours de validité de l'offre | Email 2 |
 | `deliveryDate` | `Date.now() + 2 jours` | Date de livraison | Email 2, Email 3, Email 4 |
-| `expiryDate` | `Date.now() + 7 jours` | Date d'expiration | Email 2 |
-| `invoiceDate` | `Date.now()` | Date de facture | Email 3, Email 5 |
+| `expiryDate` | `Date.now() + 7 jours` | Date d'expiration | Rappel 2 |
 
 ---
 
-## 📄 **Variables de documents et liens**
+## 📄 **Variables de documents**
 
 | Variable | Valeur par défaut | Description | Utilisation |
 |----------|-------------------|-------------|-------------|
-| `devisLink` | `https://siteup-services.vercel.app/devis/${lead.id}` | Lien vers le devis | Email 2 |
-| `invoiceLink` | `https://siteup-services.vercel.app/invoice/${lead.id}` | Lien vers la facture | Email 3, Email 5 |
+| `devisLink` | `devisLinks[lead.id] || '#'` | Lien vers le devis PDF | Email 2, Rappel 2 |
+| `invoiceLink` | `invoiceLinks[lead.id] || '#'` | Lien vers la facture PDF | Email 3, Email 5 |
 | `invoiceNumber` | `INV-${lead.id}-${timestamp}` | Numéro de facture | Email 3, Email 5 |
-| `documentationLink` | `https://siteup-services.vercel.app/docs` | Lien documentation | Email 6 |
+| `invoiceDate` | `Date.now() format fr-FR` | Date de facture | Email 3, Email 5 |
 
 ---
 
-## 🔐 **Variables d'administration**
+## 🔐 **Variables d'accès administrateur**
 
 | Variable | Valeur par défaut | Description | Utilisation |
 |----------|-------------------|-------------|-------------|
-| `adminLink` | `https://siteup-services.vercel.app/admin/${lead.id}` | Lien administration | Email 6 |
-| `adminUsername` | `lead.name.toLowerCase().replace(/[^a-z0-9]/g, '')` | Nom d'utilisateur admin | Email 6 |
-| `adminPassword` | `'TempPassword123!'` | Mot de passe admin | Email 6 |
+| `adminLink` | `lead.landingUrl || lead.siteUrl || '#'` | Lien accès admin | Email 6 |
+| `adminUsername` | `lead.name` | Nom d'utilisateur admin | Email 6 |
+| `adminPassword` | `Généré aléatoirement` | Mot de passe admin | Email 6 |
+| `documentationLink` | `lead.landingUrl || lead.siteUrl || '#'` | Lien documentation | Email 6 |
 
 ---
 
-## 📝 **Notes importantes**
+## 🏢 **Variables de localisation**
 
-- **Toutes les variables utilisent la syntaxe `{{variable}}`**
-- **Les liens de sites web affichent "VOTRE SITE WEB ICI" au lieu des URLs directes**
-- **La variable `{id}` est toujours égale à `firstName` (2 premiers mots du nom)**
-- **Toutes les dates sont formatées en français (fr-FR)**
-- **Les liens utilisent le domaine `https://siteup-services.vercel.app`**
-
+| Variable | Valeur par défaut | Description | Utilisation |
+|----------|-------------------|-------------|-------------|
+| `sector` | `lead.sector || 'votre secteur'` | Secteur d'activité | Email 1, Email 6 |
+| `city` | `lead.city || 'votre ville'` | Ville de l'entreprise | Email 1, Email 6 |
 
 ---
 
-## 🔧 **Fonction getFirstName**
+## 📧 **Utilisation par Email**
+
+### **Email 1 - Présentation Site Web**
+- `firstName`, `companyName`, `websiteLink`, `price`, `agentName`, `agentEmail`, `sector`, `city`
+
+### **Email 2 - Devis et Paiement**
+- `firstName`, `companyName`, `devisLink`, `paymentLink`, `price`, `agentName`, `agentEmail`, `validityDays`, `deliveryDate`
+
+### **Email 3 - Confirmation Dépôt**
+- `firstName`, `companyName`, `invoiceLink`, `price`, `agentName`, `agentEmail`, `deliveryDate`
+
+### **Email 4 - Paiement Final**
+- `firstName`, `companyName`, `websiteLink`, `finalPaymentLink`, `agentName`, `agentEmail`, `deliveryDate`
+
+### **Email 5 - Confirmation Paiement Final**
+- `firstName`, `companyName`, `websiteLink`, `invoiceLink`, `agentName`, `agentEmail`
+
+### **Email 6 - Livraison et Documentation**
+- `firstName`, `companyName`, `websiteLink`, `adminLink`, `adminUsername`, `adminPassword`, `documentationLink`, `agentName`, `agentEmail`
+
+### **Rappel 1 - Après Email 1**
+- `firstName`, `companyName`, `websiteLink`, `paymentLink`, `price`, `agentName`, `agentEmail`
+
+### **Rappel 2 - Dernière Chance**
+- `firstName`, `companyName`, `devisLink`, `paymentLink`, `price`, `agentName`, `agentEmail`, `expiryDate`
+
+### **Rappel 3 - Paiement Final**
+- `firstName`, `companyName`, `websiteLink`, `finalPaymentLink`, `agentName`, `agentEmail`
+
+---
+
+## 🔗 **Système de paiement Whop**
+
+### **Paiement en 2 étapes**
+1. **Dépôt** : `paymentLink` → 46$
+2. **Final** : `finalPaymentLink` → 100$
+3. **Total** : 146$
+
+### **Configuration requise**
+- `apiConfig.whopDepositLink` : Lien de paiement dépôt
+- `apiConfig.whopFinalPaymentLink` : Lien de paiement final
+
+---
+
+## � **Fonction getFirstName**
 
 La variable `{{firstName}}` utilise une fonction personnalisée pour extraire les 2 premiers mots du nom :
 
