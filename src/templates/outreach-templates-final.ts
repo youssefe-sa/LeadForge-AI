@@ -1,5 +1,5 @@
 // ============================================================
-// LeadForge AI - Templates Email Outreach Agent (Version Minimaliste Professionnelle)
+// Solutions Web - Templates Email Outreach Agent (Version Minimaliste Professionnelle)
 // ============================================================
 
 export interface EmailTemplate {
@@ -26,7 +26,7 @@ export const salesTemplates: EmailTemplate[] = [
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Votre site web</title>
+        <title>Solutions Web - Votre site web</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -177,7 +177,7 @@ export const salesTemplates: EmailTemplate[] = [
           <!-- Signature -->
           <div style="margin-top: 30px; text-align: left;">
             <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
@@ -246,7 +246,7 @@ Souhaitez-vous démarrer votre projet ?
 
 Cordialement,
 {{agentName}}
-LeadForge AI
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -263,7 +263,7 @@ LeadForge AI
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Devis Site Web</title>
+        <title>Solutions Web - Devis Site Web</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -414,7 +414,7 @@ LeadForge AI
           <!-- Signature -->
           <div style="margin-top: 30px; text-align: left;">
             <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
@@ -478,7 +478,7 @@ Offre valide {{validityDays}} jours. Paiement 100% sécurisé via Whop.
 Commencer votre projet (dépôt 46$) : {{paymentLink}}
 
 {{agentName}}
-LeadForge AI
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -495,7 +495,7 @@ LeadForge AI
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Dépôt Confirmé</title>
+        <title>Solutions Web - Dépôt Confirmé</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -588,7 +588,7 @@ LeadForge AI
           <!-- Signature -->
           <div style="margin-top: 30px; text-align: left;">
             <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
           </div>
@@ -638,7 +638,7 @@ Livraison garantie le {{deliveryDate}}
 
 Cordialement,
 {{agentName}}
-LeadForge AI
+Solutions Web
 {{agentEmail}}
    `
   },
@@ -655,7 +655,7 @@ LeadForge AI
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Votre site est prêt</title>
+        <title>Solutions Web - Votre site est prêt</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -736,7 +736,7 @@ LeadForge AI
           <!-- Signature -->
           <div style="margin-top: 30px; text-align: left;">
             <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
@@ -770,7 +770,7 @@ Livraison garantie sous 24h après paiement final
 
 Cordialement,
 {{agentName}}
-LeadForge AI
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -787,7 +787,7 @@ LeadForge AI
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Paiement Final Confirmé</title>
+        <title>Solutions Web - Paiement Final Confirmé</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -854,7 +854,7 @@ LeadForge AI
           <!-- Signature -->
           <div style="margin-top: 30px; text-align: left;">
             <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
@@ -887,7 +887,7 @@ Support technique 3 mois inclus - Nous sommes là pour vous
 
 Cordialement,
 {{agentName}}
-LeadForge AI
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -904,7 +904,7 @@ LeadForge AI
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Livraison et Documentation</title>
+        <title>Solutions Web - Livraison et Documentation</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -994,7 +994,7 @@ LeadForge AI
           <!-- Signature -->
           <div style="margin-top: 30px; text-align: left;">
             <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
@@ -1036,7 +1036,7 @@ Support prioritaire 3 mois - Disponible 7j/7
 
 Cordialement,
 {{agentName}}
-LeadForge AI
+Solutions Web
 {{agentEmail}}
     `
   }
@@ -1056,7 +1056,7 @@ export const reminderTemplates: EmailTemplate[] = [
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Suivi</title>
+        <title>Solutions Web - Suivi</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -1135,7 +1135,7 @@ export const reminderTemplates: EmailTemplate[] = [
               <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Ce que nos clients disent</h3>
               <div style="background-color: #f8f9fa; padding: 20px; margin: 15px 0; border-left: 4px solid #007bff;">
                 <p style="margin: 0 0 10px 0; font-style: italic; font-size: 14px;">
-                  "LeadForge AI a transformé notre présence en ligne. Site professionnel, rapide, et surtout abordable. 
+                  "Solutions Web a transformé notre présence en ligne. Site professionnel, rapide, et surtout abordable. 
                   Nous avons économisé plus de 150€ par rapport aux autres devis !"
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #7f8c8d;">- Marie T., Boutique en ligne</p>
@@ -1196,7 +1196,7 @@ export const reminderTemplates: EmailTemplate[] = [
           <!-- Signature -->
           <div style="margin-top: 30px; text-align: left;">
             <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
@@ -1240,7 +1240,7 @@ Pourquoi choisir {{agentName}} ?
 • Confiance mutuelle : Notre réputation repose sur votre satisfaction
 
 Ce que nos clients disent :
-"LeadForge AI a transformé notre présence en ligne. Site professionnel, rapide, et surtout abordable. 
+"Solutions Web a transformé notre présence en ligne. Site professionnel, rapide, et surtout abordable. 
 Nous avons économisé plus de 150€ par rapport aux autres devis !"
 - Marie T., Boutique en ligne
 
@@ -1282,7 +1282,7 @@ Nous sommes là pour répondre à toutes vos questions
 
 Cordialement,
 {{agentName}}
-LeadForge AI
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -1299,7 +1299,7 @@ LeadForge AI
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Dernière Chance</title>
+        <title>Solutions Web - Dernière Chance</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -1396,7 +1396,7 @@ LeadForge AI
           <!-- Signature -->
           <div style="margin-top: 30px; text-align: left;">
             <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
@@ -1468,7 +1468,7 @@ Ne laissez pas cette opportunité vous échapper !
 
 Cordialement,
 {{agentName}}
-LeadForge AI
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -1485,7 +1485,7 @@ LeadForge AI
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LeadForge AI - Paiement Final</title>
+        <title>Solutions Web - Paiement Final</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -1566,7 +1566,7 @@ LeadForge AI
           <!-- Signature -->
           <div style="margin-top: 30px; text-align: left;">
             <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">LeadForge AI - Votre partenaire web</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
         </div>
@@ -1605,7 +1605,7 @@ Finalisez maintenant et soyez en ligne dans les 24h
 
 Cordialement,
 {{agentName}}
-LeadForge AI
+Solutions Web
 {{agentEmail}}
     `
   }

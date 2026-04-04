@@ -60,17 +60,24 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const ready = leads.filter(l => l.siteGenerated && !l.emailSent && l.email);
   const sent = leads.filter(l => l.emailSent);
 
+  // Fonction pour extraire les 2 premiers mots d'un nom
+  const getFirstName = (fullName: string): string => {
+    if (!fullName) return '';
+    const words = fullName.trim().split(/\s+/);
+    return words.slice(0, 2).join(' ');
+  };
+
   // Fonction de personnalisation pour nouveaux templates
   const personalizeOutreachTemplate = (templateId: string, lead: Lead) => {
     const template = getTemplateById(templateId);
     if (!template) return { subject: '', htmlContent: '', textContent: '' };
 
     const variables: Record<string, string> = {
-      firstName: lead.name,
+      firstName: getFirstName(lead.name), // 2 premiers mots du nom
       companyName: lead.name,
-      websiteLink: lead.landingUrl || lead.siteUrl || '#',
+      websiteLink: lead.siteUrl || '#', // Toujours depuis site_url de la table leads
       price: '146', // Prix par défaut
-      agentName: apiConfig.gmailSmtpFromName || 'LeadForge AI',
+      agentName: apiConfig.gmailSmtpFromName || 'Solutions Web',
       agentEmail: apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai',
       amount: '146',
       validityDays: '7',
@@ -102,14 +109,20 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
   const personalizeTemplate = (template: EmailTemplate, lead: Lead, apiConfig: ApiConfig) => {
     const replacements: Record<string, string> = {
-      '{name}': lead.name,
-      '{city}': lead.city || 'votre ville',
-      '{sector}': lead.sector || 'votre secteur',
-      '{landingUrl}': lead.landingUrl || lead.siteUrl || '#',
-      '{email}': lead.email || '',
+      '{{name}}': lead.name,
+      '{{firstName}}': getFirstName(lead.name), // 2 premiers mots du nom
+      '{{companyName}}': lead.name, // Toujours depuis la table leads
+      '{{city}}': lead.city || 'votre ville',
+      '{{sector}}': lead.sector || 'votre secteur',
+      '{{websiteLink}}': lead.siteUrl || '#', // Toujours depuis site_url de la table leads
+      '{{landingUrl}}': lead.landingUrl || lead.siteUrl || '#',
+      '{{email}}': lead.email || '',
       // Variables de paiement Whop
-      '{paymentLink}': apiConfig.whopDepositLink || '#',
-      '{finalPaymentLink}': apiConfig.whopFinalPaymentLink || '#',
+      '{{paymentLink}}': apiConfig.whopDepositLink || '#',
+      '{{finalPaymentLink}}': apiConfig.whopFinalPaymentLink || '#',
+      // Variables agent depuis Supabase
+      '{{agentName}}': apiConfig.gmailSmtpFromName || 'Solutions Web',
+      '{{agentEmail}}': apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai',
     };
     let subject = template.subject;
     let body = template.textContent || template.subject; // Utiliser textContent comme fallback

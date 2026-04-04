@@ -451,7 +451,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const content = await generateContent(lead);
       setProgress(p => ({ ...p, step: '🎨 Génération du site premium...' }));
       const html = generatePremiumSiteHtml(lead, content);
-      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || window.location.origin;
+      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
       updateLead(lead.id, {
         siteGenerated: true, siteHtml: html,
         siteUrl: `${baseUrl}/api/sites/${lead.id}`,
@@ -466,7 +466,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       }
       setProgress(p => ({ ...p, step: '🔄 Fallback template...' }));
       const emergencyHtml = generateProfessionalSite(lead);
-      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || window.location.origin;
+      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
       updateLead(lead.id, {
         siteGenerated: true, siteHtml: emergencyHtml,
         siteUrl: `${baseUrl}/api/sites/${lead.id}`,
@@ -641,7 +641,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const html = generatePremiumSiteHtml(tempLead, content);
       
       // Mettre à jour le site avec la nouvelle palette mais restaurer le nom original
-      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || window.location.origin;
+      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
       updateLead(previewLead.id, { 
         siteHtml: html,
         siteUrl: `${baseUrl}/api/sites/${previewLead.id}`,
