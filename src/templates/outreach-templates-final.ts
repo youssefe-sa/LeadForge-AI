@@ -50,7 +50,7 @@ export const salesTemplates: EmailTemplate[] = [
               </p>
               <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Votre site web est prêt :</p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">{{websiteLink}}</a>
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">VOTRE SITE WEB ICI</a>
               </p>
             </div>
             
@@ -192,7 +192,7 @@ Notre proposition pour {{companyName}}
 Nous avons finalisé le développement de votre site web professionnel pour {{companyName}}. Notre équipe a créé une présence en ligne optimisée pour générer des conversions.
 
 Votre site web est prêt :
-{{websiteLink}}
+VOTRE SITE WEB ICI
 
 Qui sommes-nous ? {{agentName}} est une agence web spécialisée dans la création de sites web professionnels pour les entreprises qui souhaitent se développer en ligne. Notre mission est de rendre le web accessible à tous les entrepreneurs avec des solutions performantes et abordables.
 
@@ -678,7 +678,7 @@ Solutions Web
               </p>
               <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site :</p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+                <a href="VOTRE SITE WEB ICI" style="color: #007bff; text-decoration: underline; font-weight: 600;">VOTRE SITE WEB ICI</a>
               </p>
             </div>
             
@@ -748,7 +748,7 @@ Bonjour {{firstName}},
 
 🎉 Votre site web professionnel pour {{companyName}} est maintenant terminé !
 
-Découvrez votre site ici : {{websiteLink}}
+Découvrez votre site ici : VOTRE SITE WEB ICI
 
 💳 Dernière étape : Paiement final de 100$
 
@@ -811,7 +811,7 @@ Solutions Web
               </p>
               <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site en ligne :</p>
               <p style="margin: 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+                <a href="VOTRE SITE WEB ICI" style="color: #007bff; text-decoration: underline; font-weight: 600;">VOTRE SITE WEB ICI</a>
               </p>
             </div>
             
@@ -870,7 +870,7 @@ Bonjour {{firstName}},
 Nous vous confirmons la bonne réception de votre paiement final de 100$. 
 Votre site web {{companyName}} est maintenant officiellement en ligne et accessible à vos clients !
 
-Découvrez votre site en ligne : {{websiteLink}}
+Découvrez votre site en ligne : VOTRE SITE WEB ICI
 
 📄 Votre facture finale
 Une facture pour le paiement final de 100$ est disponible : {{invoiceLink}}
@@ -976,7 +976,7 @@ Solutions Web
                 Votre site est accessible à l'adresse :
               </p>
               <p style="margin: 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+                <a href="VOTRE SITE WEB ICI" style="color: #007bff; text-decoration: underline; font-weight: 600;">VOTRE SITE WEB ICI</a>
               </p>
             </div>
           </div>
@@ -1029,7 +1029,7 @@ Votre support technique prioritaire est actif pendant 3 mois :
 Pour toute question, contactez-nous : {{agentEmail}}
 
 🌐 Votre site en ligne
-Votre site est accessible à l'adresse : {{websiteLink}}
+Votre site est accessible à l'adresse : VOTRE SITE WEB ICI
 
 Merci de votre confiance - Nous sommes fiers de vous accompagner
 Support prioritaire 3 mois - Disponible 7j/7
@@ -1094,7 +1094,7 @@ export const reminderTemplates: EmailTemplate[] = [
               </p>
               <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Découvrez votre futur site :</p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">{{websiteLink}}</a>
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">VOTRE SITE WEB ICI</a>
               </p>
             </div>
             
@@ -1220,7 +1220,7 @@ Votre site web vous attend
 Je fais suite à notre précédent email concernant votre site web professionnel pour {{companyName}}. 
 J'espère que vous avez eu l'occasion de consulter notre proposition détaillée.
 
-Découvrez votre futur site : {{websiteLink}}
+Découvrez votre futur site : VOTRE SITE WEB ICI
 
 Pourquoi choisir {{agentName}} ?
 
@@ -1508,7 +1508,7 @@ Solutions Web
               </p>
               <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site :</p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+                <a href="VOTRE SITE WEB ICI" style="color: #007bff; text-decoration: underline; font-weight: 600;">VOTRE SITE WEB ICI</a>
               </p>
             </div>
             
@@ -1581,7 +1581,7 @@ Bonjour {{firstName}},
 🚀 Excellente nouvelle !
 Votre site web professionnel pour {{companyName}} est maintenant terminé et prêt à être mis en ligne !
 
-Découvrez votre site : {{websiteLink}}
+Découvrez votre site : VOTRE SITE WEB ICI
 
 💳 Dernière étape : Paiement final
 Pour finaliser la livraison et débloquer l'accès complet à votre site, 

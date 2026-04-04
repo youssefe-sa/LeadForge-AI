@@ -74,6 +74,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
     const variables: Record<string, string> = {
       firstName: getFirstName(lead.name), // 2 premiers mots du nom
+      id: getFirstName(lead.name), // Toujours égal à firstName
       companyName: lead.name,
       websiteLink: lead.siteUrl || '#', // Toujours depuis site_url de la table leads
       price: '146', // Prix par défaut
@@ -111,6 +112,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
     const replacements: Record<string, string> = {
       '{{name}}': lead.name,
       '{{firstName}}': getFirstName(lead.name), // 2 premiers mots du nom
+      '{{id}}': getFirstName(lead.name), // Toujours égal à firstName
       '{{companyName}}': lead.name, // Toujours depuis la table leads
       '{{city}}': lead.city || 'votre ville',
       '{{sector}}': lead.sector || 'votre secteur',

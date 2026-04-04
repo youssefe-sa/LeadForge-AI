@@ -9,6 +9,7 @@
 | Variable | Valeur par défaut | Description | Utilisation |
 |----------|-------------------|-------------|-------------|
 | `firstName` | `getFirstName(lead.name)` | 2 premiers mots du nom (depuis table leads) | Tous les emails |
+| `id` | `getFirstName(lead.name)` | Identifiant (toujours égal à firstName) | Tous les emails |
 | `companyName` | `lead.name` | Nom de l'entreprise (depuis table leads) | Tous les emails |
 | `websiteLink` | `lead.siteUrl || '#'` | Lien vers le site web (depuis site_url table leads) | Email 1, Rappel 1, Rappel 3, Email 4, Email 5, Email 6 |
 | `agentName` | `apiConfig.gmailSmtpFromName || 'Solutions Web'` | Nom de l'agent (depuis Supabase) | Tous les emails |
