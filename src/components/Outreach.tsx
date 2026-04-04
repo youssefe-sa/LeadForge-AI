@@ -125,14 +125,33 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       // Variables agent depuis Supabase
       '{{agentName}}': apiConfig.gmailSmtpFromName || 'Solutions Web',
       '{{agentEmail}}': apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai',
+      // Variables de dates et prix
+      '{{price}}': '146',
+      '{{amount}}': '146',
+      '{{validityDays}}': '7',
+      '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+      '{{expiryDate}}': new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+      // Variables de liens
+      '{{devisLink}}': `https://siteup-services.vercel.app/devis/${lead.id}`,
+      '{{invoiceLink}}': `https://siteup-services.vercel.app/invoice/${lead.id}`,
+      '{{invoiceNumber}}': `INV-${lead.id}-${Date.now()}`,
+      '{{invoiceDate}}': new Date().toLocaleDateString('fr-FR'),
+      // Variables admin
+      '{{adminLink}}': `https://siteup-services.vercel.app/admin/${lead.id}`,
+      '{{adminUsername}}': lead.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+      '{{adminPassword}}': 'TempPassword123!',
+      '{{documentationLink}}': 'https://siteup-services.vercel.app/docs',
     };
     let subject = template.subject;
-    let body = template.textContent || template.subject; // Utiliser textContent comme fallback
+    let htmlContent = template.htmlContent;
+    let textContent = template.textContent;
+    
     for (const [key, val] of Object.entries(replacements)) {
       subject = subject.split(key).join(val);
-      body = body.split(key).join(val);
+      htmlContent = htmlContent.split(key).join(val);
+      textContent = textContent.split(key).join(val);
     }
-    return { subject, body };
+    return { subject, htmlContent, textContent };
   };
 
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
