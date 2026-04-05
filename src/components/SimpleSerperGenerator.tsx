@@ -358,25 +358,6 @@ export default function SimpleSerperGenerator({ onClose }: { onClose: () => void
               }}>
                 💡 Copiez le lien complet de l'email de vérification que vous avez reçu
               </p>
-              <button
-                onClick={openVerificationLink}
-                disabled={!verificationLink}
-                style={{
-                  padding: '10px 16px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: verificationLink ? colors.warning : colors.textMuted,
-                  color: 'white',
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  cursor: verificationLink ? 'pointer' : 'not-allowed',
-                  transition: 'all 0.2s ease',
-                  opacity: verificationLink ? 1 : 0.5,
-                  width: '100%',
-                }}
-              >
-                📧 Ouvrir le lien de vérification
-              </button>
             </div>
           )}
 
