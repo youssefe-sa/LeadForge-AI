@@ -843,7 +843,11 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
 
   // Helper: NVIDIA NIM via API route (contourne CORS)
   const callNvidia = async (maxTokens = 1024): Promise<string> => {
-    if (!config.nvidiaKey) return '';
+    if (!config.nvidiaKey) {
+      console.warn('⚠️ NVIDIA: No key provided');
+      return '';
+    }
+    console.log('🚀 NVIDIA: Attempting call with key length:', config.nvidiaKey.length);
     const res = await fetch('/api/nvidia', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -854,9 +858,16 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
         nvidiaKey: config.nvidiaKey,
       }),
     });
-    if (!res.ok) { console.warn('NVIDIA NIM error:', res.status); return ''; }
+    console.log('🚀 NVIDIA: Response status:', res.status);
+    if (!res.ok) { 
+      const errorText = await res.text();
+      console.warn('❌ NVIDIA NIM error:', res.status, errorText); 
+      return ''; 
+    }
     const data = await res.json();
-    return data.result || '';
+    const result = data.result || '';
+    console.log('✅ NVIDIA: Success, result length:', result.length);
+    return result;
   };
 
   // Helper: appel Gemini (1M TPM gratuit, OpenAI-compatible)
@@ -941,6 +952,7 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
 
   // Ordre des providers selon le choix de l'utilisateur
   const defaultLlm = config.defaultLlm || 'groq';
+  console.log('🎯 LLM: Default provider is:', defaultLlm);
   const providerOrder: Array<() => Promise<string>> = [];
 
   // Le provider par défaut en premier
@@ -955,16 +967,22 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
   if (defaultLlm !== 'nvidia')      providerOrder.push(() => callNvidia());
   if (defaultLlm !== 'openrouter')  providerOrder.push(() => callOpenRouter());
 
-  for (const fn of providerOrder) {
+  console.log('🔄 LLM: Provider order:', providerOrder.length, 'providers configured');
+
+  for (let i = 0; i < providerOrder.length; i++) {
     try {
-      const result = await fn();
-      if (result) return result;
+      console.log(`🧪 LLM: Trying provider ${i + 1}/${providerOrder.length}`);
+      const result = await providerOrder[i]();
+      if (result) {
+        console.log(`✅ LLM: Provider ${i + 1} succeeded`);
+        return result;
+      }
     } catch (err: any) {
       // CORS / network errors (NVIDIA NIM, etc.) → ne pas re-throw, essayer le suivant
       const msg = String(err?.message || err).toLowerCase();
       const isCors = msg.includes('failed to fetch') || msg.includes('cors') || msg.includes('network');
       if (!isRateLimitError(err) && !isCors) throw err;
-      console.warn(`⚠️ LLM provider indisponible (${isCors ? 'CORS/réseau' : 'rate limit'}), essai du suivant...`);
+      console.warn(`⚠️ LLM provider ${i + 1} indisponible (${isCors ? 'CORS/réseau' : 'rate limit'}), essai du suivant...`);
     }
   }
 
