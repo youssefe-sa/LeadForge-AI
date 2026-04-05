@@ -49,4 +49,9 @@ export const LeadForgeEvents = {
   // Nouveaux événements pour les erreurs API
   API_ERROR: 'api-error',
   AGENTS_STOPPED: 'agents-stopped',
+  // Nouveaux événements pour le processing global
+  PROCESSING_STARTED: 'processing-started',
+  PROCESSING_STOPPED: 'processing-stopped',
+  PROCESSING_PAUSED: 'processing-paused',
+  PROCESSING_RESUMED: 'processing-resumed',
 };

@@ -9,7 +9,6 @@ import {
 import { testAllApis, formatTestResults } from '../lib/api-test';
 import { eventBus, LeadForgeEvents } from '../lib/events';
 import { apiErrorState } from '../lib/api-error-state';
-import { useProcessingState } from '../lib/processing-state';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -38,8 +37,13 @@ interface Props {
 }
 
 export default function Scorer({ leads, updateLead, apiConfig }: Props) {
-  // Utiliser l'état global de processing
-  const { isProcessing, isPaused, progress, startProcessing, updateProgress, stopProcessing, pauseProcessing, resumeProcessing } = useProcessingState();
+  // Utiliser l'état local pour éviter les erreurs
+  const [isEnrichmentActive, setIsEnrichmentActive] = useState(false);
+  const [progress, setProgress] = useState({ current: 0, total: 0, name: '', step: '' });
+  
+  // Fonctions de processing locales
+  const startProcessing = () => setIsEnrichmentActive(true);
+  const stopProcessing = () => setIsEnrichmentActive(false);
   
   // État local pour les logs et filtres
   const [enrichmentDelay, setEnrichmentDelay] = useState(2000);
@@ -91,7 +95,6 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
 
   // Vérifier si l'enrichissement est actif (global)
   const isEnrichmentActive = isProcessing;
-  const isEnrichmentPaused = isPaused;
   const hasImages = false; // Plus d'APIs images depuis suppression Unsplash/Pexels
 
   // ENRICHMENT FLOW — 8 steps
@@ -327,16 +330,6 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
         break;
       }
 
-      // Vérifier si l'enrichissement est en pause
-      while (isEnrichmentPaused) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
-        // Continuer à vérifier si le processing est toujours actif
-        if (!isEnrichmentActive) {
-          setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - Processing arrêté`]);
-          return;
-        }
-      }
-
       const lead = toScore[i];
       const setStep = (step: string) => updateProgress({ current: i + 1, total: toScore.length, name: lead.name || lead.email, step });
       setStep('Démarrage...');
@@ -424,16 +417,6 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       if (apiErrorState.shouldStop()) {
         setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - API error détecté`]);
         break;
-      }
-
-      // Vérifier si l'enrichissement est en pause
-      while (isEnrichmentPaused) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
-        // Continuer à vérifier si le processing est toujours actif
-        if (!isEnrichmentActive) {
-          setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - Processing arrêté`]);
-          return;
-        }
       }
 
       const lead = toScore[i];
@@ -744,81 +727,14 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       {/* Progress */}
       {isEnrichmentActive && (
         <div style={{ background: C.surface, borderRadius: 8, padding: '16px 20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
             <span style={{ fontSize: 13, fontWeight: 500 }}>⚙️ {progress.name}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 12, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>{progress.current}/{progress.total}</span>
-              {/* Boutons Pause/Reprise */}
-              <div style={{ display: 'flex', gap: 4 }}>
-                {isEnrichmentPaused ? (
-                  <button
-                    onClick={resumeProcessing}
-                    style={{
-                      padding: '4px 8px',
-                      borderRadius: 4,
-                      border: 'none',
-                      background: C.green,
-                      color: '#fff',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4
-                    }}
-                    title="Reprendre l'enrichissement"
-                  >
-                    ▶️ Reprendre
-                  </button>
-                ) : (
-                  <button
-                    onClick={pauseProcessing}
-                    style={{
-                      padding: '4px 8px',
-                      borderRadius: 4,
-                      border: 'none',
-                      background: C.amber,
-                      color: '#fff',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4
-                    }}
-                    title="Mettre en pause l'enrichissement"
-                  >
-                    ⏸️ Pause
-                  </button>
-                )}
-                <button
-                  onClick={stopProcessing}
-                  style={{
-                    padding: '4px 8px',
-                    borderRadius: 4,
-                    border: 'none',
-                    background: C.red,
-                    color: '#fff',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 4
-                  }}
-                  title="Arrêter l'enrichissement"
-                >
-                  ⏹️ Arrêter
-                </button>
-              </div>
-            </div>
+            <span style={{ fontSize: 12, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>{progress.current}/{progress.total}</span>
           </div>
-          <div style={{ fontSize: 12, color: isEnrichmentPaused ? C.amber : C.accent, marginBottom: 8 }}>
-            {isEnrichmentPaused ? '⏸️ En pause' : progress.step}
-          </div>
+          <div style={{ fontSize: 12, color: C.accent, marginBottom: 8 }}>{progress.step}</div>
           <div style={{ height: 6, borderRadius: 3, background: C.surface2, overflow: 'hidden' }}>
             <div style={{
-              height: '100%', borderRadius: 3, background: isEnrichmentPaused ? C.amber : C.green,
+              height: '100%', borderRadius: 3, background: C.green,
               width: `${(progress.current / progress.total) * 100}%`,
               transition: 'width 300ms ease',
             }} />

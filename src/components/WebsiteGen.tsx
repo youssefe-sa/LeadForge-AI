@@ -3,6 +3,7 @@ import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, saf
 import { generateProfessionalSite } from '../lib/professionalTemplate';
 import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { generatePremiumSiteHtml } from '../lib/siteTemplate';
+import { useWebsiteGenState } from '../lib/websitegen-state';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -134,8 +135,9 @@ function getCuratedFallback(sector: string, index: number): string {
 }
 
 export default function WebsiteGen({ leads, updateLead, apiConfig }: Props) {
-  const [generating, setGenerating] = useState(false);
-  const [progress, setProgress] = useState({ current: 0, total: 0, name: '', step: '' });
+  // Utiliser l'état local de processing pour WebsiteGen
+  const { isProcessing, isPaused, progress, startProcessing, updateProgress, stopProcessing, pauseProcessing, resumeProcessing } = useWebsiteGenState();
+  
   const [batchDelay, setBatchDelay] = useState(8000);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
@@ -146,8 +148,9 @@ export default function WebsiteGen({ leads, updateLead, apiConfig }: Props) {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.openrouterKey);
-  const enriched = leads.filter(l => l.score > 0 && !l.siteGenerated);
-  const generated = leads.filter(l => l.siteGenerated);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const enriched = useMemo(() => leads.filter(l => l.score > 0 && !l.siteGenerated), [leads, refreshKey]);
+  const generated = useMemo(() => leads.filter(l => l.siteGenerated), [leads, refreshKey]);
   const previewLead = useMemo(() => leads.find(l => l.id === previewId) || null, [leads, previewId]);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages, chatLoading]);
@@ -579,14 +582,58 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
 
   const generateBatch = async () => {
     if (enriched.length === 0) return;
-    setGenerating(true);
-    setProgress({ current: 0, total: enriched.length, name: '', step: '' });
-    for (let i = 0; i < enriched.length; i++) {
-      setProgress({ current: i + 1, total: enriched.length, name: enriched[i].name, step: '🤖 Génération...' });
-      await generateSite(enriched[i]);
-      if (i < enriched.length - 1) await new Promise(r => setTimeout(r, batchDelay));
+    startProcessing('website-generation', 'websitegen-batch');
+    
+    let processedCount = 0;
+    let totalProcessed = 0;
+    
+    // Boucle continue jusqu'à ce qu'il n'y ait plus de sites en attente
+    while (true) {
+      // Obtenir les sites actuellement en attente (mis à jour dynamiquement)
+      const currentEnriched = leads.filter(l => l.score > 0 && !l.siteGenerated);
+      
+      if (currentEnriched.length === 0) {
+        // Plus de sites en attente
+        break;
+      }
+      
+      // Si c'est le premier tour ou si de nouveaux sites ont été ajoutés
+      if (totalProcessed === 0 || currentEnriched.length > (totalProcessed - processedCount)) {
+        totalProcessed = currentEnriched.length + processedCount;
+      }
+      
+      // Vérifier si la génération est en pause
+      while (isPaused) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
+        // Continuer à vérifier si le processing est toujours actif
+        if (!isProcessing) {
+          stopProcessing();
+          return;
+        }
+      }
+      
+      const currentLead = currentEnriched[0]; // Prendre le premier site en attente
+      processedCount++;
+      
+      updateProgress({ 
+        current: processedCount, 
+        total: totalProcessed, 
+        name: currentLead.name, 
+        step: isPaused ? '⏸️ En pause' : '🤖 Génération...' 
+      });
+      
+      await generateSite(currentLead);
+      
+      // Forcer la mise à jour des compteurs après chaque génération
+      setRefreshKey(prev => prev + 1);
+      
+      // Petit délai entre les sites (sauf pour le dernier)
+      if (currentEnriched.length > 1) {
+        await new Promise(r => setTimeout(r, batchDelay));
+      }
     }
-    setGenerating(false);
+    
+    stopProcessing();
   };
 
   // ── AI CHAT EDITOR ──
@@ -624,8 +671,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
   // ── CHANGER PALETTE DE COULEURS ──
   const changePalette = async () => {
     if (!previewLead) return;
-    setGenerating(true);
-    setProgress({ current: 1, total: 1, name: previewLead.name, step: '🎨 Changement de palette...' });
+    startProcessing('palette-change', 'websitegen-palette');
+    updateProgress({ current: 1, total: 1, name: previewLead.name, step: '🎨 Changement de palette...' });
     
     try {
       // Forcer une nouvelle seed pour générer une palette différente
@@ -657,7 +704,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       console.error('Erreur lors du changement de palette:', error);
       setProgress(p => ({ ...p, step: '❌ Erreur lors du changement de palette' }));
     } finally {
-      setGenerating(false);
+      stopProcessing();
     }
   };
 
@@ -686,21 +733,21 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 12, color: C.tx3 }}>⏱ Délai entre sites :</span>
             {[2, 3, 5, 8].map(s => (
-              <button key={s} onClick={() => setBatchDelay(s * 1000)} disabled={generating} style={{
+              <button key={s} onClick={() => setBatchDelay(s * 1000)} disabled={isProcessing} style={{
                 padding: '4px 10px', borderRadius: 4, border: `1px solid ${batchDelay === s * 1000 ? C.blue : C.border}`,
                 background: batchDelay === s * 1000 ? C.blue + '22' : C.surface,
                 color: batchDelay === s * 1000 ? C.blue : C.tx2,
                 fontSize: 12, fontWeight: batchDelay === s * 1000 ? 700 : 400,
-                cursor: generating ? 'default' : 'pointer',
+                cursor: isProcessing ? 'default' : 'pointer',
               }}>{s}s</button>
             ))}
           </div>
-          <button onClick={generateBatch} disabled={generating || enriched.length === 0} style={{
+          <button onClick={generateBatch} disabled={isProcessing || enriched.length === 0} style={{
             padding: '10px 20px', borderRadius: 6, border: 'none',
-            background: generating ? C.tx3 : C.blue, color: '#fff',
-            fontWeight: 600, fontSize: 14, cursor: generating ? 'default' : 'pointer',
+            background: isProcessing ? C.tx3 : C.blue, color: '#fff',
+            fontWeight: 600, fontSize: 14, cursor: isProcessing ? 'default' : 'pointer',
           }}>
-            {generating ? `Génération ${progress.current}/${progress.total}...` : `🌐 Générer ${enriched.length} sites`}
+            {isProcessing ? `Génération ${progress.current}/${progress.total}...` : `🌐 Générer ${enriched.length} sites`}
           </button>
         </div>
       </div>
@@ -733,16 +780,83 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       </div>
 
       {/* Progress */}
-      {generating && (
+      {isProcessing && (
         <div style={{ background: C.surface, borderRadius: 8, padding: '16px 20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
             <span style={{ fontSize: 13, fontWeight: 500 }}>🌐 {progress.name}</span>
-            <span style={{ fontSize: 12, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>{progress.current}/{progress.total}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 12, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>{progress.current}/{progress.total}</span>
+              {/* Boutons Pause/Reprise */}
+              <div style={{ display: 'flex', gap: 4 }}>
+                {isPaused ? (
+                  <button
+                    onClick={resumeProcessing}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: 4,
+                      border: 'none',
+                      background: C.green,
+                      color: '#fff',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                    title="Reprendre la génération"
+                  >
+                    ▶️ Reprendre
+                  </button>
+                ) : (
+                  <button
+                    onClick={pauseProcessing}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: 4,
+                      border: 'none',
+                      background: C.amber,
+                      color: '#fff',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                    title="Mettre en pause la génération"
+                  >
+                    ⏸️ Pause
+                  </button>
+                )}
+                <button
+                  onClick={stopProcessing}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: 4,
+                    border: 'none',
+                    background: C.red,
+                    color: '#fff',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4
+                  }}
+                  title="Arrêter la génération"
+                >
+                  ⏹️ Arrêter
+                </button>
+              </div>
+            </div>
           </div>
-          <div style={{ fontSize: 12, color: C.blue, marginBottom: 8 }}>{progress.step}</div>
+          <div style={{ fontSize: 12, color: isPaused ? C.amber : C.blue, marginBottom: 8 }}>
+            {isPaused ? '⏸️ En pause' : progress.step}
+          </div>
           <div style={{ height: 6, borderRadius: 3, background: C.surface2, overflow: 'hidden' }}>
             <div style={{
-              height: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${C.blue}, ${C.accent})`,
+              height: '100%', borderRadius: 3, background: isPaused ? C.amber : `linear-gradient(90deg, ${C.blue}, ${C.accent})`,
               width: `${(progress.current / progress.total) * 100}%`, transition: 'width 500ms ease',
             }} />
           </div>
@@ -772,10 +886,10 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
                     background: C.surface, fontSize: 12, cursor: 'pointer', color: C.blue, fontWeight: 500,
                   }}>👁️ Voir</button>
                   <button onClick={() => {
-                    setGenerating(true);
-                    setProgress({ current: 1, total: 1, name: l.name, step: '🔄 Régénération...' });
+                    startProcessing('single-regeneration', 'websitegen-single');
+                    updateProgress({ current: 1, total: 1, name: l.name, step: '🔄 Régénération...' });
                     generateSite(l).then(() => {
-                      setGenerating(false);
+                      stopProcessing();
                       // Forcer le rafraîchissement si c'est le lead en preview
                       if (previewId === l.id) {
                         setTimeout(() => {
@@ -784,10 +898,10 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
                         }, 500);
                       }
                     });
-                  }} disabled={generating} style={{
+                  }} disabled={isProcessing} style={{
                     padding: '4px 10px', borderRadius: 4, border: `1px solid ${C.border}`,
-                    background: generating ? C.tx3 : C.surface, fontSize: 12, cursor: generating ? 'default' : 'pointer', color: generating ? C.tx2 : C.amber,
-                    opacity: generating ? 0.6 : 1,
+                    background: isProcessing ? C.tx3 : C.surface, fontSize: 12, cursor: isProcessing ? 'default' : 'pointer', color: isProcessing ? C.tx2 : C.amber,
+                    opacity: isProcessing ? 0.6 : 1,
                   }}>🔄</button>
                   <button onClick={() => {
                     const blob = new Blob([l.siteHtml], { type: 'text/html' });
