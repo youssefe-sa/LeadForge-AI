@@ -4,7 +4,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { leadsService, configService, templatesService, campaignsService, Database, supabase } from './supabase';
 import { apiErrorState, detectApiError } from './api-error-state';
-import { EmailValidationResult, validateEmailBasic, validateEmailComprehensive } from './email-validator';
 
 // --- SAFE HELPERS (defined once, used everywhere) ---
 export function safeStr(v: unknown): string {
@@ -1476,119 +1475,10 @@ JSON: [{"author":"","rating":5,"text":""}]`;
   return [];
 }
 
-// --- EMAIL VALIDATION HELPER ---
-async function validateAndFilterEmail(
-  email: string, 
-  leadName: string, 
-  domain?: string,
-  apiConfig?: ApiConfig
-): Promise<{ email: string; validation: EmailValidationResult }> {
-  
-  console.log(`🔍 EMAIL VALIDATION: Validating ${email} for ${leadName}`);
-  
-  // Validation basique rapide
-  const basicValidation = await validateEmailBasic(email);
-  
-  // Si la validation basique échoue, retourner le résultat
-  if (!basicValidation.isValid) {
-    console.log(`❌ EMAIL VALIDATION: ${email} failed basic validation - ${basicValidation.reason}`);
-    return { email, validation: basicValidation };
-  }
-  
-  // Validation avancée si disponible
-  let finalValidation = basicValidation;
-  
-  if (apiConfig) {
-    try {
-      // Essayer de récupérer les clés d'API depuis la config
-      const apiKeys = {
-        // Pour le moment, on utilise la validation basique
-        // Plus tard, on pourra ajouter les clés dans apiConfig
-      };
-      
-      const advancedValidation = await validateEmailComprehensive(email, apiKeys);
-      finalValidation = advancedValidation;
-      
-      console.log(`✅ EMAIL VALIDATION: ${email} - Score: ${finalValidation.score}/100, Deliverable: ${finalValidation.isDeliverable}`);
-      
-    } catch (error) {
-      console.warn(`⚠️ EMAIL VALIDATION: Advanced validation failed for ${email}, using basic result`);
-    }
-  }
-  
-  return { email, validation: finalValidation };
-}
-
-// --- HELPERS REGEX AMÉLIORÉS ---
-const extractEmail = (text: string, leadName?: string, domain?: string): string => {
-  const matches = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g) || [];
-  
-  console.log(`🔍 EMAIL EXTRACTION: Searching in ${text.length} chars for ${leadName || 'unknown'} (${domain || 'no domain'})`);
-  console.log(`🔍 EMAIL EXTRACTION: Found ${matches.length} potential emails:`, matches);
-  
-  for (const email of matches) {
-    const normalizedEmail = email.toLowerCase().trim();
-    
-    // 1. Filtrer SEULEMENT les emails automatiques/non consultés
-    const autoPatterns = [
-      /^noreply@/, /^no-reply@/, /^donotreply@/, /^do-not-reply@/,
-      /^bounce@/, /^return@/, /^mailer@/, /^notification@/,
-      /^newsletter@/, /^marketing@/, /^promo@/, /^offer@/, /^deal@/,
-      /^abuse@/, /^spam@/, /^postmaster@/, /^webmaster@/
-    ];
-    
-    if (autoPatterns.some(pattern => pattern.test(normalizedEmail))) {
-      console.log(`❌ EMAIL FILTERED: ${normalizedEmail} (automated pattern)`);
-      continue; // Skip automated emails only
-    }
-    
-    // 2. Pour les emails personnels (gmail, outlook, etc.), vérifier qu'ils ont l'air professionnel
-    const personalDomainPatterns = [
-      /\b(gmail|yahoo|hotmail|outlook|live|msn|aol|icloud|sfr|orange|wanadoo)\.(com|fr|net|org)$/
-    ];
-    
-    if (personalDomainPatterns.some(pattern => pattern.test(normalizedEmail))) {
-      const localPart = normalizedEmail.split('@')[0];
-      
-      // Accepter les emails personnels qui ont l'air professionnel
-      const professionalPersonalPatterns = [
-        /^[a-z]+\.[a-z]+/, // jean.dupont
-        /^[a-z]+_[a-z]+/, // jean_dupont
-        /^[a-z]+-[a-z]+/, // jean-dupont
-        /^[a-z]+[0-9]*$/, // jean, jean123 (artisan simple)
-        /^[a-z]{2,}\./, // jd. (initials)
-        /^[a-z]+\.[a-z]+[0-9]*$/ // jean.dupont75
-      ];
-      
-      if (!professionalPersonalPatterns.some(pattern => pattern.test(localPart))) {
-        console.log(`❌ EMAIL FILTERED: ${normalizedEmail} (personal but unprofessional)`);
-        continue; // Skip personal emails that don't look professional
-      }
-      
-      console.log(`✅ EMAIL ACCEPTED: ${normalizedEmail} (professional personal email)`);
-      return normalizedEmail;
-    }
-    
-    // 3. Vérifier que le domaine correspond à l'entreprise (si disponible)
-    if (domain) {
-      const emailDomain = normalizedEmail.split('@')[1];
-      const normalizedDomain = domain.replace(/^www\./, '').toLowerCase();
-      
-      // Vérifier que le domaine de l'email contient le domaine de l'entreprise
-      if (!emailDomain.includes(normalizedDomain) && !normalizedDomain.includes(emailDomain)) {
-        console.log(`❌ EMAIL FILTERED: ${normalizedEmail} (domain mismatch: ${emailDomain} vs ${normalizedDomain})`);
-        continue; // Skip if domain doesn't match
-      }
-    }
-    
-    // 4. Accepter tous les emails d'entreprise (y compris contact@, info@, etc.)
-    // Ces emails sont légitimes pour les artisans et petites entreprises
-    console.log(`✅ EMAIL ACCEPTED: ${normalizedEmail} (business email)`);
-    return normalizedEmail;
-  }
-  
-  console.log(`❌ EMAIL EXTRACTION: No valid email found`);
-  return '';
+// --- HELPERS REGEX ---
+const extractEmail = (text: string): string => {
+  const match = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+  return match ? match[0].toLowerCase() : '';
 };
 
 const extractPhone = (text: string): string => {
@@ -1646,7 +1536,7 @@ export async function scrapeWebsiteForContact(
   } catch { /* continue */ }
 
   const fullText = allText.join(' ');
-  if (!result.email) result.email = extractEmail(fullText, _leadName, domain);
+  if (!result.email) result.email = extractEmail(fullText);
   if (!result.phone) result.phone = extractPhone(fullText);
 
   return result;
@@ -1728,29 +1618,21 @@ Réponds UNIQUEMENT en JSON valide sans markdown, sans explication :
   }
 }
 
-// --- DEEP CONTACT SEARCH (email + téléphone) AVEC VALIDATION ---
+// --- DEEP CONTACT SEARCH (email + téléphone) ---
 export async function deepSearchContact(
   serperKey: string,
   lead: Lead,
   apiConfig: ApiConfig
-): Promise<{ email: string; phone: string; validation?: EmailValidationResult }> {
+): Promise<{ email: string; phone: string }> {
   const result = { email: '', phone: '' };
   if (!serperKey) return result;
 
   const allSnippets: string[] = [];
-  const candidateEmails: string[] = [];
 
   // Strategy 0 : scraping pages du site web
   if (lead.website) {
     const siteContact = await scrapeWebsiteForContact(serperKey, lead.website, lead.name);
-    if (siteContact.email) {
-      candidateEmails.push(siteContact.email);
-      const validation = await validateAndFilterEmail(siteContact.email, lead.name, lead.website, apiConfig);
-      if (validation.validation.isValid && validation.validation.score >= 50) {
-        result.email = validation.email;
-        result.validation = validation.validation;
-      }
-    }
+    if (siteContact.email) result.email = siteContact.email;
     if (siteContact.phone) result.phone = siteContact.phone;
     if (result.email && result.phone) return result;
   }
@@ -1763,18 +1645,7 @@ export async function deepSearchContact(
       if (r?.organic && Array.isArray(r.organic)) {
         const text = snippetsText(r.organic);
         allSnippets.push(text);
-        
-        // Extraire et valider les emails
-        const extractedEmail = extractEmail(text, lead.name, domain);
-        if (extractedEmail && !candidateEmails.includes(extractedEmail)) {
-          candidateEmails.push(extractedEmail);
-          const validation = await validateAndFilterEmail(extractedEmail, lead.name, domain, apiConfig);
-          if (validation.validation.isValid && validation.validation.score >= 50) {
-            result.email = validation.email;
-            result.validation = validation.validation;
-          }
-        }
-        
+        if (!result.email) result.email = extractEmail(text);
         if (!result.phone) result.phone = extractPhone(text);
         if (result.email && result.phone) return result;
       }
@@ -1789,33 +1660,13 @@ export async function deepSearchContact(
       // Knowledge Graph
       if (r2.knowledgeGraph && typeof r2.knowledgeGraph === 'object') {
         const kg = r2.knowledgeGraph as Record<string, unknown>;
-        if (!result.email) { 
-          const e = safeStr(kg.email); 
-          if (e.includes('@')) {
-            const validation = await validateAndFilterEmail(e.toLowerCase(), lead.name, lead.website, apiConfig);
-            if (validation.validation.isValid && validation.validation.score >= 50) {
-              result.email = validation.email;
-              result.validation = validation.validation;
-            }
-          }
-        }
+        if (!result.email) { const e = safeStr(kg.email); if (e.includes('@')) result.email = e.toLowerCase(); }
         if (!result.phone) { const p = safeStr(kg.phone); if (p.length > 6) result.phone = p; }
       }
       if (r2.organic && Array.isArray(r2.organic)) {
         const text = snippetsText(r2.organic);
         allSnippets.push(text);
-        
-        // Extraire et valider les emails
-        const extractedEmail = extractEmail(text, lead.name, lead.website ? lead.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : undefined);
-        if (extractedEmail && !candidateEmails.includes(extractedEmail)) {
-          candidateEmails.push(extractedEmail);
-          const validation = await validateAndFilterEmail(extractedEmail, lead.name, lead.website, apiConfig);
-          if (validation.validation.isValid && validation.validation.score >= 50) {
-            result.email = validation.email;
-            result.validation = validation.validation;
-          }
-        }
-        
+        if (!result.email) result.email = extractEmail(text);
         if (!result.phone) result.phone = extractPhone(text);
         if (result.email && result.phone) return result;
       }
@@ -1829,18 +1680,7 @@ export async function deepSearchContact(
     if (r3?.organic && Array.isArray(r3.organic)) {
       const text = snippetsText(r3.organic);
       allSnippets.push(text);
-      
-      // Extraire et valider les emails
-      const extractedEmail = extractEmail(text, lead.name, lead.website ? lead.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : undefined);
-      if (extractedEmail && !candidateEmails.includes(extractedEmail)) {
-        candidateEmails.push(extractedEmail);
-        const validation = await validateAndFilterEmail(extractedEmail, lead.name, lead.website, apiConfig);
-        if (validation.validation.isValid && validation.validation.score >= 50) {
-          result.email = validation.email;
-          result.validation = validation.validation;
-        }
-      }
-      
+      if (!result.email) result.email = extractEmail(text);
       if (!result.phone) result.phone = extractPhone(text);
       if (result.email && result.phone) return result;
     }
@@ -1858,93 +1698,12 @@ ${allSnippets.join('\n').substring(0, 1500)}`;
       if (response) {
         const cleaned = response.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
         const data = JSON.parse(cleaned) as Record<string, string>;
-        if (!result.email && data.email && !data.email.toUpperCase().includes('NONE') && data.email.includes('@')) {
-          const extractedEmail = extractEmail(data.email, lead.name, lead.website ? lead.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : undefined);
-          if (extractedEmail && !candidateEmails.includes(extractedEmail)) {
-            candidateEmails.push(extractedEmail);
-            const validation = await validateAndFilterEmail(extractedEmail, lead.name, lead.website, apiConfig);
-            if (validation.validation.isValid && validation.validation.score >= 50) {
-              result.email = validation.email;
-              result.validation = validation.validation;
-            }
-          }
-        }
+        if (!result.email && data.email && !data.email.toUpperCase().includes('NONE') && data.email.includes('@'))
+          result.email = data.email.toLowerCase();
         if (!result.phone && data.phone && !data.phone.toUpperCase().includes('NONE') && data.phone.length > 6)
           result.phone = data.phone;
       }
     } catch { /* ignore */ }
-  }
-
-  // Strategy 5 : Recherche ciblée avec patterns d'emails professionnels (adapté aux artisans)
-  if (!result.email && lead.website) {
-    try {
-      const domain = lead.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '');
-      const companyName = lead.name.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '');
-      
-      // Patterns d'emails professionnels pour artisans et petites entreprises
-      // Inclut les emails de base qui sont souvent les seuls disponibles
-      const emailPatterns = [
-        // Emails de base (souvent les seuls disponibles pour les artisans)
-        `contact@${domain}`,
-        `info@${domain}`,
-        
-        // Emails spécifiques (mieux si disponibles)
-        `commercial@${domain}`,
-        `direction@${domain}`,
-        `gestion@${domain}`,
-        `service.client@${domain}`,
-        `${companyName}@${domain}`,
-        `bonjour@${domain}`,
-        `devi@${domain}`,
-        `devis@${domain}`,
-        `reservation@${domain}`,
-        `rdv@${domain}`,
-        `commande@${domain}`,
-        `support@${domain}`,
-        `aide@${domain}`
-      ];
-
-      // Vérifier chaque pattern avec une recherche rapide
-      for (const pattern of emailPatterns) {
-        const searchQuery = `"${pattern}" site:${domain}`;
-        const r = await serperFetch(serperKey, 'search', { q: searchQuery, gl: 'fr', hl: 'fr', num: 3 });
-        if (r?.organic && Array.isArray(r.organic) && r.organic.length > 0) {
-          const text = snippetsText(r.organic);
-          if (text.includes(pattern)) {
-            const validation = await validateAndFilterEmail(pattern, lead.name, domain, apiConfig);
-            if (validation.validation.isValid && validation.validation.score >= 50) {
-              result.email = validation.email;
-              result.validation = validation.validation;
-              break;
-            }
-          }
-        }
-      }
-    } catch { /* ignore */ }
-  }
-
-  // Validation finale : choisir le meilleur email parmi tous les candidats
-  if (!result.email && candidateEmails.length > 0) {
-    console.log(`🔍 EMAIL SELECTION: Evaluating ${candidateEmails.length} candidate emails`);
-    
-    let bestEmail = '';
-    let bestScore = 0;
-    let bestValidation: EmailValidationResult | undefined;
-    
-    for (const candidate of candidateEmails) {
-      const validation = await validateAndFilterEmail(candidate, lead.name, lead.website, apiConfig);
-      if (validation.validation.isValid && validation.validation.score > bestScore) {
-        bestEmail = validation.email;
-        bestScore = validation.validation.score;
-        bestValidation = validation.validation;
-      }
-    }
-    
-    if (bestEmail && bestScore >= 50) {
-      result.email = bestEmail;
-      result.validation = bestValidation;
-      console.log(`✅ EMAIL SELECTION: Selected ${bestEmail} with score ${bestScore}/100`);
-    }
   }
 
   return result;
