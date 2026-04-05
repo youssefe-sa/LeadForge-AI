@@ -23,6 +23,17 @@ export function NotificationContainer() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
+    // Réinitialiser automatiquement au montage si NVIDIA fonctionne
+    const checkAndClearErrors = () => {
+      const status = apiErrorState.getStatus();
+      if (status.totalErrors > 0) {
+        console.log('🧹 Clearing old API errors on component mount');
+        apiErrorState.reset();
+        setNotifications([]);
+      }
+    };
+
+    checkAndClearErrors();
     // Écouter les événements d'erreur API
     const handleApiError = (error: ApiError) => {
       const notification: Notification = {
@@ -85,6 +96,7 @@ export function NotificationContainer() {
   const handleReset = () => {
     apiErrorState.reset();
     setNotifications([]);
+    console.log('🔄 Notifications reset - API errors cleared');
   };
 
   if (notifications.length === 0) return null;

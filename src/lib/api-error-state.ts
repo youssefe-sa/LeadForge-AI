@@ -117,8 +117,8 @@ class ApiErrorState {
   // Réinitialiser l'état (après résolution manuelle)
   reset(): void {
     this.agentsStopped = false;
-    this.errors = this.errors.filter(e => e.timestamp > Date.now() - 3600000); // Garder 1h
-    console.log('[ApiErrorState] State reset');
+    this.errors = []; // Vider complètement les erreurs
+    console.log('[ApiErrorState] State reset - All errors cleared');
   }
 
   // Obtenir le statut actuel

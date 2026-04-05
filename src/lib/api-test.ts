@@ -9,7 +9,7 @@ import { eventBus, LeadForgeEvents } from './events';
 
 export interface ApiTestResult {
   service: string;
-  status: 'ok' | 'error';
+  status: 'ok' | 'error' | 'skipped';
   message: string;
   statusCode?: number;
 }
@@ -146,25 +146,33 @@ async function testGmailSmtp(config: ApiConfig): Promise<ApiTestResult> {
 export async function testAllApis(config: ApiConfig): Promise<ApiTestReport> {
   const results: ApiTestResult[] = [];
 
-  // Tester chaque API
-  const [serperResult, groqResult, gmailResult] = await Promise.all([
-    testSerperApi(config),
-    testGroqApi(config),
-    testGmailSmtp(config),
-  ]);
+  // Ne tester que les services nécessaires selon le LLM principal
+  const defaultLlm = config.defaultLlm || 'groq';
+  const shouldTestGroq = defaultLlm === 'groq' || (!config.nvidiaKey && !config.geminiKey && !config.openrouterKey);
 
-  results.push(serperResult, groqResult, gmailResult);
+  console.log(`🔧 API Testing: Default LLM is ${defaultLlm}, testing Groq: ${shouldTestGroq}`);
+
+  // Tester chaque API
+  const tests = [
+    testSerperApi(config),
+    shouldTestGroq ? testGroqApi(config) : Promise.resolve({ status: 'skipped' as const, service: 'groq', message: 'Groq not needed - using ' + defaultLlm })
+  ];
+
+  const [serperResult, groqResult] = await Promise.all(tests);
+  results.push(serperResult, groqResult);
+
+  // Toujours tester Gmail SMTP
+  const gmailResult = await testGmailSmtp(config);
+  results.push(gmailResult);
 
   // Vérifier si on peut procéder
-  // On nécessite au moins Serper OU Groq pour fonctionner
-  const criticalServices = ['serper', 'groq'];
-  const criticalResults = results.filter(r => criticalServices.includes(r.service));
-  const hasWorkingCritical = criticalResults.some(r => r.status === 'ok');
+  // On nécessite au moins Serper et un LLM fonctionnel
+  const hasWorkingSerper = serperResult.status === 'ok';
+  const hasWorkingLlm = groqResult.status === 'ok' || !shouldTestGroq; // Si on ne teste pas Groq, on suppose qu'on a un autre LLM
 
-  // Si aucun service critique ne fonctionne, on ne peut pas procéder
-  const canProceed = hasWorkingCritical;
+  const canProceed = hasWorkingSerper && hasWorkingLlm;
 
-  // Émettre des événements pour les erreurs
+  // Émettre des événements pour les erreurs (uniquement pour les vraies erreurs)
   results
     .filter(r => r.status === 'error')
     .forEach(r => {
