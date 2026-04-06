@@ -1932,7 +1932,18 @@ ${wsImageList ? `- Original Website Images:\n${wsImageList}` : ''}`;
 export function proxyImage(url: string, w?: number): string {
   if (!url) return '';
   if (!url.startsWith('http')) return url;
-  return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=${w}&q=80&output=webp&default=1`;
+  
+  // Liste des domaines qui causent des problèmes CORS
+  const problematicDomains = ['pagesjaunes.fr', 'rhezo-interim.fr'];
+  const domain = new URL(url).hostname;
+  
+  // Utiliser un proxy plus robuste pour les domaines problématiques
+  if (problematicDomains.some(d => domain.includes(d))) {
+    return `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=${w || 1200}&q=80&output=webp&default=1`;
+  }
+  
+  // Pour les autres domaines, essayer sans proxy d'abord
+  return url;
 }
 
 // Alias pour compatibilité avec le code existant

@@ -681,11 +681,19 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           while (currentState.isPaused) {
             console.log('⏸️ Generation paused, waiting...');
             await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Vérifier l'état actuel après chaque attente
             const updatedState = websiteGenState.getState();
             if (!updatedState.isProcessing) {
               console.log('⏹️ Processing stopped during pause');
               stopProcessing();
               return;
+            }
+            
+            // Si la pause est terminée, sortir de la boucle
+            if (!updatedState.isPaused) {
+              console.log('▶️ Resuming generation...');
+              break;
             }
           }
           
