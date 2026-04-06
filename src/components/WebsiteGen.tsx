@@ -638,6 +638,9 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     
     try {
       for (const currentLead of leadsToProcess) {
+        // Petit délai pour laisser le state React se synchroniser
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         // Vérifier si le processing est toujours actif
         if (!isProcessing) {
           console.log('⏹️ Processing stopped, exiting loop');
