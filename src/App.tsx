@@ -15,8 +15,8 @@ type View = 'dashboard' | 'scorer' | 'website' | 'outreach' | 'pipeline' | 'camp
 
 export default function App() {
   const [view, setView] = useState<View>('dashboard');
-  const { leads, addLeads, updateLead, deleteLeads, loadLeads, loading: leadsLoading } = useLeads();
-  const { config, updateConfig, loading: configLoading } = useApiConfig();
+  const { leads, addLeads, updateLead, deleteLeads, loadLeads, loading: leadsLoading, error: leadsError } = useLeads();
+  const { config, updateConfig, loading: configLoading, error: configError } = useApiConfig();
   const { templates } = useEmailTemplates();
 
   // Compter les APIs configurées (non vides)
@@ -30,6 +30,88 @@ export default function App() {
     config.pexelsKey,
     config.gmailSmtpUser && config.gmailSmtpPassword
   ].filter(Boolean).length;
+
+  // Afficher un écran d'erreur critique si les deux services sont en erreur
+  if (leadsError && configError) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh', 
+        background: '#F7F6F2',
+        padding: '20px',
+        textAlign: 'center'
+      }}>
+        <div style={{
+          background: 'white',
+          padding: '40px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          maxWidth: '500px',
+          width: '100%'
+        }}>
+          <h1 style={{ color: '#dc2626', marginBottom: '16px' }}>🚫 Erreur de Connexion</h1>
+          <p style={{ color: '#6b7280', marginBottom: '24px', lineHeight: '1.6' }}>
+            Impossible de se connecter à la base de données et de charger la configuration.
+          </p>
+          
+          <div style={{ background: '#fef2f2', padding: '16px', borderRadius: '8px', marginBottom: '24px', textAlign: 'left' }}>
+            <h3 style={{ color: '#dc2626', marginBottom: '12px', fontSize: '16px' }}>🔍 Vérifications à effectuer :</h3>
+            <ul style={{ color: '#6b7280', lineHeight: '1.6', paddingLeft: '20px' }}>
+              <li>Variables d'environnement <code>VITE_SUPABASE_URL</code> et <code>VITE_SUPABASE_ANON_KEY</code> configurées dans Vercel</li>
+              <li>Projet Supabase accessible et fonctionnel</li>
+              <li>Connexion internet stable</li>
+              <li>Aucun bloqueur réseau empêchant l'accès à Supabase</li>
+            </ul>
+          </div>
+
+          <div style={{ background: '#f0f9ff', padding: '12px', borderRadius: '8px', marginBottom: '24px' }}>
+            <p style={{ color: '#0369a1', margin: 0, fontSize: '14px' }}>
+              <strong>En production :</strong> Allez dans <strong>Vercel Dashboard → Settings → Environment Variables</strong>
+            </p>
+          </div>
+
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              marginRight: '12px'
+            }}
+          >
+            🔄 Réessayer
+          </button>
+          
+          <button 
+            onClick={() => {
+              console.log('Debug info:', { leadsError, configError, environment: import.meta.env?.MODE });
+              alert('Informations de débogage envoyées dans la console (F12)');
+            }}
+            style={{
+              background: '#6b7280',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            🐛 Déboguer
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ErrorBoundary>
