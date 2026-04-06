@@ -634,8 +634,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     let totalProcessed = enriched.length;
     
     // Obtenir tous les leads à traiter au début pour éviter les doublons
-    const leadsToProcess = [...enriched];
-    console.log('🎯 Leads to process:', leadsToProcess.map(l => l.name));
+    let leadsToProcess = [...enriched];
+    console.log('🎯 Initial leads to process:', leadsToProcess.map(l => l.name));
     
     try {
       for (const currentLead of leadsToProcess) {
@@ -676,6 +676,20 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           // Forcer le rechargement depuis Supabase pour voir le déplacement en temps réel
           console.log('🔄 Reloading leads from Supabase to show updated status...');
           await loadLeads();
+          
+          // ⚡ VÉRIFIER les nouveaux leads enrichis PENDANT la génération
+          // Attendre un petit délai pour que le state soit à jour
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          const currentEnriched = leads.filter(l => l.score > 0 && !l.siteGenerated);
+          const newLeads = currentEnriched.filter(l => !leadsToProcess.some(existing => existing.id === l.id));
+          
+          if (newLeads.length > 0) {
+            console.log(`🆕 ${newLeads.length} nouveaux leads enrichis détectés pendant la génération:`, newLeads.map(l => l.name));
+            leadsToProcess = [...leadsToProcess, ...newLeads];
+            totalProcessed += newLeads.length;
+            console.log(`📊 Mise à jour: ${totalProcessed} leads au total à traiter`);
+          }
           
         } catch (error) {
           console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
