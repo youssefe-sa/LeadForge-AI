@@ -223,55 +223,59 @@ function mapSupabaseLeadToLead(supabaseLead: Database['public']['Tables']['leads
 }
 
 function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads']['Update'] | any {
-  return {
+  const data: any = {
     name: lead.name,
-    email: lead.email || undefined,
-    phone: lead.phone || undefined,
-    sector: lead.sector || undefined,
-    city: lead.city || undefined,
-    address: lead.address || undefined,
-    website: lead.website || undefined,
     rating: lead.googleRating || undefined,
     reviews_count: lead.googleReviews || undefined,
     has_website: !!lead.website,
     enriched: lead.stage !== 'new',
     score: lead.score,
     status: lead.stage,
-    notes: lead.notes || undefined,
     site_generated: lead.siteGenerated,
-    site_url: lead.siteUrl || undefined,
-    // Utiliser les noms de colonnes corrects pour Supabase
     site_clicked: lead.siteClicked,
     payment_clicked: lead.paymentClicked,
     devis_clicked: lead.devisClicked,
     invoice_clicked: lead.invoiceClicked,
-    landing_url: lead.landingUrl || undefined,
     email_sent: lead.emailSent,
-    email_sent_date: lead.emailSentDate || undefined,
     email_opened: lead.emailOpened,
     email_clicked: lead.emailClicked,
-    last_contact: lead.lastContact || undefined,
-    campaign: lead.campaign || undefined,
-    campaign_date: lead.campaignDate || undefined,
-    source: lead.source || undefined,
-    // NOUVEAUX CHAMPS D'ENRICHISSEMENT
-    google_rating: lead.googleRating || undefined,
-    google_reviews: lead.googleReviews || undefined,
-    google_maps_url: lead.googleMapsUrl || undefined,
-    serper_cid: lead.serperCid || undefined,
-    serper_type: lead.serperType || undefined,
-    serper_hours: lead.serperHours || undefined,
-    serper_snippets: lead.serperSnippets || undefined,
-    description: lead.description || undefined,
-    logo: lead.logo || undefined,
-    images: lead.images || undefined,
-    website_images: lead.websiteImages || undefined,
-    google_reviews_data: lead.googleReviewsData || undefined,
-    temperature: lead.temperature || undefined,
-    tags: lead.tags || undefined,
-    generated_prompt: lead.generatedPrompt || undefined,
-    ...(lead.siteHtml ? { site_html: lead.siteHtml } : {}),
   };
+
+  // Ajouter les champs uniquement s'ils ont une valeur non-undefined et non-null
+  if (lead.email) data.email = lead.email;
+  if (lead.phone) data.phone = lead.phone;
+  if (lead.sector) data.sector = lead.sector;
+  if (lead.city) data.city = lead.city;
+  if (lead.address) data.address = lead.address;
+  if (lead.website) data.website = lead.website;
+  if (lead.notes) data.notes = lead.notes;
+  if (lead.siteUrl) data.site_url = lead.siteUrl;
+  if (lead.landingUrl) data.landing_url = lead.landingUrl;
+  if (lead.emailSentDate) data.email_sent_date = lead.emailSentDate;
+  if (lead.lastContact) data.last_contact = lead.lastContact;
+  if (lead.campaign) data.campaign = lead.campaign;
+  if (lead.campaignDate) data.campaign_date = lead.campaignDate;
+  if (lead.source) data.source = lead.source;
+
+  // NOUVEAUX CHAMPS D'ENRICHISSEMENT
+  if (lead.googleRating !== undefined && lead.googleRating !== null) data.google_rating = lead.googleRating;
+  if (lead.googleReviews !== undefined && lead.googleReviews !== null) data.google_reviews = lead.googleReviews;
+  if (lead.googleMapsUrl) data.google_maps_url = lead.googleMapsUrl;
+  if (lead.serperCid) data.serper_cid = lead.serperCid;
+  if (lead.serperType) data.serper_type = lead.serperType;
+  if (lead.serperHours) data.serper_hours = lead.serperHours;
+  if (lead.serperSnippets && lead.serperSnippets.length > 0) data.serper_snippets = lead.serperSnippets;
+  if (lead.description) data.description = lead.description;
+  if (lead.logo) data.logo = lead.logo;
+  if (lead.images && lead.images.length > 0) data.images = lead.images;
+  if (lead.websiteImages && lead.websiteImages.length > 0) data.website_images = lead.websiteImages;
+  if (lead.googleReviewsData && lead.googleReviewsData.length > 0) data.google_reviews_data = lead.googleReviewsData;
+  if (lead.temperature) data.temperature = lead.temperature;
+  if (lead.tags && lead.tags.length > 0) data.tags = lead.tags;
+  if (lead.generatedPrompt) data.generated_prompt = lead.generatedPrompt;
+  if (lead.siteHtml) data.site_html = lead.siteHtml;
+
+  return data;
 }
 
 // --- HOOKS ---

@@ -149,8 +149,10 @@ export default function WebsiteGen({ leads, updateLead, apiConfig }: Props) {
 
   const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.openrouterKey);
   const [refreshKey, setRefreshKey] = useState(0);
-  const enriched = useMemo(() => leads.filter(l => l.score > 0 && !l.siteGenerated), [leads, refreshKey]);
-  const generated = useMemo(() => leads.filter(l => l.siteGenerated), [leads, refreshKey]);
+  
+  // Calculer les listes sans dépendre de refreshKey pour éviter les boucles
+  const enriched = useMemo(() => leads.filter(l => l.score > 0 && !l.siteGenerated), [leads]);
+  const generated = useMemo(() => leads.filter(l => l.siteGenerated), [leads]);
   const previewLead = useMemo(() => leads.find(l => l.id === previewId) || null, [leads, previewId]);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages, chatLoading]);
@@ -449,33 +451,50 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
   const generateSite = async (lead: Lead) => {
     const slug = lead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 30);
     updateProgress({ step: '📝 Génération du contenu...' });
+    
     try {
       // Contenu riche puis template premium (hero image, secteur, galerie, WhatsApp)
       const content = await generateContent(lead);
       updateProgress({ step: '🎨 Génération du site premium...' });
       const html = generatePremiumSiteHtml(lead, content);
       const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
-      updateLead(lead.id, {
-        siteGenerated: true, siteHtml: html,
+      
+      // Mettre à jour le lead avec les données du site
+      await updateLead(lead.id, {
+        siteGenerated: true, 
+        siteHtml: html,
         siteUrl: `${baseUrl}/api/sites/${lead.id}`,
         landingUrl: `${baseUrl}/api/sites/${lead.id}`,
         stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
       });
       
+      console.log(`✅ Site généré avec succès pour: ${lead.name}`);
+      
     } catch (e) {
-      // Log uniquement en développement
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Generation failed:', e);
-      }
+      console.error('❌ Erreur lors de la génération du site:', e);
       updateProgress({ step: '🔄 Fallback template...' });
-      const emergencyHtml = generateProfessionalSite(lead);
-      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
-      updateLead(lead.id, {
-        siteGenerated: true, siteHtml: emergencyHtml,
-        siteUrl: `${baseUrl}/api/sites/${lead.id}`,
-        landingUrl: `${baseUrl}/api/sites/${lead.id}`,
-        stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
-      });
+      
+      try {
+        const emergencyHtml = generateProfessionalSite(lead);
+        const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
+        
+        await updateLead(lead.id, {
+          siteGenerated: true, 
+          siteHtml: emergencyHtml,
+          siteUrl: `${baseUrl}/api/sites/${lead.id}`,
+          landingUrl: `${baseUrl}/api/sites/${lead.id}`,
+          stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
+        });
+        
+        console.log(`🔄 Site fallback généré pour: ${lead.name}`);
+      } catch (fallbackError) {
+        console.error('❌ Erreur critique - même le fallback a échoué:', fallbackError);
+        // Marquer quand même comme traité pour éviter les boucles infinies
+        await updateLead(lead.id, {
+          siteGenerated: true,
+          stage: 'site_generated',
+        });
+      }
     }
   };
 
@@ -585,7 +604,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     startProcessing('website-generation', 'websitegen-batch');
     
     let processedCount = 0;
-    let totalProcessed = 0;
+    let totalProcessed = enriched.length; // Initialiser avec le nombre total de sites à traiter
     
     // Boucle continue jusqu'à ce qu'il n'y ait plus de sites en attente
     while (true) {
@@ -597,9 +616,9 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         break;
       }
       
-      // Si c'est le premier tour ou si de nouveaux sites ont été ajoutés
-      if (totalProcessed === 0 || currentEnriched.length > (totalProcessed - processedCount)) {
-        totalProcessed = currentEnriched.length + processedCount;
+      // Mettre à jour le total si de nouveaux sites ont été ajoutés
+      if (currentEnriched.length > totalProcessed) {
+        totalProcessed = currentEnriched.length;
       }
       
       // Vérifier si la génération est en pause
@@ -623,9 +642,6 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       });
       
       await generateSite(currentLead);
-      
-      // Forcer la mise à jour des compteurs après chaque génération
-      setRefreshKey(prev => prev + 1);
       
       // Petit délai entre les sites (sauf pour le dernier)
       if (currentEnriched.length > 1) {
