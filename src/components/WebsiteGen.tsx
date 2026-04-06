@@ -632,20 +632,39 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     
     let processedCount = 0;
     const processedLeadIds = new Set<string>(); // Suivre les leads déjà traités
+    let lastCheckTime = Date.now();
     
     try {
       // Boucle dynamique qui s'adapte aux nouveaux leads
       while (true) {
+        // Recharger les leads pour détecter les nouveaux enrichis
+        await loadLeads();
+        
         // Obtenir les leads actuels à traiter (mis à jour dynamiquement)
         const currentLeads = leads.filter(l => l.score > 0 && !l.siteGenerated);
         const newLeadsToProcess = currentLeads.filter(l => !processedLeadIds.has(l.id));
         
         console.log(`🔄 Current leads to process: ${currentLeads.length}, New leads: ${newLeadsToProcess.length}`);
         
-        // Si plus de nouveaux leads à traiter, arrêter
+        // Si plus de nouveaux leads à traiter, attendre et vérifier à nouveau
         if (newLeadsToProcess.length === 0) {
-          console.log('✅ No more leads to process, generation completed');
-          break;
+          console.log('⏱️ No new leads to process, waiting for new enriched leads...');
+          
+          // Attendre 5 secondes et vérifier s'il y a de nouveaux leads
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          
+          // Recharger à nouveau pour voir s'il y a de nouveaux leads
+          await loadLeads();
+          const refreshedLeads = leads.filter(l => l.score > 0 && !l.siteGenerated);
+          const refreshedNewLeads = refreshedLeads.filter(l => !processedLeadIds.has(l.id));
+          
+          if (refreshedNewLeads.length === 0) {
+            console.log('✅ No more leads to process after waiting, generation completed');
+            break;
+          } else {
+            console.log(`🆕 Detected ${refreshedNewLeads.length} new enriched leads! Continuing generation...`);
+            continue; // Continuer la boucle avec les nouveaux leads
+          }
         }
         
         // Utiliser directement le singleton pour éviter les problèmes de synchronisation
@@ -705,6 +724,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           console.log('⏱️ Waiting before next lead...');
           await new Promise(r => setTimeout(r, batchDelay));
         }
+        
+        lastCheckTime = Date.now();
       }
     } catch (error) {
       console.error('💥 Error in generateBatch loop:', error);
