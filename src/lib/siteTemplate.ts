@@ -891,16 +891,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             background: var(--secondary);
         }
         
-        /* Chat bot et autres éléments - MÊMES COULEURS QUE BOUTONS */
-        .chat-bubble {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .chat-bubble:hover {
-            background: var(--secondary);
-        }
-        
+        /* Branding */
         .brand-slogan {
             color: var(--primary);
             font-weight: 600;
@@ -911,32 +902,31 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             font-weight: 600;
         }
         
-        /* Chat bot externe - FORCER COULEURS DU SITE */
-        .chat-widget {
+        /* Chatbot Externe - Intégration Premium Parfaite */
+        .chatbot-toggle {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+            box-shadow: 0 12px 32px rgba(var(--primary-rgb), 0.4) !important;
+        }
+        
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+        }
+        
+        .chat-message.user {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+        }
+        
+        .chatbot-input-area button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+        }
+        
+        .chat-quick-actions button:hover {
             background: var(--primary) !important;
-            color: white !important;
-        }
-        
-        .chat-widget:hover {
-            background: var(--secondary) !important;
-        }
-        
-        .chat-message {
-            background: var(--primary) !important;
-            color: white !important;
-        }
-        
-        .chat-input {
             border-color: var(--primary) !important;
         }
         
-        .chat-send {
-            background: var(--primary) !important;
-            color: white !important;
-        }
-        
-        .chat-send:hover {
-            background: var(--secondary) !important;
+        .chatbot-input-area input:focus {
+            border-color: var(--primary) !important;
         }
         
         /* Espacements uniques */
@@ -1929,6 +1919,12 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             background: rgba(var(--primary-rgb), 0.1);
             transform: translateX(10px);
         }
+        
+        .value-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
             box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             transition: all 0.4s ease;
             height: 100%;
@@ -3918,17 +3914,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                 document.body.style.opacity = '1';
             }, 100);
             
-            // Forcer les couleurs du chat bot après chargement
-            setTimeout(() => {
-                const chatWidgets = document.querySelectorAll('[class*="chat"], [id*="chat"]');
-                chatWidgets.forEach(element => {
-                    const style = window.getComputedStyle(element);
-                    if (style.display !== 'none') {
-                        element.style.setProperty('background', 'var(--primary)', 'important');
-                        element.style.setProperty('color', 'white', 'important');
-                    }
-                });
-            }, 2000);
+        });
         });
     </script>
 </body>
