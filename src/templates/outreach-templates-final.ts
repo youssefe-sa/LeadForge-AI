@@ -678,7 +678,7 @@ Solutions Web
               </p>
               <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site :</p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="VOTRE SITE WEB ICI" style="color: #007bff; text-decoration: underline; font-weight: 600;">VOTRE SITE WEB ICI</a>
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
               </p>
             </div>
             
@@ -748,7 +748,7 @@ Bonjour {{firstName}},
 
 🎉 Votre site web professionnel pour {{companyName}} est maintenant terminé !
 
-Découvrez votre site ici : VOTRE SITE WEB ICI
+Découvrez votre site : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
 💳 Dernière étape : Paiement final de 100$
 
@@ -811,7 +811,7 @@ Solutions Web
               </p>
               <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site en ligne :</p>
               <p style="margin: 0; font-size: 14px; color: #007bff;">
-                <a href="VOTRE SITE WEB ICI" style="color: #007bff; text-decoration: underline; font-weight: 600;">VOTRE SITE WEB ICI</a>
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
               </p>
             </div>
             
@@ -870,7 +870,7 @@ Bonjour {{firstName}},
 Nous vous confirmons la bonne réception de votre paiement final de 100$. 
 Votre site web {{companyName}} est maintenant officiellement en ligne et accessible à vos clients !
 
-Découvrez votre site en ligne : VOTRE SITE WEB ICI
+Découvrez votre site en ligne : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
 📄 Votre facture finale
 Une facture pour le paiement final de 100$ est disponible : {{invoiceLink}}
@@ -973,11 +973,7 @@ Solutions Web
             <div style="background-color: #d4edda; padding: 20px; margin: 0 0 30px 0; border: 1px solid #c3e6cb; border-radius: 8px;">
               <h3 style="color: #155724; margin-top: 0; margin-bottom: 10px; font-size: 16px;">🌐 Votre site en ligne</h3>
               <p style="margin: 0 0 10px 0; font-size: 14px; color: #155724;">
-                Votre site est accessible à l'adresse :
-              </p>
-              <p style="margin: 0; font-size: 14px; color: #007bff;">
-                <a href="VOTRE SITE WEB ICI" style="color: #007bff; text-decoration: underline; font-weight: 600;">VOTRE SITE WEB ICI</a>
-              </p>
+                Votre site est accessible à l'adresse : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
             </div>
           </div>
           
@@ -1029,7 +1025,7 @@ Votre support technique prioritaire est actif pendant 3 mois :
 Pour toute question, contactez-nous : {{agentEmail}}
 
 🌐 Votre site en ligne
-Votre site est accessible à l'adresse : VOTRE SITE WEB ICI
+Votre site est accessible à l'adresse : <a href="{{websiteLink}}">{{websiteLink}}</a>
 
 Merci de votre confiance - Nous sommes fiers de vous accompagner
 Support prioritaire 3 mois - Disponible 7j/7
@@ -1220,7 +1216,7 @@ Votre site web vous attend
 Je fais suite à notre précédent email concernant votre site web professionnel pour {{companyName}}. 
 J'espère que vous avez eu l'occasion de consulter notre proposition détaillée.
 
-Découvrez votre futur site : VOTRE SITE WEB ICI
+Découvrez votre futur site : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
 Pourquoi choisir {{agentName}} ?
 
@@ -1508,7 +1504,7 @@ Solutions Web
               </p>
               <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site :</p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="VOTRE SITE WEB ICI" style="color: #007bff; text-decoration: underline; font-weight: 600;">VOTRE SITE WEB ICI</a>
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
               </p>
             </div>
             
@@ -1581,7 +1577,7 @@ Bonjour {{firstName}},
 🚀 Excellente nouvelle !
 Votre site web professionnel pour {{companyName}} est maintenant terminé et prêt à être mis en ligne !
 
-Découvrez votre site : VOTRE SITE WEB ICI
+Découvrez votre site : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
 💳 Dernière étape : Paiement final
 Pour finaliser la livraison et débloquer l'accès complet à votre site, 

@@ -473,7 +473,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const html = generatePremiumSiteHtml(lead, content);
       console.log(`✅ HTML generated for ${lead.name}`);
       
-      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
+      const baseUrl = 'https://www.services-siteup.online'; // Forcer l'utilisation de votre domaine
       
       console.log(`🔧 Updating lead ${lead.id} in Supabase...`);
       // Mettre à jour le lead avec les données du site
@@ -494,7 +494,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       try {
         console.log(`🔄 Using fallback template for ${lead.name}`);
         const emergencyHtml = generateProfessionalSite(lead);
-        const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
+        const baseUrl = 'https://www.services-siteup.online'; // Forcer l'utilisation de votre domaine
         
         await updateLead(lead.id, {
           siteGenerated: true, 
@@ -774,7 +774,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const html = generatePremiumSiteHtml(tempLead, content);
       
       // Mettre à jour le site avec la nouvelle palette mais restaurer le nom original
-      const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
+      const baseUrl = 'https://www.services-siteup.online'; // Forcer l'utilisation de votre domaine
       updateLead(previewLead.id, { 
         siteHtml: html,
         siteUrl: `${baseUrl}/api/sites/${previewLead.id}`,

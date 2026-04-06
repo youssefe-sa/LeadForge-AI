@@ -127,7 +127,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       '{{agentEmail}}': apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai',
     };
     let subject = template.subject;
-    let body = template.textContent || template.subject; // Utiliser textContent comme fallback
+    let body = template.htmlContent || template.textContent || template.subject; // Utiliser htmlContent en priorité
     for (const [key, val] of Object.entries(replacements)) {
       subject = subject.split(key).join(val);
       body = body.split(key).join(val);
@@ -802,10 +802,14 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
               <span style={{ fontSize: 12, color: C.tx3 }}>Sujet :</span>
               <span style={{ fontSize: 14, marginLeft: 8, fontWeight: 600 }}>{previewEmail.subject}</span>
             </div>
-            <div style={{
-              padding: 20, background: C.bg, borderRadius: 8, fontSize: 14, lineHeight: 1.7,
-              whiteSpace: 'pre-wrap', fontFamily: "'Bricolage Grotesque', sans-serif",
-            }}>{previewEmail.body}</div>
+            <div 
+              style={{ 
+                padding: 20, background: '#F7F6F2', borderRadius: 8, 
+                fontSize: 14, lineHeight: 1.7, fontFamily: "'Bricolage Grotesque', sans-serif",
+                maxHeight: 400, overflow: 'auto'
+              }}
+              dangerouslySetInnerHTML={{ __html: previewEmail.body }}
+            />
             <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
               <button onClick={() => { sendOne(previewEmail.lead); setPreviewEmail(null); }} disabled={!hasGmailSmtp} style={{
                 flex: 1, padding: '11px 0', borderRadius: 6, border: 'none',
