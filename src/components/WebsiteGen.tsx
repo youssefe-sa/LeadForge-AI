@@ -477,11 +477,12 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       
       console.log(`🔧 Updating lead ${lead.id} in Supabase...`);
       // Mettre à jour le lead avec les données du site
+      const firstName = lead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 20);
       await updateLead(lead.id, {
         siteGenerated: true, 
         siteHtml: html,
-        siteUrl: `${baseUrl}/api/sites/${lead.id}`,
-        landingUrl: `${baseUrl}/api/sites/${lead.id}`,
+        siteUrl: `${baseUrl}/api/sites/${firstName}`,
+        landingUrl: `${baseUrl}/api/sites/${firstName}`,
         stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
       });
       
@@ -496,11 +497,12 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         const emergencyHtml = generateProfessionalSite(lead);
         const baseUrl = 'https://www.services-siteup.online'; // Forcer l'utilisation de votre domaine
         
+        const firstName = lead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 20);
         await updateLead(lead.id, {
           siteGenerated: true, 
           siteHtml: emergencyHtml,
-          siteUrl: `${baseUrl}/api/sites/${lead.id}`,
-          landingUrl: `${baseUrl}/api/sites/${lead.id}`,
+          siteUrl: `${baseUrl}/api/sites/${firstName}`,
+          landingUrl: `${baseUrl}/api/sites/${firstName}`,
           stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
         });
         
@@ -775,10 +777,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       
       // Mettre à jour le site avec la nouvelle palette mais restaurer le nom original
       const baseUrl = 'https://www.services-siteup.online'; // Forcer l'utilisation de votre domaine
+      const firstName = previewLead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 20);
       updateLead(previewLead.id, { 
         siteHtml: html,
-        siteUrl: `${baseUrl}/api/sites/${previewLead.id}`,
-        landingUrl: `${baseUrl}/api/sites/${previewLead.id}`,
+        siteUrl: `${baseUrl}/api/sites/${firstName}`,
+        landingUrl: `${baseUrl}/api/sites/${firstName}`,
       });
       
       // Forcer le rafraîchissement de l'aperçu
