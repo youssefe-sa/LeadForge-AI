@@ -57,7 +57,7 @@ export default function App() {
               <Scorer leads={leads} updateLead={updateLead} apiConfig={config} />
             )}
             {view === 'website' && (
-              <WebsiteGen leads={leads} updateLead={updateLead} apiConfig={config} />
+              <WebsiteGen leads={leads} updateLead={updateLead} apiConfig={config} loadLeads={loadLeads} />
             )}
             {view === 'outreach' && (
               <Outreach leads={leads} updateLead={updateLead} apiConfig={config} templates={templates} />

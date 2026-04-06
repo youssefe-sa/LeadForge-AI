@@ -17,6 +17,7 @@ interface Props {
   leads: Lead[];
   updateLead: (id: string, updates: Partial<Lead>) => Promise<void>;
   apiConfig: ApiConfig;
+  loadLeads: () => Promise<void>; // Ajout de loadLeads
 }
 
 interface ChatMessage { role: 'user' | 'assistant'; text: string; }
@@ -134,7 +135,7 @@ function getCuratedFallback(sector: string, index: number): string {
   return CURATED_FALLBACKS.default[index % 6];
 }
 
-export default function WebsiteGen({ leads, updateLead, apiConfig }: Props) {
+export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: Props) {
   // Utiliser l'état local de processing pour WebsiteGen
   const { isProcessing, isPaused, progress, startProcessing, updateProgress, stopProcessing, pauseProcessing, resumeProcessing } = useWebsiteGenState();
   
@@ -672,9 +673,9 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           await generateSite(currentLead);
           console.log(`✅ Lead ${currentLead.name} traité avec succès`);
           
-          // Forcer le rechargement des données pour voir le déplacement en temps réel
-          console.log('🔄 Refreshing leads list to show updated status...');
-          setRefreshKey(prev => prev + 1);
+          // Forcer le rechargement depuis Supabase pour voir le déplacement en temps réel
+          console.log('🔄 Reloading leads from Supabase to show updated status...');
+          await loadLeads();
           
         } catch (error) {
           console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
