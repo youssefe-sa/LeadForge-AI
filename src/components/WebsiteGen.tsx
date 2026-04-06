@@ -458,16 +458,23 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
 
   // ── GENERATE SITE — TEMPLATE PREMIUM PROFESSIONNEL ──
   const generateSite = async (lead: Lead) => {
+    console.log(`🔧 generateSite called for: ${lead.name}`);
     const slug = lead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 30);
     updateProgress({ step: '📝 Génération du contenu...' });
     
     try {
+      console.log(`🔧 Starting content generation for ${lead.name}`);
       // Contenu riche puis template premium (hero image, secteur, galerie, WhatsApp)
       const content = await generateContent(lead);
+      console.log(`✅ Content generated for ${lead.name}`);
+      
       updateProgress({ step: '🎨 Génération du site premium...' });
       const html = generatePremiumSiteHtml(lead, content);
+      console.log(`✅ HTML generated for ${lead.name}`);
+      
       const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
       
+      console.log(`🔧 Updating lead ${lead.id} in Supabase...`);
       // Mettre à jour le lead avec les données du site
       await updateLead(lead.id, {
         siteGenerated: true, 
@@ -480,10 +487,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       console.log(`✅ Site généré avec succès pour: ${lead.name}`);
       
     } catch (e) {
-      console.error('❌ Erreur lors de la génération du site:', e);
+      console.error(`❌ Erreur lors de la génération du site pour ${lead.name}:`, e);
       updateProgress({ step: '🔄 Fallback template...' });
       
       try {
+        console.log(`🔄 Using fallback template for ${lead.name}`);
         const emergencyHtml = generateProfessionalSite(lead);
         const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
         
@@ -497,7 +505,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         
         console.log(`🔄 Site fallback généré pour: ${lead.name}`);
       } catch (fallbackError) {
-        console.error('❌ Erreur critique - même le fallback a échoué:', fallbackError);
+        console.error(`❌ Erreur critique - même le fallback a échoué pour ${lead.name}:`, fallbackError);
         // Marquer quand même comme traité pour éviter les boucles infinies
         await updateLead(lead.id, {
           siteGenerated: true,
