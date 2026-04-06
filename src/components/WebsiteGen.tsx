@@ -677,11 +677,23 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           
           console.log(`🔄 Processing lead ${processedCount}: ${currentLead.name}`);
           
+          // Vérifier si la génération est en pause
+          while (currentState.isPaused) {
+            console.log('⏸️ Generation paused, waiting...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            const updatedState = websiteGenState.getState();
+            if (!updatedState.isProcessing) {
+              console.log('⏹️ Processing stopped during pause');
+              stopProcessing();
+              return;
+            }
+          }
+          
           updateProgress({ 
             current: processedCount, 
             total: processedLeadIds.size,
             name: currentLead.name, 
-            step: '🤖 Génération...' 
+            step: currentState.isPaused ? '⏸️ En pause' : '🤖 Génération...' 
           });
           
           try {
