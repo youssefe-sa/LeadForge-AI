@@ -167,14 +167,14 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages, chatLoading]);
 
-  // PROPOSITION 4: Stabilisation Lifecycle et Memory Leaks
-  // Si le composant est démonté (l'utilisateur quitte l'onglet), stopper le processing proprement
+  // PROPOSITION 4: Stabilisation Lifecycle
+  // Cleanup retiré temporairement pour éviter l'interruption des générations en React Strict Mode
   useEffect(() => {
     return () => {
-      console.log('🛑 WebsiteGen unmounted, stopping processing loops to prevent memory leaks.');
-      stopProcessing();
+      console.log('🛑 WebsiteGen unmounted.');
+      // stopProcessing() retiré car causait l'arrêt immédiat lors des re-renders !
     }
-  }, [stopProcessing]);
+  }, []);
 
   // ── SHORTER, MORE EFFECTIVE AI PROMPT ──
   const buildShortPrompt = (lead: Lead, styleHint?: string): { prompt: string; system: string } => {
