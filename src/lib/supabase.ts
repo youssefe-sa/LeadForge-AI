@@ -125,25 +125,25 @@ export const leadsService = {
     let query = supabase
       .from('leads')
       .select('*');
-    
+
     if (params?.status) {
       query = query.eq('status', params.status);
     }
-    
+
     if (params?.search) {
       query = query.or(`name.ilike.%${params.search}%,email.ilike.%${params.search}%,city.ilike.%${params.search}%`);
     }
-    
+
     if (params?.limit) {
       query = query.limit(params.limit);
     }
-    
+
     if (params?.offset) {
       query = query.range(params.offset, params.offset + (params.limit || 100) - 1);
     }
-    
+
     const { data, error } = await query.order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return { leads: data || [], count: data?.length || 0 };
   },
@@ -154,7 +154,7 @@ export const leadsService = {
       .select('*')
       .eq('id', id)
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -165,86 +165,33 @@ export const leadsService = {
       .insert([lead])
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
 
   async update(id: string, updates: Database['public']['Tables']['leads']['Update']) {
     console.log('🔧 Supabase update attempt for ID:', id);
-    console.log('🔧 Raw updates data:', updates);
-    
-    try {
-      // Essayer la mise à jour directe d'abord
-      const { data, error } = await supabase
-        .from('leads')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('❌ Supabase update error:', error);
-        throw error;
-      }
-      
-      console.log('✅ Supabase update successful:', data);
-      return data;
-      
-    } catch (err) {
-      console.error('💥 Supabase update failed, trying with filtered data:', err);
-      
-      // En cas d'erreur, essayer de mettre à jour uniquement les champs de base
-      const basicFields = {
-        name: updates.name,
-        email: updates.email,
-        phone: updates.phone,
-        sector: updates.sector,
-        city: updates.city,
-        address: updates.address,
-        website: updates.website,
-        rating: updates.rating,
-        reviews_count: updates.reviews_count,
-        has_website: updates.has_website,
-        enriched: updates.enriched,
-        score: updates.score,
-        status: updates.status,
-        notes: updates.notes,
-        site_generated: updates.site_generated,
-        site_url: updates.site_url,
-        landing_url: updates.landing_url,
-        email_sent: updates.email_sent,
-        email_sent_date: updates.email_sent_date,
-        email_opened: updates.email_opened,
-        email_clicked: updates.email_clicked,
-        last_contact: updates.last_contact,
-        campaign: updates.campaign,
-        campaign_date: updates.campaign_date,
-        source: updates.source,
-      };
-      
-      // Filtrer les valeurs undefined
-      const filteredBasicFields = Object.fromEntries(
-        Object.entries(basicFields).filter(([key, value]) => value !== undefined)
-      );
-      
-      console.log('🔄 Retrying with basic fields:', filteredBasicFields);
-      
-      const { data, error } = await supabase
-        .from('leads')
-        .update(filteredBasicFields)
-        .eq('id', id)
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('❌ Even basic update failed:', error);
-        throw error;
-      }
-      
-      console.log('✅ Basic update successful:', data);
-      return data;
+
+    // Nettoyer explicitement les valeurs "undefined" avant l'envoi pour éviter tout problème avec Supabase
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, value]) => value !== undefined)
+    );
+
+    const { data, error } = await supabase
+      .from('leads')
+      .update(cleanUpdates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('❌ Supabase update error:', error);
+      throw error;
     }
+
+    console.log('✅ Supabase update successful:', data);
+    return data;
   },
 
   async delete(id: string) {
@@ -252,7 +199,7 @@ export const leadsService = {
       .from('leads')
       .delete()
       .eq('id', id);
-    
+
     if (error) throw error;
   },
 
@@ -261,7 +208,7 @@ export const leadsService = {
       .from('leads')
       .delete()
       .in('id', ids);
-    
+
     if (error) throw error;
   },
 
@@ -270,7 +217,7 @@ export const leadsService = {
       .from('leads')
       .delete()
       .eq('campaign', campaignName);
-    
+
     if (error) throw error;
   },
 
@@ -279,27 +226,27 @@ export const leadsService = {
       .from('leads')
       .select('campaign, campaign_date, created_at')
       .order('campaign_date', { ascending: false });
-    
+
     if (error) throw error;
-    
+
     // Debug seulement en développement
     if (process.env.NODE_ENV === 'development') {
       console.log('All leads for campaigns:', data);
     }
-    
+
     // Grouper par campagne et compter les leads
     const campaigns: Record<string, { name: string; date: string; count: number }> = {};
-    
+
     data?.forEach(lead => {
       let campaignName = lead.campaign;
       let campaignDate = lead.campaign_date || lead.created_at;
-      
+
       // Si pas de campagne, créer une campagne par défaut
       if (!campaignName) {
         campaignName = 'Importation sans nom';
         campaignDate = lead.created_at;
       }
-      
+
       if (!campaigns[campaignName]) {
         campaigns[campaignName] = {
           name: campaignName,
@@ -309,11 +256,11 @@ export const leadsService = {
       }
       campaigns[campaignName].count++;
     });
-    
+
     if (process.env.NODE_ENV === 'development') {
       console.log('Campaigns grouped:', campaigns);
     }
-    
+
     return Object.values(campaigns);
   }
 };
@@ -326,7 +273,7 @@ export const configService = {
       .select('*')
       .eq('id', 1)
       .single();
-    
+
     if (error || !data) {
       // Return default config if none exists
       return {
@@ -349,7 +296,7 @@ export const configService = {
         whopFinalPaymentLink: ''
       };
     }
-    
+
     return {
       groqKey: data.groq_key || '',
       openrouterKey: data.openrouter_key || '',
@@ -397,7 +344,7 @@ export const configService = {
       .from('api_config')
       .update(row)
       .eq('id', 1);
-    
+
     if (error) {
       console.error('❌ Supabase Update Error:', error);
       throw error;
@@ -413,7 +360,7 @@ export const templatesService = {
       .from('email_templates')
       .select('*')
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -424,7 +371,7 @@ export const templatesService = {
       .insert([template])
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -436,7 +383,7 @@ export const templatesService = {
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -446,7 +393,7 @@ export const templatesService = {
       .from('email_templates')
       .delete()
       .eq('id', id);
-    
+
     if (error) throw error;
   }
 };
@@ -458,7 +405,7 @@ export const campaignsService = {
       .from('campaigns')
       .select('*')
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -469,7 +416,7 @@ export const campaignsService = {
       .insert([campaign])
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -481,7 +428,7 @@ export const campaignsService = {
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -491,7 +438,7 @@ export const campaignsService = {
       .from('campaigns')
       .delete()
       .eq('id', id);
-    
+
     if (error) throw error;
   }
 };

@@ -7,12 +7,9 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"vite\"",
-    "dev:client": "vite",
-    "dev:server": "npx tsx server/email-server.ts",
-    "server": "npx tsx server/email-server.ts",
-    "build": "npx vite build",
-    "preview": "npx vite preview",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "node test-simple.cjs",
     "test:unit": "jest --config jest.config.fixed.js --watchAll=false",
     "test:e2e": "playwright test",
