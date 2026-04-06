@@ -448,11 +448,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
   // ── GENERATE SITE — TEMPLATE PREMIUM PROFESSIONNEL ──
   const generateSite = async (lead: Lead) => {
     const slug = lead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 30);
-    setProgress(p => ({ ...p, step: '📝 Génération du contenu...' }));
+    updateProgress({ step: '📝 Génération du contenu...' });
     try {
       // Contenu riche puis template premium (hero image, secteur, galerie, WhatsApp)
       const content = await generateContent(lead);
-      setProgress(p => ({ ...p, step: '🎨 Génération du site premium...' }));
+      updateProgress({ step: '🎨 Génération du site premium...' });
       const html = generatePremiumSiteHtml(lead, content);
       const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
       updateLead(lead.id, {
@@ -467,7 +467,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       if (process.env.NODE_ENV === 'development') {
         console.error('Generation failed:', e);
       }
-      setProgress(p => ({ ...p, step: '🔄 Fallback template...' }));
+      updateProgress({ step: '🔄 Fallback template...' });
       const emergencyHtml = generateProfessionalSite(lead);
       const baseUrl = ((import.meta as any).env?.VITE_APP_URL as string | undefined)?.replace(/\/$/, '') || 'https://siteup-services.vercel.app';
       updateLead(lead.id, {
@@ -702,7 +702,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       }, 500);
     } catch (error) {
       console.error('Erreur lors du changement de palette:', error);
-      setProgress(p => ({ ...p, step: '❌ Erreur lors du changement de palette' }));
+      updateProgress({ step: '❌ Erreur lors du changement de palette' });
     } finally {
       stopProcessing();
     }
