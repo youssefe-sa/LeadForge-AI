@@ -671,6 +671,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         try {
           await generateSite(currentLead);
           console.log(`✅ Lead ${currentLead.name} traité avec succès`);
+          
+          // Forcer le rechargement des données pour voir le déplacement en temps réel
+          console.log('🔄 Refreshing leads list to show updated status...');
+          setRefreshKey(prev => prev + 1);
+          
         } catch (error) {
           console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
         }
