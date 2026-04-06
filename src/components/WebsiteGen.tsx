@@ -632,44 +632,36 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     
     let processedCount = 0;
     const processedLeadIds = new Set<string>();
+    let noNewLeadsCount = 0; // Compteur pour éviter les boucles infinies
     
     try {
-      // Boucle simple mais efficace
-      while (true) {
+      // Boucle intelligente avec détection robuste
+      while (noNewLeadsCount < 3) { // Max 3 vérifications sans nouveaux leads
         // Attendre un peu pour laisser le state se mettre à jour
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
         // Recharger les données depuis Supabase
         console.log('🔄 Checking for new leads...');
         await loadLeads();
         
         // Attendre encore un peu pour la synchronisation
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
         // Filtrer les leads à traiter
         const currentLeads = leads.filter(l => l.score > 0 && !l.siteGenerated);
         const newLeadsToProcess = currentLeads.filter(l => !processedLeadIds.has(l.id));
         
-        console.log(`� Status: Total leads=${leads.length}, Enriched=${currentLeads.length}, New to process=${newLeadsToProcess.length}`);
+        console.log(`📊 Status: Total leads=${leads.length}, Score>0=${leads.filter(l => l.score > 0).length}, Enriched=${currentLeads.length}, New to process=${newLeadsToProcess.length}`);
         console.log(`📋 Processed IDs: ${Array.from(processedLeadIds).slice(0, 3)}...`);
+        console.log(`🔄 No new leads count: ${noNewLeadsCount}/3`);
         
         if (newLeadsToProcess.length === 0) {
-          // Vérifier une dernière fois après 3 secondes
-          console.log('⏱️ No new leads found, waiting 3 seconds for final check...');
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          await loadLeads();
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          const finalLeads = leads.filter(l => l.score > 0 && !l.siteGenerated);
-          const finalNewLeads = finalLeads.filter(l => !processedLeadIds.has(l.id));
-          
-          if (finalNewLeads.length === 0) {
-            console.log('✅ No more leads found after final check. Generation completed!');
-            break;
-          } else {
-            console.log(`🆕 Found ${finalNewLeads.length} new leads in final check! Continuing...`);
-            continue;
-          }
+          noNewLeadsCount++;
+          console.log(`⏱️ No new leads found (${noNewLeadsCount}/3), waiting 5 seconds...`);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          continue;
+        } else {
+          noNewLeadsCount = 0; // Reset counter si on trouve des leads
         }
         
         // Traiter les nouveaux leads
@@ -708,6 +700,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           await new Promise(r => setTimeout(r, batchDelay));
         }
       }
+      
+      console.log('✅ Maximum no-new-leads count reached or no more leads to process');
     } catch (error) {
       console.error('💥 Error in generateBatch loop:', error);
     } finally {
