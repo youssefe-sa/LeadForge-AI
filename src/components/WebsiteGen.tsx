@@ -631,95 +631,66 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     startProcessing('website-generation', 'websitegen-batch');
     
     let processedCount = 0;
-    const processedIds = new Set<string>(); // Pour éviter les doublons
+    let totalProcessed = enriched.length;
+    
+    // Obtenir tous les leads à traiter au début pour éviter les doublons
+    const leadsToProcess = [...enriched];
+    console.log('🎯 Leads to process:', leadsToProcess.map(l => l.name));
     
     try {
-      // Boucle dynamique qui continue tant qu'il y a des leads à traiter
-      while (true) {
-        // Vérifier si le processing est toujours actif
+      for (const currentLead of leadsToProcess) {
+        // Utiliser directement le singleton pour éviter les problèmes de synchronisation
         const currentState = websiteGenState.getState();
         if (!currentState.isProcessing) {
           console.log('⏹️ Processing stopped, exiting loop');
           break;
         }
         
-        // Obtenir les leads actuellement en attente (mis à jour dynamiquement)
-        const currentLeads = leads.filter(l => l.score > 0 && !l.siteGenerated && !processedIds.has(l.id));
+        console.log(`🔄 Processing lead ${processedCount + 1}/${totalProcessed}: ${currentLead.name}`);
         
-        if (currentLeads.length === 0) {
-          console.log('✅ No more leads to process, generation completed');
-          break;
+        // Vérifier si la génération est en pause
+        while (currentState.isPaused) {
+          console.log('⏸️ Generation paused, waiting...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const updatedState = websiteGenState.getState();
+          if (!updatedState.isProcessing) {
+            console.log('⏹️ Processing stopped during pause');
+            stopProcessing();
+            return;
+          }
         }
         
-        console.log(`🎯 Current batch: ${currentLeads.length} leads to process`);
-        console.log('🎯 Leads in this batch:', currentLeads.map(l => l.name));
+        processedCount++;
         
-        for (const currentLead of currentLeads) {
-          // Vérifier si le processing est toujours actif
-          const currentState = websiteGenState.getState();
-          if (!currentState.isProcessing) {
-            console.log('⏹️ Processing stopped, exiting loop');
-            break;
-          }
+        updateProgress({ 
+          current: processedCount, 
+          total: totalProcessed, 
+          name: currentLead.name, 
+          step: currentState.isPaused ? '⏸️ En pause' : '🤖 Génération...' 
+        });
+        
+        try {
+          await generateSite(currentLead);
+          console.log(`✅ Lead ${currentLead.name} traité avec succès`);
           
-          // Vérifier si ce lead n'a pas déjà été traité
-          if (processedIds.has(currentLead.id)) {
-            console.log(`⏭️ Skipping already processed lead: ${currentLead.name}`);
-            continue;
-          }
+          // Forcer le rechargement depuis Supabase pour voir le déplacement en temps réel
+          console.log('🔄 Reloading leads from Supabase to show updated status...');
+          await loadLeads();
           
-          console.log(`🔄 Processing lead ${processedCount + 1}: ${currentLead.name}`);
-          
-          // Vérifier si la génération est en pause
-          while (currentState.isPaused) {
-            console.log('⏸️ Generation paused, waiting...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            const updatedState = websiteGenState.getState();
-            if (!updatedState.isProcessing) {
-              console.log('⏹️ Processing stopped during pause');
-              stopProcessing();
-              return;
-            }
-          }
-          
-          processedCount++;
-          processedIds.add(currentLead.id); // Marquer comme traité
-          
-          // Mettre à jour le total dynamiquement
-          const totalEnriched = leads.filter(l => l.score > 0 && !l.siteGenerated).length + processedIds.size;
-          
-          updateProgress({ 
-            current: processedCount, 
-            total: Math.max(totalEnriched, processedCount), 
-            name: currentLead.name, 
-            step: currentState.isPaused ? '⏸️ En pause' : '🤖 Génération...' 
-          });
-          
-          try {
-            await generateSite(currentLead);
-            console.log(`✅ Lead ${currentLead.name} traité avec succès`);
-            
-            // Forcer le rechargement depuis Supabase pour voir le déplacement en temps réel
-            console.log('🔄 Reloading leads from Supabase to show updated status...');
-            await loadLeads();
-            
-          } catch (error) {
-            console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
-          }
-          
-          // Petit délai entre les sites
+        } catch (error) {
+          console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
+        }
+        
+        // Petit délai entre les sites (sauf pour le dernier)
+        if (processedCount < totalProcessed) {
           console.log('⏱️ Waiting before next lead...');
           await new Promise(r => setTimeout(r, batchDelay));
         }
-        
-        // Petite pause avant de vérifier s'il y a de nouveaux leads
-        console.log('🔍 Checking for new enriched leads...');
-        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     } catch (error) {
       console.error('💥 Error in generateBatch loop:', error);
     } finally {
-      console.log(`🏁 Batch generation completed. Total processed: ${processedCount}`);
+      console.log('🏁 Batch generation completed, stopping processing');
       stopProcessing();
     }
   };
