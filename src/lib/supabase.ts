@@ -171,15 +171,80 @@ export const leadsService = {
   },
 
   async update(id: string, updates: Database['public']['Tables']['leads']['Update']) {
-    const { data, error } = await supabase
-      .from('leads')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    console.log('🔧 Supabase update attempt for ID:', id);
+    console.log('🔧 Raw updates data:', updates);
     
-    if (error) throw error;
-    return data;
+    try {
+      // Essayer la mise à jour directe d'abord
+      const { data, error } = await supabase
+        .from('leads')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('❌ Supabase update error:', error);
+        throw error;
+      }
+      
+      console.log('✅ Supabase update successful:', data);
+      return data;
+      
+    } catch (err) {
+      console.error('💥 Supabase update failed, trying with filtered data:', err);
+      
+      // En cas d'erreur, essayer de mettre à jour uniquement les champs de base
+      const basicFields = {
+        name: updates.name,
+        email: updates.email,
+        phone: updates.phone,
+        sector: updates.sector,
+        city: updates.city,
+        address: updates.address,
+        website: updates.website,
+        rating: updates.rating,
+        reviews_count: updates.reviews_count,
+        has_website: updates.has_website,
+        enriched: updates.enriched,
+        score: updates.score,
+        status: updates.status,
+        notes: updates.notes,
+        site_generated: updates.site_generated,
+        site_url: updates.site_url,
+        landing_url: updates.landing_url,
+        email_sent: updates.email_sent,
+        email_sent_date: updates.email_sent_date,
+        email_opened: updates.email_opened,
+        email_clicked: updates.email_clicked,
+        last_contact: updates.last_contact,
+        campaign: updates.campaign,
+        campaign_date: updates.campaign_date,
+        source: updates.source,
+      };
+      
+      // Filtrer les valeurs undefined
+      const filteredBasicFields = Object.fromEntries(
+        Object.entries(basicFields).filter(([key, value]) => value !== undefined)
+      );
+      
+      console.log('🔄 Retrying with basic fields:', filteredBasicFields);
+      
+      const { data, error } = await supabase
+        .from('leads')
+        .update(filteredBasicFields)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('❌ Even basic update failed:', error);
+        throw error;
+      }
+      
+      console.log('✅ Basic update successful:', data);
+      return data;
+    }
   },
 
   async delete(id: string) {

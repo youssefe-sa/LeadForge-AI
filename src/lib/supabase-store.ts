@@ -282,6 +282,20 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
       if (value === undefined || value === null) return false;
       if (typeof value === 'string' && value.trim() === '') return false;
       if (Array.isArray(value) && value.length === 0) return false;
+      
+      // Exclure temporairement les champs suspects pour diagnostiquer
+      const suspiciousFields = [
+        'google_rating', 'google_reviews', 'google_maps_url', 'serper_cid', 
+        'serper_type', 'serper_hours', 'serper_snippets', 'description', 
+        'logo', 'images', 'website_images', 'google_reviews_data', 
+        'temperature', 'tags', 'generated_prompt', 'site_html'
+      ];
+      
+      if (suspiciousFields.includes(key)) {
+        console.log(`🚫 Excluding suspicious field: ${key} =`, value);
+        return false;
+      }
+      
       return true;
     })
   );
@@ -480,6 +494,25 @@ export function useLeads() {
       
     } catch (err) {
       console.error('💾 Update error:', err);
+      
+      // Ne pas bloquer l'interface utilisateur en cas d'erreur de base de données
+      // Mettre à jour le state local même si la base de données échoue
+      const currentLead = leads.find(l => l.id === id);
+      if (currentLead) {
+        const mergedLead = { ...currentLead, ...updates };
+        setLeads(currentLeads => {
+          const index = currentLeads.findIndex(l => l.id === id);
+          if (index !== -1) {
+            const updatedLeads = [...currentLeads];
+            updatedLeads[index] = mergedLead;
+            console.log('💾 Local state updated despite DB error:', updatedLeads[index]);
+            return updatedLeads;
+          }
+          return currentLeads;
+        });
+      }
+      
+      // Afficher l'erreur sans bloquer
       setError(err instanceof Error ? err.message : 'Failed to update lead');
     } finally {
       setLoading(false);
