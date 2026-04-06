@@ -268,9 +268,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "232,89,12",
     dark: "#1c1917",
     light: "#FFF7ED",
-    grd: "linear-gradient(135deg,#E8590C,#FB923C)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(28,25,23,.85),rgba(232,89,12,.4))",
+      "var(--primary),rgba(232,89,12,.4))",
     accent: "#E8590C",
   },
   boulangerie: {
@@ -279,9 +279,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "217,119,6",
     dark: "#1c1917",
     light: "#FFFBEB",
-    grd: "linear-gradient(135deg,#D97706,#FBBF24)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(28,25,23,.85),rgba(217,119,6,.4))",
+      "var(--primary),rgba(217,119,6,.4))",
     accent: "#D97706",
   },
   coiffeur: {
@@ -290,9 +290,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "124,58,237",
     dark: "#1e1040",
     light: "#F5F3FF",
-    grd: "linear-gradient(135deg,#7C3AED,#A78BFA)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(30,16,64,.88),rgba(124,58,237,.35))",
+      "var(--primary),rgba(124,58,237,.35))",
     accent: "#7C3AED",
   },
   salon: {
@@ -301,9 +301,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "219,39,119",
     dark: "#2d0a20",
     light: "#FFF0F6",
-    grd: "linear-gradient(135deg,#DB2777,#F472B6)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(45,10,32,.88),rgba(219,39,119,.35))",
+      "var(--primary),rgba(219,39,119,.35))",
     accent: "#DB2777",
   },
   spa: {
@@ -312,9 +312,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "13,148,136",
     dark: "#042f2e",
     light: "#F0FDFA",
-    grd: "linear-gradient(135deg,#0D9488,#2DD4BF)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(4,47,46,.88),rgba(13,148,136,.35))",
+      "var(--primary),rgba(13,148,136,.35))",
     accent: "#0D9488",
   },
   beauté: {
@@ -323,9 +323,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "219,39,119",
     dark: "#2d0a20",
     light: "#FFF0F6",
-    grd: "linear-gradient(135deg,#DB2777,#F472B6)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(45,10,32,.88),rgba(219,39,119,.35))",
+      "var(--primary),rgba(219,39,119,.35))",
     accent: "#DB2777",
   },
   médecin: {
@@ -334,9 +334,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "37,99,235",
     dark: "#172554",
     light: "#EFF6FF",
-    grd: "linear-gradient(135deg,#2563EB,#60A5FA)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(23,37,84,.88),rgba(37,99,235,.35))",
+      "var(--primary),rgba(37,99,235,.35))",
     accent: "#2563EB",
   },
   dentiste: {
@@ -345,9 +345,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "8,145,178",
     dark: "#0c4a6e",
     light: "#ECFEFF",
-    grd: "linear-gradient(135deg,#0891B2,#22D3EE)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(12,74,110,.88),rgba(8,145,178,.35))",
+      "var(--primary),rgba(8,145,178,.35))",
     accent: "#0891B2",
   },
   avocat: {
@@ -356,8 +356,8 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "30,58,95",
     dark: "#0f172a",
     light: "#F1F5F9",
-    grd: "linear-gradient(135deg,#1e3a5f,#c9a84c)",
-    heroOverlay: "linear-gradient(135deg,rgba(15,23,42,.9),rgba(30,58,95,.45))",
+    grd: "var(--primary)",
+    heroOverlay: "var(--primary),rgba(30,58,95,.45))",
     accent: "#1e3a5f",
   },
   immobilier: {
@@ -366,9 +366,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "5,150,105",
     dark: "#064e3b",
     light: "#ECFDF5",
-    grd: "linear-gradient(135deg,#059669,#34D399)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(6,78,59,.88),rgba(5,150,105,.35))",
+      "var(--primary),rgba(5,150,105,.35))",
     accent: "#059669",
   },
   hôtel: {
@@ -377,8 +377,8 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "180,83,9",
     dark: "#1c1917",
     light: "#FFFBEB",
-    grd: "linear-gradient(135deg,#B45309,#F59E0B)",
-    heroOverlay: "linear-gradient(135deg,rgba(28,25,23,.85),rgba(180,83,9,.4))",
+    grd: "var(--primary)",
+    heroOverlay: "var(--primary),rgba(180,83,9,.4))",
     accent: "#B45309",
   },
   garage: {
@@ -387,9 +387,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "220,38,38",
     dark: "#1c1917",
     light: "#FEF2F2",
-    grd: "linear-gradient(135deg,#DC2626,#F87171)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(28,25,23,.9),rgba(220,38,38,.35))",
+      "var(--primary),rgba(220,38,38,.35))",
     accent: "#DC2626",
   },
   commerce: {
@@ -398,9 +398,9 @@ const SCHEMES: Record<string, Scheme> = {
     pRgb: "124,58,237",
     dark: "#1e1040",
     light: "#F5F3FF",
-    grd: "linear-gradient(135deg,#7C3AED,#A78BFA)",
+    grd: "var(--primary)",
     heroOverlay:
-      "linear-gradient(135deg,rgba(30,16,64,.88),rgba(124,58,237,.35))",
+      "var(--primary),rgba(124,58,237,.35))",
     accent: "#7C3AED",
   },
 };
@@ -832,7 +832,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             line-height: 1.6;
             color: var(--dark);
             overflow-x: hidden;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: var(--primary);
         }
         
         h1, h2, h3, h4, h5, h6 {
@@ -904,20 +904,20 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         /* Chatbot Externe - Intégration Premium Parfaite */
         .chatbot-toggle {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+            background: var(--primary) 0%, var(--secondary) 100%) !important;
             box-shadow: 0 12px 32px rgba(var(--primary-rgb), 0.4) !important;
         }
         
         .chatbot-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+            background: var(--primary) 0%, var(--secondary) 100%) !important;
         }
         
         .chat-message.user {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+            background: var(--primary) 0%, var(--secondary) 100%) !important;
         }
         
         .chatbot-input-area button {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+            background: var(--primary) 0%, var(--secondary) 100%) !important;
         }
         
         .chat-quick-actions button:hover {
@@ -974,7 +974,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         }
         
         .gradient-bg {
-            background: linear-gradient(-45deg, ${scheme.p}, ${scheme.p2}, ${scheme.accent});
+            background: var(--primary);
             background-size: 400% 400%;
             animation: gradientShift 8s ease infinite;
         }
@@ -1110,7 +1110,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         /* Hero Section Premium - Design Moderne */
         .hero-premium {
             min-height: 100vh;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #ffffff 100%);
+            background: var(--primary);
             position: relative;
             overflow: hidden;
             padding-top: 120px;
@@ -1125,7 +1125,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             right: -10%;
             width: 60%;
             height: 200%;
-            background: linear-gradient(45deg, rgba(var(--primary-rgb), 0.05) 0%, rgba(var(--accent-rgb), 0.08) 100%);
+            background: var(--primary), 0.05) 0%, rgba(var(--accent-rgb), 0.08) 100%);
             transform: rotate(45deg);
             pointer-events: none;
         }
@@ -1164,7 +1164,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         }
         
         .hero-title-accent {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            background: var(--primary) 0%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -1191,7 +1191,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             display: flex;
             align-items: center;
             gap: 10px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            background: var(--primary) 0%, var(--accent) 100%);
             color: white;
             padding: 12px 20px;
             border-radius: 12px;
@@ -1337,7 +1337,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1) 0%, rgba(var(--accent-rgb), 0.05) 100%);
+            background: var(--primary), 0.1) 0%, rgba(var(--accent-rgb), 0.05) 100%);
             pointer-events: none;
         }
         
@@ -1353,7 +1353,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         .decoration-circle {
             position: absolute;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            background: var(--primary) 0%, var(--accent) 100%);
             opacity: 0.1;
         }
         
@@ -1377,7 +1377,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             position: absolute;
             width: 200px;
             height: 3px;
-            background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
+            background: var(--primary) 50%, transparent 100%);
             top: 50%;
             right: -100px;
             transform: rotate(45deg);
@@ -1446,7 +1446,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: var(--primary), transparent);
             transition: left 0.5s;
         }
         
@@ -1492,7 +1492,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            background: var(--primary), transparent);
             opacity: 0.3;
         }
         
@@ -1581,7 +1581,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, rgba(var(--primary-rgb), 0.9) 0%, rgba(var(--primary-rgb), 0.7) 100%);
+            background: var(--primary), 0.9) 0%, rgba(var(--primary-rgb), 0.7) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1626,7 +1626,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, rgba(var(--primary-rgb), 0.95) 0%, rgba(var(--primary-rgb), 0.85) 100%);
+            background: var(--primary), 0.95) 0%, rgba(var(--primary-rgb), 0.85) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1732,7 +1732,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             right: 0;
             width: 30px;
             height: ${baseSize}px;
-            background: linear-gradient(to right, transparent, white 70%);
+            background: var(--primary);
             pointer-events: none;
         }
         
@@ -2013,7 +2013,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.8) 0%, rgba(var(--accent-rgb), 0.9) 100%);
+            background: var(--primary), 0.8) 0%, rgba(var(--accent-rgb), 0.9) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2119,7 +2119,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         .engagement-icon {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            background: var(--primary) 0%, var(--accent) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -2207,7 +2207,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         .certification-item-inline .cert-icon {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            background: var(--primary) 0%, var(--accent) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -2324,7 +2324,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         .contact-info-professional {
             padding: 40px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            background: var(--primary);
             border-radius: 20px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.08);
             height: 100%;
@@ -2577,7 +2577,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         /* Footer professionnel */
         footer {
-            background: linear-gradient(135deg, var(--dark) 0%, #1a1a1a 100%);
+            background: var(--primary) 0%, #1a1a1a 100%);
             color: white;
             padding: 80px 0 40px;
             position: relative;
@@ -2590,7 +2590,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            background: var(--primary), transparent);
         }
         
         .footer-link {
@@ -2671,7 +2671,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: linear-gradient(45deg, #25d366, #128c7e);
+            background: var(--primary);
             color: white;
             width: 56px;
             height: 56px;
@@ -2779,7 +2779,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <li class="nav-item"><a class="nav-link" href="#about">À Propos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
                     <li class="nav-item"><a class="nav-link" href="#process">Démarche</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#gallery">Réalisations</a></li>
+                    
                     <li class="nav-item"><a class="nav-link" href="#testimonials">Témoignages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item ms-3">
@@ -3148,52 +3148,13 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- Gallery Section -->
-    <section class="section" id="gallery">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">${uniqueContent.galleryTitle}</h2>
-            <div class="gallery-professional">
-                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                    ${imgs.slice(2, 6).map((img, index) => `
-                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
-                            <div class="gallery-image-wrapper">
-                                <img src="${img}" alt="Réalisation ${index + 1}" loading="lazy" class="gallery-image">
-                                <div class="gallery-overlay-pro">
-                                    <div class="gallery-number">${index + 1}</div>
-                                    <div class="gallery-icon">
-                                        <i class="bi bi-search"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                    ${imgs.slice(6, 10).map((img, index) => `
-                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
-                            <div class="gallery-image-wrapper">
-                                <img src="${img}" alt="Réalisation ${index + 5}" loading="lazy" class="gallery-image">
-                                <div class="gallery-overlay-pro">
-                                    <div class="gallery-number">${index + 5}</div>
-                                    <div class="gallery-icon">
-                                        <i class="bi bi-search"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Testimonials Section -->
     <section class="section bg-light" id="testimonials">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Témoignages Clients</h2>
             <div class="testimonials-header text-center mb-5" data-aos="fade-up" data-aos-delay="100">
                 <p class="lead fs-4">Avis authentiques vérifiés Google Maps</p>
-                <div class="google-badge mx-auto">
+                <div class="google-badge mx-auto mt-4">
                     <div class="badge-stars">
                         ${Array(5).fill('<i class="bi bi-star-fill"></i>').join('')}
                     </div>
@@ -3451,7 +3412,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                         <li><a href="#about" class="footer-link">À Propos</a></li>
                         <li><a href="#services" class="footer-link">Services</a></li>
                         <li><a href="#process" class="footer-link">Notre Démarche</a></li>
-                        <li><a href="#gallery" class="footer-link">Nos Réalisations</a></li>
+                        
                         <li><a href="#testimonials" class="footer-link">Témoignages</a></li>
                         <li><a href="#contact" class="footer-link">Contact</a></li>
                     </ul>
@@ -3913,8 +3874,6 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                 document.body.style.transition = 'opacity 0.5s ease';
                 document.body.style.opacity = '1';
             }, 100);
-            
-        });
         });
     </script>
 </body>
