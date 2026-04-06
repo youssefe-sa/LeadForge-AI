@@ -777,7 +777,9 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
   const totalPages = Math.ceil(filtered.length / perPage);
   const pageLeads = filtered.slice(page * perPage, (page + 1) * perPage);
   const sectors = [...new Set(leads.map(l => l.sector).filter(Boolean))];
-  const campaignList = [...new Set([...campaigns, ...leads.map(l => l.campaign).filter(Boolean)])].filter(c => typeof c === 'string');
+  // Fusionner les campagnes du hook et des leads pour éviter le décalage
+  const allCampaigns = [...new Set([...campaigns.map(c => c.name), ...leads.map(l => l.campaign).filter(Boolean)])];
+  const campaignList = allCampaigns.filter(c => typeof c === 'string');
   
   // Debug pour voir les données
   console.log('campaigns from hook:', campaigns);

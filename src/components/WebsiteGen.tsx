@@ -15,7 +15,7 @@ const C = {
 
 interface Props {
   leads: Lead[];
-  updateLead: (id: string, updates: Partial<Lead>) => void;
+  updateLead: (id: string, updates: Partial<Lead>) => Promise<void>;
   apiConfig: ApiConfig;
 }
 
@@ -154,6 +154,15 @@ export default function WebsiteGen({ leads, updateLead, apiConfig }: Props) {
   const enriched = useMemo(() => leads.filter(l => l.score > 0 && !l.siteGenerated), [leads]);
   const generated = useMemo(() => leads.filter(l => l.siteGenerated), [leads]);
   const previewLead = useMemo(() => leads.find(l => l.id === previewId) || null, [leads, previewId]);
+
+  // Debug pour comprendre pourquoi la génération ne marche pas
+  console.log('🔍 WebsiteGen Debug:');
+  console.log('🔍 Total leads:', leads.length);
+  console.log('🔍 Leads with score > 0:', leads.filter(l => l.score > 0).length);
+  console.log('🔍 Leads not generated:', leads.filter(l => !l.siteGenerated).length);
+  console.log('🔍 Enriched (score > 0 && !siteGenerated):', enriched.length);
+  console.log('🔍 Generated:', generated.length);
+  console.log('🔍 Has LLM:', hasLLM);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages, chatLoading]);
 
@@ -600,38 +609,40 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
   };
 
   const generateBatch = async () => {
-    if (enriched.length === 0) return;
+    console.log('🚀 generateBatch called!');
+    console.log('🚀 enriched.length:', enriched.length);
+    console.log('🚀 isProcessing:', isProcessing);
+    
+    if (enriched.length === 0) {
+      console.log('❌ No enriched leads to process');
+      return;
+    }
+    
+    console.log('✅ Starting batch generation...');
     startProcessing('website-generation', 'websitegen-batch');
     
     let processedCount = 0;
-    let totalProcessed = enriched.length; // Initialiser avec le nombre total de sites à traiter
+    let totalProcessed = enriched.length;
     
-    // Boucle continue jusqu'à ce qu'il n'y ait plus de sites en attente
-    while (true) {
-      // Obtenir les sites actuellement en attente (mis à jour dynamiquement)
-      const currentEnriched = leads.filter(l => l.score > 0 && !l.siteGenerated);
-      
-      if (currentEnriched.length === 0) {
-        // Plus de sites en attente
-        break;
-      }
-      
-      // Mettre à jour le total si de nouveaux sites ont été ajoutés
-      if (currentEnriched.length > totalProcessed) {
-        totalProcessed = currentEnriched.length;
+    // Obtenir tous les leads à traiter au début pour éviter les doublons
+    const leadsToProcess = [...enriched];
+    
+    for (const currentLead of leadsToProcess) {
+      // Vérifier si le processing est toujours actif
+      if (!isProcessing) {
+        stopProcessing();
+        return;
       }
       
       // Vérifier si la génération est en pause
       while (isPaused) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
-        // Continuer à vérifier si le processing est toujours actif
+        await new Promise(resolve => setTimeout(resolve, 1000));
         if (!isProcessing) {
           stopProcessing();
           return;
         }
       }
       
-      const currentLead = currentEnriched[0]; // Prendre le premier site en attente
       processedCount++;
       
       updateProgress({ 
@@ -641,10 +652,15 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         step: isPaused ? '⏸️ En pause' : '🤖 Génération...' 
       });
       
-      await generateSite(currentLead);
+      try {
+        await generateSite(currentLead);
+        console.log(`✅ Lead ${currentLead.name} traité avec succès`);
+      } catch (error) {
+        console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
+      }
       
       // Petit délai entre les sites (sauf pour le dernier)
-      if (currentEnriched.length > 1) {
+      if (processedCount < totalProcessed) {
         await new Promise(r => setTimeout(r, batchDelay));
       }
     }

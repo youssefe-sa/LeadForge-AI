@@ -283,19 +283,7 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
       if (typeof value === 'string' && value.trim() === '') return false;
       if (Array.isArray(value) && value.length === 0) return false;
       
-      // Exclure temporairement les champs suspects pour diagnostiquer
-      const suspiciousFields = [
-        'google_rating', 'google_reviews', 'google_maps_url', 'serper_cid', 
-        'serper_type', 'serper_hours', 'serper_snippets', 'description', 
-        'logo', 'images', 'website_images', 'google_reviews_data', 
-        'temperature', 'tags', 'generated_prompt', 'site_html'
-      ];
-      
-      if (suspiciousFields.includes(key)) {
-        console.log(`🚫 Excluding suspicious field: ${key} =`, value);
-        return false;
-      }
-      
+      // Réactiver les champs enrichis - l'erreur 400 est résolue
       return true;
     })
   );
@@ -436,12 +424,11 @@ export function useLeads() {
     
     try {
       const currentLead = leads.find(l => l.id === id);
-      console.log('💾 Current lead found:', currentLead);
-      
       if (!currentLead) {
-        console.error('💾 Lead not found for update:', id);
-        return;
+        throw new Error(`Lead with id ${id} not found`);
       }
+      
+      console.log('💾 Current lead found:', currentLead);
       
       const mergedLead = { ...currentLead, ...updates };
       console.log('💾 Merged lead for Supabase:', mergedLead);
@@ -449,48 +436,36 @@ export function useLeads() {
       const supabaseData = mapLeadToSupabaseLead(mergedLead);
       console.log('💾 Supabase mapped data:', supabaseData);
       
-      // DIAGNOSTIC MAPPING : Vérifier que les champs enrichis sont bien inclus
-      console.log('🔍 DIAGNOSTIC MAPPING:');
-      console.log('🔍 google_rating dans mapped data:', supabaseData?.google_rating);
-      console.log('🔍 google_reviews dans mapped data:', supabaseData?.google_reviews);
-      console.log('🔍 google_maps_url dans mapped data:', supabaseData?.google_maps_url);
-      console.log('🔍 serper_cid dans mapped data:', supabaseData?.serper_cid);
-      console.log('🔍 description dans mapped data:', supabaseData?.description);
-      console.log('🔍 logo dans mapped data:', supabaseData?.logo);
-      console.log('🔍 images dans mapped data:', supabaseData?.images);
-      console.log('🔍 temperature dans mapped data:', supabaseData?.temperature);
-      console.log('🔍 TOUS LES CHAMPS:', Object.keys(supabaseData || {}));
+      // Mettre à jour dans Supabase
+      const updatedLead = await leadsService.update(id, supabaseData);
+      console.log('� Supabase update successful');
       
-      await leadsService.update(id, supabaseData);
-      console.log('💾 Supabase update successful');
-      
-      // DIAGNOSTIC COMPLET : Vérifier ce qui est réellement dans Supabase
-      console.log('🔍 DIAGNOSTIC: Vérification des données dans Supabase...');
-      try {
-        const freshData = await leadsService.getById(id);
-        console.log('🔍 Données fraîches depuis Supabase:', freshData);
-        console.log('🔍 google_rating dans Supabase:', freshData?.google_rating);
-        console.log('🔍 google_maps_url dans Supabase:', freshData?.google_maps_url);
-        console.log('🔍 description dans Supabase:', freshData?.description);
-        console.log('🔍 logo dans Supabase:', freshData?.logo);
-      } catch (err) {
-        console.error('🔍 Erreur diagnostic Supabase:', err);
-      }
-      
-      // Ne PAS recharger les données depuis Supabase pour éviter d'écraser les données fraîchement sauvegardées
-      // await loadLeads(); // ❌ COMMENTÉ : Écrase les données locales
-      
-      // Mettre à jour le state local avec la forme fonctionnelle pour éviter les problèmes de closure
+      // Mettre à jour le state local avec les données fraîches de Supabase
       setLeads(currentLeads => {
         const index = currentLeads.findIndex(l => l.id === id);
         if (index !== -1) {
           const updatedLeads = [...currentLeads];
-          updatedLeads[index] = mergedLead;
-          console.log('💾 Local state updated via functional setLeads:', updatedLeads[index]);
+          updatedLeads[index] = updatedLead;
+          console.log('� Local state updated via functional setLeads:', updatedLeads[index]);
           return updatedLeads;
         }
         return currentLeads;
       });
+      
+      // DIAGNOSTIC: Vérifier que les données sont bien dans Supabase
+      setTimeout(async () => {
+        try {
+          console.log('🔍 DIAGNOSTIC: Vérification des données dans Supabase...');
+          const freshData = await leadsService.getById(id);
+          console.log('🔍 Données fraîches depuis Supabase:', freshData);
+          console.log('🔍 google_rating dans Supabase:', freshData?.google_rating);
+          console.log('🔍 google_maps_url dans Supabase:', freshData?.google_maps_url);
+          console.log('🔍 description dans Supabase:', freshData?.description);
+          console.log('🔍 logo dans Supabase:', freshData?.logo);
+        } catch (err) {
+          console.error('🔍 Erreur lors de la vérification:', err);
+        }
+      }, 2000);
       
     } catch (err) {
       console.error('💾 Update error:', err);
