@@ -3,7 +3,7 @@ import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, saf
 import { generateProfessionalSite } from '../lib/professionalTemplate';
 import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { generatePremiumSiteHtml } from '../lib/siteTemplate';
-import { useWebsiteGenState } from '../lib/websitegen-state';
+import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -638,11 +638,9 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     
     try {
       for (const currentLead of leadsToProcess) {
-        // Petit délai pour laisser le state React se synchroniser
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Vérifier si le processing est toujours actif
-        if (!isProcessing) {
+        // Utiliser directement le singleton pour éviter les problèmes de synchronisation
+        const currentState = websiteGenState.getState();
+        if (!currentState.isProcessing) {
           console.log('⏹️ Processing stopped, exiting loop');
           break;
         }
@@ -650,10 +648,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         console.log(`🔄 Processing lead ${processedCount + 1}/${totalProcessed}: ${currentLead.name}`);
         
         // Vérifier si la génération est en pause
-        while (isPaused) {
+        while (currentState.isPaused) {
           console.log('⏸️ Generation paused, waiting...');
           await new Promise(resolve => setTimeout(resolve, 1000));
-          if (!isProcessing) {
+          const updatedState = websiteGenState.getState();
+          if (!updatedState.isProcessing) {
             console.log('⏹️ Processing stopped during pause');
             stopProcessing();
             return;
@@ -666,7 +665,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           current: processedCount, 
           total: totalProcessed, 
           name: currentLead.name, 
-          step: isPaused ? '⏸️ En pause' : '🤖 Génération...' 
+          step: currentState.isPaused ? '⏸️ En pause' : '🤖 Génération...' 
         });
         
         try {
