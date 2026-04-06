@@ -634,46 +634,57 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     
     // Obtenir tous les leads à traiter au début pour éviter les doublons
     const leadsToProcess = [...enriched];
+    console.log('🎯 Leads to process:', leadsToProcess.map(l => l.name));
     
-    for (const currentLead of leadsToProcess) {
-      // Vérifier si le processing est toujours actif
-      if (!isProcessing) {
-        stopProcessing();
-        return;
-      }
-      
-      // Vérifier si la génération est en pause
-      while (isPaused) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      for (const currentLead of leadsToProcess) {
+        // Vérifier si le processing est toujours actif
         if (!isProcessing) {
-          stopProcessing();
-          return;
+          console.log('⏹️ Processing stopped, exiting loop');
+          break;
+        }
+        
+        console.log(`🔄 Processing lead ${processedCount + 1}/${totalProcessed}: ${currentLead.name}`);
+        
+        // Vérifier si la génération est en pause
+        while (isPaused) {
+          console.log('⏸️ Generation paused, waiting...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          if (!isProcessing) {
+            console.log('⏹️ Processing stopped during pause');
+            stopProcessing();
+            return;
+          }
+        }
+        
+        processedCount++;
+        
+        updateProgress({ 
+          current: processedCount, 
+          total: totalProcessed, 
+          name: currentLead.name, 
+          step: isPaused ? '⏸️ En pause' : '🤖 Génération...' 
+        });
+        
+        try {
+          await generateSite(currentLead);
+          console.log(`✅ Lead ${currentLead.name} traité avec succès`);
+        } catch (error) {
+          console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
+        }
+        
+        // Petit délai entre les sites (sauf pour le dernier)
+        if (processedCount < totalProcessed) {
+          console.log('⏱️ Waiting before next lead...');
+          await new Promise(r => setTimeout(r, batchDelay));
         }
       }
-      
-      processedCount++;
-      
-      updateProgress({ 
-        current: processedCount, 
-        total: totalProcessed, 
-        name: currentLead.name, 
-        step: isPaused ? '⏸️ En pause' : '🤖 Génération...' 
-      });
-      
-      try {
-        await generateSite(currentLead);
-        console.log(`✅ Lead ${currentLead.name} traité avec succès`);
-      } catch (error) {
-        console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
-      }
-      
-      // Petit délai entre les sites (sauf pour le dernier)
-      if (processedCount < totalProcessed) {
-        await new Promise(r => setTimeout(r, batchDelay));
-      }
+    } catch (error) {
+      console.error('💥 Error in generateBatch loop:', error);
+    } finally {
+      console.log('🏁 Batch generation completed, stopping processing');
+      stopProcessing();
     }
-    
-    stopProcessing();
   };
 
   // ── AI CHAT EDITOR ──
