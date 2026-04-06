@@ -156,6 +156,12 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
   const generated = useMemo(() => leads.filter(l => l.siteGenerated), [leads]);
   const previewLead = useMemo(() => leads.find(l => l.id === previewId) || null, [leads, previewId]);
 
+  // Référence mutante pour que la boucle asynchrone voie les nouveaux leads !
+  const leadsRef = useRef(leads);
+  useEffect(() => {
+    leadsRef.current = leads;
+  }, [leads]);
+
   // Debug pour comprendre pourquoi la génération ne marche pas
   console.log('🔍 WebsiteGen Debug:');
   console.log('🔍 Total leads:', leads.length);
@@ -677,11 +683,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         // Attendre encore un peu pour la synchronisation
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Filtrer les leads à traiter
-        const currentLeads = leads.filter(l => l.score > 0 && !l.siteGenerated);
+        // Filtrer les leads à traiter en utilisant leadsRef.current (données fraîches non gelées !)
+        const currentLeads = leadsRef.current.filter(l => l.score > 0 && !l.siteGenerated);
         const newLeadsToProcess = currentLeads.filter(l => !processedLeadIds.has(l.id));
         
-        console.log(`📊 Status: Total leads=${leads.length}, Score>0=${leads.filter(l => l.score > 0).length}, Enriched=${currentLeads.length}, New to process=${newLeadsToProcess.length}`);
+        console.log(`📊 Status: Total leads=${leadsRef.current.length}, Score>0=${leadsRef.current.filter(l => l.score > 0).length}, Enriched=${currentLeads.length}, New to process=${newLeadsToProcess.length}`);
         console.log(`📋 Processed IDs: ${Array.from(processedLeadIds).slice(0, 3)}...`);
         console.log(`🔄 No new leads count: ${noNewLeadsCount}/3`);
         
@@ -696,8 +702,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         
         // Traiter les nouveaux leads
         for (const currentLead of newLeadsToProcess) {
-          const currentState = websiteGenState.getState();
-          if (!currentState.isProcessing) {
+          if (!websiteGenState.getState().isProcessing) {
             console.log('⏹️ Processing stopped, exiting loop');
             break;
           }
@@ -707,14 +712,13 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           
           console.log(`🔄 Processing lead ${processedCount}: ${currentLead.name}`);
           
-          // Vérifier si la génération est en pause
-          while (currentState.isPaused) {
+          // Vérifier si la génération est en pause dynamiquement !
+          while (websiteGenState.getState().isPaused) {
             console.log('⏸️ Generation paused, waiting...');
+            updateProgress({ step: '⏸️ En pause', current: processedCount, total: processedLeadIds.size, name: currentLead.name });
             await new Promise(resolve => setTimeout(resolve, 1000));
-            const updatedState = websiteGenState.getState();
-            if (!updatedState.isProcessing) {
+            if (!websiteGenState.getState().isProcessing) {
               console.log('⏹️ Processing stopped during pause');
-              stopProcessing();
               return;
             }
           }
@@ -723,23 +727,34 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
             current: processedCount, 
             total: processedLeadIds.size,
             name: currentLead.name, 
-            step: currentState.isPaused ? '⏸️ En pause' : '🤖 Génération...' 
+            step: '🤖 Génération...' 
           });
           
           try {
+            // Re-vérifier l'état (Stop / Cancel) juste avant de générer
+            if (!websiteGenState.getState().isProcessing) return;
+            
             await generateSite(currentLead);
             console.log(`✅ Lead ${currentLead.name} traité avec succès`);
             
-            // Recharger pour voir le déplacement
+            // Recharger pour voir le déplacement de la table en direct
             await loadLeads();
             
           } catch (error) {
             console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
           }
           
-          // Délai entre les sites
-          console.log('⏱️ Waiting before next lead...');
-          await new Promise(r => setTimeout(r, batchDelay));
+          // Délai réactif entre les sites : permet l'arrêt instantané via bouton !
+          console.log(`⏱️ Waiting ${batchDelay}ms before next lead...`);
+          let waited = 0;
+          while (waited < batchDelay) {
+            if (!websiteGenState.getState().isProcessing) {
+              console.log('⏹️ Processing stopped during delay interval');
+              return;
+            }
+            await new Promise(r => setTimeout(r, 500));
+            waited += 500;
+          }
         }
       }
       
