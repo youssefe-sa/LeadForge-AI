@@ -666,7 +666,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         
         // Traiter les nouveaux leads
         for (const currentLead of newLeadsToProcess) {
-          const currentState = websiteGenState.getState();
+          // Vérifier si le processing est toujours actif
+          let currentState = websiteGenState.getState();
           if (!currentState.isProcessing) {
             console.log('⏹️ Processing stopped, exiting loop');
             break;
@@ -681,7 +682,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
             current: processedCount, 
             total: processedLeadIds.size,
             name: currentLead.name, 
-            step: '🤖 Génération...' 
+            step: isPaused ? '⏸️ En pause' : '🤖 Génération...' 
           });
           
           try {
@@ -693,6 +694,24 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
             
           } catch (error) {
             console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
+          }
+          
+          // Vérifier la pause entre les sites
+          currentState = websiteGenState.getState();
+          while (currentState.isPaused && currentState.isProcessing) {
+            console.log('⏸️ Generation paused, waiting...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            currentState = websiteGenState.getState();
+            if (!currentState.isProcessing) {
+              console.log('⏹️ Processing stopped during pause');
+              break;
+            }
+          }
+          
+          // Vérifier si le processing est toujours actif après la pause
+          if (!currentState.isProcessing) {
+            console.log('⏹️ Processing stopped after pause, exiting loop');
+            break;
           }
           
           // Délai entre les sites
