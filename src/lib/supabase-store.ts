@@ -257,7 +257,7 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
   if (lead.campaignDate) data.campaign_date = lead.campaignDate;
   if (lead.source) data.source = lead.source;
 
-  // NOUVEAUX CHAMPS D'ENRICHISSEMENT
+  // NOUVEAUX CHAMPS D'ENRICHISSEMENT - Vérifier qu'ils existent bien dans la base
   if (lead.googleRating !== undefined && lead.googleRating !== null) data.google_rating = lead.googleRating;
   if (lead.googleReviews !== undefined && lead.googleReviews !== null) data.google_reviews = lead.googleReviews;
   if (lead.googleMapsUrl) data.google_maps_url = lead.googleMapsUrl;
@@ -275,7 +275,19 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
   if (lead.generatedPrompt) data.generated_prompt = lead.generatedPrompt;
   if (lead.siteHtml) data.site_html = lead.siteHtml;
 
-  return data;
+  // Nettoyer les objets vides et undefined pour éviter les erreurs Supabase
+  const cleanData = Object.fromEntries(
+    Object.entries(data).filter(([key, value]) => {
+      // Garder les valeurs définies, les tableaux non vides, et les chaînes non vides
+      if (value === undefined || value === null) return false;
+      if (typeof value === 'string' && value.trim() === '') return false;
+      if (Array.isArray(value) && value.length === 0) return false;
+      return true;
+    })
+  );
+
+  console.log('🧹 Cleaned data for Supabase:', cleanData);
+  return cleanData;
 }
 
 // --- HOOKS ---
