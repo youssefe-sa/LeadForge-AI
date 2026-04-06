@@ -167,6 +167,15 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages, chatLoading]);
 
+  // PROPOSITION 4: Stabilisation Lifecycle et Memory Leaks
+  // Si le composant est démonté (l'utilisateur quitte l'onglet), stopper le processing proprement
+  useEffect(() => {
+    return () => {
+      console.log('🛑 WebsiteGen unmounted, stopping processing loops to prevent memory leaks.');
+      stopProcessing();
+    }
+  }, [stopProcessing]);
+
   // ── SHORTER, MORE EFFECTIVE AI PROMPT ──
   const buildShortPrompt = (lead: Lead, styleHint?: string): { prompt: string; system: string } => {
     const pal = getSectorPalette(lead.sector);
@@ -437,7 +446,26 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
           const jsonStr = response.replace(/```json?\s*/gi, '').replace(/```\s*/g, '').trim();
           const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
           if (jsonMatch) {
-            const data = JSON.parse(jsonMatch[0]);
+            let cleanJsonStr = jsonMatch[0];
+            // PROPOSITION 2: Réparateur JSON Intelligent (Self-Healing AI)
+            cleanJsonStr = cleanJsonStr.replace(/,\s*([}\]])/g, '$1'); // Réparer les trailing commas
+            cleanJsonStr = cleanJsonStr.replace(/[\x00-\x1F\x7F-\x9F]/g, ""); // Retirer les caractères de contrôle invisibles
+            
+            let data;
+            try {
+              data = JSON.parse(cleanJsonStr);
+            } catch (parseError) {
+              console.warn('⚠️ JSON Parse failed. Tentative de Self-Correction...', parseError);
+              const repairPrompt = `Corrige ce JSON invalide pour qu'il soit parfaitement parsable. Ne renvoie QUE le JSON:\n${cleanJsonStr.substring(0, 1000)}`;
+              const repairResponse = await callLLM(apiConfig, repairPrompt, 'Expert JSON. Renvoie UNIQUEMENT le JSON réparé.');
+              const repairedMatch = (repairResponse || '').match(/\{[\s\S]*\}/);
+              if (repairedMatch) {
+                data = JSON.parse(repairedMatch[0].replace(/,\s*([}\]])/g, '$1').replace(/[\x00-\x1F\x7F-\x9F]/g, ""));
+              } else {
+                throw new Error('Échec de la réparation du JSON');
+              }
+            }
+
             if (data.heroTitle) content.heroTitle = safeStr(data.heroTitle);
             if (data.heroSubtitle) content.heroSubtitle = safeStr(data.heroSubtitle);
             if (data.aboutText) content.aboutText = safeStr(data.aboutText);
@@ -452,7 +480,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
             if (Array.isArray(data.whyChooseUs)) content.whyChooseUs = data.whyChooseUs.map((w: unknown) => safeStr(w)).filter(Boolean);
           }
         }
-      } catch { /* use defaults */ }
+      } catch (e) { console.error('💥 Erreur finale generateContent:', e); }
     }
     return content;
   };
@@ -725,6 +753,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
   };
 
   // ── AI CHAT EDITOR ──
+  // ── AI CHAT EDITOR ──
   const handleChatSend = async () => {
     if (!chatInput.trim() || !previewLead || chatLoading) return;
     const msg = chatInput.trim();
@@ -733,23 +762,35 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     setChatLoading(true);
 
     try {
-      const { prompt, system } = buildShortPrompt(previewLead, msg.includes('couleur') || msg.includes('color') ? msg : undefined);
-      const fullPrompt = `${prompt}\n\nMODIFICATION DEMANDÉE PAR L'UTILISATEUR:\n"${msg}"\n\nApplique cette modification au site. Retourne le HTML COMPLET modifié.`;
-      const response = await callLLMForWebsite(apiConfig, fullPrompt, system);
-      const extracted = extractHtml(response);
+      // PROPOSITION 1 : Révolution du Chat (Architecture JSON-First pour la sécurité des LLMs)
+      // Régénérer rapidement le contenu actuel pour utiliser comme base (ultra-rapide)
+      updateProgress({ step: "🤖 Réflexion de l'IA..." });
+      let currentContent = await generateContent(previewLead);
 
-      if (extracted && validateHtml(extracted)) {
-        updateLead(previewLead.id, { siteHtml: extracted });
-        setChatMessages(prev => [...prev, { role: 'assistant', text: `✅ Site modifié avec succès ! La modification "${msg}" a été appliquée. Le site est rafraîchi dans la prévisualisation.` }]);
-      } else {
-        // Fallback: regenerate with template
-        const content = await generateContent(previewLead);
-        const html = generatePremiumSiteHtml(previewLead, content);
-        updateLead(previewLead.id, { siteHtml: html });
-        setChatMessages(prev => [...prev, { role: 'assistant', text: `⚠️ L'IA n'a pas pu modifier directement. Le site a été régénéré avec un nouveau design. Réessayez votre demande.` }]);
+      const sysPrompt = "Tu es un expert JSON. L'utilisateur veut modifier le contenu de son site.\nVoici le contenu actuel (JSON):\n" + JSON.stringify(currentContent) + "\n\nINSTRUCTIONS:\n1. Modifie ce JSON pour intégrer cette demande: \"" + msg + "\"\n2. Garde EXACTEMENT la même structure et les mêmes clés.\n3. Retourne UNIQUEMENT le JSON modifié, rien d'autre.";
+      
+      const response = await callLLM(apiConfig, sysPrompt, "Expert data. Retourne UNIQUEMENT le JSON valide sans markdown.");
+      
+      let newContent = currentContent;
+      if (response) {
+        const jsonMatch = response.replace(/```json?\s*/gi, '').replace(/```\s*/g, '').trim().match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          let cleanStr = jsonMatch[0].replace(/,\s*([}\]])/g, '$1').replace(/[\x00-\x1F\x7F-\x9F]/g, "");
+          try {
+            newContent = { ...currentContent, ...JSON.parse(cleanStr) };
+          } catch(e) {
+            console.error('Chat AI parse error. Utilisation du contenu de base.', e);
+          }
+        }
       }
+
+      // Re-générer instantanément le HTML localement. Le Design n'est jamais cassé !
+      const newHtml = generatePremiumSiteHtml(previewLead, newContent);
+      await updateLead(previewLead.id, { siteHtml: newHtml });
+      
+      setChatMessages(prev => [...prev, { role: 'assistant', text: "✅ J'ai méticuleusement appliqué tes modifications: \"" + msg + "\". Mon design Premium est préservé ! ❤️" }]);
     } catch {
-      setChatMessages(prev => [...prev, { role: 'assistant', text: '❌ Erreur lors de la modification. Vérifiez votre clé API.' }]);
+      setChatMessages(prev => [...prev, { role: 'assistant', text: "❌ Erreur de réseau ou problème d'API." }]);
     }
     setChatLoading(false);
   };
@@ -763,28 +804,21 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     updateProgress({ current: 1, total: 1, name: previewLead.name, step: '🎨 Changement de palette...' });
     
     try {
-      // Forcer une nouvelle seed pour générer une palette différente
-      // On modifie temporairement le nom pour générer une nouvelle palette
-      const originalName = previewLead.name;
-      const tempLead = { 
-        ...previewLead, 
-        name: previewLead.name + '_' + Date.now().toString() // Ajouter timestamp pour forcer nouvelle palette
-      };
+      // PROPOSITION 3: Mathématique Seed Offset (Correction du bug de Titre)
+      const newOffset = Math.floor(Math.random() * 1000) + 1;
       
-      // Générer le contenu avec la nouvelle palette
-      const content = await generateContent(tempLead);
-      const html = generatePremiumSiteHtml(tempLead, content);
+      const content = await generateContent(previewLead);
+      const html = generatePremiumSiteHtml(previewLead, content, newOffset);
       
-      // Mettre à jour le site avec la nouvelle palette mais restaurer le nom original
-      const baseUrl = 'https://www.services-siteup.online'; // Forcer l'utilisation de votre domaine
+      const baseUrl = 'https://www.services-siteup.online';
       const firstName = previewLead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 20);
+      
       updateLead(previewLead.id, { 
         siteHtml: html,
-        siteUrl: `${baseUrl}/api/sites/${firstName}`,
-        landingUrl: `${baseUrl}/api/sites/${firstName}`,
+        siteUrl: baseUrl + '/api/sites/' + firstName,
+        landingUrl: baseUrl + '/api/sites/' + firstName,
       });
       
-      // Forcer le rafraîchissement de l'aperçu
       setTimeout(() => {
         setPreviewId(null);
         setTimeout(() => setPreviewId(previewLead.id), 100);

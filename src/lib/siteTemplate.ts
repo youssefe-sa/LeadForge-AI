@@ -426,9 +426,9 @@ const getLogoName = (fullName: string): string => {
   const words = fullName.trim().split(/\s+/);
   return words.slice(0, 2).join(' ');
 };
-function generateUniquePalette(lead: Lead): Scheme {
+function generateUniquePalette(lead: Lead, offset: number = 0): Scheme {
   const seed = lead.name + (lead.city || '') + (lead.sector || '') + (lead.address || '');
-  const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset;
   
   // 🎯 PALETTES SANS DÉGRADÉS - COULEURS PURES FULL HD
   const baseSchemes = [
@@ -708,8 +708,8 @@ function getLogo(lead: Lead, scheme: Scheme): string {
 // MAIN TEMPLATE GENERATOR — Bootstrap 5 Professional
 // ════════════════════════════════════════════════════════════
 
-export function generatePremiumSiteHtml(lead: Lead, content: SiteContent): string {
-  const scheme = generateUniquePalette(lead); // 🎨 PALETTE UNIQUE PAR PROSPECT
+export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorSeedOffset: number = 0): string {
+  const scheme = generateUniquePalette(lead, colorSeedOffset); // 🎨 PALETTE UNIQUE PAR PROSPECT
   const imgs = getImgs(lead);
   const n = safeStr(lead.name);
   const sector = safeStr(lead.sector) || 'Professionnel';
