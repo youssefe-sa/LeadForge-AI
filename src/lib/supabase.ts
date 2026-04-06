@@ -3,38 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL as string | undefined;
 const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-// Vérification plus robuste avec fallback pour le développement
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('[LeadForge] Variables Supabase manquantes:', {
-    VITE_SUPABASE_URL: supabaseUrl ? '✓' : '✗',
-    VITE_SUPABASE_ANON_KEY: supabaseAnonKey ? '✓' : '✗',
-    environment: import.meta.env?.MODE || 'unknown'
-  });
-  
-  // En production, afficher une erreur claire
-  if (import.meta.env?.MODE === 'production') {
-    throw new Error(
-      '[LeadForge] Configuration Supabase manquante en production.\n' +
-      'Veuillez vérifier que VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY sont configurées dans Vercel Dashboard → Settings → Environment Variables.'
-    );
-  }
-  
-  // En développement, utiliser un fallback avec message clair
   throw new Error(
     '[LeadForge] Variables d\'environnement manquantes : VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY sont requises.\n' +
-    'Ajoutez-les dans votre fichier .env.local (développement).\n' +
-    'Exemple :\n' +
-    'VITE_SUPABASE_URL=https://votre-projet.supabase.co\n' +
-    'VITE_SUPABASE_ANON_KEY=votre-cle-anon-supabase'
+    'Ajoutez-les dans votre fichier .env.local (développement) ou dans Vercel Dashboard → Settings → Environment Variables (production).'
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: false,
-    detectSessionInUrl: false
-  }
-});
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Types pour les tables Supabase
 export interface Database {

@@ -304,22 +304,10 @@ export function useLeads() {
     setLoading(true);
     setError(null);
     try {
-      console.log('[useLeads] Chargement des leads depuis Supabase...');
       const { leads: supabaseLeads } = await leadsService.getAll();
-      console.log(`[useLeads] ${supabaseLeads.length} leads chargés depuis Supabase`);
       setLeads(supabaseLeads.map(mapSupabaseLeadToLead));
     } catch (err) {
-      console.error('[useLeads] Erreur lors du chargement des leads:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load leads';
-      
-      // En cas d'erreur de connexion Supabase, ne pas bloquer l'application
-      if (errorMessage.includes('fetch') || errorMessage.includes('network') || errorMessage.includes('supabase')) {
-        console.warn('[useLeads] Erreur de connexion Supabase, utilisation d\'un tableau vide...');
-        setLeads([]); // Utiliser un tableau vide au lieu de bloquer
-        setError('Impossible de se connecter à la base de données. Veuillez vérifier votre connexion.');
-      } else {
-        setError(errorMessage);
-      }
+      setError(err instanceof Error ? err.message : 'Failed to load leads');
     } finally {
       setLoading(false);
     }
@@ -639,16 +627,7 @@ export function useApiConfig() {
       setConfig(supabaseConfig);
     } catch (err) {
       console.error('Failed to load config:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load config';
-      
-      // En cas d'erreur de connexion, utiliser la configuration par défaut
-      if (errorMessage.includes('fetch') || errorMessage.includes('network') || errorMessage.includes('supabase')) {
-        console.warn('[useApiConfig] Erreur de connexion Supabase, utilisation de la configuration par défaut...');
-        setConfig(defaultApiConfig);
-        setError('Impossible de charger la configuration depuis la base de données. Utilisation des valeurs par défaut.');
-      } else {
-        setError(errorMessage);
-      }
+      setError(err instanceof Error ? err.message : 'Failed to load config');
     } finally {
       setLoading(false);
     }
