@@ -631,101 +631,82 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     startProcessing('website-generation', 'websitegen-batch');
     
     let processedCount = 0;
-    const processedLeadIds = new Set<string>(); // Suivre les leads déjà traités
-    let lastCheckTime = Date.now();
+    const processedLeadIds = new Set<string>();
     
     try {
-      // Boucle dynamique qui s'adapte aux nouveaux leads
+      // Boucle simple mais efficace
       while (true) {
-        // Recharger les leads pour détecter les nouveaux enrichis
+        // Attendre un peu pour laisser le state se mettre à jour
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Recharger les données depuis Supabase
+        console.log('🔄 Checking for new leads...');
         await loadLeads();
         
-        // Obtenir les leads actuels à traiter (mis à jour dynamiquement)
+        // Attendre encore un peu pour la synchronisation
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Filtrer les leads à traiter
         const currentLeads = leads.filter(l => l.score > 0 && !l.siteGenerated);
         const newLeadsToProcess = currentLeads.filter(l => !processedLeadIds.has(l.id));
         
-        console.log(`🔄 Current leads to process: ${currentLeads.length}, New leads: ${newLeadsToProcess.length}`);
+        console.log(`� Status: Total leads=${leads.length}, Enriched=${currentLeads.length}, New to process=${newLeadsToProcess.length}`);
+        console.log(`📋 Processed IDs: ${Array.from(processedLeadIds).slice(0, 3)}...`);
         
-        // Si plus de nouveaux leads à traiter, attendre et vérifier à nouveau
         if (newLeadsToProcess.length === 0) {
-          console.log('⏱️ No new leads to process, waiting for new enriched leads...');
-          
-          // Attendre 5 secondes et vérifier s'il y a de nouveaux leads
-          await new Promise(resolve => setTimeout(resolve, 5000));
-          
-          // Recharger à nouveau pour voir s'il y a de nouveaux leads
+          // Vérifier une dernière fois après 3 secondes
+          console.log('⏱️ No new leads found, waiting 3 seconds for final check...');
+          await new Promise(resolve => setTimeout(resolve, 3000));
           await loadLeads();
-          const refreshedLeads = leads.filter(l => l.score > 0 && !l.siteGenerated);
-          const refreshedNewLeads = refreshedLeads.filter(l => !processedLeadIds.has(l.id));
+          await new Promise(resolve => setTimeout(resolve, 500));
           
-          if (refreshedNewLeads.length === 0) {
-            console.log('✅ No more leads to process after waiting, generation completed');
+          const finalLeads = leads.filter(l => l.score > 0 && !l.siteGenerated);
+          const finalNewLeads = finalLeads.filter(l => !processedLeadIds.has(l.id));
+          
+          if (finalNewLeads.length === 0) {
+            console.log('✅ No more leads found after final check. Generation completed!');
             break;
           } else {
-            console.log(`🆕 Detected ${refreshedNewLeads.length} new enriched leads! Continuing generation...`);
-            continue; // Continuer la boucle avec les nouveaux leads
+            console.log(`🆕 Found ${finalNewLeads.length} new leads in final check! Continuing...`);
+            continue;
           }
         }
         
-        // Utiliser directement le singleton pour éviter les problèmes de synchronisation
-        const currentState = websiteGenState.getState();
-        if (!currentState.isProcessing) {
-          console.log('⏹️ Processing stopped, exiting loop');
-          break;
-        }
-        
+        // Traiter les nouveaux leads
         for (const currentLead of newLeadsToProcess) {
-          // Vérifier si le processing est toujours actif
           const currentState = websiteGenState.getState();
           if (!currentState.isProcessing) {
             console.log('⏹️ Processing stopped, exiting loop');
             break;
           }
           
-          // Marquer comme traité immédiatement pour éviter les doublons
           processedLeadIds.add(currentLead.id);
-          
-          console.log(`🔄 Processing lead ${processedCount + 1}: ${currentLead.name}`);
-          
-          // Vérifier si la génération est en pause
-          while (currentState.isPaused) {
-            console.log('⏸️ Generation paused, waiting...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            const updatedState = websiteGenState.getState();
-            if (!updatedState.isProcessing) {
-              console.log('⏹️ Processing stopped during pause');
-              stopProcessing();
-              return;
-            }
-          }
-          
           processedCount++;
+          
+          console.log(`🔄 Processing lead ${processedCount}: ${currentLead.name}`);
           
           updateProgress({ 
             current: processedCount, 
-            total: processedLeadIds.size, // Total dynamique mis à jour
+            total: processedLeadIds.size,
             name: currentLead.name, 
-            step: currentState.isPaused ? '⏸️ En pause' : '🤖 Génération...' 
+            step: '🤖 Génération...' 
           });
           
           try {
             await generateSite(currentLead);
             console.log(`✅ Lead ${currentLead.name} traité avec succès`);
             
-            // Forcer le rechargement depuis Supabase pour voir le déplacement en temps réel
-            console.log('🔄 Reloading leads from Supabase to show updated status...');
+            // Recharger pour voir le déplacement
             await loadLeads();
             
           } catch (error) {
             console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
           }
           
-          // Petit délai entre les sites
+          // Délai entre les sites
           console.log('⏱️ Waiting before next lead...');
           await new Promise(r => setTimeout(r, batchDelay));
         }
-        
-        lastCheckTime = Date.now();
       }
     } catch (error) {
       console.error('💥 Error in generateBatch loop:', error);
