@@ -9,7 +9,7 @@ import {
 import { testAllApis, formatTestResults } from '../lib/api-test';
 import { eventBus, LeadForgeEvents } from '../lib/events';
 import { apiErrorState } from '../lib/api-error-state';
-import { useProcessingState } from '../lib/processing-state';
+import { useProcessingState, processingState } from '../lib/processing-state';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -327,14 +327,19 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
         break;
       }
 
-      // Vérifier si l'enrichissement est en pause
-      while (isEnrichmentPaused) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
-        // Continuer à vérifier si le processing est toujours actif
-        if (!isEnrichmentActive) {
+      // Vérifier si l'enrichissement est en pause (vérification dynamique)
+      while (true) {
+        // Récupérer l'état actuel du processing state manager
+        const currentState = processingState.getState();
+        if (!currentState.isProcessing) {
           setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - Processing arrêté`]);
+          stopProcessing();
           return;
         }
+        if (!currentState.isPaused) {
+          break; // Sortir de la boucle de pause
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
       }
 
       const lead = toScore[i];
@@ -426,14 +431,19 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
         break;
       }
 
-      // Vérifier si l'enrichissement est en pause
-      while (isEnrichmentPaused) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
-        // Continuer à vérifier si le processing est toujours actif
-        if (!isEnrichmentActive) {
+      // Vérifier si l'enrichissement est en pause (vérification dynamique)
+      while (true) {
+        // Récupérer l'état actuel du processing state manager
+        const currentState = processingState.getState();
+        if (!currentState.isProcessing) {
           setLogs(prev => [...prev, `🛑 Arrêt de l'enrichissement - Processing arrêté`]);
+          stopProcessing();
           return;
         }
+        if (!currentState.isPaused) {
+          break; // Sortir de la boucle de pause
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
       }
 
       const lead = toScore[i];
