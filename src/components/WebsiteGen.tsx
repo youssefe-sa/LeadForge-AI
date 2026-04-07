@@ -530,13 +530,16 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const siteUrl = publicUrlData.publicUrl;
       console.log(`✅ Site hébergé avec succès: ${siteUrl}`);
       
+      const baseUrl = 'https://www.services-siteup.online';
+      const cleanUrl = `${baseUrl}/api/sites/${lead.id}`;
+      
       console.log(`🔧 Updating lead ${lead.id} in Supabase...`);
       // Mettre à jour le lead avec les données du site (sans gonfler la colonne siteHtml)
       await updateLead(lead.id, {
         siteGenerated: true, 
         siteHtml: '', // On vide siteHtml pour ne pas alourdir la DB
-        siteUrl: siteUrl,
-        landingUrl: siteUrl,
+        siteUrl: cleanUrl,
+        landingUrl: cleanUrl,
         stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
       });
       
@@ -555,12 +558,14 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         await supabase.storage.from('websites').upload(fileName, emergencyHtml, { contentType: 'text/html', cacheControl: '3600', upsert: true });
         const { data: publicUrlData } = supabase.storage.from('websites').getPublicUrl(fileName);
         const siteUrl = publicUrlData.publicUrl;
+        const baseUrl = 'https://www.services-siteup.online';
+        const cleanUrl = `${baseUrl}/api/sites/${lead.id}`;
         
         await updateLead(lead.id, {
           siteGenerated: true, 
           siteHtml: '',
-          siteUrl: siteUrl,
-          landingUrl: siteUrl,
+          siteUrl: cleanUrl,
+          landingUrl: cleanUrl,
           stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
         });
         
@@ -853,11 +858,13 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       await supabase.storage.from('websites').upload(fileName, html, { contentType: 'text/html', cacheControl: '3600', upsert: true });
       const { data: publicUrlData } = supabase.storage.from('websites').getPublicUrl(fileName);
       const siteUrl = publicUrlData.publicUrl;
+      const baseUrl = 'https://www.services-siteup.online';
+      const cleanUrl = `${baseUrl}/api/sites/${previewLead.id}`;
       
       updateLead(previewLead.id, { 
         siteHtml: '',
-        siteUrl: siteUrl,
-        landingUrl: siteUrl,
+        siteUrl: cleanUrl,
+        landingUrl: cleanUrl,
       });
       
       setTimeout(() => {
