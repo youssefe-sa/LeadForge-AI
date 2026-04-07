@@ -430,30 +430,82 @@ function generateUniquePalette(lead: Lead, offset: number = 0): Scheme {
   const seed = lead.name + (lead.city || '') + (lead.sector || '') + (lead.address || '');
   const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset;
   
-  // 🎯 PALETTES ULTRA PROFESSIONNELLES - COULEURS LÉGÈRES ET PURES
+  // 🎯 PALETTES SANS DÉGRADÉS - COULEURS PURES FULL HD
   const baseSchemes = [
-    { p: "#1a365d", p2: "#2c5282", pRgb: "26,54,93", dark: "#1a202c", light: "#f7fafc", grd: "#1a365d", heroOverlay: "rgba(25,30,45,0.05)", accent: "#3182ce" }, // Navy
-    { p: "#065f46", p2: "#059669", pRgb: "6,95,70", dark: "#064e3b", light: "#f0fdf4", grd: "#065f46", heroOverlay: "rgba(5,30,25,0.05)", accent: "#10b981" }, // Emerald
-    { p: "#854d0e", p2: "#b45309", pRgb: "133,77,14", dark: "#451a03", light: "#fffbeb", grd: "#854d0e", heroOverlay: "rgba(45,30,5,0.05)", accent: "#d97706" }, // Golden
-    { p: "#374151", p2: "#4b5563", pRgb: "55,65,81", dark: "#111827", light: "#f9fafb", grd: "#374151", heroOverlay: "rgba(20,25,35,0.05)", accent: "#6b7280" }, // Slate
-    { p: "#1e40af", p2: "#2563eb", pRgb: "30,64,175", dark: "#1e3a8a", light: "#f0f9ff", grd: "#1e40af", heroOverlay: "rgba(30,40,65,0.05)", accent: "#3b82f6" }, // Blue
-    { p: "#5b21b6", p2: "#7c3aed", pRgb: "91,33,182", dark: "#2e1065", light: "#f5f3ff", grd: "#5b21b6", heroOverlay: "rgba(45,20,70,0.05)", accent: "#8b5cf6" }, // Purple
+    { p: "#2563EB", p2: "#60A5FA", pRgb: "37,99,235", dark: "#1e3a8a", light: "#EFF6FF", grd: "#2563EB", heroOverlay: "rgba(30,58,138,0.88)", accent: "#2563EB" },
+    { p: "#DC2626", p2: "#F87171", pRgb: "220,38,38", dark: "#1c1917", light: "#FEF2F2", grd: "#DC2626", heroOverlay: "rgba(28,25,23,0.9)", accent: "#DC2626" },
+    { p: "#059669", p2: "#34D399", pRgb: "5,150,105", dark: "#064e3b", light: "#ECFDF5", grd: "#059669", heroOverlay: "rgba(6,78,59,0.88)", accent: "#059669" },
+    { p: "#7C3AED", p2: "#A78BFA", pRgb: "124,58,237", dark: "#1e1040", light: "#F5F3FF", grd: "#7C3AED", heroOverlay: "rgba(30,16,64,0.88)", accent: "#7C3AED" },
+    { p: "#B45309", p2: "#F59E0B", pRgb: "180,83,9", dark: "#1c1917", light: "#FFFBEB", grd: "#B45309", heroOverlay: "rgba(28,25,23,0.85)", accent: "#B45309" },
+    { p: "#0D9488", p2: "#2DD4BF", pRgb: "13,148,136", dark: "#042f2e", light: "#F0FDFA", grd: "#0D9488", heroOverlay: "rgba(4,47,46,0.88)", accent: "#0D9488" },
+    { p: "#DB2777", p2: "#F472B6", pRgb: "219,39,119", dark: "#2d0a20", light: "#FDF2F8", grd: "#DB2777", heroOverlay: "rgba(45,10,32,0.88)", accent: "#DB2777" },
+    { p: "#0891B2", p2: "#22D3EE", pRgb: "8,145,178", dark: "#0c4a6e", light: "#ECFEFF", grd: "#0891B2", heroOverlay: "rgba(12,74,110,0.88)", accent: "#0891B2" }
   ];
   
   // Sélection basée sur le hash pour unicité
   const baseIndex = hash % baseSchemes.length;
-  const base = baseSchemes[(baseIndex + offset) % baseSchemes.length];
+  const base = baseSchemes[baseIndex];
   
-  // 🎯 PLUS DE VARIATIONS DE SHIFT - COULEURS STABLES
+  // Variation des couleurs basée sur le hash
+  const hueShift = (hash % 360);
+  const lightnessShift = (hash % 20) - 10; // -10 à +10
+  
+  // Fonction pour ajuster une couleur
+  const adjustColor = (hex: string, hue: number, light: number): string => {
+    // Convert hex to RGB
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    
+    // Convert to HSL
+    const max = Math.max(r, g, b) / 255;
+    const min = Math.min(r, g, b) / 255;
+    let h = 0, s = 0, l = (max + min) / 2;
+    
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / 255 / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / 255 / d + 2) / 6; break;
+        case b: h = ((r - g) / 255 / d + 4) / 6; break;
+      }
+    }
+    
+    // Adjust HSL
+    h = (h * 360 + hue) % 360;
+    l = Math.max(0, Math.min(1, l + light / 100));
+    
+    // Convert back to hex
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = l - c / 2;
+    let [rNew, gNew, bNew] = [0, 0, 0];
+    
+    if (h >= 0 && h < 60) [rNew, gNew, bNew] = [c, x, 0];
+    else if (h >= 60 && h < 120) [rNew, gNew, bNew] = [x, c, 0];
+    else if (h >= 120 && h < 180) [rNew, gNew, bNew] = [0, c, x];
+    else if (h >= 180 && h < 240) [rNew, gNew, bNew] = [0, x, c];
+    else if (h >= 240 && h < 300) [rNew, gNew, bNew] = [x, 0, c];
+    else [rNew, gNew, bNew] = [c, 0, x];
+    
+    const toHex = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
+    return `#${toHex(rNew)}${toHex(gNew)}${toHex(bNew)}`;
+  };
+  
+  // Générer palette unique
+  const primary = adjustColor(base.p, hueShift, lightnessShift);
+  const secondary = adjustColor(base.p2, hueShift + 30, lightnessShift - 5);
+  
   return {
-    p: base.p,
-    p2: base.p2,
-    pRgb: base.pRgb,
+    p: primary,
+    p2: secondary,
+    pRgb: `${parseInt(primary.slice(1, 3), 16)},${parseInt(primary.slice(3, 5), 16)},${parseInt(primary.slice(5, 7), 16)}`,
     dark: base.dark,
     light: base.light,
-    grd: base.p, // 🎯 PAS DE DÉGRADÉ
+    grd: primary, // 🎯 PAS DE DÉGRADÉ - COULEUR PURE
     heroOverlay: base.heroOverlay,
-    accent: base.accent
+    accent: primary
   };
 }
 
@@ -1285,7 +1337,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(var(--primary-rgb), 0.05);
+            background: var(--primary), 0.1) 0%, rgba(var(--accent-rgb), 0.05) 100%);
             pointer-events: none;
         }
         
@@ -1301,7 +1353,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         .decoration-circle {
             position: absolute;
             border-radius: 50%;
-            background: var(--primary);
+            background: var(--primary) 0%, var(--accent) 100%);
             opacity: 0.1;
         }
         
@@ -1325,7 +1377,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             position: absolute;
             width: 200px;
             height: 3px;
-            background: var(--primary);
+            background: var(--primary) 50%, transparent 100%);
             top: 50%;
             right: -100px;
             transform: rotate(45deg);
@@ -1440,7 +1492,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             height: 1px;
-            background: rgba(var(--primary-rgb), 0.1);
+            background: var(--primary), transparent);
             opacity: 0.3;
         }
         
@@ -1461,7 +1513,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             transform: translateX(-50%);
             width: 100px;
             height: 4px;
-            background: var(--primary);
+            background: ${scheme.grd};
             border-radius: 2px;
         }
         
@@ -1485,7 +1537,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             height: 4px;
-            background: var(--primary);
+            background: ${scheme.grd};
             transform: scaleX(0);
             transition: transform 0.4s ease;
         }
@@ -1502,7 +1554,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         .service-icon {
             width: 90px;
             height: 90px;
-            background: var(--primary);
+            background: ${scheme.grd};
             border-radius: 25px;
             display: flex;
             align-items: center;
@@ -1513,7 +1565,90 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
         }
         
-        /* Fin des sections premium */
+        /* Gallery ultra-HD avec overlay */
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary), 0.9) 0%, rgba(var(--primary-rgb), 0.7) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .gallery-content {
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .gallery-item:hover::before {
+            opacity: 1;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05) translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            display: block;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary), 0.95) 0%, rgba(var(--primary-rgb), 0.85) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            padding: 20px;
+        }
+        
+        .gallery-content {
+            color: white;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-item:hover .gallery-content {
+            transform: translateY(0);
+        }
         
         .gallery-content h5 {
             font-size: 1.3rem;
@@ -1825,7 +1960,95 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             line-height: 1.6;
         }
         
-        /* Fin Gallery */
+        /* Gallery Section Professionnelle */
+        .gallery-professional {
+            margin-top: 50px;
+        }
+        
+        .gallery-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .gallery-item-pro {
+            flex: 1;
+            max-width: 280px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gallery-item-pro:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        
+        .gallery-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 15px;
+        }
+        
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gallery-item-pro:hover .gallery-image {
+            transform: scale(1.1);
+            filter: brightness(0.8);
+        }
+        
+        .gallery-overlay-pro {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary), 0.8) 0%, rgba(var(--accent-rgb), 0.9) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gallery-item-pro:hover .gallery-overlay-pro {
+            opacity: 1;
+        }
+        
+        .gallery-number {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
+        
+        .gallery-icon {
+            background: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
             justify-content: center;
             color: var(--primary);
             font-size: 1.2rem;
@@ -1984,7 +2207,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         .certification-item-inline .cert-icon {
             width: 60px;
             height: 60px;
-            background: var(--primary);
+            background: var(--primary) 0%, var(--accent) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -2144,7 +2367,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         .contact-icon-professional {
             width: 50px;
             height: 50px;
-            background: var(--primary);
+            background: ${scheme.grd};
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -2354,7 +2577,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         /* Footer professionnel */
         footer {
-            background: #111827;
+            background: var(--primary) 0%, #1a1a1a 100%);
             color: white;
             padding: 80px 0 40px;
             position: relative;
@@ -2367,7 +2590,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             left: 0;
             right: 0;
             height: 1px;
-            background: rgba(var(--primary-rgb), 0.2);
+            background: var(--primary), transparent);
         }
         
         .footer-link {
@@ -2938,10 +3161,10 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <div class="badge-text">${lead.googleRating || '4.9'} sur 5 basé sur ${lead.googleReviews || '234'} avis</div>
                 </div>
             </div>
-            <div class="row g-5">
+            <div class="row">
                 ${content.testimonials && content.testimonials.length > 0 ? 
                     content.testimonials.map((testimonial, index) => `
-                        <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="col-lg-4 col-md-6">
                             <div class="testimonial-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
                                 <div class="testimonial-header">
                                     <div class="stars">${stars(testimonial.rating)}</div>
