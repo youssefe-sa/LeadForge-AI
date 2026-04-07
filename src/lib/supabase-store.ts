@@ -871,74 +871,70 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
       console.warn('⚠️ NVIDIA: No key provided');
       return '';
     }
-    console.log('🚀 NVIDIA: Attempting call with key length:', config.nvidiaKey.length);
-    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+    const res = await fetch('/api/llm', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.nvidiaKey}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'meta/llama-3.1-8b-instruct',
-        messages: [
-          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-          { role: 'user', content: truncatedPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: maxTokens,
+        provider: 'nvidia',
+        apiKey: config.nvidiaKey,
+        body: {
+          model: 'meta/llama-3.1-8b-instruct',
+          messages: [
+            { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+            { role: 'user', content: truncatedPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens,
+        }
       }),
     });
-    console.log('🚀 NVIDIA: Response status:', res.status);
-    if (!res.ok) { 
-      const errorText = await res.text();
-      console.warn('❌ NVIDIA NIM error:', res.status, errorText); 
-      return ''; 
-    }
+    console.log('🚀 NVIDIA Proxy: Response status:', res.status);
+    if (!res.ok) return '';
     const data = await res.json();
-    const result = data.choices?.[0]?.message?.content?.trim() || '';
-    console.log('✅ NVIDIA: Success, result length:', result.length);
-    return result;
+    return data.choices?.[0]?.message?.content?.trim() || '';
   };
 
   // Helper: appel Gemini (1M TPM gratuit, OpenAI-compatible)
   const callGemini = async (maxTokens = 1024): Promise<string> => {
-    if (!config.geminiKey) return '';
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+    const res = await fetch('/api/llm', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.geminiKey}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemini-2.0-flash-lite',
-        messages: [
-          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-          { role: 'user', content: truncatedPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: maxTokens,
+        provider: 'gemini',
+        apiKey: config.geminiKey,
+        body: {
+          model: 'gemini-2.0-flash-lite',
+          messages: [
+            { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+            { role: 'user', content: truncatedPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens,
+        }
       }),
     });
-    if (!res.ok) { console.warn('Gemini error:', res.status); return ''; }
+    if (!res.ok) return '';
     const data = await res.json();
     return data.choices?.[0]?.message?.content?.trim() || '';
   };
 
   // Helper: appel OpenRouter (modèles gratuits)
   const callOpenRouter = async (maxTokens = 1024): Promise<string> => {
-    if (!config.openrouterKey) return '';
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const res = await fetch('/api/llm', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.openrouterKey}`,
-        'HTTP-Referer': 'https://siteup-services.vercel.app',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.1-8b-instruct:free',
-        messages: [
-          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-          { role: 'user', content: truncatedPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: maxTokens,
+        provider: 'openrouter',
+        apiKey: config.openrouterKey,
+        body: {
+          model: 'meta-llama/llama-3.1-8b-instruct:free',
+          messages: [
+            { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+            { role: 'user', content: truncatedPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens,
+        }
       }),
     });
     if (!res.ok) return '';
@@ -951,24 +947,28 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
     if (!config.groqKey) return '';
     await enforceRateLimit(truncatedPrompt.length);
     return await retryWithBackoff(async () => {
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const res = await fetch('/api/llm', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.groqKey}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: [
-            { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
-            { role: 'user', content: truncatedPrompt }
-          ],
-          temperature: 0.7,
-          max_tokens: 1024,
+          provider: 'groq',
+          apiKey: config.groqKey,
+          body: {
+            model: 'llama-3.1-8b-instant',
+            messages: [
+              { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+              { role: 'user', content: truncatedPrompt }
+            ],
+            temperature: 0.7,
+            max_tokens: 1024,
+          }
         }),
       });
       if (res.ok) {
         const data = await res.json();
         const content = data.choices?.[0]?.message?.content;
         if (content?.trim()) return content;
-        throw { status: 500, message: 'Empty response from LLM' };
+        throw { status: 500, message: 'Empty response from LLM Proxy' };
       }
       const errorText = await res.text();
       let errorObj: any;
