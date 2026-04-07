@@ -1929,6 +1929,12 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             background: rgba(var(--primary-rgb), 0.1);
             transform: translateX(10px);
         }
+        
+        .value-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
             box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             transition: all 0.4s ease;
             height: 100%;
