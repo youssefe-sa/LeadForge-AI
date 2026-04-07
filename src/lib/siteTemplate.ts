@@ -1,7 +1,7 @@
 // ============================================================
-// Services-SiteUp — Professional Website Generator v5
+// LeadForge AI — Professional Website Generator v4
 // Bootstrap 5 + Bootstrap Icons + Animate.css + Google Fonts
-// CURATED real Unsplash images (Modern & Professional)
+// CURATED real Unsplash images (source.unsplash.com is DEAD)
 // ============================================================
 import { Lead, safeStr, proxyImg } from "./supabase-store";
 
@@ -430,32 +430,83 @@ function generateUniquePalette(lead: Lead, offset: number = 0): Scheme {
   const seed = lead.name + (lead.city || '') + (lead.sector || '') + (lead.address || '');
   const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset;
   
-  // 🎯 PALETTES ULTRA-PROFESSIONNELLES PAR NICHE
-  const s = (lead.sector || "").toLowerCase();
-  
-  // Forçage de couleurs par émotion de niche
-  if (s.includes("avocat") || s.includes("droit") || s.includes("conseil")) {
-    return { p: "#1A365D", p2: "#B8860B", pRgb: "26,54,93", dark: "#0F172A", light: "#F8FAFC", grd: "#1A365D", heroOverlay: "rgba(15,23,42,0.9)", accent: "#B8860B" };
-  }
-  if (s.includes("beauté") || s.includes("salon") || s.includes("spa") || s.includes("esthét")) {
-    return { p: "#8E5D52", p2: "#D4A5A5", pRgb: "142,93,82", dark: "#2D1B18", light: "#FFF9F8", grd: "#8E5D52", heroOverlay: "rgba(45,27,24,0.85)", accent: "#D4A5A5" };
-  }
-  if (s.includes("santé") || s.includes("médical") || s.includes("docteur") || s.includes("dentiste")) {
-    return { p: "#0369A1", p2: "#7DD3FC", pRgb: "3,105,161", dark: "#082F49", light: "#F0F9FF", grd: "#0369A1", heroOverlay: "rgba(8,47,73,0.88)", accent: "#0369A1" };
-  }
-  if (s.includes("tech") || s.includes("informatique") || s.includes("digital")) {
-    return { p: "#4F46E5", p2: "#818CF8", pRgb: "79,70,229", dark: "#1E1B4B", light: "#EEF2FF", grd: "#4F46E5", heroOverlay: "rgba(30,27,75,0.9)", accent: "#4F46E5" };
-  }
-
-  // Fallback sur palettes générées intelligentes
+  // 🎯 PALETTES SANS DÉGRADÉS - COULEURS PURES FULL HD
   const baseSchemes = [
     { p: "#2563EB", p2: "#60A5FA", pRgb: "37,99,235", dark: "#1e3a8a", light: "#EFF6FF", grd: "#2563EB", heroOverlay: "rgba(30,58,138,0.88)", accent: "#2563EB" },
     { p: "#DC2626", p2: "#F87171", pRgb: "220,38,38", dark: "#1c1917", light: "#FEF2F2", grd: "#DC2626", heroOverlay: "rgba(28,25,23,0.9)", accent: "#DC2626" },
-    { p: "#059669", p2: "#34D399", pRgb: "5,150,105", dark: "#064e3b", light: "#ECFDF5", grd: "#059669", heroOverlay: "rgba(6,78,59,0.88)", accent: "#059669" }
+    { p: "#059669", p2: "#34D399", pRgb: "5,150,105", dark: "#064e3b", light: "#ECFDF5", grd: "#059669", heroOverlay: "rgba(6,78,59,0.88)", accent: "#059669" },
+    { p: "#7C3AED", p2: "#A78BFA", pRgb: "124,58,237", dark: "#1e1040", light: "#F5F3FF", grd: "#7C3AED", heroOverlay: "rgba(30,16,64,0.88)", accent: "#7C3AED" },
+    { p: "#B45309", p2: "#F59E0B", pRgb: "180,83,9", dark: "#1c1917", light: "#FFFBEB", grd: "#B45309", heroOverlay: "rgba(28,25,23,0.85)", accent: "#B45309" },
+    { p: "#0D9488", p2: "#2DD4BF", pRgb: "13,148,136", dark: "#042f2e", light: "#F0FDFA", grd: "#0D9488", heroOverlay: "rgba(4,47,46,0.88)", accent: "#0D9488" },
+    { p: "#DB2777", p2: "#F472B6", pRgb: "219,39,119", dark: "#2d0a20", light: "#FDF2F8", grd: "#DB2777", heroOverlay: "rgba(45,10,32,0.88)", accent: "#DB2777" },
+    { p: "#0891B2", p2: "#22D3EE", pRgb: "8,145,178", dark: "#0c4a6e", light: "#ECFEFF", grd: "#0891B2", heroOverlay: "rgba(12,74,110,0.88)", accent: "#0891B2" }
   ];
   
-  const base = baseSchemes[hash % baseSchemes.length];
-  return { ...base, accent: base.p };
+  // Sélection basée sur le hash pour unicité
+  const baseIndex = hash % baseSchemes.length;
+  const base = baseSchemes[baseIndex];
+  
+  // Variation des couleurs basée sur le hash
+  const hueShift = (hash % 360);
+  const lightnessShift = (hash % 20) - 10; // -10 à +10
+  
+  // Fonction pour ajuster une couleur
+  const adjustColor = (hex: string, hue: number, light: number): string => {
+    // Convert hex to RGB
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    
+    // Convert to HSL
+    const max = Math.max(r, g, b) / 255;
+    const min = Math.min(r, g, b) / 255;
+    let h = 0, s = 0, l = (max + min) / 2;
+    
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / 255 / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / 255 / d + 2) / 6; break;
+        case b: h = ((r - g) / 255 / d + 4) / 6; break;
+      }
+    }
+    
+    // Adjust HSL
+    h = (h * 360 + hue) % 360;
+    l = Math.max(0, Math.min(1, l + light / 100));
+    
+    // Convert back to hex
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = l - c / 2;
+    let [rNew, gNew, bNew] = [0, 0, 0];
+    
+    if (h >= 0 && h < 60) [rNew, gNew, bNew] = [c, x, 0];
+    else if (h >= 60 && h < 120) [rNew, gNew, bNew] = [x, c, 0];
+    else if (h >= 120 && h < 180) [rNew, gNew, bNew] = [0, c, x];
+    else if (h >= 180 && h < 240) [rNew, gNew, bNew] = [0, x, c];
+    else if (h >= 240 && h < 300) [rNew, gNew, bNew] = [x, 0, c];
+    else [rNew, gNew, bNew] = [c, 0, x];
+    
+    const toHex = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
+    return `#${toHex(rNew)}${toHex(gNew)}${toHex(bNew)}`;
+  };
+  
+  // Générer palette unique
+  const primary = adjustColor(base.p, hueShift, lightnessShift);
+  const secondary = adjustColor(base.p2, hueShift + 30, lightnessShift - 5);
+  
+  return {
+    p: primary,
+    p2: secondary,
+    pRgb: `${parseInt(primary.slice(1, 3), 16)},${parseInt(primary.slice(3, 5), 16)},${parseInt(primary.slice(5, 7), 16)}`,
+    dark: base.dark,
+    light: base.light,
+    grd: primary, // 🎯 PAS DE DÉGRADÉ - COULEUR PURE
+    heroOverlay: base.heroOverlay,
+    accent: primary
+  };
 }
 
 // 🎯 GÉNÉRATION DE CONTENU UNIQUE PAR PROSPECT
@@ -675,23 +726,43 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
   const seed = lead.name + (lead.city || '') + (lead.sector || '');
   const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
-  // Unification typographique (Modern Inter)
-  const bodyFont = "'Inter', sans-serif";
-  const headingFont = "'Inter', sans-serif";
+  // Typographies uniques
+  const fontFamilies = [
+    "'Inter', sans-serif",
+    "'Roboto', sans-serif", 
+    "'Poppins', sans-serif",
+    "'Montserrat', sans-serif",
+    "'Nunito', sans-serif",
+    "'Raleway', sans-serif"
+  ];
+  const headingFonts = [
+    "'Playfair Display', serif",
+    "'Montserrat', serif",
+    "'Roboto Slab', serif",
+    "'Merriweather', serif",
+    "'Lora', serif"
+  ];
+  
+  const bodyFont = fontFamilies[hash % fontFamilies.length];
+  const headingFont = headingFonts[(hash + 1) % headingFonts.length];
   
   // Tailles de texte uniques
-  // Tailles de texte standardisées (Premium Balance)
-  const baseSize = 16;
-  const h1Size = 4.2; 
-  const h2Size = 2.8; 
-  const h3Size = 1.8;
+  const baseSize = 16 + (hash % 4); // 16-19px
+  const h1Size = 2.5 + ((hash % 5) * 0.3); // 2.5-3.8rem
+  const h2Size = 2.0 + ((hash % 4) * 0.2); // 2.0-2.6rem
   
   // Espacements uniques
-  // Spacements généreux (High-End UX)
-  const baseSpacing = 16; 
+  const baseSpacing = 8 + (hash % 8); // 8-16px
   
-  // Style de bouton unifié (Elegant Rounded)
-  const buttonStyle = { radius: '12px', shadow: '0 10px 30px rgba(var(--primary-rgb), 0.2)' };
+  // Styles de boutons uniques
+  const buttonStyles = [
+    { radius: '8px', shadow: '0 4px 15px rgba(0,0,0,0.2)' },
+    { radius: '12px', shadow: '0 6px 20px rgba(0,0,0,0.15)' },
+    { radius: '25px', shadow: '0 8px 25px rgba(0,0,0,0.25)' },
+    { radius: '4px', shadow: '0 2px 10px rgba(0,0,0,0.3)' },
+    { radius: '50px', shadow: '0 10px 30px rgba(0,0,0,0.2)' }
+  ];
+  const buttonStyle = buttonStyles[hash % buttonStyles.length];
   
   // Génération du logo SVG professionnel
   const initials = n.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase();
@@ -1110,24 +1181,6 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             font-weight: 900;
         }
         
-        /* Glassmorphism Cards */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .glass-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.85);
-            box-shadow: 0 15px 45px rgba(var(--primary-rgb), 0.15);
-        }
-
         .hero-description-premium {
             font-size: 1.2rem;
             color: #6c757d;
@@ -1382,30 +1435,18 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         }
         
         .btn-primary {
-            background: var(--primary);
+            background: ${scheme.grd};
             border: none;
-            padding: 16px 40px;
-            border-radius: 12px;
+            padding: 18px 45px;
+            border-radius: 50px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.3);
+            box-shadow: 0 15px 40px rgba(var(--primary-rgb), 0.3);
             position: relative;
             overflow: hidden;
-            font-family: 'Inter', sans-serif;
-            color: white;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(var(--primary-rgb), 0.4);
-            background: var(--secondary);
-            color: white;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .btn-primary::before {
@@ -1664,22 +1705,17 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         .testimonial-card {
             background: white;
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
-            transition: all 0.4s ease;
+            padding: 50px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
             position: relative;
             height: 100%;
+            min-height: 400px;
             display: flex;
             flex-direction: column;
-            border: 1px solid rgba(var(--primary-rgb), 0.05);
-            margin-bottom: 20px;
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(var(--primary-rgb), 0.1);
-            border-color: rgba(var(--primary-rgb), 0.2);
+            justify-content: space-between;
+            border: 1px solid rgba(0,0,0,0.03);
         }
         
         .testimonial-text p {
@@ -1895,22 +1931,18 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         }
         
         .value-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: white;
             padding: 40px 30px;
             border-radius: 20px;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             transition: all 0.4s ease;
             height: 100%;
         }
         
         .value-card:hover {
             transform: translateY(-10px);
-            background: white;
-            box-shadow: 0 20px 60px rgba(var(--primary-rgb), 0.15);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         }
         
         .value-icon {
@@ -2746,7 +2778,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                 ${svgLogo.replace('width="60" height="60"', 'width="35" height="35"')}
                 <div class="brand-text">
                     <span class="brand-name">${logoName}</span>
-                    <span class="brand-slogan">par Services-SiteUp</span>
+                    <span class="brand-slogan">${heroAccent}</span>
                 </div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -2754,13 +2786,15 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#testimonials">Avis Clients</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about">Notre Expertise</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">À Propos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#process">Démarche</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#gallery">Réalisations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#testimonials">Témoignages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item ms-3">
                         <button class="btn btn-primary btn-sm">
-                            <i class="bi bi-telephone-fill me-1"></i>Contact Direct
+                            <i class="bi bi-telephone-fill me-1"></i>Appeler
                         </button>
                     </li>
                 </ul>
@@ -2843,6 +2877,198 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
+    <!-- Statistics Section -->
+    <section class="section bg-light" id="statistics">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Nos Chiffres Clés</h2>
+            <div class="row">
+                ${[
+                    { number: `${Math.floor(Math.random() * 500) + 200}+`, label: "Clients Satisfaits", icon: "bi-people-fill" },
+                    { number: `${Math.floor(Math.random() * 15) + 5}+`, label: "Ans d'Expérience", icon: "bi-award-fill" },
+                    { number: `${Math.floor(Math.random() * 1000) + 500}+`, label: "Projets Réalisés", icon: "bi-briefcase-fill" },
+                    { number: "100%", label: "Satisfaction Garantie", icon: "bi-patch-check-fill" }
+                ].map((stat, index) => `
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                            <div class="stat-icon">
+                                <i class="bi ${stat.icon}"></i>
+                            </div>
+                            <div class="stat-number">${stat.number}</div>
+                            <div class="stat-label">${stat.label}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <!-- Expertise Section -->
+    <section class="section" id="expertise">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Notre Expertise</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div data-aos="fade-right" data-aos-duration="1000">
+                        <h3 class="mb-4">Une Excellence Reconnue</h3>
+                        <p class="lead mb-4">
+                            Avec plus de 10 ans d'expérience dans le secteur ${sector.toLowerCase()}, 
+                            nous avons développé un savoir-faire unique qui garantit des résultats exceptionnels.
+                        </p>
+                        <div class="expertise-list">
+                            ${[
+                                "Qualité professionnelle certifiée",
+                                "Équipe d'experts dédiés", 
+                                "Matériels de dernière génération",
+                                "Suivi personnalisé",
+                                "Garantie satisfaction",
+                                "Intervention rapide"
+                            ].map(item => `
+                                <div class="expertise-item">
+                                    <i class="bi bi-check-circle-fill text-success me-3"></i>
+                                    <span>${item}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div data-aos="fade-left" data-aos-duration="1000">
+                        <img src="${imgs[1]}" alt="Notre Expertise" class="img-fluid rounded-4 shadow-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="section bg-light" id="values">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Nos Valeurs</h2>
+            <div class="row">
+                ${[
+                    { icon: "bi-check-circle-fill", title: "Fiabilité", description: "Nous tenons nos promesses avec rigueur et transparence." },
+                    { icon: "bi-lightbulb-fill", title: "Innovation", description: "Nous intégrons les dernières technologies et méthodes." },
+                    { icon: "bi-heart-fill", title: "Passion", description: "Notre passion pour le métier se reflète dans chaque projet." },
+                    { icon: "bi-trophy-fill", title: "Excellence", description: "Nous visons toujours la perfection dans nos réalisations." }
+                ].map((value, index) => `
+                    <div class="col-lg-3 col-md-6">
+                        <div class="value-card" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                            <div class="value-icon">
+                                <i class="bi ${value.icon}"></i>
+                            </div>
+                            <h5>${value.title}</h5>
+                            <p>${value.description}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section class="section" id="technology">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Technologie & Innovation</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6 order-lg-2">
+                    <div data-aos="fade-left" data-aos-duration="1000">
+                        <img src="${imgs[2]}" alt="Technologie" class="img-fluid rounded-4 shadow-lg">
+                    </div>
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <div data-aos="fade-right" data-aos-duration="1000">
+                        <h3 class="mb-4">Au Coeur de l'Innovation</h3>
+                        <p class="lead mb-4">
+                            Nous investissons continuellement dans les technologies les plus avancées 
+                            pour vous offrir des solutions d'avant-garde.
+                        </p>
+                        <div class="tech-features">
+                            ${[
+                                "Équipements de pointe",
+                                "Méthodes innovantes",
+                                "Formation continue",
+                                "R&D permanente"
+                            ].map(feature => `
+                                <div class="tech-feature">
+                                    <div class="tech-icon">
+                                        <i class="bi bi-cpu-fill"></i>
+                                    </div>
+                                    <div class="tech-content">
+                                        <h6>${feature}</h6>
+                                        <p class="mb-0 text-muted">Technologie de dernière génération</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Engagements Section -->
+    <section class="section bg-light" id="engagements">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Nos Engagements</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="0">
+                        <div class="engagement-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h4>Qualité Garantie</h4>
+                        <p>Intervention réalisée selon les normes les plus strictes avec garantie décennale sur tous nos travaux.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+                        <div class="engagement-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <h4>Réactivité</h4>
+                        <p>Intervention rapide sous 24h maximum. Disibilité 7j/7 et 24h/24 pour les urgences.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                        <div class="engagement-icon">
+                            <i class="bi bi-hand-thumbs-up"></i>
+                        </div>
+                        <h4>Satisfaction Client</h4>
+                        <p>Plus de 234 clients satisfaits. Note moyenne de 4.9/5 basée sur des avis authentiques.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+                        <div class="engagement-icon">
+                            <i class="bi bi-award"></i>
+                        </div>
+                        <h4>Expertise Certifiée</h4>
+                        <p>Formation continue et certifications professionnelles garantissent une expertise à la pointe du secteur.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+                        <div class="engagement-icon">
+                            <i class="bi bi-piggy-bank"></i>
+                        </div>
+                        <h4>Transparence</h4>
+                        <p>Devis détaillé et gratuit. Aucun frais caché. Paiement sécurisé et facturation claire.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
+                        <div class="engagement-icon">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <h4>Matériel Professionnel</h4>
+                        <p>Équipements de dernière génération et techniques modernes pour des résultats durables.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Certifications Section -->
     <section class="section" id="certifications">
         <div class="container">
@@ -2874,43 +3100,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- 📌 [I] INTÉRÊT : TÉMOIGNAGES (Remontés stratégiquement) -->
-    <section class="section bg-light" id="testimonials">
-        <div class="container">
-            <h2 class="section-title text-center mb-5" data-aos="fade-up">La Confiance de nos Clients à ${city || 'Proximité'}</h2>
-            <div class="row g-4">
-                ${content.testimonials.slice(0, 3).map((t, i) => `
-                    <div class="col-lg-4 d-flex">
-                        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="${i * 100}">
-                            <div class="testimonial-header mb-4">
-                                <div class="rating-stars">
-                                    ${Array(Math.floor(t.rating || 5)).fill('<i class="bi bi-star-fill text-warning"></i>').join('')}
-                                </div>
-                                <div class="google-verified">
-                                    <i class="bi bi-patch-check-fill text-primary"></i>
-                                    <small class="text-muted fw-600">Avis Vérifié</small>
-                                </div>
-                            </div>
-                            <div class="testimonial-text flex-grow-1">
-                                <p class="mb-4">"${t.text}"</p>
-                            </div>
-                            <div class="d-flex align-items-center mt-auto border-top pt-3">
-                                <div class="avatar-sm me-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; font-weight: 700; font-size: 1.1rem;">
-                                    ${t.author.charAt(0)}
-                                </div>
-                                <div>
-                                    <h6 class="mb-0 fw-bold">${t.author}</h6>
-                                    <small class="text-muted">${t.date || 'Client Local'}</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>
-
-    <!-- 📌 [D] DÉSIR : EXPERTISE & VALEURS -->
+    <!-- About Section -->
     <section class="section" id="about">
         <div class="container">
             <div class="row align-items-center">
@@ -2918,57 +3108,45 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <div data-aos="fade-right" data-aos-duration="1000">
                         <h2 class="section-title">${uniqueContent.aboutTitle}</h2>
                         <p class="lead fs-4">${uniqueContent.aboutText}</p>
-                        
+                        ${content.whyChooseUs ? `
                         <div class="mt-5">
-                            <h4 class="mb-4 fs-3">Pourquoi 9/10 clients nous recommandent :</h4>
+                            <h4 class="mb-4 fs-3">Pourquoi nous choisir ?</h4>
                             <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-start mb-3">
-                                        <div class="service-icon me-3 bg-primary-soft text-primary" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="bi bi-shield-check-fill"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1">Garantie & Assurance</h6>
-                                            <p class="small text-muted mb-0">Couverture complète sur site.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-start mb-3">
-                                        <div class="service-icon me-3 bg-primary-soft text-primary" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="bi bi-speedometer2"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1">Rapidité d'exécution</h6>
-                                            <p class="small text-muted mb-0">Intervention optimisée.</p>
+                                ${content.whyChooseUs.map((reason, index) => `
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="service-icon me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                                <i class="bi bi-check-circle-fill"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-2">${reason}</h6>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                `).join('')}
                             </div>
                         </div>
+                        ` : ''}
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
                     <div data-aos="fade-left" data-aos-duration="1000">
-                        <img src="${imgs[1]}" alt="${n}" class="img-fluid rounded-4 shadow-lg" style="border: 8px solid white;">
+                        <img src="${imgs[1]}" alt="${n}" class="img-fluid rounded-4 shadow-lg">
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Services Section (Contenu Riche) -->
+    <!-- Services Section -->
     <section class="section bg-light" id="services">
         <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="section-title" data-aos="fade-up">${uniqueContent.servicesTitle}</h2>
-                <p class="lead text-muted mx-auto" style="max-width: 700px;">Des solutions sur-mesure conçues pour répondre précisément aux exigences de nos clients.</p>
-            </div>
+            <h2 class="section-title" data-aos="fade-up">${uniqueContent.servicesTitle}</h2>
             <div class="row g-4">
                 ${content.services.map((service, index) => `
                     <div class="col-lg-4 col-md-6">
-                        <div class="value-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
-                            <div class="value-icon" style="background: var(--primary); color: white;">
+                        <div class="service-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                            <div class="service-icon">
                                 <i class="bi ${getBI(lead.sector)[index] || 'bi-star-fill'}"></i>
                             </div>
                             <h4 class="mb-3">${service.name}</h4>
@@ -2980,38 +3158,125 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- Section "Expertise Technique" (Remplace la Galerie) -->
-    <section class="section" id="expertise-technique">
+    <!-- Gallery Section -->
+    <section class="section" id="gallery">
         <div class="container">
-            <div class="glass-card bg-dark text-white p-5 border-0">
-                <div class="row align-items-center">
-                    <div class="col-lg-7">
-                        <h2 class="text-white mb-4 fw-800">Une Maîtrise Technique Certifiée</h2>
-                        <p class="lead opacity-75 mb-5">Nous utilisons uniquement des protocoles de haute précision et du matériel de pointe pour garantir une durabilité exceptionnelle à chaque projet.</p>
-                        <div class="row g-4 text-start">
-                            <div class="col-sm-6">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-patch-check-fill text-primary fs-3 me-3"></i>
-                                    <span>Normes de sécurité strictes</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-tools text-primary fs-3 me-3"></i>
-                                    <span>Matériel de dernière génération</span>
+            <h2 class="section-title" data-aos="fade-up">${uniqueContent.galleryTitle}</h2>
+            <div class="gallery-professional">
+                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+                    ${imgs.slice(2, 6).map((img, index) => `
+                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
+                            <div class="gallery-image-wrapper">
+                                <img src="${img}" alt="Réalisation ${index + 1}" loading="lazy" class="gallery-image">
+                                <div class="gallery-overlay-pro">
+                                    <div class="gallery-number">${index + 1}</div>
+                                    <div class="gallery-icon">
+                                        <i class="bi bi-search"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-5 text-center mt-5 mt-lg-0">
-                        <div class="display-1 fw-900 text-primary mb-0">100%</div>
-                        <div class="h5 fw-bold opacity-50">Satisfaction Garantie</div>
-                    </div>
+                    `).join('')}
+                </div>
+                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                    ${imgs.slice(6, 10).map((img, index) => `
+                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
+                            <div class="gallery-image-wrapper">
+                                <img src="${img}" alt="Réalisation ${index + 5}" loading="lazy" class="gallery-image">
+                                <div class="gallery-overlay-pro">
+                                    <div class="gallery-number">${index + 5}</div>
+                                    <div class="gallery-icon">
+                                        <i class="bi bi-search"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Testimonials Section -->
+    <section class="section bg-light" id="testimonials">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Témoignages Clients</h2>
+            <div class="testimonials-header text-center mb-5" data-aos="fade-up" data-aos-delay="100">
+                <p class="lead fs-4">Avis authentiques vérifiés Google Maps</p>
+                <div class="google-badge mx-auto">
+                    <div class="badge-stars">
+                        ${Array(5).fill('<i class="bi bi-star-fill"></i>').join('')}
+                    </div>
+                    <div class="badge-text">${lead.googleRating || '4.9'} sur 5 basé sur ${lead.googleReviews || '234'} avis</div>
+                </div>
+            </div>
+            <div class="row">
+                ${content.testimonials && content.testimonials.length > 0 ? 
+                    content.testimonials.map((testimonial, index) => `
+                        <div class="col-lg-4 col-md-6">
+                            <div class="testimonial-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                                <div class="testimonial-header">
+                                    <div class="stars">${stars(testimonial.rating)}</div>
+                                    <div class="google-verified">
+                                        <i class="bi bi-patch-check-fill text-primary"></i>
+                                        <small>Avis Google Maps vérifié</small>
+                                    </div>
+                                </div>
+                                <div class="testimonial-text">
+                                    <p class="mb-4 fs-5">${testimonial.text}</p>
+                                    ${testimonial.text.length > 150 ? `
+                                        <a href="#" class="read-more" onclick="this.closest('.testimonial-card').querySelector('.testimonial-text p').classList.toggle('expanded'); this.textContent = this.textContent === 'Lire plus' ? 'Lire moins' : 'Lire plus'; return false;">Lire plus</a>
+                                    ` : ''}
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">${testimonial.author}</h6>
+                                        <small class="text-muted">${testimonial.date}</small>
+                                    </div>
+                                    <div class="google-logo">
+                                        <small class="text-muted">Google</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('') :
+                    // Fallback si pas de témoignages réels
+                    [
+                        { author: "Client Satisfait", text: `Excellent service ${sector.toLowerCase()} ! Très professionnel et disponible.`, rating: 5, date: "Il y a 2 jours" },
+                        { author: "Client Fidèle", text: `Intervention rapide et efficace. Je recommande vivement pour vos besoins en ${sector.toLowerCase()}.`, rating: 5, date: "Il y a 1 semaine" },
+                        { author: "Client Ravi", text: `Expertise confirmée et résultat parfait. Le meilleur ${sector.toLowerCase()} de la région !`, rating: 5, date: "Il y a 2 semaines" }
+                    ].map((testimonial, index) => `
+                        <div class="col-lg-4 col-md-6">
+                            <div class="testimonial-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                                <div class="testimonial-header">
+                                    <div class="stars">${stars(testimonial.rating)}</div>
+                                    <div class="google-verified">
+                                        <i class="bi bi-patch-check-fill text-primary"></i>
+                                        <small>Avis Google Maps vérifié</small>
+                                    </div>
+                                </div>
+                                <div class="testimonial-text">
+                                    <p class="mb-4 fs-5">${testimonial.text}</p>
+                                    ${testimonial.text.length > 150 ? `
+                                        <a href="#" class="read-more" onclick="this.closest('.testimonial-card').querySelector('.testimonial-text p').classList.toggle('expanded'); this.textContent = this.textContent === 'Lire plus' ? 'Lire moins' : 'Lire plus'; return false;">Lire plus</a>
+                                    ` : ''}
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">${testimonial.author}</h6>
+                                        <small class="text-muted">${testimonial.date}</small>
+                                    </div>
+                                    <div class="google-logo">
+                                        <small class="text-muted">Google</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')
+                }
+            </div>
+        </div>
+    </section>
 
     <!-- Section Notre Démarche -->
     <section class="section" id="process">
@@ -3177,7 +3442,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                                 ${svgLogo.replace('width="60" height="60"', 'width="40" height="40"')}
                                 <div class="footer-brand-text">
                                     <span class="footer-brand-name">${logoName}</span>
-                                    <span class="footer-brand-slogan">par Services-SiteUp</span>
+                                    <span class="footer-brand-slogan">${heroAccent}</span>
                                 </div>
                             </div>
                         </a>
@@ -3193,9 +3458,11 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                 <div class="col-lg-4 mb-4">
                     <h5 class="footer-title">Navigation</h5>
                     <ul class="footer-menu">
-                        <li><a href="#about" class="footer-link">Notre Expertise</a></li>
-                        <li><a href="#services" class="footer-link">Nos Services</a></li>
-                        <li><a href="#testimonials" class="footer-link">Avis Clients</a></li>
+                        <li><a href="#about" class="footer-link">À Propos</a></li>
+                        <li><a href="#services" class="footer-link">Services</a></li>
+                        <li><a href="#process" class="footer-link">Notre Démarche</a></li>
+                        <li><a href="#gallery" class="footer-link">Nos Réalisations</a></li>
+                        <li><a href="#testimonials" class="footer-link">Témoignages</a></li>
                         <li><a href="#contact" class="footer-link">Contact</a></li>
                     </ul>
                 </div>
