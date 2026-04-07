@@ -1279,16 +1279,30 @@ export async function enrichWithSerper(apiKey: string, lead: Lead): Promise<Part
             if (!lead.hours) updates.hours = hoursStr;
           }
 
-          // Logo et images
+          // Logo et images réelles de Google Maps (Priorité 1)
           const logo = safeStr(place.logoUrl || place.logo);
           if (logo && logo.startsWith('http')) {
             updates.logo = logo;
           }
 
+          // Extraire le tableau d'images réelles de Google Maps
+          const rawImages = place.images || place.photos || [];
+          const realImgs: string[] = [];
+          if (Array.isArray(rawImages)) {
+            rawImages.slice(0, 10).forEach(img => {
+              const url = typeof img === 'string' ? img : safeStr((img as any).imageUrl || (img as any).link);
+              if (url && url.startsWith('http')) realImgs.push(url);
+            });
+          }
+
           const thumb = safeStr(place.thumbnailUrl || place.thumbnail);
-          if (thumb && thumb.startsWith('http')) {
-            const imgs = [...(lead.images || [])];
-            if (!imgs.includes(thumb)) { imgs.push(thumb); updates.images = imgs; }
+          if (thumb && thumb.startsWith('http') && !realImgs.includes(thumb)) {
+            realImgs.unshift(thumb);
+          }
+
+          if (realImgs.length > 0) {
+            updates.images = realImgs;
+            console.log(`✅ Photos réelles trouvées sur Google Maps : ${realImgs.length}`);
           }
 
           console.log(`✅ Places data extracted: rating=${updates.googleRating}, reviews=${updates.googleReviews}, cid=${cid}`);
@@ -1589,9 +1603,14 @@ export async function scrapeWebsiteForContact(
     }
   } catch { /* continue */ }
 
-  const fullText = allText.join(' ');
+  const fullText = allText.join(' \n ');
+  
+  // Extraire l'email et le téléphone via Regex simple (fallback)
   if (!result.email) result.email = extractEmail(fullText);
   if (!result.phone) result.phone = extractPhone(fullText);
+
+  // Garder le texte pour le donner au LLM plus tard
+  (result as any).rawScrapedText = fullText.substring(0, 3000);
 
   return result;
 }
@@ -1740,24 +1759,42 @@ export async function deepSearchContact(
     }
   } catch { /* continue */ }
 
-  // Strategy 4 : LLM sur tous les snippets collectés
-  if ((!result.email || !result.phone) && apiConfig.groqKey) {
-    const prompt = `Ces résultats de recherche concernent l'entreprise "${lead.name}" à ${lead.city || 'France'}. Extrais l'email professionnel et le téléphone. Retourne UNIQUEMENT ce JSON :
-{"email":"email ou NONE","phone":"téléphone ou NONE"}
+  // Strategy 4 : LLM sur tous les snippets collectÉS + Texte du site
+  if ((!result.email || !result.phone) && (apiConfig.groqKey || apiConfig.geminiKey || apiConfig.nvidiaKey)) {
+    const scrapedText = (result as any).rawScrapedText || '';
+    const prompt = `Tu es un détective business. Analyse les données de "${lead.name}" (${lead.city || 'France'}). 
+    Extrais l'EMAIL PROFESSIONNEL ACTIF et le TÉLÉPHONE.
+    
+    CONSIGNE STRICTE :
+    - Ignore les emails d'annuaires (ex: @pagesjaunes.fr, @societe.com, @mairie.fr).
+    - Privilégie l'email trouvé sur le site officiel : ${lead.website || 'N/A'}.
+    - Si l'email contient le nom propre "${lead.name.split(' ')[0]}", c'est un excellent signe.
+    - Si l'email semble inactif ou générique NONE, réponds "NONE".
+    
+    RÉPONSES JSON UNIQUEMENT : {"email": "string", "phone": "string"}
+    
+    --- TEXTE DU SITE WEB ---
+    ${scrapedText}
+    
+    --- RÉSULTATS DE RECHERCHE ---
+    ${allSnippets.join('\n').substring(0, 1000)}`;
 
-Résultats :
-${allSnippets.join('\n').substring(0, 1500)}`;
     try {
       const response = await callLLM(apiConfig, prompt, 'Réponds UNIQUEMENT en JSON valide.');
       if (response) {
         const cleaned = response.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
-        const data = JSON.parse(cleaned) as Record<string, string>;
-        if (!result.email && data.email && !data.email.toUpperCase().includes('NONE') && data.email.includes('@'))
+        const data = JSON.parse(cleaned);
+        if (data.email && data.email.includes('@') && !data.email.toUpperCase().includes('NONE')) {
           result.email = data.email.toLowerCase();
-        if (!result.phone && data.phone && !data.phone.toUpperCase().includes('NONE') && data.phone.length > 6)
+          console.log('✅ Email validé par IA:', result.email);
+        }
+        if (data.phone && data.phone.length > 6 && !data.phone.toUpperCase().includes('NONE')) {
           result.phone = data.phone;
+        }
       }
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error('❌ LLM contact extraction failed:', err);
+    }
   }
 
   return result;
