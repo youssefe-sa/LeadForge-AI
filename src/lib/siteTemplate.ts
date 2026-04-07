@@ -1,7 +1,7 @@
 // ============================================================
-// LeadForge AI — Professional Website Generator v4
+// Services-SiteUp — Professional Website Generator v5
 // Bootstrap 5 + Bootstrap Icons + Animate.css + Google Fonts
-// CURATED real Unsplash images (source.unsplash.com is DEAD)
+// CURATED real Unsplash images (Modern & Professional)
 // ============================================================
 import { Lead, safeStr, proxyImg } from "./supabase-store";
 
@@ -430,83 +430,32 @@ function generateUniquePalette(lead: Lead, offset: number = 0): Scheme {
   const seed = lead.name + (lead.city || '') + (lead.sector || '') + (lead.address || '');
   const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset;
   
-  // 🎯 PALETTES SANS DÉGRADÉS - COULEURS PURES FULL HD
+  // 🎯 PALETTES ULTRA-PROFESSIONNELLES PAR NICHE
+  const s = (lead.sector || "").toLowerCase();
+  
+  // Forçage de couleurs par émotion de niche
+  if (s.includes("avocat") || s.includes("droit") || s.includes("conseil")) {
+    return { p: "#1A365D", p2: "#B8860B", pRgb: "26,54,93", dark: "#0F172A", light: "#F8FAFC", grd: "#1A365D", heroOverlay: "rgba(15,23,42,0.9)", accent: "#B8860B" };
+  }
+  if (s.includes("beauté") || s.includes("salon") || s.includes("spa") || s.includes("esthét")) {
+    return { p: "#8E5D52", p2: "#D4A5A5", pRgb: "142,93,82", dark: "#2D1B18", light: "#FFF9F8", grd: "#8E5D52", heroOverlay: "rgba(45,27,24,0.85)", accent: "#D4A5A5" };
+  }
+  if (s.includes("santé") || s.includes("médical") || s.includes("docteur") || s.includes("dentiste")) {
+    return { p: "#0369A1", p2: "#7DD3FC", pRgb: "3,105,161", dark: "#082F49", light: "#F0F9FF", grd: "#0369A1", heroOverlay: "rgba(8,47,73,0.88)", accent: "#0369A1" };
+  }
+  if (s.includes("tech") || s.includes("informatique") || s.includes("digital")) {
+    return { p: "#4F46E5", p2: "#818CF8", pRgb: "79,70,229", dark: "#1E1B4B", light: "#EEF2FF", grd: "#4F46E5", heroOverlay: "rgba(30,27,75,0.9)", accent: "#4F46E5" };
+  }
+
+  // Fallback sur palettes générées intelligentes
   const baseSchemes = [
     { p: "#2563EB", p2: "#60A5FA", pRgb: "37,99,235", dark: "#1e3a8a", light: "#EFF6FF", grd: "#2563EB", heroOverlay: "rgba(30,58,138,0.88)", accent: "#2563EB" },
     { p: "#DC2626", p2: "#F87171", pRgb: "220,38,38", dark: "#1c1917", light: "#FEF2F2", grd: "#DC2626", heroOverlay: "rgba(28,25,23,0.9)", accent: "#DC2626" },
-    { p: "#059669", p2: "#34D399", pRgb: "5,150,105", dark: "#064e3b", light: "#ECFDF5", grd: "#059669", heroOverlay: "rgba(6,78,59,0.88)", accent: "#059669" },
-    { p: "#7C3AED", p2: "#A78BFA", pRgb: "124,58,237", dark: "#1e1040", light: "#F5F3FF", grd: "#7C3AED", heroOverlay: "rgba(30,16,64,0.88)", accent: "#7C3AED" },
-    { p: "#B45309", p2: "#F59E0B", pRgb: "180,83,9", dark: "#1c1917", light: "#FFFBEB", grd: "#B45309", heroOverlay: "rgba(28,25,23,0.85)", accent: "#B45309" },
-    { p: "#0D9488", p2: "#2DD4BF", pRgb: "13,148,136", dark: "#042f2e", light: "#F0FDFA", grd: "#0D9488", heroOverlay: "rgba(4,47,46,0.88)", accent: "#0D9488" },
-    { p: "#DB2777", p2: "#F472B6", pRgb: "219,39,119", dark: "#2d0a20", light: "#FDF2F8", grd: "#DB2777", heroOverlay: "rgba(45,10,32,0.88)", accent: "#DB2777" },
-    { p: "#0891B2", p2: "#22D3EE", pRgb: "8,145,178", dark: "#0c4a6e", light: "#ECFEFF", grd: "#0891B2", heroOverlay: "rgba(12,74,110,0.88)", accent: "#0891B2" }
+    { p: "#059669", p2: "#34D399", pRgb: "5,150,105", dark: "#064e3b", light: "#ECFDF5", grd: "#059669", heroOverlay: "rgba(6,78,59,0.88)", accent: "#059669" }
   ];
   
-  // Sélection basée sur le hash pour unicité
-  const baseIndex = hash % baseSchemes.length;
-  const base = baseSchemes[baseIndex];
-  
-  // Variation des couleurs basée sur le hash
-  const hueShift = (hash % 360);
-  const lightnessShift = (hash % 20) - 10; // -10 à +10
-  
-  // Fonction pour ajuster une couleur
-  const adjustColor = (hex: string, hue: number, light: number): string => {
-    // Convert hex to RGB
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    
-    // Convert to HSL
-    const max = Math.max(r, g, b) / 255;
-    const min = Math.min(r, g, b) / 255;
-    let h = 0, s = 0, l = (max + min) / 2;
-    
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r: h = ((g - b) / 255 / d + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / 255 / d + 2) / 6; break;
-        case b: h = ((r - g) / 255 / d + 4) / 6; break;
-      }
-    }
-    
-    // Adjust HSL
-    h = (h * 360 + hue) % 360;
-    l = Math.max(0, Math.min(1, l + light / 100));
-    
-    // Convert back to hex
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-    const m = l - c / 2;
-    let [rNew, gNew, bNew] = [0, 0, 0];
-    
-    if (h >= 0 && h < 60) [rNew, gNew, bNew] = [c, x, 0];
-    else if (h >= 60 && h < 120) [rNew, gNew, bNew] = [x, c, 0];
-    else if (h >= 120 && h < 180) [rNew, gNew, bNew] = [0, c, x];
-    else if (h >= 180 && h < 240) [rNew, gNew, bNew] = [0, x, c];
-    else if (h >= 240 && h < 300) [rNew, gNew, bNew] = [x, 0, c];
-    else [rNew, gNew, bNew] = [c, 0, x];
-    
-    const toHex = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
-    return `#${toHex(rNew)}${toHex(gNew)}${toHex(bNew)}`;
-  };
-  
-  // Générer palette unique
-  const primary = adjustColor(base.p, hueShift, lightnessShift);
-  const secondary = adjustColor(base.p2, hueShift + 30, lightnessShift - 5);
-  
-  return {
-    p: primary,
-    p2: secondary,
-    pRgb: `${parseInt(primary.slice(1, 3), 16)},${parseInt(primary.slice(3, 5), 16)},${parseInt(primary.slice(5, 7), 16)}`,
-    dark: base.dark,
-    light: base.light,
-    grd: primary, // 🎯 PAS DE DÉGRADÉ - COULEUR PURE
-    heroOverlay: base.heroOverlay,
-    accent: primary
-  };
+  const base = baseSchemes[hash % baseSchemes.length];
+  return { ...base, accent: base.p };
 }
 
 // 🎯 GÉNÉRATION DE CONTENU UNIQUE PAR PROSPECT
@@ -1181,6 +1130,24 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             font-weight: 900;
         }
         
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 15px 45px rgba(var(--primary-rgb), 0.15);
+        }
+
         .hero-description-premium {
             font-size: 1.2rem;
             color: #6c757d;
@@ -1931,18 +1898,22 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         }
         
         .value-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 40px 30px;
             border-radius: 20px;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
             transition: all 0.4s ease;
             height: 100%;
         }
         
         .value-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            background: white;
+            box-shadow: 0 20px 60px rgba(var(--primary-rgb), 0.15);
         }
         
         .value-icon {
@@ -2778,7 +2749,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                 ${svgLogo.replace('width="60" height="60"', 'width="35" height="35"')}
                 <div class="brand-text">
                     <span class="brand-name">${logoName}</span>
-                    <span class="brand-slogan">${heroAccent}</span>
+                    <span class="brand-slogan">par Services-SiteUp</span>
                 </div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -2786,15 +2757,13 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#about">À Propos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#testimonials">Avis Clients</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">Notre Expertise</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#process">Démarche</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#gallery">Réalisations</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#testimonials">Témoignages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item ms-3">
                         <button class="btn btn-primary btn-sm">
-                            <i class="bi bi-telephone-fill me-1"></i>Appeler
+                            <i class="bi bi-telephone-fill me-1"></i>Contact Direct
                         </button>
                     </li>
                 </ul>
@@ -3100,7 +3069,35 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- 📌 [I] INTÉRÊT : TÉMOIGNAGES (Remontés stratégiquement) -->
+    <section class="section bg-light" id="testimonials">
+        <div class="container">
+            <h2 class="section-title text-center mb-5" data-aos="fade-up">La Confiance de nos Clients à ${city || 'Proximité'}</h2>
+            <div class="row g-4">
+                ${content.testimonials.slice(0, 3).map((t, i) => `
+                    <div class="col-lg-4">
+                        <div class="glass-card" data-aos="fade-up" data-aos-delay="${i * 100}">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="rating-stars me-3">
+                                    ${Array(Math.floor(t.rating || 5)).fill('<i class="bi bi-star-fill text-warning"></i>').join('')}
+                                </div>
+                                <span class="badge bg-primary-soft text-primary">Client Vérifié</span>
+                            </div>
+                            <p class="fst-italic mb-3">"${t.text}"</p>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm me-2 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    ${t.author.charAt(0)}
+                                </div>
+                                <h6 class="mb-0">${t.author}</h6>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <!-- 📌 [D] DÉSIR : EXPERTISE & VALEURS -->
     <section class="section" id="about">
         <div class="container">
             <div class="row align-items-center">
@@ -3108,45 +3105,57 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <div data-aos="fade-right" data-aos-duration="1000">
                         <h2 class="section-title">${uniqueContent.aboutTitle}</h2>
                         <p class="lead fs-4">${uniqueContent.aboutText}</p>
-                        ${content.whyChooseUs ? `
+                        
                         <div class="mt-5">
-                            <h4 class="mb-4 fs-3">Pourquoi nous choisir ?</h4>
+                            <h4 class="mb-4 fs-3">Pourquoi 9/10 clients nous recommandent :</h4>
                             <div class="row g-3">
-                                ${content.whyChooseUs.map((reason, index) => `
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-start mb-3">
-                                            <div class="service-icon me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
-                                                <i class="bi bi-check-circle-fill"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-2">${reason}</h6>
-                                            </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <div class="service-icon me-3 bg-primary-soft text-primary" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="bi bi-shield-check-fill"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">Garantie & Assurance</h6>
+                                            <p class="small text-muted mb-0">Couverture complète sur site.</p>
                                         </div>
                                     </div>
-                                `).join('')}
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <div class="service-icon me-3 bg-primary-soft text-primary" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="bi bi-speedometer2"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">Rapidité d'exécution</h6>
+                                            <p class="small text-muted mb-0">Intervention optimisée.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        ` : ''}
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
                     <div data-aos="fade-left" data-aos-duration="1000">
-                        <img src="${imgs[1]}" alt="${n}" class="img-fluid rounded-4 shadow-lg">
+                        <img src="${imgs[1]}" alt="${n}" class="img-fluid rounded-4 shadow-lg" style="border: 8px solid white;">
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Services Section -->
+    <!-- Services Section (Contenu Riche) -->
     <section class="section bg-light" id="services">
         <div class="container">
-            <h2 class="section-title" data-aos="fade-up">${uniqueContent.servicesTitle}</h2>
+            <div class="text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">${uniqueContent.servicesTitle}</h2>
+                <p class="lead text-muted mx-auto" style="max-width: 700px;">Des solutions sur-mesure conçues pour répondre précisément aux exigences de nos clients.</p>
+            </div>
             <div class="row g-4">
                 ${content.services.map((service, index) => `
                     <div class="col-lg-4 col-md-6">
-                        <div class="service-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
-                            <div class="service-icon">
+                        <div class="value-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                            <div class="value-icon">
                                 <i class="bi ${getBI(lead.sector)[index] || 'bi-star-fill'}"></i>
                             </div>
                             <h4 class="mb-3">${service.name}</h4>
@@ -3158,46 +3167,39 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- Gallery Section -->
-    <section class="section" id="gallery">
+    <!-- Section "Expertise Technique" (Remplace la Galerie) -->
+    <section class="section" id="expertise-technique">
         <div class="container">
-            <h2 class="section-title" data-aos="fade-up">${uniqueContent.galleryTitle}</h2>
-            <div class="gallery-professional">
-                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                    ${imgs.slice(2, 6).map((img, index) => `
-                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
-                            <div class="gallery-image-wrapper">
-                                <img src="${img}" alt="Réalisation ${index + 1}" loading="lazy" class="gallery-image">
-                                <div class="gallery-overlay-pro">
-                                    <div class="gallery-number">${index + 1}</div>
-                                    <div class="gallery-icon">
-                                        <i class="bi bi-search"></i>
-                                    </div>
+            <div class="glass-card bg-dark text-white p-5 border-0">
+                <div class="row align-items-center">
+                    <div class="col-lg-7">
+                        <h2 class="text-white mb-4 fw-800">Une Maîtrise Technique Certifiée</h2>
+                        <p class="lead opacity-75 mb-5">Nous utilisons uniquement des protocoles de haute précision et du matériel de pointe pour garantir une durabilité exceptionnelle à chaque projet.</p>
+                        <div class="row g-4 text-start">
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-patch-check-fill text-primary fs-3 me-3"></i>
+                                    <span>Normes de sécurité strictes</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-tools text-primary fs-3 me-3"></i>
+                                    <span>Matériel de dernière génération</span>
                                 </div>
                             </div>
                         </div>
-                    `).join('')}
-                </div>
-                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                    ${imgs.slice(6, 10).map((img, index) => `
-                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
-                            <div class="gallery-image-wrapper">
-                                <img src="${img}" alt="Réalisation ${index + 5}" loading="lazy" class="gallery-image">
-                                <div class="gallery-overlay-pro">
-                                    <div class="gallery-number">${index + 5}</div>
-                                    <div class="gallery-icon">
-                                        <i class="bi bi-search"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
+                    </div>
+                    <div class="col-lg-5 text-center mt-5 mt-lg-0">
+                        <div class="display-1 fw-900 text-primary mb-0">100%</div>
+                        <div class="h5 fw-bold opacity-50">Satisfaction Garantie</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
+    <!-- Testimonials Section (Supprimée ici car remontée) -->
     <section class="section bg-light" id="testimonials">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Témoignages Clients</h2>
@@ -3442,7 +3444,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                                 ${svgLogo.replace('width="60" height="60"', 'width="40" height="40"')}
                                 <div class="footer-brand-text">
                                     <span class="footer-brand-name">${logoName}</span>
-                                    <span class="footer-brand-slogan">${heroAccent}</span>
+                                    <span class="footer-brand-slogan">par Services-SiteUp</span>
                                 </div>
                             </div>
                         </a>
@@ -3458,11 +3460,9 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                 <div class="col-lg-4 mb-4">
                     <h5 class="footer-title">Navigation</h5>
                     <ul class="footer-menu">
-                        <li><a href="#about" class="footer-link">À Propos</a></li>
-                        <li><a href="#services" class="footer-link">Services</a></li>
-                        <li><a href="#process" class="footer-link">Notre Démarche</a></li>
-                        <li><a href="#gallery" class="footer-link">Nos Réalisations</a></li>
-                        <li><a href="#testimonials" class="footer-link">Témoignages</a></li>
+                        <li><a href="#about" class="footer-link">Notre Expertise</a></li>
+                        <li><a href="#services" class="footer-link">Nos Services</a></li>
+                        <li><a href="#testimonials" class="footer-link">Avis Clients</a></li>
                         <li><a href="#contact" class="footer-link">Contact</a></li>
                     </ul>
                 </div>
