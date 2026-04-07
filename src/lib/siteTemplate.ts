@@ -427,85 +427,40 @@ const getLogoName = (fullName: string): string => {
   return words.slice(0, 2).join(' ');
 };
 function generateUniquePalette(lead: Lead, offset: number = 0): Scheme {
-  const seed = lead.name + (lead.city || '') + (lead.sector || '') + (lead.address || '');
-  const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset;
+  const seed = lead.name + (lead.city || '') + (lead.sector || '');
+  const hash = Math.abs(seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset);
   
-  // 🎯 PALETTES SANS DÉGRADÉS - COULEURS PURES FULL HD
-  const baseSchemes = [
-    { p: "#2563EB", p2: "#60A5FA", pRgb: "37,99,235", dark: "#1e3a8a", light: "#EFF6FF", grd: "#2563EB", heroOverlay: "rgba(30,58,138,0.88)", accent: "#2563EB" },
-    { p: "#DC2626", p2: "#F87171", pRgb: "220,38,38", dark: "#1c1917", light: "#FEF2F2", grd: "#DC2626", heroOverlay: "rgba(28,25,23,0.9)", accent: "#DC2626" },
-    { p: "#059669", p2: "#34D399", pRgb: "5,150,105", dark: "#064e3b", light: "#ECFDF5", grd: "#059669", heroOverlay: "rgba(6,78,59,0.88)", accent: "#059669" },
-    { p: "#7C3AED", p2: "#A78BFA", pRgb: "124,58,237", dark: "#1e1040", light: "#F5F3FF", grd: "#7C3AED", heroOverlay: "rgba(30,16,64,0.88)", accent: "#7C3AED" },
-    { p: "#B45309", p2: "#F59E0B", pRgb: "180,83,9", dark: "#1c1917", light: "#FFFBEB", grd: "#B45309", heroOverlay: "rgba(28,25,23,0.85)", accent: "#B45309" },
-    { p: "#0D9488", p2: "#2DD4BF", pRgb: "13,148,136", dark: "#042f2e", light: "#F0FDFA", grd: "#0D9488", heroOverlay: "rgba(4,47,46,0.88)", accent: "#0D9488" },
-    { p: "#DB2777", p2: "#F472B6", pRgb: "219,39,119", dark: "#2d0a20", light: "#FDF2F8", grd: "#DB2777", heroOverlay: "rgba(45,10,32,0.88)", accent: "#DB2777" },
-    { p: "#0891B2", p2: "#22D3EE", pRgb: "8,145,178", dark: "#0c4a6e", light: "#ECFEFF", grd: "#0891B2", heroOverlay: "rgba(12,74,110,0.88)", accent: "#0891B2" }
+  // 🎯 PALETTES DE LUXE SÉLECTIONNÉES (MATES ET ÉLÉGANTES)
+  const PREMIUM_PALETTES = [
+    { p: "#1E3A8A", p2: "#3B82F6", dark: "#0F172A", light: "#F8FAFC" }, // Royal Blue
+    { p: "#111827", p2: "#4B5563", dark: "#030712", light: "#F9FAFB" }, // Tech Slate
+    { p: "#064E3B", p2: "#10B981", dark: "#022C22", light: "#F0FDF4" }, // Forest Green
+    { p: "#7C2D12", p2: "#F97316", dark: "#431407", light: "#FFF7ED" }, // Terracotta
+    { p: "#4C1D95", p2: "#8B5CF6", dark: "#2E1065", light: "#F5F3FF" }, // Deep Purple
+    { p: "#831843", p2: "#EC4899", dark: "#500724", light: "#FDF2F8" }, // Crimson
+    { p: "#2D3748", p2: "#718096", dark: "#1A202C", light: "#F7FAFC" }, // Corporate Gray
+    { p: "#4A5568", p2: "#A0AEC0", dark: "#2D3748", light: "#F8FAFC" }, // Steel Blue
   ];
   
-  // Sélection basée sur le hash pour unicité
-  const baseIndex = hash % baseSchemes.length;
-  const base = baseSchemes[baseIndex];
+  const base = PREMIUM_PALETTES[hash % PREMIUM_PALETTES.length];
   
-  // Variation des couleurs basée sur le hash
-  const hueShift = (hash % 360);
-  const lightnessShift = (hash % 20) - 10; // -10 à +10
-  
-  // Fonction pour ajuster une couleur
-  const adjustColor = (hex: string, hue: number, light: number): string => {
-    // Convert hex to RGB
+  // Convert hex to RGB helper
+  const hexToRgb = (hex: string) => {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    
-    // Convert to HSL
-    const max = Math.max(r, g, b) / 255;
-    const min = Math.min(r, g, b) / 255;
-    let h = 0, s = 0, l = (max + min) / 2;
-    
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r: h = ((g - b) / 255 / d + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / 255 / d + 2) / 6; break;
-        case b: h = ((r - g) / 255 / d + 4) / 6; break;
-      }
-    }
-    
-    // Adjust HSL
-    h = (h * 360 + hue) % 360;
-    l = Math.max(0, Math.min(1, l + light / 100));
-    
-    // Convert back to hex
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-    const m = l - c / 2;
-    let [rNew, gNew, bNew] = [0, 0, 0];
-    
-    if (h >= 0 && h < 60) [rNew, gNew, bNew] = [c, x, 0];
-    else if (h >= 60 && h < 120) [rNew, gNew, bNew] = [x, c, 0];
-    else if (h >= 120 && h < 180) [rNew, gNew, bNew] = [0, c, x];
-    else if (h >= 180 && h < 240) [rNew, gNew, bNew] = [0, x, c];
-    else if (h >= 240 && h < 300) [rNew, gNew, bNew] = [x, 0, c];
-    else [rNew, gNew, bNew] = [c, 0, x];
-    
-    const toHex = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
-    return `#${toHex(rNew)}${toHex(gNew)}${toHex(bNew)}`;
+    return `${r},${g},${b}`;
   };
-  
-  // Générer palette unique
-  const primary = adjustColor(base.p, hueShift, lightnessShift);
-  const secondary = adjustColor(base.p2, hueShift + 30, lightnessShift - 5);
-  
+
   return {
-    p: primary,
-    p2: secondary,
-    pRgb: `${parseInt(primary.slice(1, 3), 16)},${parseInt(primary.slice(3, 5), 16)},${parseInt(primary.slice(5, 7), 16)}`,
+    p: base.p,
+    p2: base.p2,
+    pRgb: hexToRgb(base.p),
     dark: base.dark,
     light: base.light,
-    grd: primary, // 🎯 PAS DE DÉGRADÉ - COULEUR PURE
-    heroOverlay: base.heroOverlay,
-    accent: primary
+    grd: `linear-gradient(135deg, ${base.p} 0%, ${base.p2} 100%)`,
+    heroOverlay: `linear-gradient(135deg, rgba(${hexToRgb(base.dark)}, 0.9), rgba(${hexToRgb(base.p)}, 0.4))`,
+    accent: base.p2
   };
 }
 
@@ -685,22 +640,12 @@ function getImgs(lead: Lead): string[] {
 function getLogo(lead: Lead, scheme: Scheme): string {
   const n = safeStr(lead.name);
   const words = n.split(/\s+/).filter(Boolean);
-  const initials =
-    words.length >= 2
-      ? (words[0][0] + words[1][0]).toUpperCase()
-      : n.substring(0, 2).toUpperCase();
   const brandText = words.slice(0, 2).join(" ");
+  const initials = words.length >= 2 ? (words[0][0] + words[1][0]).toUpperCase() : n.substring(0, 2).toUpperCase();
 
-  if (lead.logo) {
-    return `<a class="navbar-brand d-flex align-items-center gap-3" href="#home">
-      <img src="${px(lead.logo)}" alt="${esc(n)}" style="height:45px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div style="display:none;width:45px;height:45px;border-radius:12px;background:${scheme.grd};color:#fff;font-weight:800;font-size:18px;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(var(--prgb),.3)">${initials}</div>
-      <span class="fw-bold fs-4" style="color:#fff;margin-left:8px">${esc(brandText)}</span>
-    </a>`;
-  }
-  return `<a class="navbar-brand d-flex align-items-center gap-3" href="#home">
-    <div style="display:flex;width:45px;height:45px;border-radius:12px;background:${scheme.grd};color:#fff;font-weight:800;font-size:18px;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(var(--prgb),.3);letter-spacing:-0.5px">${initials}</div>
-    <span class="fw-bold fs-4" style="color:#fff;margin-left:8px">${esc(brandText)}</span>
+  return `<a class="navbar-brand d-flex align-items-center gap-3" href="#home" style="transition: transform 0.3s ease;">
+    <div style="display:flex;width:42px;height:42px;border-radius:10px;background:${scheme.grd};color:#fff;font-weight:800;font-size:16px;align-items:center;justify-content:center;box-shadow:0 10px 20px rgba(var(--prgb),.2)">${initials}</div>
+    <span class="fw-extrabold fs-4" style="color:var(--dark);letter-spacing:-0.5px">${esc(brandText)}</span>
   </a>`;
 }
 
@@ -727,24 +672,8 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
   const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
   // Typographies uniques
-  const fontFamilies = [
-    "'Inter', sans-serif",
-    "'Roboto', sans-serif", 
-    "'Poppins', sans-serif",
-    "'Montserrat', sans-serif",
-    "'Nunito', sans-serif",
-    "'Raleway', sans-serif"
-  ];
-  const headingFonts = [
-    "'Playfair Display', serif",
-    "'Montserrat', serif",
-    "'Roboto Slab', serif",
-    "'Merriweather', serif",
-    "'Lora', serif"
-  ];
-  
-  const bodyFont = fontFamilies[hash % fontFamilies.length];
-  const headingFont = headingFonts[(hash + 1) % headingFonts.length];
+  const bodyFont = "'Plus Jakarta Sans', sans-serif";
+  const headingFont = "'Plus Jakarta Sans', sans-serif";
   
   // Tailles de texte uniques
   const baseSize = 16 + (hash % 4); // 16-19px
@@ -766,26 +695,15 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
   
   // Génération du logo SVG professionnel
   const initials = n.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase();
-  const svgLogo = `<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  const svgLogo = `<svg width="45" height="45" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" style="stop-color:${scheme.p};stop-opacity:1" />
           <stop offset="100%" style="stop-color:${scheme.p2};stop-opacity:1" />
         </linearGradient>
-        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-          <feOffset dx="0" dy="2" result="offsetblur"/>
-          <feComponentTransfer>
-            <feFuncA type="linear" slope="0.2"/>
-          </feComponentTransfer>
-          <feMerge>
-            <feMergeNode/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
       </defs>
-      <rect width="60" height="60" rx="12" fill="url(#logoGradient)" filter="url(#shadow)"/>
-      <text x="30" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">${initials}</text>
+      <circle cx="30" cy="30" r="28" fill="none" stroke="url(#logoGradient)" stroke-width="4"/>
+      <text x="30" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-size="22" font-weight="800" text-anchor="middle" fill="${scheme.p}">${initials}</text>
     </svg>`;
   
   // 🎯 NOM LIMITÉ À 2 MOTS + PHRASE UNIQUE
@@ -806,8 +724,9 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -1048,7 +967,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             font-weight: 700;
             font-size: 1.2rem;
             color: var(--primary) !important;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         
         .brand-text {
@@ -1170,7 +1089,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             line-height: 1.1;
             color: #2c3e50;
             margin-bottom: 20px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         
         .hero-title-accent {
@@ -1446,7 +1365,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             box-shadow: 0 15px 40px rgba(var(--primary-rgb), 0.3);
             position: relative;
             overflow: hidden;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         
         .btn-primary::before {
@@ -1479,7 +1398,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             letter-spacing: 1.5px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             background: transparent;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         
         .btn-outline-primary:hover {
@@ -1970,69 +1889,40 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             line-height: 1.6;
         }
         
-        /* Gallery Section Professionnelle */
-        .gallery-professional {
-            margin-top: 50px;
-        }
-        
-        .gallery-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-        
-        .gallery-item-pro {
-            flex: 1;
-            max-width: 280px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .gallery-item-pro:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-        }
-        
-        .gallery-image-wrapper {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            overflow: hidden;
-            border-radius: 15px;
-        }
-        
-        .gallery-image {
-            width: 100%;
+        /* Testimonials Section */
+        .testimonial-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
             height: 100%;
-            object-fit: cover;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .gallery-item-pro:hover .gallery-image {
-            transform: scale(1.1);
-            filter: brightness(0.8);
-        }
-        
-        .gallery-overlay-pro {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.8) 0%, rgba(var(--accent-rgb), 0.9) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
         
-        .gallery-item-pro:hover .gallery-overlay-pro {
-            opacity: 1;
+        .testimonial-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+            border-color: var(--primary);
+        }
+        
+        .testimonial-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #4a5568;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+        
+        .stars {
+            color: #ffc107;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 2px;
         }
         
         .gallery-number {
@@ -3158,44 +3048,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- Gallery Section -->
-    <section class="section" id="gallery">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">${uniqueContent.galleryTitle}</h2>
-            <div class="gallery-professional">
-                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                    ${imgs.slice(2, 6).map((img, index) => `
-                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
-                            <div class="gallery-image-wrapper">
-                                <img src="${img}" alt="Réalisation ${index + 1}" loading="lazy" class="gallery-image">
-                                <div class="gallery-overlay-pro">
-                                    <div class="gallery-number">${index + 1}</div>
-                                    <div class="gallery-icon">
-                                        <i class="bi bi-search"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                    ${imgs.slice(6, 10).map((img, index) => `
-                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
-                            <div class="gallery-image-wrapper">
-                                <img src="${img}" alt="Réalisation ${index + 5}" loading="lazy" class="gallery-image">
-                                <div class="gallery-overlay-pro">
-                                    <div class="gallery-number">${index + 5}</div>
-                                    <div class="gallery-icon">
-                                        <i class="bi bi-search"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Testimonials Section -->
     <section class="section bg-light" id="testimonials">
@@ -3210,7 +3063,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <div class="badge-text">${lead.googleRating || '4.9'} sur 5 basé sur ${lead.googleReviews || '234'} avis</div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row g-4">
                 ${content.testimonials && content.testimonials.length > 0 ? 
                     content.testimonials.map((testimonial, index) => `
                         <div class="col-lg-4 col-md-6">
@@ -3460,8 +3313,6 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <ul class="footer-menu">
                         <li><a href="#about" class="footer-link">À Propos</a></li>
                         <li><a href="#services" class="footer-link">Services</a></li>
-                        <li><a href="#process" class="footer-link">Notre Démarche</a></li>
-                        <li><a href="#gallery" class="footer-link">Nos Réalisations</a></li>
                         <li><a href="#testimonials" class="footer-link">Témoignages</a></li>
                         <li><a href="#contact" class="footer-link">Contact</a></li>
                     </ul>
