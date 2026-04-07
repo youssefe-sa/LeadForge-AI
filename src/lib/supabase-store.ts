@@ -872,14 +872,20 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
       return '';
     }
     console.log('🚀 NVIDIA: Attempting call with key length:', config.nvidiaKey.length);
-    const res = await fetch('/api/nvidia', {
+    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.nvidiaKey}`
+      },
       body: JSON.stringify({
-        prompt: truncatedPrompt,
-        systemPrompt: systemPrompt || 'You are a helpful assistant.',
-        maxTokens,
-        nvidiaKey: config.nvidiaKey,
+        model: 'meta/llama-3.1-8b-instruct',
+        messages: [
+          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+          { role: 'user', content: truncatedPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens,
       }),
     });
     console.log('🚀 NVIDIA: Response status:', res.status);
@@ -889,7 +895,7 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
       return ''; 
     }
     const data = await res.json();
-    const result = data.result || '';
+    const result = data.choices?.[0]?.message?.content?.trim() || '';
     console.log('✅ NVIDIA: Success, result length:', result.length);
     return result;
   };
@@ -1038,22 +1044,28 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
     return data.choices?.[0]?.message?.content?.trim() || '';
   };
 
-  // Helper: NVIDIA NIM via API route pour website (contourne CORS)
+  // Helper: NVIDIA NIM pour website (Appel Direct)
   const callNvidiaWeb = async (): Promise<string> => {
     if (!config.nvidiaKey) return '';
-    const res = await fetch('/api/nvidia-website', {
+    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.nvidiaKey}`
+      },
       body: JSON.stringify({
-        prompt: truncatedPrompt,
-        systemPrompt: systemPrompt || 'You are a helpful assistant.',
-        maxTokens: 4096,
-        nvidiaKey: config.nvidiaKey,
+        model: 'meta/llama-3.1-8b-instruct',
+        messages: [
+          { role: 'system', content: systemPrompt || 'You are a helpful assistant.' },
+          { role: 'user', content: truncatedPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 4096,
       }),
     });
     if (!res.ok) return '';
     const data = await res.json();
-    return data.result || '';
+    return data.choices?.[0]?.message?.content?.trim() || '';
   };
 
   const callOpenRouter = async (): Promise<string> => {
