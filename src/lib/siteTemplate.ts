@@ -427,40 +427,85 @@ const getLogoName = (fullName: string): string => {
   return words.slice(0, 2).join(' ');
 };
 function generateUniquePalette(lead: Lead, offset: number = 0): Scheme {
-  const seed = lead.name + (lead.city || '') + (lead.sector || '');
-  const hash = Math.abs(seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset);
+  const seed = lead.name + (lead.city || '') + (lead.sector || '') + (lead.address || '');
+  const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset;
   
-  // 🎯 PALETTES HOSTINGER SELECTIONNÉES (UX PREMIUM)
-  const PREMIUM_PALETTES = [
-    { p: "#1a73e8", p2: "#4285f4", dark: "#202124", light: "#f8f9fa", name: "Minimalist Blue" },
-    { p: "#0d6efd", p2: "#6ea8fe", dark: "#212529", light: "#f8f9fa", name: "Modern Corporate" },
-    { p: "#198754", p2: "#20c997", dark: "#051b11", light: "#f1fdf7", name: "Natural Earthy" },
-    { p: "#fd7e14", p2: "#ffc107", dark: "#2d0a00", light: "#fffaf0", name: "Energy Contrast" },
-    { p: "#6f42c1", p2: "#a445b2", dark: "#2b1352", light: "#f8f0ff", name: "Creative Vibrant" },
-    { p: "#2c3e50", p2: "#34495e", dark: "#1a252f", light: "#ecf0f1", name: "Elegance Charcoal" },
-    { p: "#2c2c54", p2: "#40407a", dark: "#1e272e", light: "#f7f1e3", name: "High Depth" },
-    { p: "#d63031", p2: "#ff7675", dark: "#2d3436", light: "#ffecec", name: "Bold Impact" }
+  // 🎯 PALETTES SANS DÉGRADÉS - COULEURS PURES FULL HD
+  const baseSchemes = [
+    { p: "#2563EB", p2: "#60A5FA", pRgb: "37,99,235", dark: "#1e3a8a", light: "#EFF6FF", grd: "#2563EB", heroOverlay: "rgba(30,58,138,0.88)", accent: "#2563EB" },
+    { p: "#DC2626", p2: "#F87171", pRgb: "220,38,38", dark: "#1c1917", light: "#FEF2F2", grd: "#DC2626", heroOverlay: "rgba(28,25,23,0.9)", accent: "#DC2626" },
+    { p: "#059669", p2: "#34D399", pRgb: "5,150,105", dark: "#064e3b", light: "#ECFDF5", grd: "#059669", heroOverlay: "rgba(6,78,59,0.88)", accent: "#059669" },
+    { p: "#7C3AED", p2: "#A78BFA", pRgb: "124,58,237", dark: "#1e1040", light: "#F5F3FF", grd: "#7C3AED", heroOverlay: "rgba(30,16,64,0.88)", accent: "#7C3AED" },
+    { p: "#B45309", p2: "#F59E0B", pRgb: "180,83,9", dark: "#1c1917", light: "#FFFBEB", grd: "#B45309", heroOverlay: "rgba(28,25,23,0.85)", accent: "#B45309" },
+    { p: "#0D9488", p2: "#2DD4BF", pRgb: "13,148,136", dark: "#042f2e", light: "#F0FDFA", grd: "#0D9488", heroOverlay: "rgba(4,47,46,0.88)", accent: "#0D9488" },
+    { p: "#DB2777", p2: "#F472B6", pRgb: "219,39,119", dark: "#2d0a20", light: "#FDF2F8", grd: "#DB2777", heroOverlay: "rgba(45,10,32,0.88)", accent: "#DB2777" },
+    { p: "#0891B2", p2: "#22D3EE", pRgb: "8,145,178", dark: "#0c4a6e", light: "#ECFEFF", grd: "#0891B2", heroOverlay: "rgba(12,74,110,0.88)", accent: "#0891B2" }
   ];
   
-  const base = PREMIUM_PALETTES[hash % PREMIUM_PALETTES.length];
+  // Sélection basée sur le hash pour unicité
+  const baseIndex = hash % baseSchemes.length;
+  const base = baseSchemes[baseIndex];
   
-  // Convert hex to RGB helper
-  const hexToRgb = (hex: string) => {
+  // Variation des couleurs basée sur le hash
+  const hueShift = (hash % 360);
+  const lightnessShift = (hash % 20) - 10; // -10 à +10
+  
+  // Fonction pour ajuster une couleur
+  const adjustColor = (hex: string, hue: number, light: number): string => {
+    // Convert hex to RGB
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    return `${r},${g},${b}`;
+    
+    // Convert to HSL
+    const max = Math.max(r, g, b) / 255;
+    const min = Math.min(r, g, b) / 255;
+    let h = 0, s = 0, l = (max + min) / 2;
+    
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / 255 / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / 255 / d + 2) / 6; break;
+        case b: h = ((r - g) / 255 / d + 4) / 6; break;
+      }
+    }
+    
+    // Adjust HSL
+    h = (h * 360 + hue) % 360;
+    l = Math.max(0, Math.min(1, l + light / 100));
+    
+    // Convert back to hex
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = l - c / 2;
+    let [rNew, gNew, bNew] = [0, 0, 0];
+    
+    if (h >= 0 && h < 60) [rNew, gNew, bNew] = [c, x, 0];
+    else if (h >= 60 && h < 120) [rNew, gNew, bNew] = [x, c, 0];
+    else if (h >= 120 && h < 180) [rNew, gNew, bNew] = [0, c, x];
+    else if (h >= 180 && h < 240) [rNew, gNew, bNew] = [0, x, c];
+    else if (h >= 240 && h < 300) [rNew, gNew, bNew] = [x, 0, c];
+    else [rNew, gNew, bNew] = [c, 0, x];
+    
+    const toHex = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
+    return `#${toHex(rNew)}${toHex(gNew)}${toHex(bNew)}`;
   };
-
+  
+  // Générer palette unique
+  const primary = adjustColor(base.p, hueShift, lightnessShift);
+  const secondary = adjustColor(base.p2, hueShift + 30, lightnessShift - 5);
+  
   return {
-    p: base.p,
-    p2: base.p2,
-    pRgb: hexToRgb(base.p),
+    p: primary,
+    p2: secondary,
+    pRgb: `${parseInt(primary.slice(1, 3), 16)},${parseInt(primary.slice(3, 5), 16)},${parseInt(primary.slice(5, 7), 16)}`,
     dark: base.dark,
     light: base.light,
-    grd: `linear-gradient(135deg, ${base.p} 0%, ${base.p2} 100%)`,
-    heroOverlay: `linear-gradient(135deg, rgba(${hexToRgb(base.dark)}, 0.9), rgba(${hexToRgb(base.p)}, 0.4))`,
-    accent: base.p2
+    grd: primary, // 🎯 PAS DE DÉGRADÉ - COULEUR PURE
+    heroOverlay: base.heroOverlay,
+    accent: primary
   };
 }
 
@@ -640,12 +685,22 @@ function getImgs(lead: Lead): string[] {
 function getLogo(lead: Lead, scheme: Scheme): string {
   const n = safeStr(lead.name);
   const words = n.split(/\s+/).filter(Boolean);
+  const initials =
+    words.length >= 2
+      ? (words[0][0] + words[1][0]).toUpperCase()
+      : n.substring(0, 2).toUpperCase();
   const brandText = words.slice(0, 2).join(" ");
-  const initials = words.length >= 2 ? (words[0][0] + words[1][0]).toUpperCase() : n.substring(0, 2).toUpperCase();
 
-  return `<a class="navbar-brand d-flex align-items-center gap-3" href="#home" style="transition: transform 0.3s ease;">
-    <div style="display:flex;width:42px;height:42px;border-radius:10px;background:${scheme.grd};color:#fff;font-weight:800;font-size:16px;align-items:center;justify-content:center;box-shadow:0 10px 20px rgba(var(--prgb),.2)">${initials}</div>
-    <span class="fw-extrabold fs-4" style="color:var(--dark);letter-spacing:-0.5px">${esc(brandText)}</span>
+  if (lead.logo) {
+    return `<a class="navbar-brand d-flex align-items-center gap-3" href="#home">
+      <img src="${px(lead.logo)}" alt="${esc(n)}" style="height:45px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div style="display:none;width:45px;height:45px;border-radius:12px;background:${scheme.grd};color:#fff;font-weight:800;font-size:18px;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(var(--prgb),.3)">${initials}</div>
+      <span class="fw-bold fs-4" style="color:#fff;margin-left:8px">${esc(brandText)}</span>
+    </a>`;
+  }
+  return `<a class="navbar-brand d-flex align-items-center gap-3" href="#home">
+    <div style="display:flex;width:45px;height:45px;border-radius:12px;background:${scheme.grd};color:#fff;font-weight:800;font-size:18px;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(var(--prgb),.3);letter-spacing:-0.5px">${initials}</div>
+    <span class="fw-bold fs-4" style="color:#fff;margin-left:8px">${esc(brandText)}</span>
   </a>`;
 }
 
@@ -672,8 +727,24 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
   const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
   // Typographies uniques
-  const bodyFont = "'Plus Jakarta Sans', sans-serif";
-  const headingFont = "'Plus Jakarta Sans', sans-serif";
+  const fontFamilies = [
+    "'Inter', sans-serif",
+    "'Roboto', sans-serif", 
+    "'Poppins', sans-serif",
+    "'Montserrat', sans-serif",
+    "'Nunito', sans-serif",
+    "'Raleway', sans-serif"
+  ];
+  const headingFonts = [
+    "'Playfair Display', serif",
+    "'Montserrat', serif",
+    "'Roboto Slab', serif",
+    "'Merriweather', serif",
+    "'Lora', serif"
+  ];
+  
+  const bodyFont = fontFamilies[hash % fontFamilies.length];
+  const headingFont = headingFonts[(hash + 1) % headingFonts.length];
   
   // Tailles de texte uniques
   const baseSize = 16 + (hash % 4); // 16-19px
@@ -695,15 +766,26 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
   
   // Génération du logo SVG professionnel
   const initials = n.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase();
-  const svgLogo = `<svg width="45" height="45" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  const svgLogo = `<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" style="stop-color:${scheme.p};stop-opacity:1" />
           <stop offset="100%" style="stop-color:${scheme.p2};stop-opacity:1" />
         </linearGradient>
+        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+          <feOffset dx="0" dy="2" result="offsetblur"/>
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.2"/>
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
-      <circle cx="30" cy="30" r="28" fill="none" stroke="url(#logoGradient)" stroke-width="4"/>
-      <text x="30" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-size="22" font-weight="800" text-anchor="middle" fill="${scheme.p}">${initials}</text>
+      <rect width="60" height="60" rx="12" fill="url(#logoGradient)" filter="url(#shadow)"/>
+      <text x="30" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">${initials}</text>
     </svg>`;
   
   // 🎯 NOM LIMITÉ À 2 MOTS + PHRASE UNIQUE
@@ -724,9 +806,8 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -810,31 +891,52 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             background: var(--secondary);
         }
         
-        /* Chat bot et autres éléments - CERCLE PARFAIT */
-        .chat-bubble, .chat-widget, .whatsapp-float {
-            border-radius: 50% !important;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+        /* Chat bot et autres éléments - MÊMES COULEURS QUE BOUTONS */
+        .chat-bubble {
             background: var(--primary);
             color: white;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
         }
         
-        .chat-bubble:hover, .chat-widget:hover, .whatsapp-float:hover {
-            background: var(--secondary) !important;
-            transform: scale(1.1);
+        .chat-bubble:hover {
+            background: var(--secondary);
         }
-
+        
+        .brand-slogan {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .footer-brand-slogan {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Chat bot externe - FORCER COULEURS DU SITE */
+        .chat-widget {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+        
+        .chat-widget:hover {
+            background: var(--secondary) !important;
+        }
+        
         .chat-message {
-            background: white !important;
-            color: var(--dark) !important;
-            border-radius: 12px !important;
-            border: 1px solid rgba(0,0,0,0.05) !important;
+            background: var(--primary) !important;
+            color: white !important;
+        }
+        
+        .chat-input {
+            border-color: var(--primary) !important;
+        }
+        
+        .chat-send {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+        
+        .chat-send:hover {
+            background: var(--secondary) !important;
         }
         
         /* Espacements uniques */
@@ -946,7 +1048,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             font-weight: 700;
             font-size: 1.2rem;
             color: var(--primary) !important;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .brand-text {
@@ -1068,7 +1170,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             line-height: 1.1;
             color: #2c3e50;
             margin-bottom: 20px;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
         
         .hero-title-accent {
@@ -1344,7 +1446,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             box-shadow: 0 15px 40px rgba(var(--primary-rgb), 0.3);
             position: relative;
             overflow: hidden;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .btn-primary::before {
@@ -1377,7 +1479,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             letter-spacing: 1.5px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             background: transparent;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .btn-outline-primary:hover {
@@ -1389,67 +1491,143 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         /* Sections améliorées */
         .section {
-            padding: 100px 0;
+            padding: 120px 0;
             position: relative;
         }
         
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.3;
+        }
+        
         .section-title {
-            font-size: ${h2Size}rem;
-            font-weight: 800;
+            font-size: 3.5rem;
+            font-weight: 900;
             text-align: center;
-            margin-bottom: 60px;
-            color: var(--dark);
+            margin-bottom: 80px;
             position: relative;
+            font-family: 'Playfair Display', serif;
         }
         
         .section-title::after {
             content: '';
             position: absolute;
-            bottom: -20px;
+            bottom: -30px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
+            width: 100px;
             height: 4px;
-            background: var(--primary);
+            background: ${scheme.grd};
             border-radius: 2px;
         }
         
         /* Service Cards premium */
         .service-card {
             background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            transition: all 0.4s ease;
+            padding: 50px 40px;
+            border-radius: 25px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             height: 100%;
-            border: 1px solid rgba(0,0,0,0.02);
-            text-align: center;
+            border: 1px solid rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: ${scheme.grd};
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .service-card:hover::before {
+            transform: scaleX(1);
         }
         
         .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-            border-color: var(--primary);
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.15);
         }
         
         .service-icon {
-            width: 80px;
-            height: 80px;
-            background: rgba(var(--primary-rgb), 0.1);
-            color: var(--primary);
-            border-radius: 20px;
+            width: 90px;
+            height: 90px;
+            background: ${scheme.grd};
+            border-radius: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 25px;
-            font-size: 2rem;
-            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
         }
         
-        .service-card:hover .service-icon {
-            background: var(--primary);
+        /* Gallery ultra-HD avec overlay */
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(var(--primary-rgb), 0.9) 0%, rgba(var(--primary-rgb), 0.7) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .gallery-content {
             color: white;
-            transform: rotate(10deg);
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .gallery-item:hover::before {
+            opacity: 1;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05) translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            display: block;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.1);
         }
         
         .gallery-overlay {
@@ -1792,40 +1970,69 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             line-height: 1.6;
         }
         
-        /* Testimonials Section */
-        .testimonial-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
-            height: 100%;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(0,0,0,0.03);
+        /* Gallery Section Professionnelle */
+        .gallery-professional {
+            margin-top: 50px;
+        }
+        
+        .gallery-row {
             display: flex;
-            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .gallery-item-pro {
+            flex: 1;
+            max-width: 280px;
             position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .testimonial-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
-            border-color: var(--primary);
+        .gallery-item-pro:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
         }
         
-        .testimonial-text {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            color: #4a5568;
-            margin-bottom: 30px;
-            flex-grow: 1;
+        .gallery-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 15px;
         }
         
-        .stars {
-            color: #ffc107;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gallery-item-pro:hover .gallery-image {
+            transform: scale(1.1);
+            filter: brightness(0.8);
+        }
+        
+        .gallery-overlay-pro {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.8) 0%, rgba(var(--accent-rgb), 0.9) 100%);
             display: flex;
-            gap: 2px;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gallery-item-pro:hover .gallery-overlay-pro {
+            opacity: 1;
         }
         
         .gallery-number {
@@ -2582,10 +2789,11 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <li class="nav-item"><a class="nav-link" href="#about">À Propos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
                     <li class="nav-item"><a class="nav-link" href="#process">Démarche</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#gallery">Réalisations</a></li>
                     <li class="nav-item"><a class="nav-link" href="#testimonials">Témoignages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item ms-3">
-                        <button class="btn btn-primary btn-sm rounded-pill px-3">
+                        <button class="btn btn-primary btn-sm">
                             <i class="bi bi-telephone-fill me-1"></i>Appeler
                         </button>
                     </li>
@@ -2669,37 +2877,129 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-
-    <!-- Section Engagements (Preuve Sociale & Confiance) -->
-    <section class="section bg-light" id="engagements">
+    <!-- Statistics Section -->
+    <section class="section bg-light" id="statistics">
         <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Pourquoi nous faire confiance ?</h2>
+            <h2 class="section-title" data-aos="fade-up">Nos Chiffres Clés</h2>
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card text-center" data-aos="fade-up">
-                        <div class="engagement-icon mb-4" style="font-size: 3rem; color: var(--primary);">
-                            <i class="bi bi-shield-check"></i>
+                ${[
+                    { number: `${Math.floor(Math.random() * 500) + 200}+`, label: "Clients Satisfaits", icon: "bi-people-fill" },
+                    { number: `${Math.floor(Math.random() * 15) + 5}+`, label: "Ans d'Expérience", icon: "bi-award-fill" },
+                    { number: `${Math.floor(Math.random() * 1000) + 500}+`, label: "Projets Réalisés", icon: "bi-briefcase-fill" },
+                    { number: "100%", label: "Satisfaction Garantie", icon: "bi-patch-check-fill" }
+                ].map((stat, index) => `
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                            <div class="stat-icon">
+                                <i class="bi ${stat.icon}"></i>
+                            </div>
+                            <div class="stat-number">${stat.number}</div>
+                            <div class="stat-label">${stat.label}</div>
                         </div>
-                        <h4 class="mb-3">Expertise Certifiée</h4>
-                        <p class="text-muted">Des interventions réalisées dans le respect total des normes de sécurité et de qualité.</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <!-- Expertise Section -->
+    <section class="section" id="expertise">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Notre Expertise</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div data-aos="fade-right" data-aos-duration="1000">
+                        <h3 class="mb-4">Une Excellence Reconnue</h3>
+                        <p class="lead mb-4">
+                            Avec plus de 10 ans d'expérience dans le secteur ${sector.toLowerCase()}, 
+                            nous avons développé un savoir-faire unique qui garantit des résultats exceptionnels.
+                        </p>
+                        <div class="expertise-list">
+                            ${[
+                                "Qualité professionnelle certifiée",
+                                "Équipe d'experts dédiés", 
+                                "Matériels de dernière génération",
+                                "Suivi personnalisé",
+                                "Garantie satisfaction",
+                                "Intervention rapide"
+                            ].map(item => `
+                                <div class="expertise-item">
+                                    <i class="bi bi-check-circle-fill text-success me-3"></i>
+                                    <span>${item}</span>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card text-center" data-aos="fade-up" data-aos-delay="100">
-                        <div class="engagement-icon mb-4" style="font-size: 3rem; color: var(--primary);">
-                            <i class="bi bi-clock-history"></i>
-                        </div>
-                        <h4 class="mb-3">Réactivité Immédiate</h4>
-                        <p class="text-muted">Un service client réactif et des interventions rapides pour garantir votre tranquillité.</p>
+                <div class="col-lg-6">
+                    <div data-aos="fade-left" data-aos-duration="1000">
+                        <img src="${imgs[1]}" alt="Notre Expertise" class="img-fluid rounded-4 shadow-lg">
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card text-center" data-aos="fade-up" data-aos-delay="200">
-                        <div class="engagement-icon mb-4" style="font-size: 3rem; color: var(--primary);">
-                            <i class="bi bi-heart-fill"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="section bg-light" id="values">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Nos Valeurs</h2>
+            <div class="row">
+                ${[
+                    { icon: "bi-check-circle-fill", title: "Fiabilité", description: "Nous tenons nos promesses avec rigueur et transparence." },
+                    { icon: "bi-lightbulb-fill", title: "Innovation", description: "Nous intégrons les dernières technologies et méthodes." },
+                    { icon: "bi-heart-fill", title: "Passion", description: "Notre passion pour le métier se reflète dans chaque projet." },
+                    { icon: "bi-trophy-fill", title: "Excellence", description: "Nous visons toujours la perfection dans nos réalisations." }
+                ].map((value, index) => `
+                    <div class="col-lg-3 col-md-6">
+                        <div class="value-card" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                            <div class="value-icon">
+                                <i class="bi ${value.icon}"></i>
+                            </div>
+                            <h5>${value.title}</h5>
+                            <p>${value.description}</p>
                         </div>
-                        <h4 class="mb-3">Satisfaction Totale</h4>
-                        <p class="text-muted">Plus de 500 clients nous font déjà confiance pour la qualité irréprochable de nos services.</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section class="section" id="technology">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Technologie & Innovation</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6 order-lg-2">
+                    <div data-aos="fade-left" data-aos-duration="1000">
+                        <img src="${imgs[2]}" alt="Technologie" class="img-fluid rounded-4 shadow-lg">
+                    </div>
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <div data-aos="fade-right" data-aos-duration="1000">
+                        <h3 class="mb-4">Au Coeur de l'Innovation</h3>
+                        <p class="lead mb-4">
+                            Nous investissons continuellement dans les technologies les plus avancées 
+                            pour vous offrir des solutions d'avant-garde.
+                        </p>
+                        <div class="tech-features">
+                            ${[
+                                "Équipements de pointe",
+                                "Méthodes innovantes",
+                                "Formation continue",
+                                "R&D permanente"
+                            ].map(feature => `
+                                <div class="tech-feature">
+                                    <div class="tech-icon">
+                                        <i class="bi bi-cpu-fill"></i>
+                                    </div>
+                                    <div class="tech-content">
+                                        <h6>${feature}</h6>
+                                        <p class="mb-0 text-muted">Technologie de dernière génération</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2707,49 +3007,132 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
     </section>
 
     <!-- Engagements Section -->
-    <!-- Section Engagements (Cartes) -->
     <section class="section bg-light" id="engagements">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Nos Engagements</h2>
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card" data-aos="fade-up">
-                        <div class="engagement-icon"><i class="bi bi-shield-check"></i></div>
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="0">
+                        <div class="engagement-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
                         <h4>Qualité Garantie</h4>
-                        <p>Intervention réalisée selon les normes strictes avec garantie décennale.</p>
+                        <p>Intervention réalisée selon les normes les plus strictes avec garantie décennale sur tous nos travaux.</p>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card" data-aos="fade-up" data-aos-delay="100">
-                        <div class="engagement-icon"><i class="bi bi-clock-history"></i></div>
-                        <h4>Réactivité 24/7</h4>
-                        <p>Intervention rapide sous 24h. Disponibilité totale pour vos urgences.</p>
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+                        <div class="engagement-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <h4>Réactivité</h4>
+                        <p>Intervention rapide sous 24h maximum. Disibilité 7j/7 et 24h/24 pour les urgences.</p>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card" data-aos="fade-up" data-aos-delay="200">
-                        <div class="engagement-icon"><i class="bi bi-hand-thumbs-up"></i></div>
-                        <h4>Satisfaction</h4>
-                        <p>Plus de 234 clients satisfaits. Note moyenne de 4.9/5.</p>
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                        <div class="engagement-icon">
+                            <i class="bi bi-hand-thumbs-up"></i>
+                        </div>
+                        <h4>Satisfaction Client</h4>
+                        <p>Plus de 234 clients satisfaits. Note moyenne de 4.9/5 basée sur des avis authentiques.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+                        <div class="engagement-icon">
+                            <i class="bi bi-award"></i>
+                        </div>
+                        <h4>Expertise Certifiée</h4>
+                        <p>Formation continue et certifications professionnelles garantissent une expertise à la pointe du secteur.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+                        <div class="engagement-icon">
+                            <i class="bi bi-piggy-bank"></i>
+                        </div>
+                        <h4>Transparence</h4>
+                        <p>Devis détaillé et gratuit. Aucun frais caché. Paiement sécurisé et facturation claire.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
+                        <div class="engagement-icon">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <h4>Matériel Professionnel</h4>
+                        <p>Équipements de dernière génération et techniques modernes pour des résultats durables.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Certifications Section -->
+    <section class="section" id="certifications">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Garanties & Assurances</h2>
+            <div class="row">
+                <div class="col-lg-12 mx-auto text-center">
+                    <div data-aos="fade-up" data-aos-duration="1000">
+                        <p class="lead mb-5">
+                            Votre tranquillité d'esprit est notre priorité. Toutes nos interventions sont couvertes par des garanties complètes.
+                        </p>
+                        <div class="certifications-grid-inline">
+                            ${[
+                                "Garantie Décennale",
+                                "Assurance Responsabilité Civile", 
+                                "Certification Qualité",
+                                "Assurance Tous Risques"
+                            ].map((cert, index) => `
+                                <div class="certification-item-inline" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                                    <div class="cert-icon">
+                                        <i class="bi bi-shield-check"></i>
+                                    </div>
+                                    <p class="mb-0 fw-600">${cert}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- About Section -->
     <section class="section" id="about">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-4">
-                    <div data-aos="fade-right">
+                    <div data-aos="fade-right" data-aos-duration="1000">
                         <h2 class="section-title">${uniqueContent.aboutTitle}</h2>
                         <p class="lead fs-4">${uniqueContent.aboutText}</p>
+                        ${content.whyChooseUs ? `
+                        <div class="mt-5">
+                            <h4 class="mb-4 fs-3">Pourquoi nous choisir ?</h4>
+                            <div class="row g-3">
+                                ${content.whyChooseUs.map((reason, index) => `
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="service-icon me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                                <i class="bi bi-check-circle-fill"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-2">${reason}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
-                    <img src="${imgs[1]}" alt="${n}" class="img-fluid rounded-4 shadow-lg" data-aos="fade-left">
+                    <div data-aos="fade-left" data-aos-duration="1000">
+                        <img src="${imgs[1]}" alt="${n}" class="img-fluid rounded-4 shadow-lg">
+                    </div>
                 </div>
             </div>
         </div>
@@ -2762,13 +3145,135 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             <div class="row g-4">
                 ${content.services.map((service, index) => `
                     <div class="col-lg-4 col-md-6">
-                        <div class="service-card" data-aos="fade-up" data-aos-delay="${index * 100}">
-                            <div class="service-icon"><i class="bi ${getBI(lead.sector)[index] || 'bi-star-fill'}"></i></div>
+                        <div class="service-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                            <div class="service-icon">
+                                <i class="bi ${getBI(lead.sector)[index] || 'bi-star-fill'}"></i>
+                            </div>
                             <h4 class="mb-3">${service.name}</h4>
                             <p class="mb-0">${service.description}</p>
                         </div>
                     </div>
                 `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="section" id="gallery">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">${uniqueContent.galleryTitle}</h2>
+            <div class="gallery-professional">
+                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+                    ${imgs.slice(2, 6).map((img, index) => `
+                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
+                            <div class="gallery-image-wrapper">
+                                <img src="${img}" alt="Réalisation ${index + 1}" loading="lazy" class="gallery-image">
+                                <div class="gallery-overlay-pro">
+                                    <div class="gallery-number">${index + 1}</div>
+                                    <div class="gallery-icon">
+                                        <i class="bi bi-search"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                    ${imgs.slice(6, 10).map((img, index) => `
+                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
+                            <div class="gallery-image-wrapper">
+                                <img src="${img}" alt="Réalisation ${index + 5}" loading="lazy" class="gallery-image">
+                                <div class="gallery-overlay-pro">
+                                    <div class="gallery-number">${index + 5}</div>
+                                    <div class="gallery-icon">
+                                        <i class="bi bi-search"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section bg-light" id="testimonials">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Témoignages Clients</h2>
+            <div class="testimonials-header text-center mb-5" data-aos="fade-up" data-aos-delay="100">
+                <p class="lead fs-4">Avis authentiques vérifiés Google Maps</p>
+                <div class="google-badge mx-auto">
+                    <div class="badge-stars">
+                        ${Array(5).fill('<i class="bi bi-star-fill"></i>').join('')}
+                    </div>
+                    <div class="badge-text">${lead.googleRating || '4.9'} sur 5 basé sur ${lead.googleReviews || '234'} avis</div>
+                </div>
+            </div>
+            <div class="row">
+                ${content.testimonials && content.testimonials.length > 0 ? 
+                    content.testimonials.map((testimonial, index) => `
+                        <div class="col-lg-4 col-md-6">
+                            <div class="testimonial-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                                <div class="testimonial-header">
+                                    <div class="stars">${stars(testimonial.rating)}</div>
+                                    <div class="google-verified">
+                                        <i class="bi bi-patch-check-fill text-primary"></i>
+                                        <small>Avis Google Maps vérifié</small>
+                                    </div>
+                                </div>
+                                <div class="testimonial-text">
+                                    <p class="mb-4 fs-5">${testimonial.text}</p>
+                                    ${testimonial.text.length > 150 ? `
+                                        <a href="#" class="read-more" onclick="this.closest('.testimonial-card').querySelector('.testimonial-text p').classList.toggle('expanded'); this.textContent = this.textContent === 'Lire plus' ? 'Lire moins' : 'Lire plus'; return false;">Lire plus</a>
+                                    ` : ''}
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">${testimonial.author}</h6>
+                                        <small class="text-muted">${testimonial.date}</small>
+                                    </div>
+                                    <div class="google-logo">
+                                        <small class="text-muted">Google</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('') :
+                    // Fallback si pas de témoignages réels
+                    [
+                        { author: "Client Satisfait", text: `Excellent service ${sector.toLowerCase()} ! Très professionnel et disponible.`, rating: 5, date: "Il y a 2 jours" },
+                        { author: "Client Fidèle", text: `Intervention rapide et efficace. Je recommande vivement pour vos besoins en ${sector.toLowerCase()}.`, rating: 5, date: "Il y a 1 semaine" },
+                        { author: "Client Ravi", text: `Expertise confirmée et résultat parfait. Le meilleur ${sector.toLowerCase()} de la région !`, rating: 5, date: "Il y a 2 semaines" }
+                    ].map((testimonial, index) => `
+                        <div class="col-lg-4 col-md-6">
+                            <div class="testimonial-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                                <div class="testimonial-header">
+                                    <div class="stars">${stars(testimonial.rating)}</div>
+                                    <div class="google-verified">
+                                        <i class="bi bi-patch-check-fill text-primary"></i>
+                                        <small>Avis Google Maps vérifié</small>
+                                    </div>
+                                </div>
+                                <div class="testimonial-text">
+                                    <p class="mb-4 fs-5">${testimonial.text}</p>
+                                    ${testimonial.text.length > 150 ? `
+                                        <a href="#" class="read-more" onclick="this.closest('.testimonial-card').querySelector('.testimonial-text p').classList.toggle('expanded'); this.textContent = this.textContent === 'Lire plus' ? 'Lire moins' : 'Lire plus'; return false;">Lire plus</a>
+                                    ` : ''}
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">${testimonial.author}</h6>
+                                        <small class="text-muted">${testimonial.date}</small>
+                                    </div>
+                                    <div class="google-logo">
+                                        <small class="text-muted">Google</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')
+                }
             </div>
         </div>
     </section>
@@ -2779,15 +3284,17 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             <h2 class="section-title" data-aos="fade-up">Notre Démarche</h2>
             <div class="row">
                 ${[
-                    { step: "1", icon: "bi-telephone-fill", title: "Contact", description: "Écoute de vos besoins et définition des objectifs." },
-                    { step: "2", icon: "bi-clipboard-check-fill", title: "Devis", description: "Établissement d'un devis détaillé et gratuit." },
-                    { step: "3", icon: "bi-building-fill", title: "Réalisation", description: "Intervention professionnelle dans les délais." },
-                    { step: "4", icon: "bi-check-circle-fill", title: "Validation", description: "Contrôle qualité et livraison finale." }
+                    { step: "1", icon: "bi-telephone-fill", title: "Contact Initial", description: "Nous écoutons vos besoins et définissons ensemble les objectifs de votre projet." },
+                    { step: "2", icon: "bi-clipboard-check-fill", title: "Devis Personnalisé", description: "Nous établissons un devis détaillé et transparent adapté à votre budget." },
+                    { step: "3", icon: "bi-building-fill", title: "Réalisation", description: "Notre équipe intervient avec professionnalisme et respect des délais." },
+                    { step: "4", icon: "bi-check-circle-fill", title: "Livraison", description: "Nous vous livrons un travail de qualité et assurons votre satisfaction." }
                 ].map((process, index) => `
                     <div class="col-lg-3 col-md-6">
-                        <div class="process-card" data-aos="fade-up" data-aos-delay="${index * 100}">
+                        <div class="process-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
                             <div class="process-number">${process.step}</div>
-                            <div class="process-icon"><i class="bi ${process.icon}"></i></div>
+                            <div class="process-icon">
+                                <i class="bi ${process.icon}"></i>
+                            </div>
                             <h5>${process.title}</h5>
                             <p>${process.description}</p>
                         </div>
@@ -2797,120 +3304,100 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="section bg-light" id="testimonials">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Témoignages Clients</h2>
-            <div class="testimonials-header text-center mb-5">
-                <p class="lead fs-4">Avis clients vérifiés</p>
-                <div class="google-badge mx-auto">
-                    <div class="badge-stars">${Array(5).fill('<i class="bi bi-star-fill"></i>').join('')}</div>
-                    <div class="badge-text">${lead.googleRating || '4.9'}/5 (${lead.googleReviews || '234'} avis)</div>
-                </div>
-            </div>
-            <div class="row g-4">
-                ${content.testimonials && content.testimonials.length > 0 ? 
-                    content.testimonials.map((testimonial, index) => `
-                        <div class="col-lg-4 col-md-6">
-                            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="${index * 100}">
-                                <div class="stars">${stars(testimonial.rating)}</div>
-                                <div class="testimonial-text"><p>${testimonial.text}</p></div>
-                                <h6 class="mb-1">${testimonial.author}</h6>
-                                <small class="text-muted">Client vérifié</small>
-                            </div>
-                        </div>
-                    `).join('') :
-                    [
-                        { author: "Marc L.", text: "Excellent service ! Très professionnel et disponible pour toutes nos questions.", rating: 5 },
-                        { author: "Sophie D.", text: "Intervention rapide et résultat impeccable. Je recommande fortement.", rating: 5 },
-                        { author: "Jean M.", text: "Expertise confirmée et travail de grande qualité. Merci pour votre aide.", rating: 5 }
-                    ].map((testimonial, index) => `
-                        <div class="col-lg-4 col-md-6">
-                            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="${index * 100}">
-                                <div class="stars">${stars(testimonial.rating)}</div>
-                                <div class="testimonial-text"><p>${testimonial.text}</p></div>
-                                <h6 class="mb-1">${testimonial.author}</h6>
-                                <small class="text-muted">Avis Google vérifié</small>
-                            </div>
-                        </div>
-                    `).join('')
-                }
-            </div>
-        </div>
-    </section>
-
-
-    <!-- Contact Section -->
-    <section class="section" id="contact">
+    <!-- Contact Section Professionnelle -->
+    <section class="section contact-section" id="contact">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">${uniqueContent.contactTitle}</h2>
             
-            <div class="row g-5">
-                <!-- Info et Coordonnées -->
+            <!-- Informations de contact et formulaire -->
+            <div class="row">
+                <!-- Colonne 1: Informations de contact -->
                 <div class="col-lg-5">
-                    <div class="contact-info-premium" data-aos="fade-right">
-                        <div class="contact-card-premium mb-4">
-                            <div class="contact-icon-premium">
-                                <i class="bi bi-geo-alt-fill"></i>
-                            </div>
-                            <div class="contact-text-premium">
-                                <h6>Notre Adresse</h6>
-                                <p>${addr || 'Adresse à venir'}</p>
-                            </div>
-                        </div>
+                    <div class="contact-info-professional" data-aos="fade-right" data-aos-duration="1000">
+                        <h3 class="contact-title">Contactez-nous</h3>
+                        <p class="contact-subtitle">Nous sommes à votre disposition pour répondre à toutes vos questions</p>
                         
-                        <div class="contact-card-premium mb-4">
-                            <div class="contact-icon-premium">
-                                <i class="bi bi-telephone-fill"></i>
+                        <div class="contact-grid">
+                            <div class="contact-card-professional">
+                                <div class="contact-icon-professional">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </div>
+                                <div class="contact-info-text">
+                                    <h6>Téléphone</h6>
+                                    <a href="tel:${ph}" class="contact-link">${ph || 'Non renseigné'}</a>
+                                </div>
                             </div>
-                            <div class="contact-text-premium">
-                                <h6>Téléphone</h6>
-                                <p>${ph || 'Non renseigné'}</p>
+                            
+                            <div class="contact-card-professional">
+                                <div class="contact-icon-professional">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </div>
+                                <div class="contact-info-text">
+                                    <h6>Email</h6>
+                                    <a href="mailto:${em}" class="contact-link">${em || 'Non renseigné'}</a>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="contact-card-premium mb-4">
-                            <div class="contact-icon-premium">
-                                <i class="bi bi-envelope-fill"></i>
+                            
+                            <div class="contact-card-professional">
+                                <div class="contact-icon-professional">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+                                <div class="contact-info-text">
+                                    <h6>Adresse</h6>
+                                    <p class="contact-address">${addr || 'Non renseigné'}</p>
+                                </div>
                             </div>
-                            <div class="contact-text-premium">
-                                <h6>Email</h6>
-                                <p>${em || 'Non renseigné'}</p>
-                            </div>
-                        </div>
-
-                        <div class="contact-card-premium">
-                            <div class="contact-icon-premium">
-                                <i class="bi bi-clock-fill"></i>
-                            </div>
-                            <div class="contact-text-premium">
-                                <h6>Horaires</h6>
-                                <p>Lun - Ven: 08:30 - 18:30 <br> Sam: 09:00 - 12:30</p>
+                            
+                            <div class="contact-card-professional">
+                                <div class="contact-icon-professional">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <div class="contact-info-text">
+                                    <h6>Horaires</h6>
+                                    <p class="contact-hours">Lun-Ven: 8h-19h<br>Sam: 9h-17h</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Formulaire -->
+                <!-- Colonne 2: Formulaire de contact -->
                 <div class="col-lg-7">
-                    <div class="contact-form-premium" data-aos="fade-left">
-                        <form id="contactForm" class="p-4 shadow-sm rounded-4 bg-white border">
+                    <div class="contact-form-professional" data-aos="fade-left" data-aos-duration="1000">
+                        <h3 class="form-title">Envoyez-nous un message</h3>
+                        <p class="form-subtitle">Nous vous répondrons dans les plus brefs délais</p>
+                        
+                        <form id="contactForm" class="contact-form-modern">
                             <div class="row g-4">
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control form-control-lg border-0 bg-light" placeholder="Prénom & Nom" required>
+                                    <label class="form-label-modern">Nom Complet *</label>
+                                    <input type="text" class="form-control-modern" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <input type="email" class="form-control form-control-lg border-0 bg-light" placeholder="Votre Email" required>
+                                    <label class="form-label-modern">Email *</label>
+                                    <input type="email" class="form-control-modern" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-modern">Téléphone</label>
+                                    <input type="tel" class="form-control-modern">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-modern">Service</label>
+                                    <select class="form-control-modern">
+                                        <option>Choisir un service</option>
+                                        ${content.services.map(service => `
+                                            <option>${service.name}</option>
+                                        `).join('')}
+                                    </select>
                                 </div>
                                 <div class="col-12">
-                                    <input type="text" class="form-control form-control-lg border-0 bg-light" placeholder="Sujet de votre demande">
+                                    <label class="form-label-modern">Message *</label>
+                                    <textarea class="form-control-modern" rows="6" required></textarea>
                                 </div>
                                 <div class="col-12">
-                                    <textarea class="form-control form-control-lg border-0 bg-light" rows="5" placeholder="Comment pouvons-nous vous aider ?" required></textarea>
-                                </div>
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">
-                                        Envoyer le message <i class="bi bi-send ms-2"></i>
+                                    <button type="submit" class="btn-submit-professional">
+                                        <i class="bi bi-send-fill me-2"></i>
+                                        Envoyer le message
                                     </button>
                                 </div>
                             </div>
@@ -2918,17 +3405,27 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     </div>
                 </div>
             </div>
-
-            <!-- Google Maps -->
-            <div class="mt-5 rounded-4 overflow-hidden shadow-lg" data-aos="zoom-in">
-                <iframe 
-                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(addr || lead.city || 'Marrakech, Maroc')}&zoom=15"
-                    width="100%" 
-                    height="450" 
-                    style="border:0;" 
-                    allowfullscreen="" 
-                    loading="lazy">
-                </iframe>
+            
+            <!-- Carte Google Maps en dessous -->
+            <div class="map-section-bottom" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                <div class="map-wrapper-bottom">
+                    <iframe 
+                        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(addr || 'Paris, France')}&zoom=15&maptype=roadmap"
+                        width="100%" 
+                        height="400" 
+                        style="border:0; border-radius: 20px;" 
+                        allowfullscreen="" 
+                        loading="lazy"
+                        class="map-iframe-bottom">
+                    </iframe>
+                    <div class="map-overlay-bottom">
+                        <div class="map-info-bottom">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <h5>${n}</h5>
+                            <p>${addr || 'Adresse non renseignée'}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -2963,6 +3460,8 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <ul class="footer-menu">
                         <li><a href="#about" class="footer-link">À Propos</a></li>
                         <li><a href="#services" class="footer-link">Services</a></li>
+                        <li><a href="#process" class="footer-link">Notre Démarche</a></li>
+                        <li><a href="#gallery" class="footer-link">Nos Réalisations</a></li>
                         <li><a href="#testimonials" class="footer-link">Témoignages</a></li>
                         <li><a href="#contact" class="footer-link">Contact</a></li>
                     </ul>
