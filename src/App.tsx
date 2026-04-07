@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLeads, useApiConfig, useEmailTemplates } from './lib/supabase-store';
 import ErrorBoundary from './components/ErrorBoundary';
 import Sidebar from './components/Sidebar';
@@ -10,14 +10,43 @@ import Pipeline from './components/Pipeline';
 import Settings from './components/Settings';
 import Campaigns from './components/Campaigns';
 import { NotificationContainer, ApiStatusIndicator } from './components/Notifications';
+import Login from './components/Login';
+import { supabase } from './lib/supabase';
+import { Session } from '@supabase/supabase-js';
 
 type View = 'dashboard' | 'scorer' | 'website' | 'outreach' | 'pipeline' | 'campaigns' | 'settings';
 
 export default function App() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [view, setView] = useState<View>('dashboard');
+  
+  // N'instancier les hooks que si authentifié, ou bien on les garde mais on protège le rendu
   const { leads, addLeads, updateLead, deleteLeads, loadLeads, loading: leadsLoading } = useLeads();
   const { config, updateConfig, loading: configLoading } = useApiConfig();
   const { templates } = useEmailTemplates();
+
+  // Gestion de la session Supabase
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setIsInitializing(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (isInitializing) {
+    return <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>Chargement sécurisé...</div>;
+  }
+
+  if (!session) {
+    return <Login />;
+  }
 
   // Compter les APIs configurées (non vides)
   const activeApis = [

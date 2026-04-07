@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { ApiConfig, ApiStatus, useApiConfig, LlmProvider } from '../lib/supabase-store';
 import SimpleSerperGenerator from './SimpleSerperGenerator';
+import { supabase } from '../lib/supabase';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
-  border: '#E4E2DA', tx: '#1C1B18', tx2: '#5C5A53', tx3: '#9B9890',
+  border: '#E4E2DA', tx: '#1C1B18', tx1: '#1C1B18', tx2: '#5C5A53', tx3: '#9B9890',
   accent: '#D4500A', accent2: '#F0E8DF',
   green: '#1A7A4A', blue: '#1A4FA0', amber: '#B45309', red: '#C0392B',
 };
@@ -107,6 +108,12 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
       console.error(`❌ Erreur lors de la sauvegarde de ${sectionId}:`, error);
       setSavingSections(prev => ({ ...prev, [sectionId]: false }));
       alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+    }
+  };
+
+  const handleLogout = async () => {
+    if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+      await supabase.auth.signOut();
     }
   };
 
@@ -577,6 +584,22 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
                 e.currentTarget.style.boxShadow = '0 2px 4px rgba(192, 57, 43, 0.2)';
               }}
             >🗑️ Suppression Complète des Données</button>
+
+            <button 
+              onClick={handleLogout}
+              style={{
+                marginTop: 12,
+                padding: '12px 20px', borderRadius: 8, border: `2px solid ${C.tx2}`,
+                background: '#fff', color: C.tx1, fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                width: '100%', transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={e => { 
+                e.currentTarget.style.background = C.surface2; 
+              }}
+              onMouseLeave={e => { 
+                e.currentTarget.style.background = '#fff'; 
+              }}
+            >🚪 Déconnexion</button>
           </div>
         </div>
 
