@@ -3918,9 +3918,9 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         // Animation au chargement
         window.addEventListener('load', function() {
-            // --- TRACKING LEADFORGE ---
+            // --- TRACKING LEADFORGE (ABSOLU CAR HEBERGÉ SUR STORAGE) ---
             const leadId = "${lead.id}";
-            const trackUrl = "/api/track";
+            const trackUrl = "https://www.services-siteup.online/api/track";
             
             // Track site load
             fetch(trackUrl + "?id=" + leadId + "&type=site_clicked", { mode: 'no-cors' });

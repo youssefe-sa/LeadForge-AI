@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Lead, ApiConfig, EmailTemplate, callLLM } from '../lib/supabase-store';
+import { supabase } from '../lib/supabase';
 import { salesTemplates, reminderTemplates, getTemplateById } from '../templates/outreach-templates-final';
 
 const C = {
@@ -195,12 +196,18 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
       setLogs(prev => [...prev, `✅ ${templateId} envoyé à ${lead.name} (${lead.email})`]);
       
       // Logique workflow selon template
-      if (templateId === 'email1_presentation') {
-        // Programmer rappel 3 jours après
-        setTimeout(() => {
-          sendWorkflowEmail(lead, 'reminder1_after_email1');
-        }, 3 * 24 * 60 * 60 * 1000);
-      }
+        // Programmer rappel 3 jours après dans la base de données
+        const scheduledDate = new Date();
+        scheduledDate.setDate(scheduledDate.getDate() + 3);
+        
+        supabase.from('scheduled_emails').insert([{
+          lead_id: lead.id,
+          template_id: 'reminder1_after_email1',
+          scheduled_for: scheduledDate.toISOString()
+        }]).then(({ error }) => {
+          if (error) console.error("Erreur de planification du rappel 1:", error);
+          else setLogs(prev => [...prev, `📅 Rappel 1 programmé pour le ${scheduledDate.toLocaleDateString()}`]);
+        });
     } else {
       setLogs(prev => [...prev, `❌ Échec d'envoi ${templateId} à ${lead.name}: ${result.message}`]);
     }
@@ -243,10 +250,18 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
     
     await sendWorkflowEmail(lead, 'email2_devis');
     
-    // Programmer rappel expiration 2 jours avant fin
-    setTimeout(() => {
-      sendWorkflowEmail(lead, 'reminder2_before_expiry');
-    }, 5 * 24 * 60 * 60 * 1000); // 5 jours (7-2)
+    // Programmer rappel expiration 5 jours après (2 jours avant fin)
+    const scheduledDate = new Date();
+    scheduledDate.setDate(scheduledDate.getDate() + 5);
+    
+    supabase.from('scheduled_emails').insert([{
+      lead_id: lead.id,
+      template_id: 'reminder2_before_expiry',
+      scheduled_for: scheduledDate.toISOString()
+    }]).then(({ error }) => {
+      if (error) console.error("Erreur de planification du rappel 2:", error);
+      else setLogs(prev => [...prev, `📅 Rappel 2 programmé pour le ${scheduledDate.toLocaleDateString()}`]);
+    });
   };
 
   // Envoyer Email 3 après paiement

@@ -4,6 +4,7 @@ import { generateProfessionalSite } from '../lib/professionalTemplate';
 import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { generatePremiumSiteHtml } from '../lib/siteTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
+import { supabase } from '../lib/supabase';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -507,16 +508,35 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const html = generatePremiumSiteHtml(lead, content);
       console.log(`✅ HTML generated for ${lead.name}`);
       
-      const baseUrl = 'https://www.services-siteup.online'; // Forcer l'utilisation de votre domaine
+      updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
+      const fileName = `${lead.id}.html`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('websites')
+        .upload(fileName, html, {
+          contentType: 'text/html',
+          cacheControl: '3600',
+          upsert: true
+        });
+        
+      if (uploadError) {
+        throw new Error(`Erreur d'hébergement: ${uploadError.message}`);
+      }
+
+      // Obtenir l'URL publique
+      const { data: publicUrlData } = supabase.storage
+        .from('websites')
+        .getPublicUrl(fileName);
+        
+      const siteUrl = publicUrlData.publicUrl;
+      console.log(`✅ Site hébergé avec succès: ${siteUrl}`);
       
       console.log(`🔧 Updating lead ${lead.id} in Supabase...`);
-      // Mettre à jour le lead avec les données du site
-      const firstName = lead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 20);
+      // Mettre à jour le lead avec les données du site (sans gonfler la colonne siteHtml)
       await updateLead(lead.id, {
         siteGenerated: true, 
-        siteHtml: html,
-        siteUrl: `${baseUrl}/api/sites/${lead.id}`,
-        landingUrl: `${baseUrl}/api/sites/${lead.id}`,
+        siteHtml: '', // On vide siteHtml pour ne pas alourdir la DB
+        siteUrl: siteUrl,
+        landingUrl: siteUrl,
         stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
       });
       
@@ -529,14 +549,18 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       try {
         console.log(`🔄 Using fallback template for ${lead.name}`);
         const emergencyHtml = generateProfessionalSite(lead);
-        const baseUrl = 'https://www.services-siteup.online'; // Forcer l'utilisation de votre domaine
+        updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
         
-        const firstName = lead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 20);
+        const fileName = `${lead.id}.html`;
+        await supabase.storage.from('websites').upload(fileName, emergencyHtml, { contentType: 'text/html', cacheControl: '3600', upsert: true });
+        const { data: publicUrlData } = supabase.storage.from('websites').getPublicUrl(fileName);
+        const siteUrl = publicUrlData.publicUrl;
+        
         await updateLead(lead.id, {
           siteGenerated: true, 
-          siteHtml: emergencyHtml,
-          siteUrl: `${baseUrl}/api/sites/${firstName}`,
-          landingUrl: `${baseUrl}/api/sites/${firstName}`,
+          siteHtml: '',
+          siteUrl: siteUrl,
+          landingUrl: siteUrl,
           stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
         });
         
@@ -825,13 +849,15 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const content = await generateContent(previewLead);
       const html = generatePremiumSiteHtml(previewLead, content, newOffset);
       
-      const baseUrl = 'https://www.services-siteup.online';
-      const firstName = previewLead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 20);
+      const fileName = `${previewLead.id}.html`;
+      await supabase.storage.from('websites').upload(fileName, html, { contentType: 'text/html', cacheControl: '3600', upsert: true });
+      const { data: publicUrlData } = supabase.storage.from('websites').getPublicUrl(fileName);
+      const siteUrl = publicUrlData.publicUrl;
       
       updateLead(previewLead.id, { 
-        siteHtml: html,
-        siteUrl: baseUrl + '/api/sites/' + firstName,
-        landingUrl: baseUrl + '/api/sites/' + firstName,
+        siteHtml: '',
+        siteUrl: siteUrl,
+        landingUrl: siteUrl,
       });
       
       setTimeout(() => {
