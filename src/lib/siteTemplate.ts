@@ -261,148 +261,14 @@ interface Scheme {
   heroOverlay: string;
   accent: string;
 }
-const SCHEMES: Record<string, Scheme> = {
-  restaurant: {
-    p: "#E8590C",
-    p2: "#FB923C",
-    pRgb: "232,89,12",
-    dark: "#1c1917",
-    light: "#FFF7ED",
-    grd: "linear-gradient(135deg,#E8590C,#FB923C)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(28,25,23,.85),rgba(232,89,12,.4))",
-    accent: "#E8590C",
-  },
-  boulangerie: {
-    p: "#D97706",
-    p2: "#FBBF24",
-    pRgb: "217,119,6",
-    dark: "#1c1917",
-    light: "#FFFBEB",
-    grd: "linear-gradient(135deg,#D97706,#FBBF24)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(28,25,23,.85),rgba(217,119,6,.4))",
-    accent: "#D97706",
-  },
-  coiffeur: {
-    p: "#7C3AED",
-    p2: "#A78BFA",
-    pRgb: "124,58,237",
-    dark: "#1e1040",
-    light: "#F5F3FF",
-    grd: "linear-gradient(135deg,#7C3AED,#A78BFA)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(30,16,64,.88),rgba(124,58,237,.35))",
-    accent: "#7C3AED",
-  },
-  salon: {
-    p: "#DB2777",
-    p2: "#F472B6",
-    pRgb: "219,39,119",
-    dark: "#2d0a20",
-    light: "#FFF0F6",
-    grd: "linear-gradient(135deg,#DB2777,#F472B6)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(45,10,32,.88),rgba(219,39,119,.35))",
-    accent: "#DB2777",
-  },
-  spa: {
-    p: "#0D9488",
-    p2: "#2DD4BF",
-    pRgb: "13,148,136",
-    dark: "#042f2e",
-    light: "#F0FDFA",
-    grd: "linear-gradient(135deg,#0D9488,#2DD4BF)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(4,47,46,.88),rgba(13,148,136,.35))",
-    accent: "#0D9488",
-  },
-  beauté: {
-    p: "#DB2777",
-    p2: "#F472B6",
-    pRgb: "219,39,119",
-    dark: "#2d0a20",
-    light: "#FFF0F6",
-    grd: "linear-gradient(135deg,#DB2777,#F472B6)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(45,10,32,.88),rgba(219,39,119,.35))",
-    accent: "#DB2777",
-  },
-  médecin: {
-    p: "#2563EB",
-    p2: "#60A5FA",
-    pRgb: "37,99,235",
-    dark: "#172554",
-    light: "#EFF6FF",
-    grd: "linear-gradient(135deg,#2563EB,#60A5FA)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(23,37,84,.88),rgba(37,99,235,.35))",
-    accent: "#2563EB",
-  },
-  dentiste: {
-    p: "#0891B2",
-    p2: "#22D3EE",
-    pRgb: "8,145,178",
-    dark: "#0c4a6e",
-    light: "#ECFEFF",
-    grd: "linear-gradient(135deg,#0891B2,#22D3EE)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(12,74,110,.88),rgba(8,145,178,.35))",
-    accent: "#0891B2",
-  },
-  avocat: {
-    p: "#1e3a5f",
-    p2: "#c9a84c",
-    pRgb: "30,58,95",
-    dark: "#0f172a",
-    light: "#F1F5F9",
-    grd: "linear-gradient(135deg,#1e3a5f,#c9a84c)",
-    heroOverlay: "linear-gradient(135deg,rgba(15,23,42,.9),rgba(30,58,95,.45))",
-    accent: "#1e3a5f",
-  },
-  immobilier: {
-    p: "#059669",
-    p2: "#34D399",
-    pRgb: "5,150,105",
-    dark: "#064e3b",
-    light: "#ECFDF5",
-    grd: "linear-gradient(135deg,#059669,#34D399)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(6,78,59,.88),rgba(5,150,105,.35))",
-    accent: "#059669",
-  },
-  hôtel: {
-    p: "#B45309",
-    p2: "#F59E0B",
-    pRgb: "180,83,9",
-    dark: "#1c1917",
-    light: "#FFFBEB",
-    grd: "linear-gradient(135deg,#B45309,#F59E0B)",
-    heroOverlay: "linear-gradient(135deg,rgba(28,25,23,.85),rgba(180,83,9,.4))",
-    accent: "#B45309",
-  },
-  garage: {
-    p: "#DC2626",
-    p2: "#F87171",
-    pRgb: "220,38,38",
-    dark: "#1c1917",
-    light: "#FEF2F2",
-    grd: "linear-gradient(135deg,#DC2626,#F87171)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(28,25,23,.9),rgba(220,38,38,.35))",
-    accent: "#DC2626",
-  },
-  commerce: {
-    p: "#7C3AED",
-    p2: "#A78BFA",
-    pRgb: "124,58,237",
-    dark: "#1e1040",
-    light: "#F5F3FF",
-    grd: "linear-gradient(135deg,#7C3AED,#A78BFA)",
-    heroOverlay:
-      "linear-gradient(135deg,rgba(30,16,64,.88),rgba(124,58,237,.35))",
-    accent: "#7C3AED",
-  },
+const SCHEMES: Record<string, any> = {
+  "charcoal-blue": { p: "#65839a", p2: "#849cae", pRgb: "101,131,154", dark: "#141a1f", light: "#f0f3f5", grd: "linear-gradient(135deg, #65839a, #849cae)", heroOverlay: "rgba(20,26,31,0.85)", accent: "#51697b" },
+  "baltic-blue": { p: "#3e88c1", p2: "#65a0cd", pRgb: "62,136,193", dark: "#0c1b27", light: "#ecf3f9", grd: "linear-gradient(135deg, #3e88c1, #65a0cd)", heroOverlay: "rgba(12,27,39,0.85)", accent: "#326d9a" },
+  "oxford-navy": { p: "#0d78f2", p2: "#3d93f5", pRgb: "13,120,242", dark: "#031830", light: "#e7f1fe", grd: "linear-gradient(135deg, #0d78f2, #3d93f5)", heroOverlay: "rgba(3,24,48,0.85)", accent: "#0a60c2" },
+  "linen": { p: "#be8841", p2: "#cba067", pRgb: "190,136,65", dark: "#261b0d", light: "#f8f3ec", grd: "linear-gradient(135deg, #be8841, #cba067)", heroOverlay: "rgba(38,27,13,0.85)", accent: "#986d34" },
+  "lavender": { p: "#2f2fd0", p2: "#5959d9", pRgb: "47,47,208", dark: "#09092a", light: "#eaeafa", grd: "linear-gradient(135deg, #2f2fd0, #5959d9)", heroOverlay: "rgba(9,9,42,0.85)", accent: "#2626a6" },
+  "bright-ocean": { p: "#1d7fe2", p2: "#4a99e8", pRgb: "29,127,226", dark: "#06192d", light: "#e8f2fc", grd: "linear-gradient(135deg, #1d7fe2, #4a99e8)", heroOverlay: "rgba(6,25,45,0.85)", accent: "#1766b5" },
+  "celadon": { p: "#30cf80", p2: "#5ad899", pRgb: "48,207,128", dark: "#0a291a", light: "#eafaf2", grd: "linear-gradient(135deg, #30cf80, #5ad899)", heroOverlay: "rgba(10,41,26,0.85)", accent: "#27a566" }
 };
 
 // 🎯 GÉNÉRATION DE PHRASES UNIQUES POUR TITRE HERO
@@ -421,92 +287,20 @@ const generateHeroAccent = (lead: Lead): string => {
   return accentPhrases[hash % accentPhrases.length];
 };
 
-// 🎯 LIMITATION DU NOM À 2 MOTS MAX
+// 🎯 LIMITATION DU NOM À 2 MOTS MAX (SANS ARTICLES)
 const getLogoName = (fullName: string): string => {
-  const words = fullName.trim().split(/\s+/);
-  return words.slice(0, 2).join(' ');
+  const skip = ['le', 'la', 'les', 'de', 'du', 'des', 'l\'', 'à', 'a'];
+  const words = fullName.trim().split(/\s+/).filter(w => !skip.includes(w.toLowerCase()));
+  return words.slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 };
+
 function generateUniquePalette(lead: Lead, offset: number = 0): Scheme {
-  const seed = lead.name + (lead.city || '') + (lead.sector || '') + (lead.address || '');
+  const seed = lead.name + (lead.city || '') + (lead.sector || '');
   const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset;
   
-  // 🎯 PALETTES SANS DÉGRADÉS - COULEURS PURES FULL HD
-  const baseSchemes = [
-    { p: "#2563EB", p2: "#60A5FA", pRgb: "37,99,235", dark: "#1e3a8a", light: "#EFF6FF", grd: "#2563EB", heroOverlay: "rgba(30,58,138,0.88)", accent: "#2563EB" },
-    { p: "#DC2626", p2: "#F87171", pRgb: "220,38,38", dark: "#1c1917", light: "#FEF2F2", grd: "#DC2626", heroOverlay: "rgba(28,25,23,0.9)", accent: "#DC2626" },
-    { p: "#059669", p2: "#34D399", pRgb: "5,150,105", dark: "#064e3b", light: "#ECFDF5", grd: "#059669", heroOverlay: "rgba(6,78,59,0.88)", accent: "#059669" },
-    { p: "#7C3AED", p2: "#A78BFA", pRgb: "124,58,237", dark: "#1e1040", light: "#F5F3FF", grd: "#7C3AED", heroOverlay: "rgba(30,16,64,0.88)", accent: "#7C3AED" },
-    { p: "#B45309", p2: "#F59E0B", pRgb: "180,83,9", dark: "#1c1917", light: "#FFFBEB", grd: "#B45309", heroOverlay: "rgba(28,25,23,0.85)", accent: "#B45309" },
-    { p: "#0D9488", p2: "#2DD4BF", pRgb: "13,148,136", dark: "#042f2e", light: "#F0FDFA", grd: "#0D9488", heroOverlay: "rgba(4,47,46,0.88)", accent: "#0D9488" },
-    { p: "#DB2777", p2: "#F472B6", pRgb: "219,39,119", dark: "#2d0a20", light: "#FDF2F8", grd: "#DB2777", heroOverlay: "rgba(45,10,32,0.88)", accent: "#DB2777" },
-    { p: "#0891B2", p2: "#22D3EE", pRgb: "8,145,178", dark: "#0c4a6e", light: "#ECFEFF", grd: "#0891B2", heroOverlay: "rgba(12,74,110,0.88)", accent: "#0891B2" }
-  ];
-  
-  // Sélection basée sur le hash pour unicité
-  const baseIndex = hash % baseSchemes.length;
-  const base = baseSchemes[baseIndex];
-  
-  // Variation des couleurs basée sur le hash
-  const hueShift = (hash % 360);
-  const lightnessShift = (hash % 20) - 10; // -10 à +10
-  
-  // Fonction pour ajuster une couleur
-  const adjustColor = (hex: string, hue: number, light: number): string => {
-    // Convert hex to RGB
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    
-    // Convert to HSL
-    const max = Math.max(r, g, b) / 255;
-    const min = Math.min(r, g, b) / 255;
-    let h = 0, s = 0, l = (max + min) / 2;
-    
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r: h = ((g - b) / 255 / d + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / 255 / d + 2) / 6; break;
-        case b: h = ((r - g) / 255 / d + 4) / 6; break;
-      }
-    }
-    
-    // Adjust HSL
-    h = (h * 360 + hue) % 360;
-    l = Math.max(0, Math.min(1, l + light / 100));
-    
-    // Convert back to hex
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-    const m = l - c / 2;
-    let [rNew, gNew, bNew] = [0, 0, 0];
-    
-    if (h >= 0 && h < 60) [rNew, gNew, bNew] = [c, x, 0];
-    else if (h >= 60 && h < 120) [rNew, gNew, bNew] = [x, c, 0];
-    else if (h >= 120 && h < 180) [rNew, gNew, bNew] = [0, c, x];
-    else if (h >= 180 && h < 240) [rNew, gNew, bNew] = [0, x, c];
-    else if (h >= 240 && h < 300) [rNew, gNew, bNew] = [x, 0, c];
-    else [rNew, gNew, bNew] = [c, 0, x];
-    
-    const toHex = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
-    return `#${toHex(rNew)}${toHex(gNew)}${toHex(bNew)}`;
-  };
-  
-  // Générer palette unique
-  const primary = adjustColor(base.p, hueShift, lightnessShift);
-  const secondary = adjustColor(base.p2, hueShift + 30, lightnessShift - 5);
-  
-  return {
-    p: primary,
-    p2: secondary,
-    pRgb: `${parseInt(primary.slice(1, 3), 16)},${parseInt(primary.slice(3, 5), 16)},${parseInt(primary.slice(5, 7), 16)}`,
-    dark: base.dark,
-    light: base.light,
-    grd: primary, // 🎯 PAS DE DÉGRADÉ - COULEUR PURE
-    heroOverlay: base.heroOverlay,
-    accent: primary
-  };
+  const keys = Object.keys(SCHEMES);
+  const schemeKey = keys[hash % keys.length];
+  return SCHEMES[schemeKey];
 }
 
 // 🎯 GÉNÉRATION DE CONTENU UNIQUE PAR PROSPECT
@@ -807,7 +601,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -825,9 +619,9 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             box-sizing: border-box; 
         }
         
-        /* Font cohérentes - TITRES HERO ET SECTIONS IDENTIQUES */
+        /* Font cohérentes - INTER PARTOUT */
         body {
-            font-family: ${bodyFont};
+            font-family: 'Inter', sans-serif !important;
             font-size: ${baseSize}px;
             line-height: 1.6;
             color: var(--dark);
@@ -836,8 +630,8 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         }
         
         h1, h2, h3, h4, h5, h6 {
-            font-family: ${headingFont};
-            font-weight: 700;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 800;
             line-height: 1.2;
         }
         
@@ -1716,6 +1510,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             flex-direction: column;
             justify-content: space-between;
             border: 1px solid rgba(0,0,0,0.03);
+            margin-bottom: 30px; /* Espace entre les lignes */
         }
         
         .testimonial-text p {
@@ -1853,8 +1648,9 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         }
         
         .process-card h5 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif !important;
             line-height: 1;
+            font-weight: 800;
         }
         
         .stars {
@@ -2793,9 +2589,9 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <li class="nav-item"><a class="nav-link" href="#testimonials">Témoignages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item ms-3">
-                        <button class="btn btn-primary btn-sm">
+                        <a href="tel:${ph}" class="btn btn-primary btn-sm">
                             <i class="bi bi-telephone-fill me-1"></i>Appeler
-                        </button>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -2883,17 +2679,17 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             <h2 class="section-title" data-aos="fade-up">Nos Chiffres Clés</h2>
             <div class="row">
                 ${[
-                    { number: `${Math.floor(Math.random() * 500) + 200}+`, label: "Clients Satisfaits", icon: "bi-people-fill" },
-                    { number: `${Math.floor(Math.random() * 15) + 5}+`, label: "Ans d'Expérience", icon: "bi-award-fill" },
-                    { number: `${Math.floor(Math.random() * 1000) + 500}+`, label: "Projets Réalisés", icon: "bi-briefcase-fill" },
-                    { number: "100%", label: "Satisfaction Garantie", icon: "bi-patch-check-fill" }
+                    { number: `${lead.googleReviews || '450'}+`, label: "Avis Clients", icon: "bi-people-fill" },
+                    { number: `${lead.googleRating || '4.9'}/5`, label: "Note Globale", icon: "bi-star-fill" },
+                    { number: "100%", label: "Satisfaction", icon: "bi-patch-check-fill" },
+                    { number: "24/7", label: "Disponibilité", icon: "bi-clock-fill" }
                 ].map((stat, index) => `
                     <div class="col-lg-3 col-md-6">
                         <div class="stat-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
                             <div class="stat-icon">
                                 <i class="bi ${stat.icon}"></i>
                             </div>
-                            <div class="stat-number">${stat.number}</div>
+                            <div class="stat-number" style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">${stat.number}</div>
                             <div class="stat-label">${stat.label}</div>
                         </div>
                     </div>

@@ -61,13 +61,13 @@
             .chatbot-toggle {
                 width: 56px;
                 height: 56px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, #D4500A 0%, #FF6B35 100%);
+                border-radius: 50% !important;
+                background: var(--primary) !important;
                 border: none;
                 color: white;
                 font-size: 1.5rem;
                 cursor: pointer;
-                box-shadow: 0 12px 32px rgba(212, 80, 10, 0.3);
+                box-shadow: 0 12px 32px rgba(0,0,0,0.15);
                 transition: all 0.3s ease;
                 display: flex;
                 align-items: center;
@@ -98,7 +98,7 @@
             }
             
             .chatbot-header {
-                background: linear-gradient(135deg, #D4500A 0%, #FF6B35 100%);
+                background: var(--primary);
                 color: white;
                 padding: 15px;
                 display: flex;
@@ -166,7 +166,7 @@
             }
             
             .chat-message.user {
-                background: linear-gradient(135deg, #D4500A 0%, #FF6B35 100%);
+                background: var(--primary);
                 color: white;
                 border-bottom-right-radius: 5px;
                 margin-left: auto;
@@ -190,9 +190,9 @@
             }
             
             .chat-quick-actions button:hover {
-                background: #D4500A;
+                background: var(--primary);
                 color: white;
-                border-color: #D4500A;
+                border-color: var(--primary);
             }
             
             .chatbot-input-area {
@@ -213,14 +213,14 @@
             }
             
             .chatbot-input-area input:focus {
-                border-color: #D4500A;
+                border-color: var(--primary);
             }
             
             .chatbot-input-area button {
                 width: 40px;
                 height: 40px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, #D4500A 0%, #FF6B35 100%);
+                border-radius: 50% !important;
+                background: var(--primary);
                 border: none;
                 color: white;
                 cursor: pointer;
