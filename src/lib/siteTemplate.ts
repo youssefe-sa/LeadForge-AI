@@ -3918,6 +3918,20 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         // Animation au chargement
         window.addEventListener('load', function() {
+            // --- TRACKING LEADFORGE ---
+            const leadId = "${lead.id}";
+            const trackUrl = "/api/track";
+            
+            // Track site load
+            fetch(trackUrl + "?id=" + leadId + "&type=site_clicked", { mode: 'no-cors' });
+            
+            // Track button clicks (payment/cta)
+            document.querySelectorAll('a.btn, button.btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    fetch(trackUrl + "?id=" + leadId + "&type=payment_clicked", { mode: 'no-cors' });
+                });
+            });
+
             document.body.style.opacity = '0';
             setTimeout(() => {
                 document.body.style.transition = 'opacity 0.5s ease';

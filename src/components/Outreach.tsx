@@ -55,7 +55,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const [showEmailPreview, setShowEmailPreview] = useState(false);
 
   const hasGmailSmtp = !!(apiConfig.gmailSmtpUser && apiConfig.gmailSmtpPassword);
-  const hasLLM = !!(apiConfig.groqKey || apiConfig.openrouterKey);
+  const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.nvidiaKey || apiConfig.openrouterKey);
 
   const ready = leads.filter(l => l.siteGenerated && !l.emailSent && l.email);
   const sent = leads.filter(l => l.emailSent);
@@ -208,7 +208,9 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
 
   // Générer lien de paiement Whop (simulation)
   const generatePaymentLink = async (lead: Lead, amount: number = 146) => {
-    const paymentLink = `https://whop.com/pay/leadforge-${lead.id}-${Date.now()}`;
+    // Utiliser les vrais liens Whop s'ils sont configurés, sinon fallback sur simulation
+    const baseLink = amount === 46 ? apiConfig.whopDepositLink : apiConfig.whopFinalPaymentLink;
+    const paymentLink = baseLink || `https://whop.com/pay/leadforge-${lead.id}-${Date.now()}`;
     
     setPaymentLinks(prev => ({
       ...prev,

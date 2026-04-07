@@ -92,7 +92,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
   // Vérifier si l'enrichissement est actif (global)
   const isEnrichmentActive = isProcessing;
   const isEnrichmentPaused = isPaused;
-  const hasImages = false; // Plus d'APIs images depuis suppression Unsplash/Pexels
+  const hasImages = !!(apiConfig.unsplashKey || apiConfig.pexelsKey); // Activé si Unsplash ou Pexels est configuré
 
   // ENRICHMENT FLOW — 8 steps
   const enrichLead = async (lead: Lead, setStep: (s: string) => void): Promise<Partial<Lead>> => {

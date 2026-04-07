@@ -148,7 +148,7 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.openrouterKey);
+  const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.nvidiaKey || apiConfig.openrouterKey);
   const [refreshKey, setRefreshKey] = useState(0);
   
   // Calculer les listes sans dépendre de refreshKey pour éviter les boucles
@@ -515,8 +515,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       await updateLead(lead.id, {
         siteGenerated: true, 
         siteHtml: html,
-        siteUrl: `${baseUrl}/api/sites/${firstName}`,
-        landingUrl: `${baseUrl}/api/sites/${firstName}`,
+        siteUrl: `${baseUrl}/api/sites/${lead.id}`,
+        landingUrl: `${baseUrl}/api/sites/${lead.id}`,
         stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
       });
       
