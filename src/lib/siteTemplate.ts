@@ -733,6 +733,27 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             background: var(--secondary) !important;
         }
         
+        /* CORRECTIFS GLOBAUX PREMIUM */
+        .testimonial-card {
+            margin-bottom: 30px !important;
+        }
+        
+        .process-card h5 {
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 800 !important;
+        }
+        
+        .section-title {
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 800 !important;
+            color: var(--dark);
+        }
+        
+        /* Chatbot Global Force */
+        .chatbot-toggle, .chatbot-input-area button {
+            border-radius: 50% !important;
+        }
+        
         /* Espacements uniques */
         .section {
             padding: ${baseSpacing * 10}px 0;
