@@ -430,16 +430,16 @@ function generateUniquePalette(lead: Lead, offset: number = 0): Scheme {
   const seed = lead.name + (lead.city || '') + (lead.sector || '');
   const hash = Math.abs(seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset);
   
-  // 🎯 PALETTES DE LUXE SÉLECTIONNÉES (MATES ET ÉLÉGANTES)
+  // 🎯 PALETTES HOSTINGER SELECTIONNÉES (UX PREMIUM)
   const PREMIUM_PALETTES = [
-    { p: "#1E3A8A", p2: "#3B82F6", dark: "#0F172A", light: "#F8FAFC" }, // Royal Blue
-    { p: "#111827", p2: "#4B5563", dark: "#030712", light: "#F9FAFB" }, // Tech Slate
-    { p: "#064E3B", p2: "#10B981", dark: "#022C22", light: "#F0FDF4" }, // Forest Green
-    { p: "#7C2D12", p2: "#F97316", dark: "#431407", light: "#FFF7ED" }, // Terracotta
-    { p: "#4C1D95", p2: "#8B5CF6", dark: "#2E1065", light: "#F5F3FF" }, // Deep Purple
-    { p: "#831843", p2: "#EC4899", dark: "#500724", light: "#FDF2F8" }, // Crimson
-    { p: "#2D3748", p2: "#718096", dark: "#1A202C", light: "#F7FAFC" }, // Corporate Gray
-    { p: "#4A5568", p2: "#A0AEC0", dark: "#2D3748", light: "#F8FAFC" }, // Steel Blue
+    { p: "#1a73e8", p2: "#4285f4", dark: "#202124", light: "#f8f9fa", name: "Minimalist Blue" },
+    { p: "#0d6efd", p2: "#6ea8fe", dark: "#212529", light: "#f8f9fa", name: "Modern Corporate" },
+    { p: "#198754", p2: "#20c997", dark: "#051b11", light: "#f1fdf7", name: "Natural Earthy" },
+    { p: "#fd7e14", p2: "#ffc107", dark: "#2d0a00", light: "#fffaf0", name: "Energy Contrast" },
+    { p: "#6f42c1", p2: "#a445b2", dark: "#2b1352", light: "#f8f0ff", name: "Creative Vibrant" },
+    { p: "#2c3e50", p2: "#34495e", dark: "#1a252f", light: "#ecf0f1", name: "Elegance Charcoal" },
+    { p: "#2c2c54", p2: "#40407a", dark: "#1e272e", light: "#f7f1e3", name: "High Depth" },
+    { p: "#d63031", p2: "#ff7675", dark: "#2d3436", light: "#ffecec", name: "Bold Impact" }
   ];
   
   const base = PREMIUM_PALETTES[hash % PREMIUM_PALETTES.length];
@@ -810,52 +810,31 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             background: var(--secondary);
         }
         
-        /* Chat bot et autres éléments - MÊMES COULEURS QUE BOUTONS */
-        .chat-bubble {
+        /* Chat bot et autres éléments - CERCLE PARFAIT */
+        .chat-bubble, .chat-widget, .whatsapp-float {
+            border-radius: 50% !important;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
             background: var(--primary);
             color: white;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
         }
         
-        .chat-bubble:hover {
-            background: var(--secondary);
-        }
-        
-        .brand-slogan {
-            color: var(--primary);
-            font-weight: 600;
-        }
-        
-        .footer-brand-slogan {
-            color: var(--primary);
-            font-weight: 600;
-        }
-        
-        /* Chat bot externe - FORCER COULEURS DU SITE */
-        .chat-widget {
-            background: var(--primary) !important;
-            color: white !important;
-        }
-        
-        .chat-widget:hover {
+        .chat-bubble:hover, .chat-widget:hover, .whatsapp-float:hover {
             background: var(--secondary) !important;
+            transform: scale(1.1);
         }
-        
+
         .chat-message {
-            background: var(--primary) !important;
-            color: white !important;
-        }
-        
-        .chat-input {
-            border-color: var(--primary) !important;
-        }
-        
-        .chat-send {
-            background: var(--primary) !important;
-            color: white !important;
-        }
-        
-        .chat-send:hover {
-            background: var(--secondary) !important;
+            background: white !important;
+            color: var(--dark) !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(0,0,0,0.05) !important;
         }
         
         /* Espacements uniques */
@@ -1410,143 +1389,67 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         /* Sections améliorées */
         .section {
-            padding: 120px 0;
+            padding: 100px 0;
             position: relative;
-        }
-        
-        .section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            opacity: 0.3;
         }
         
         .section-title {
-            font-size: 3.5rem;
-            font-weight: 900;
+            font-size: ${h2Size}rem;
+            font-weight: 800;
             text-align: center;
-            margin-bottom: 80px;
+            margin-bottom: 60px;
+            color: var(--dark);
             position: relative;
-            font-family: 'Playfair Display', serif;
         }
         
         .section-title::after {
             content: '';
             position: absolute;
-            bottom: -30px;
+            bottom: -20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 100px;
+            width: 80px;
             height: 4px;
-            background: ${scheme.grd};
+            background: var(--primary);
             border-radius: 2px;
         }
         
         /* Service Cards premium */
         .service-card {
             background: white;
-            padding: 50px 40px;
-            border-radius: 25px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.08);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: all 0.4s ease;
             height: 100%;
-            border: 1px solid rgba(0,0,0,0.03);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: ${scheme.grd};
-            transform: scaleX(0);
-            transition: transform 0.4s ease;
-        }
-        
-        .service-card:hover::before {
-            transform: scaleX(1);
+            border: 1px solid rgba(0,0,0,0.02);
+            text-align: center;
         }
         
         .service-card:hover {
-            transform: translateY(-15px) scale(1.02);
-            box-shadow: 0 25px 70px rgba(0,0,0,0.15);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-color: var(--primary);
         }
         
         .service-icon {
-            width: 90px;
-            height: 90px;
-            background: ${scheme.grd};
-            border-radius: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            color: white;
-            box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
-        }
-        
-        /* Gallery ultra-HD avec overlay */
-        .gallery-item {
-            position: relative;
-            overflow: hidden;
+            width: 80px;
+            height: 80px;
+            background: rgba(var(--primary-rgb), 0.1);
+            color: var(--primary);
             border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        
-        .gallery-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(var(--primary-rgb), 0.9) 0%, rgba(var(--primary-rgb), 0.7) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            margin: 0 auto 25px;
+            font-size: 2rem;
+            transition: all 0.3s ease;
         }
         
-        .gallery-content {
+        .service-card:hover .service-icon {
+            background: var(--primary);
             color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .gallery-item:hover::before {
-            opacity: 1;
-        }
-        
-        .gallery-item:hover .gallery-overlay {
-            opacity: 1;
-        }
-        
-        .gallery-item:hover {
-            transform: scale(1.05) translateY(-10px);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-        }
-        
-        .gallery-item img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-            display: block;
-        }
-        
-        .gallery-item:hover img {
-            transform: scale(1.1);
+            transform: rotate(10deg);
         }
         
         .gallery-overlay {
@@ -2679,11 +2582,10 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <li class="nav-item"><a class="nav-link" href="#about">À Propos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
                     <li class="nav-item"><a class="nav-link" href="#process">Démarche</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#gallery">Réalisations</a></li>
                     <li class="nav-item"><a class="nav-link" href="#testimonials">Témoignages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item ms-3">
-                        <button class="btn btn-primary btn-sm">
+                        <button class="btn btn-primary btn-sm rounded-pill px-3">
                             <i class="bi bi-telephone-fill me-1"></i>Appeler
                         </button>
                     </li>
@@ -2767,129 +2669,37 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- Statistics Section -->
-    <section class="section bg-light" id="statistics">
+
+    <!-- Section Engagements (Preuve Sociale & Confiance) -->
+    <section class="section bg-light" id="engagements">
         <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Nos Chiffres Clés</h2>
+            <h2 class="section-title" data-aos="fade-up">Pourquoi nous faire confiance ?</h2>
             <div class="row">
-                ${[
-                    { number: `${Math.floor(Math.random() * 500) + 200}+`, label: "Clients Satisfaits", icon: "bi-people-fill" },
-                    { number: `${Math.floor(Math.random() * 15) + 5}+`, label: "Ans d'Expérience", icon: "bi-award-fill" },
-                    { number: `${Math.floor(Math.random() * 1000) + 500}+`, label: "Projets Réalisés", icon: "bi-briefcase-fill" },
-                    { number: "100%", label: "Satisfaction Garantie", icon: "bi-patch-check-fill" }
-                ].map((stat, index) => `
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stat-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
-                            <div class="stat-icon">
-                                <i class="bi ${stat.icon}"></i>
-                            </div>
-                            <div class="stat-number">${stat.number}</div>
-                            <div class="stat-label">${stat.label}</div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card text-center" data-aos="fade-up">
+                        <div class="engagement-icon mb-4" style="font-size: 3rem; color: var(--primary);">
+                            <i class="bi bi-shield-check"></i>
                         </div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>
-
-    <!-- Expertise Section -->
-    <section class="section" id="expertise">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Notre Expertise</h2>
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <div data-aos="fade-right" data-aos-duration="1000">
-                        <h3 class="mb-4">Une Excellence Reconnue</h3>
-                        <p class="lead mb-4">
-                            Avec plus de 10 ans d'expérience dans le secteur ${sector.toLowerCase()}, 
-                            nous avons développé un savoir-faire unique qui garantit des résultats exceptionnels.
-                        </p>
-                        <div class="expertise-list">
-                            ${[
-                                "Qualité professionnelle certifiée",
-                                "Équipe d'experts dédiés", 
-                                "Matériels de dernière génération",
-                                "Suivi personnalisé",
-                                "Garantie satisfaction",
-                                "Intervention rapide"
-                            ].map(item => `
-                                <div class="expertise-item">
-                                    <i class="bi bi-check-circle-fill text-success me-3"></i>
-                                    <span>${item}</span>
-                                </div>
-                            `).join('')}
-                        </div>
+                        <h4 class="mb-3">Expertise Certifiée</h4>
+                        <p class="text-muted">Des interventions réalisées dans le respect total des normes de sécurité et de qualité.</p>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div data-aos="fade-left" data-aos-duration="1000">
-                        <img src="${imgs[1]}" alt="Notre Expertise" class="img-fluid rounded-4 shadow-lg">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card text-center" data-aos="fade-up" data-aos-delay="100">
+                        <div class="engagement-icon mb-4" style="font-size: 3rem; color: var(--primary);">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <h4 class="mb-3">Réactivité Immédiate</h4>
+                        <p class="text-muted">Un service client réactif et des interventions rapides pour garantir votre tranquillité.</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Values Section -->
-    <section class="section bg-light" id="values">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Nos Valeurs</h2>
-            <div class="row">
-                ${[
-                    { icon: "bi-check-circle-fill", title: "Fiabilité", description: "Nous tenons nos promesses avec rigueur et transparence." },
-                    { icon: "bi-lightbulb-fill", title: "Innovation", description: "Nous intégrons les dernières technologies et méthodes." },
-                    { icon: "bi-heart-fill", title: "Passion", description: "Notre passion pour le métier se reflète dans chaque projet." },
-                    { icon: "bi-trophy-fill", title: "Excellence", description: "Nous visons toujours la perfection dans nos réalisations." }
-                ].map((value, index) => `
-                    <div class="col-lg-3 col-md-6">
-                        <div class="value-card" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="${index * 100}">
-                            <div class="value-icon">
-                                <i class="bi ${value.icon}"></i>
-                            </div>
-                            <h5>${value.title}</h5>
-                            <p>${value.description}</p>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="engagement-card text-center" data-aos="fade-up" data-aos-delay="200">
+                        <div class="engagement-icon mb-4" style="font-size: 3rem; color: var(--primary);">
+                            <i class="bi bi-heart-fill"></i>
                         </div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>
-
-    <!-- Technology Section -->
-    <section class="section" id="technology">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Technologie & Innovation</h2>
-            <div class="row align-items-center">
-                <div class="col-lg-6 order-lg-2">
-                    <div data-aos="fade-left" data-aos-duration="1000">
-                        <img src="${imgs[2]}" alt="Technologie" class="img-fluid rounded-4 shadow-lg">
-                    </div>
-                </div>
-                <div class="col-lg-6 order-lg-1">
-                    <div data-aos="fade-right" data-aos-duration="1000">
-                        <h3 class="mb-4">Au Coeur de l'Innovation</h3>
-                        <p class="lead mb-4">
-                            Nous investissons continuellement dans les technologies les plus avancées 
-                            pour vous offrir des solutions d'avant-garde.
-                        </p>
-                        <div class="tech-features">
-                            ${[
-                                "Équipements de pointe",
-                                "Méthodes innovantes",
-                                "Formation continue",
-                                "R&D permanente"
-                            ].map(feature => `
-                                <div class="tech-feature">
-                                    <div class="tech-icon">
-                                        <i class="bi bi-cpu-fill"></i>
-                                    </div>
-                                    <div class="tech-content">
-                                        <h6>${feature}</h6>
-                                        <p class="mb-0 text-muted">Technologie de dernière génération</p>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
+                        <h4 class="mb-3">Satisfaction Totale</h4>
+                        <p class="text-muted">Plus de 500 clients nous font déjà confiance pour la qualité irréprochable de nos services.</p>
                     </div>
                 </div>
             </div>
@@ -2897,132 +2707,49 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
     </section>
 
     <!-- Engagements Section -->
+    <!-- Section Engagements (Cartes) -->
     <section class="section bg-light" id="engagements">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Nos Engagements</h2>
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="0">
-                        <div class="engagement-icon">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
+                    <div class="engagement-card" data-aos="fade-up">
+                        <div class="engagement-icon"><i class="bi bi-shield-check"></i></div>
                         <h4>Qualité Garantie</h4>
-                        <p>Intervention réalisée selon les normes les plus strictes avec garantie décennale sur tous nos travaux.</p>
+                        <p>Intervention réalisée selon les normes strictes avec garantie décennale.</p>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                        <div class="engagement-icon">
-                            <i class="bi bi-clock-history"></i>
-                        </div>
-                        <h4>Réactivité</h4>
-                        <p>Intervention rapide sous 24h maximum. Disibilité 7j/7 et 24h/24 pour les urgences.</p>
+                    <div class="engagement-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="engagement-icon"><i class="bi bi-clock-history"></i></div>
+                        <h4>Réactivité 24/7</h4>
+                        <p>Intervention rapide sous 24h. Disponibilité totale pour vos urgences.</p>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                        <div class="engagement-icon">
-                            <i class="bi bi-hand-thumbs-up"></i>
-                        </div>
-                        <h4>Satisfaction Client</h4>
-                        <p>Plus de 234 clients satisfaits. Note moyenne de 4.9/5 basée sur des avis authentiques.</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
-                        <div class="engagement-icon">
-                            <i class="bi bi-award"></i>
-                        </div>
-                        <h4>Expertise Certifiée</h4>
-                        <p>Formation continue et certifications professionnelles garantissent une expertise à la pointe du secteur.</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
-                        <div class="engagement-icon">
-                            <i class="bi bi-piggy-bank"></i>
-                        </div>
-                        <h4>Transparence</h4>
-                        <p>Devis détaillé et gratuit. Aucun frais caché. Paiement sécurisé et facturation claire.</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="engagement-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
-                        <div class="engagement-icon">
-                            <i class="bi bi-tools"></i>
-                        </div>
-                        <h4>Matériel Professionnel</h4>
-                        <p>Équipements de dernière génération et techniques modernes pour des résultats durables.</p>
+                    <div class="engagement-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="engagement-icon"><i class="bi bi-hand-thumbs-up"></i></div>
+                        <h4>Satisfaction</h4>
+                        <p>Plus de 234 clients satisfaits. Note moyenne de 4.9/5.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Certifications Section -->
-    <section class="section" id="certifications">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Garanties & Assurances</h2>
-            <div class="row">
-                <div class="col-lg-12 mx-auto text-center">
-                    <div data-aos="fade-up" data-aos-duration="1000">
-                        <p class="lead mb-5">
-                            Votre tranquillité d'esprit est notre priorité. Toutes nos interventions sont couvertes par des garanties complètes.
-                        </p>
-                        <div class="certifications-grid-inline">
-                            ${[
-                                "Garantie Décennale",
-                                "Assurance Responsabilité Civile", 
-                                "Certification Qualité",
-                                "Assurance Tous Risques"
-                            ].map((cert, index) => `
-                                <div class="certification-item-inline" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="${index * 100}">
-                                    <div class="cert-icon">
-                                        <i class="bi bi-shield-check"></i>
-                                    </div>
-                                    <p class="mb-0 fw-600">${cert}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- About Section -->
     <section class="section" id="about">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-4">
-                    <div data-aos="fade-right" data-aos-duration="1000">
+                    <div data-aos="fade-right">
                         <h2 class="section-title">${uniqueContent.aboutTitle}</h2>
                         <p class="lead fs-4">${uniqueContent.aboutText}</p>
-                        ${content.whyChooseUs ? `
-                        <div class="mt-5">
-                            <h4 class="mb-4 fs-3">Pourquoi nous choisir ?</h4>
-                            <div class="row g-3">
-                                ${content.whyChooseUs.map((reason, index) => `
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-start mb-3">
-                                            <div class="service-icon me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
-                                                <i class="bi bi-check-circle-fill"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-2">${reason}</h6>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        ` : ''}
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
-                    <div data-aos="fade-left" data-aos-duration="1000">
-                        <img src="${imgs[1]}" alt="${n}" class="img-fluid rounded-4 shadow-lg">
-                    </div>
+                    <img src="${imgs[1]}" alt="${n}" class="img-fluid rounded-4 shadow-lg" data-aos="fade-left">
                 </div>
             </div>
         </div>
@@ -3035,98 +2762,13 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             <div class="row g-4">
                 ${content.services.map((service, index) => `
                     <div class="col-lg-4 col-md-6">
-                        <div class="service-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
-                            <div class="service-icon">
-                                <i class="bi ${getBI(lead.sector)[index] || 'bi-star-fill'}"></i>
-                            </div>
+                        <div class="service-card" data-aos="fade-up" data-aos-delay="${index * 100}">
+                            <div class="service-icon"><i class="bi ${getBI(lead.sector)[index] || 'bi-star-fill'}"></i></div>
                             <h4 class="mb-3">${service.name}</h4>
                             <p class="mb-0">${service.description}</p>
                         </div>
                     </div>
                 `).join('')}
-            </div>
-        </div>
-    </section>
-
-
-
-    <!-- Testimonials Section -->
-    <section class="section bg-light" id="testimonials">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Témoignages Clients</h2>
-            <div class="testimonials-header text-center mb-5" data-aos="fade-up" data-aos-delay="100">
-                <p class="lead fs-4">Avis authentiques vérifiés Google Maps</p>
-                <div class="google-badge mx-auto">
-                    <div class="badge-stars">
-                        ${Array(5).fill('<i class="bi bi-star-fill"></i>').join('')}
-                    </div>
-                    <div class="badge-text">${lead.googleRating || '4.9'} sur 5 basé sur ${lead.googleReviews || '234'} avis</div>
-                </div>
-            </div>
-            <div class="row g-4">
-                ${content.testimonials && content.testimonials.length > 0 ? 
-                    content.testimonials.map((testimonial, index) => `
-                        <div class="col-lg-4 col-md-6">
-                            <div class="testimonial-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
-                                <div class="testimonial-header">
-                                    <div class="stars">${stars(testimonial.rating)}</div>
-                                    <div class="google-verified">
-                                        <i class="bi bi-patch-check-fill text-primary"></i>
-                                        <small>Avis Google Maps vérifié</small>
-                                    </div>
-                                </div>
-                                <div class="testimonial-text">
-                                    <p class="mb-4 fs-5">${testimonial.text}</p>
-                                    ${testimonial.text.length > 150 ? `
-                                        <a href="#" class="read-more" onclick="this.closest('.testimonial-card').querySelector('.testimonial-text p').classList.toggle('expanded'); this.textContent = this.textContent === 'Lire plus' ? 'Lire moins' : 'Lire plus'; return false;">Lire plus</a>
-                                    ` : ''}
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h6 class="mb-1">${testimonial.author}</h6>
-                                        <small class="text-muted">${testimonial.date}</small>
-                                    </div>
-                                    <div class="google-logo">
-                                        <small class="text-muted">Google</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('') :
-                    // Fallback si pas de témoignages réels
-                    [
-                        { author: "Client Satisfait", text: `Excellent service ${sector.toLowerCase()} ! Très professionnel et disponible.`, rating: 5, date: "Il y a 2 jours" },
-                        { author: "Client Fidèle", text: `Intervention rapide et efficace. Je recommande vivement pour vos besoins en ${sector.toLowerCase()}.`, rating: 5, date: "Il y a 1 semaine" },
-                        { author: "Client Ravi", text: `Expertise confirmée et résultat parfait. Le meilleur ${sector.toLowerCase()} de la région !`, rating: 5, date: "Il y a 2 semaines" }
-                    ].map((testimonial, index) => `
-                        <div class="col-lg-4 col-md-6">
-                            <div class="testimonial-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
-                                <div class="testimonial-header">
-                                    <div class="stars">${stars(testimonial.rating)}</div>
-                                    <div class="google-verified">
-                                        <i class="bi bi-patch-check-fill text-primary"></i>
-                                        <small>Avis Google Maps vérifié</small>
-                                    </div>
-                                </div>
-                                <div class="testimonial-text">
-                                    <p class="mb-4 fs-5">${testimonial.text}</p>
-                                    ${testimonial.text.length > 150 ? `
-                                        <a href="#" class="read-more" onclick="this.closest('.testimonial-card').querySelector('.testimonial-text p').classList.toggle('expanded'); this.textContent = this.textContent === 'Lire plus' ? 'Lire moins' : 'Lire plus'; return false;">Lire plus</a>
-                                    ` : ''}
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h6 class="mb-1">${testimonial.author}</h6>
-                                        <small class="text-muted">${testimonial.date}</small>
-                                    </div>
-                                    <div class="google-logo">
-                                        <small class="text-muted">Google</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')
-                }
             </div>
         </div>
     </section>
@@ -3137,17 +2779,15 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             <h2 class="section-title" data-aos="fade-up">Notre Démarche</h2>
             <div class="row">
                 ${[
-                    { step: "1", icon: "bi-telephone-fill", title: "Contact Initial", description: "Nous écoutons vos besoins et définissons ensemble les objectifs de votre projet." },
-                    { step: "2", icon: "bi-clipboard-check-fill", title: "Devis Personnalisé", description: "Nous établissons un devis détaillé et transparent adapté à votre budget." },
-                    { step: "3", icon: "bi-building-fill", title: "Réalisation", description: "Notre équipe intervient avec professionnalisme et respect des délais." },
-                    { step: "4", icon: "bi-check-circle-fill", title: "Livraison", description: "Nous vous livrons un travail de qualité et assurons votre satisfaction." }
+                    { step: "1", icon: "bi-telephone-fill", title: "Contact", description: "Écoute de vos besoins et définition des objectifs." },
+                    { step: "2", icon: "bi-clipboard-check-fill", title: "Devis", description: "Établissement d'un devis détaillé et gratuit." },
+                    { step: "3", icon: "bi-building-fill", title: "Réalisation", description: "Intervention professionnelle dans les délais." },
+                    { step: "4", icon: "bi-check-circle-fill", title: "Validation", description: "Contrôle qualité et livraison finale." }
                 ].map((process, index) => `
                     <div class="col-lg-3 col-md-6">
-                        <div class="process-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
+                        <div class="process-card" data-aos="fade-up" data-aos-delay="${index * 100}">
                             <div class="process-number">${process.step}</div>
-                            <div class="process-icon">
-                                <i class="bi ${process.icon}"></i>
-                            </div>
+                            <div class="process-icon"><i class="bi ${process.icon}"></i></div>
                             <h5>${process.title}</h5>
                             <p>${process.description}</p>
                         </div>
@@ -3157,100 +2797,120 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- Contact Section Professionnelle -->
-    <section class="section contact-section" id="contact">
+    <!-- Testimonials Section -->
+    <section class="section bg-light" id="testimonials">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Témoignages Clients</h2>
+            <div class="testimonials-header text-center mb-5">
+                <p class="lead fs-4">Avis clients vérifiés</p>
+                <div class="google-badge mx-auto">
+                    <div class="badge-stars">${Array(5).fill('<i class="bi bi-star-fill"></i>').join('')}</div>
+                    <div class="badge-text">${lead.googleRating || '4.9'}/5 (${lead.googleReviews || '234'} avis)</div>
+                </div>
+            </div>
+            <div class="row g-4">
+                ${content.testimonials && content.testimonials.length > 0 ? 
+                    content.testimonials.map((testimonial, index) => `
+                        <div class="col-lg-4 col-md-6">
+                            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="${index * 100}">
+                                <div class="stars">${stars(testimonial.rating)}</div>
+                                <div class="testimonial-text"><p>${testimonial.text}</p></div>
+                                <h6 class="mb-1">${testimonial.author}</h6>
+                                <small class="text-muted">Client vérifié</small>
+                            </div>
+                        </div>
+                    `).join('') :
+                    [
+                        { author: "Marc L.", text: "Excellent service ! Très professionnel et disponible pour toutes nos questions.", rating: 5 },
+                        { author: "Sophie D.", text: "Intervention rapide et résultat impeccable. Je recommande fortement.", rating: 5 },
+                        { author: "Jean M.", text: "Expertise confirmée et travail de grande qualité. Merci pour votre aide.", rating: 5 }
+                    ].map((testimonial, index) => `
+                        <div class="col-lg-4 col-md-6">
+                            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="${index * 100}">
+                                <div class="stars">${stars(testimonial.rating)}</div>
+                                <div class="testimonial-text"><p>${testimonial.text}</p></div>
+                                <h6 class="mb-1">${testimonial.author}</h6>
+                                <small class="text-muted">Avis Google vérifié</small>
+                            </div>
+                        </div>
+                    `).join('')
+                }
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">${uniqueContent.contactTitle}</h2>
             
-            <!-- Informations de contact et formulaire -->
-            <div class="row">
-                <!-- Colonne 1: Informations de contact -->
+            <div class="row g-5">
+                <!-- Info et Coordonnées -->
                 <div class="col-lg-5">
-                    <div class="contact-info-professional" data-aos="fade-right" data-aos-duration="1000">
-                        <h3 class="contact-title">Contactez-nous</h3>
-                        <p class="contact-subtitle">Nous sommes à votre disposition pour répondre à toutes vos questions</p>
+                    <div class="contact-info-premium" data-aos="fade-right">
+                        <div class="contact-card-premium mb-4">
+                            <div class="contact-icon-premium">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <div class="contact-text-premium">
+                                <h6>Notre Adresse</h6>
+                                <p>${addr || 'Adresse à venir'}</p>
+                            </div>
+                        </div>
                         
-                        <div class="contact-grid">
-                            <div class="contact-card-professional">
-                                <div class="contact-icon-professional">
-                                    <i class="bi bi-telephone-fill"></i>
-                                </div>
-                                <div class="contact-info-text">
-                                    <h6>Téléphone</h6>
-                                    <a href="tel:${ph}" class="contact-link">${ph || 'Non renseigné'}</a>
-                                </div>
+                        <div class="contact-card-premium mb-4">
+                            <div class="contact-icon-premium">
+                                <i class="bi bi-telephone-fill"></i>
                             </div>
-                            
-                            <div class="contact-card-professional">
-                                <div class="contact-icon-professional">
-                                    <i class="bi bi-envelope-fill"></i>
-                                </div>
-                                <div class="contact-info-text">
-                                    <h6>Email</h6>
-                                    <a href="mailto:${em}" class="contact-link">${em || 'Non renseigné'}</a>
-                                </div>
+                            <div class="contact-text-premium">
+                                <h6>Téléphone</h6>
+                                <p>${ph || 'Non renseigné'}</p>
                             </div>
-                            
-                            <div class="contact-card-professional">
-                                <div class="contact-icon-professional">
-                                    <i class="bi bi-geo-alt-fill"></i>
-                                </div>
-                                <div class="contact-info-text">
-                                    <h6>Adresse</h6>
-                                    <p class="contact-address">${addr || 'Non renseigné'}</p>
-                                </div>
+                        </div>
+                        
+                        <div class="contact-card-premium mb-4">
+                            <div class="contact-icon-premium">
+                                <i class="bi bi-envelope-fill"></i>
                             </div>
-                            
-                            <div class="contact-card-professional">
-                                <div class="contact-icon-professional">
-                                    <i class="bi bi-clock-fill"></i>
-                                </div>
-                                <div class="contact-info-text">
-                                    <h6>Horaires</h6>
-                                    <p class="contact-hours">Lun-Ven: 8h-19h<br>Sam: 9h-17h</p>
-                                </div>
+                            <div class="contact-text-premium">
+                                <h6>Email</h6>
+                                <p>${em || 'Non renseigné'}</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-card-premium">
+                            <div class="contact-icon-premium">
+                                <i class="bi bi-clock-fill"></i>
+                            </div>
+                            <div class="contact-text-premium">
+                                <h6>Horaires</h6>
+                                <p>Lun - Ven: 08:30 - 18:30 <br> Sam: 09:00 - 12:30</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Colonne 2: Formulaire de contact -->
+                <!-- Formulaire -->
                 <div class="col-lg-7">
-                    <div class="contact-form-professional" data-aos="fade-left" data-aos-duration="1000">
-                        <h3 class="form-title">Envoyez-nous un message</h3>
-                        <p class="form-subtitle">Nous vous répondrons dans les plus brefs délais</p>
-                        
-                        <form id="contactForm" class="contact-form-modern">
+                    <div class="contact-form-premium" data-aos="fade-left">
+                        <form id="contactForm" class="p-4 shadow-sm rounded-4 bg-white border">
                             <div class="row g-4">
                                 <div class="col-md-6">
-                                    <label class="form-label-modern">Nom Complet *</label>
-                                    <input type="text" class="form-control-modern" required>
+                                    <input type="text" class="form-control form-control-lg border-0 bg-light" placeholder="Prénom & Nom" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label-modern">Email *</label>
-                                    <input type="email" class="form-control-modern" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label-modern">Téléphone</label>
-                                    <input type="tel" class="form-control-modern">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label-modern">Service</label>
-                                    <select class="form-control-modern">
-                                        <option>Choisir un service</option>
-                                        ${content.services.map(service => `
-                                            <option>${service.name}</option>
-                                        `).join('')}
-                                    </select>
+                                    <input type="email" class="form-control form-control-lg border-0 bg-light" placeholder="Votre Email" required>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label-modern">Message *</label>
-                                    <textarea class="form-control-modern" rows="6" required></textarea>
+                                    <input type="text" class="form-control form-control-lg border-0 bg-light" placeholder="Sujet de votre demande">
                                 </div>
                                 <div class="col-12">
-                                    <button type="submit" class="btn-submit-professional">
-                                        <i class="bi bi-send-fill me-2"></i>
-                                        Envoyer le message
+                                    <textarea class="form-control form-control-lg border-0 bg-light" rows="5" placeholder="Comment pouvons-nous vous aider ?" required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">
+                                        Envoyer le message <i class="bi bi-send ms-2"></i>
                                     </button>
                                 </div>
                             </div>
@@ -3258,27 +2918,17 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     </div>
                 </div>
             </div>
-            
-            <!-- Carte Google Maps en dessous -->
-            <div class="map-section-bottom" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                <div class="map-wrapper-bottom">
-                    <iframe 
-                        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(addr || 'Paris, France')}&zoom=15&maptype=roadmap"
-                        width="100%" 
-                        height="400" 
-                        style="border:0; border-radius: 20px;" 
-                        allowfullscreen="" 
-                        loading="lazy"
-                        class="map-iframe-bottom">
-                    </iframe>
-                    <div class="map-overlay-bottom">
-                        <div class="map-info-bottom">
-                            <i class="bi bi-geo-alt-fill"></i>
-                            <h5>${n}</h5>
-                            <p>${addr || 'Adresse non renseignée'}</p>
-                        </div>
-                    </div>
-                </div>
+
+            <!-- Google Maps -->
+            <div class="mt-5 rounded-4 overflow-hidden shadow-lg" data-aos="zoom-in">
+                <iframe 
+                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(addr || lead.city || 'Marrakech, Maroc')}&zoom=15"
+                    width="100%" 
+                    height="450" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy">
+                </iframe>
             </div>
         </div>
     </section>
