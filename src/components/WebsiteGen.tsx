@@ -1068,9 +1068,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
                     opacity: isProcessing ? 0.6 : 1,
                   }}>🔄</button>
                   <button onClick={() => {
-                    const blob = new Blob([l.siteHtml], { type: 'text/html' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a'); a.href = url; a.download = `${l.name.replace(/\s+/g, '_')}.html`; a.click();
+                    window.open(l.siteUrl, '_blank');
                   }} style={{
                     padding: '4px 10px', borderRadius: 4, border: `1px solid ${C.green}`,
                     background: '#f0fdf4', fontSize: 12, cursor: 'pointer', color: C.green,
@@ -1160,19 +1158,13 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
                   border: `1px solid ${C.amber}`, background: '#fffbeb', color: C.amber, fontWeight: 500,
                 }}>🎨 Palette</button>
                 <button onClick={() => {
-                  const blob = new Blob([previewLead.siteHtml], { type: 'text/html' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a'); a.href = url; a.download = `${previewLead.name.replace(/\s+/g, '_')}.html`; a.click();
+                  window.open(previewLead.siteUrl, '_blank');
                 }} style={{
                   padding: '5px 14px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
                   border: `1px solid ${C.green}`, background: '#f0fdf4', color: C.green, fontWeight: 500,
-                }}>↓ HTML</button>
+                }}>↓ Télécharger</button>
                 <button onClick={() => {
-                  const newWindow = window.open('', '_blank');
-                  if (newWindow && previewLead.siteHtml) {
-                    newWindow.document.write(previewLead.siteHtml);
-                    newWindow.document.close();
-                  }
+                  window.open(previewLead.siteUrl, '_blank');
                 }} style={{
                   padding: '5px 14px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
                   border: `1px solid ${C.blue}`, background: '#dbeafe', color: C.blue, fontWeight: 500,
@@ -1192,7 +1184,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
                 background: '#e5e7eb', padding: previewMode === 'mobile' ? '20px' : '0',
               }}>
                 <iframe
-                  srcDoc={previewLead.siteHtml}
+                  src={previewLead.siteUrl}
                   style={{
                     border: 'none', width: previewMode === 'mobile' ? 390 : '100%', height: '100%', background: '#fff',
                     ...(previewMode === 'mobile' ? { borderRadius: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' } : {}),
