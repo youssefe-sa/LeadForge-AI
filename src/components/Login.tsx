@@ -419,35 +419,7 @@ export default function Login() {
               </button>
             </form>
 
-            {/* Footer avec liens */}
-            <div style={{ 
-              textAlign: 'center', 
-              marginTop: 32,
-              paddingTop: 24,
-              borderTop: `1px solid ${C.border}`
-            }}>
-              <a 
-                href="#" 
-                style={{ 
-                  color: C.tx2, 
-                  fontSize: 13, 
-                  textDecoration: 'none',
-                  transition: 'color 0.2s ease',
-                  display: 'inline-block'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = C.accent;
-                  e.currentTarget.style.textDecoration = 'underline';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = C.tx2;
-                  e.currentTarget.style.textDecoration = 'none';
-                }}
-              >
-                Mot de passe oublié ?
-              </a>
-            </div>
-
+            
             {/* Informations de support */}
             <div style={{
               marginTop: 24,
