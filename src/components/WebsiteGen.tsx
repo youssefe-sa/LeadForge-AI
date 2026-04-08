@@ -3,7 +3,6 @@ import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, saf
 import { generateProfessionalSite } from '../lib/professionalTemplate';
 import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { generatePremiumSiteHtml } from '../lib/siteTemplate';
-import { generateNewProfessionalSite } from '../lib/newSiteTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { supabase } from '../lib/supabase';
 
@@ -531,8 +530,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const content = await generateContent(lead);
       console.log(`✅ Content generated for ${lead.name}`);
       
-      updateProgress({ step: '🎨 Génération du site professionnel nouveau...' });
-      const html = generateNewProfessionalSite(lead);
+      updateProgress({ step: '🎨 Génération du site premium...' });
+      const html = generatePremiumSiteHtml(lead, content);
       console.log(`✅ HTML generated for ${lead.name}`);
       
       updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
@@ -974,19 +973,19 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         border: '1px solid #bfdbfe', borderLeft: `4px solid ${C.blue}`,
         fontSize: 13, color: '#1e40af', lineHeight: 1.6,
       }}>
-        <strong>🎨 NOUVEAU Site Professionnel v5.0 :</strong> Architecture HTML totalement nouvelle avec design ultra-moderne, palettes professionnelles (rouge, bleu, noir, blanc), animations avancées, navigation fluide, sections premium, et interface responsive parfaite. Le contenu est généré par l'IA quand une clé LLM est configurée. <strong>Éditeur IA</strong> intégré pour modifier le site après génération.
+        <strong>🎨 Site professionnel :</strong> Chaque site utilise le template premium (hero avec image, couleurs par secteur, galerie, témoignages Google, bouton WhatsApp, formulaire de contact). Le contenu (titres, services, à propos) est généré par l’IA quand une clé LLM est configurée. <strong>Éditeur IA</strong> intégré pour modifier le site après génération.
       </div>
 
       {/* Progress */}
       {isProcessing && (
         <div style={{ background: C.surface, borderRadius: 8, padding: '16px 20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <span style={{ fontSize: 13, fontWeight: 500 }}>🌐 {progress.name}</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 12, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>{progress.current}/{progress.total}</span>
-            {/* Boutons Pause/Reprise */}
-            <div style={{ display: 'flex', gap: 4 }}>
-              {isPaused ? (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 13, fontWeight: 500 }}>🌐 {progress.name}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 12, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>{progress.current}/{progress.total}</span>
+              {/* Boutons Pause/Reprise */}
+              <div style={{ display: 'flex', gap: 4 }}>
+                {isPaused ? (
                   <button
                     onClick={resumeProcessing}
                     style={{
