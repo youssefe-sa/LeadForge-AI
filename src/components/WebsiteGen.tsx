@@ -3,7 +3,6 @@ import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, saf
 import { generateProfessionalSite } from '../lib/professionalTemplate';
 import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { generatePremiumSiteHtml } from '../lib/siteTemplate';
-import { generatePlumberzSite } from '../lib/plumberzTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { supabase } from '../lib/supabase';
 
@@ -531,8 +530,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const content = await generateContent(lead);
       console.log(`✅ Content generated for ${lead.name}`);
       
-      updateProgress({ step: '🎨 Génération du site web Plumberz...' });
-      const html = generatePlumberzSite(lead);
+      updateProgress({ step: '🎨 Génération du site premium...' });
+      const html = generatePremiumSiteHtml(lead, content);
       console.log(`✅ HTML generated for ${lead.name}`);
       
       updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
@@ -577,8 +576,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       updateProgress({ step: '🔄 Fallback template...' });
       
       try {
-        console.log(`🔄 Using new Plumberz template for ${lead.name}`);
-        const emergencyHtml = generatePlumberzSite(lead);
+        console.log(`🔄 Using fallback template for ${lead.name}`);
+        const emergencyHtml = generateProfessionalSite(lead);
         updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
         
         const fileName = `${lead.id}.html`;
