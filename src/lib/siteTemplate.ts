@@ -262,14 +262,11 @@ interface Scheme {
   accent: string;
 }
 const SCHEMES: Record<string, any> = {
-  "corporate-navy": { p: "#0f172a", p2: "#1e293b", pRgb: "15,23,42", dark: "#020617", light: "#ffffff", grd: "linear-gradient(135deg, #0f172a, #1e293b)", heroOverlay: "rgba(2,6,23,0.9)", accent: "#334155" },
-  "business-blue": { p: "#1e40af", p2: "#3730a3", pRgb: "30,64,175", dark: "#1e3a8a", light: "#ffffff", grd: "linear-gradient(135deg, #1e40af, #3730a3)", heroOverlay: "rgba(30,58,138,0.9)", accent: "#3b82f6" },
-  "executive-gray": { p: "#374151", p2: "#4b5563", pRgb: "55,65,81", dark: "#111827", light: "#ffffff", grd: "linear-gradient(135deg, #374151, #4b5563)", heroOverlay: "rgba(17,24,39,0.9)", accent: "#6b7280" },
-  "professional-teal": { p: "#0f766e", p2: "#115e59", pRgb: "15,118,110", dark: "#134e4a", light: "#ffffff", grd: "linear-gradient(135deg, #0f766e, #115e59)", heroOverlay: "rgba(19,78,74,0.9)", accent: "#14b8a6" },
-  "modern-burgundy": { p: "#881337", p2: "#be123c", pRgb: "136,19,55", dark: "#7f1d1d", light: "#ffffff", grd: "linear-gradient(135deg, #881337, #be123c)", heroOverlay: "rgba(127,29,29,0.9)", accent: "#dc2626" },
-  "forest-green": { p: "#14532d", p2: "#166534", pRgb: "20,83,45", dark: "#052e16", light: "#ffffff", grd: "linear-gradient(135deg, #14532d, #166534)", heroOverlay: "rgba(5,46,22,0.9)", accent: "#16a34a" },
-  "royal-purple": { p: "#6b21a8", p2: "#7c3aed", pRgb: "107,33,168", dark: "#581c87", light: "#ffffff", grd: "linear-gradient(135deg, #6b21a8, #7c3aed)", heroOverlay: "rgba(88,28,135,0.9)", accent: "#8b5cf6" },
-  "sophisticated-slate": { p: "#475569", p2: "#64748b", pRgb: "71,85,105", dark: "#1e293b", light: "#ffffff", grd: "linear-gradient(135deg, #475569, #64748b)", heroOverlay: "rgba(30,41,59,0.9)", accent: "#94a3b8" }
+  "crystal-professional": { p: "#1e293b", p2: "#64748b", pRgb: "30,41,59", dark: "#0f172a", light: "#ffffff", grd: "linear-gradient(135deg, #1e293b, #64748b)", heroOverlay: "rgba(15,23,42,0.85)", accent: "#334155" },
+  "modern-elegance": { p: "#1e40af", p2: "#60a5fa", pRgb: "30,64,175", dark: "#1e3a8a", light: "#ffffff", grd: "linear-gradient(135deg, #1e40af, #60a5fa)", heroOverlay: "rgba(30,58,138,0.85)", accent: "#2563eb" },
+  "premium-slate": { p: "#475569", p2: "#94a3b8", pRgb: "71,85,105", dark: "#1e293b", light: "#ffffff", grd: "linear-gradient(135deg, #475569, #94a3b8)", heroOverlay: "rgba(30,41,59,0.85)", accent: "#64748b" },
+  "corporate-blue": { p: "#1e3a8a", p2: "#3b82f6", pRgb: "30,58,138", dark: "#1e293b", light: "#ffffff", grd: "linear-gradient(135deg, #1e3a8a, #3b82f6)", heroOverlay: "rgba(30,41,59,0.85)", accent: "#2563eb" },
+  "executive-gray": { p: "#374151", p2: "#9ca3af", pRgb: "55,65,81", dark: "#111827", light: "#ffffff", grd: "linear-gradient(135deg, #374151, #9ca3af)", heroOverlay: "rgba(17,24,39,0.85)", accent: "#6b7280" }
 };
 
 // 🎯 GÉNÉRATION DE PHRASES UNIQUES POUR TITRE HERO
@@ -2360,19 +2357,18 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             position: fixed;
             bottom: 24px;
             right: 24px;
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #25d366, #128c7e);
-            border: none;
-            border-radius: 50%;
+            background: #25d366;
             color: white;
-            font-size: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 16px rgba(37, 211, 102, 0.25);
+            font-size: 1.2rem;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.25);
             transition: all 0.3s ease;
-            z-index: 9999;
+            z-index: 999;
             text-decoration: none;
         }
         
@@ -2387,25 +2383,21 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         [class*="chatbot"],
         [id*="chatbot"] {
             position: fixed !important;
-            bottom: 24px !important;
-            right: 90px !important; /* Espacement de WhatsApp */
+            bottom: 80px !important;
+            right: 24px !important;
             z-index: 9998 !important; /* En dessous de WhatsApp */
         }
         
-        /* Chatbot toggle cristallin - aligné avec WhatsApp */
+        /* Chatbot toggle cristallin */
         .chatbot-toggle,
         .chat-widget {
-            width: 56px !important;
-            height: 56px !important;
+            width: 48px !important;
+            height: 48px !important;
+            border-radius: 12px !important;
             background: var(--primary) !important;
-            border: 2px solid var(--accent) !important;
-            border-radius: 50% !important;
-            color: var(--light) !important;
-            font-size: 24px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
             transition: all 0.3s ease !important;
         }
         
@@ -2891,7 +2883,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <div class="badge-text">${lead.googleRating || '4.9'} sur 5 basé sur ${lead.googleReviews || '234'} avis</div>
                 </div>
             </div>
-            <div class="row g-4">
+            <div class="row">
                 ${content.testimonials && content.testimonials.length > 0 ? 
                     content.testimonials.map((testimonial, index) => `
                         <div class="col-lg-4 col-md-6">
@@ -2922,7 +2914,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                         </div>
                     `).join('') :
                     // Fallback si pas de témoignages réels
-                    `<div class="row g-4">` + [
+                    [
                         { author: "Client Satisfait", text: `Excellent service ${sector.toLowerCase()} ! Très professionnel et disponible.`, rating: 5, date: "Il y a 2 jours" },
                         { author: "Client Fidèle", text: `Intervention rapide et efficace. Je recommande vivement pour vos besoins en ${sector.toLowerCase()}.`, rating: 5, date: "Il y a 1 semaine" },
                         { author: "Client Ravi", text: `Expertise confirmée et résultat parfait. Le meilleur ${sector.toLowerCase()} de la région !`, rating: 5, date: "Il y a 2 semaines" }
@@ -2953,7 +2945,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                                 </div>
                             </div>
                         </div>
-                    `).join('') + `</div>`}
+                    `).join('')}
             </div>
         </div>
     </section>
