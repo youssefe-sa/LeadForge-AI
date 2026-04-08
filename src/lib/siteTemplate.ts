@@ -1136,23 +1136,49 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             position: relative;
             width: 100%;
             max-width: 500px;
-            height: 500px;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
-            transform: perspective(1000px) rotateY(-5deg);
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 550px;
+            border-radius: 30px;
+            overflow: visible; /* Pour laisser dépasser les badges */
+            box-shadow: 0 40px 100px rgba(0,0,0,0.2);
+            transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .hero-image-wrapper:hover {
-            transform: perspective(1000px) rotateY(0deg) scale(1.02);
-            box-shadow: 0 35px 100px rgba(0,0,0,0.2);
+        .hero-image-wrapper::after {
+            content: '10+ Years';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            background: var(--accent);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(var(--accent-rgb), 0.4);
+            z-index: 10;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .hero-image-wrapper::before {
+            content: '✓ Expert Certifié';
+            position: absolute;
+            bottom: 40px;
+            left: -30px;
+            background: white;
+            color: var(--primary);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 10;
+            animation: float 5s ease-in-out infinite reverse;
         }
         
         .hero-image-premium {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 30px;
             transition: transform 0.6s ease;
         }
         
@@ -1520,18 +1546,17 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         .testimonial-card {
             background: white;
-            padding: 50px;
-            border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+            transition: all 0.4s ease;
             position: relative;
             height: 100%;
-            min-height: 400px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border: 1px solid rgba(0,0,0,0.03);
-            margin-bottom: 30px; /* Espace entre les lignes */
+            border: 1px solid rgba(0,0,0,0.02);
+            margin-bottom: 50px !important; /* Espacement vertical premium */
         }
         
         .testimonial-text p {
@@ -2179,16 +2204,18 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         .contact-card-professional {
             display: flex;
             align-items: center;
-            padding: 20px;
+            padding: 25px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
             transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.02);
         }
         
         .contact-card-professional:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: translateX(10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            border-color: var(--primary);
         }
         
         .contact-icon-professional {
@@ -2520,15 +2547,19 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 3rem; }
-            .hero-content { padding: 50px 30px; }
+            .hero-title-premium { font-size: 2.8rem; }
             .section-title { font-size: 2.5rem; }
-            .section { padding: 80px 0; }
-            .contact-form { padding: 40px 25px; }
-            .service-card { padding: 35px 25px; }
-            .brand-slogan { display: none; }
-            .hero-buttons { flex-direction: column; align-items: center; }
-            .btn-primary, .btn-outline-primary { width: 100%; max-width: 300px; }
+            .testimonial-card { margin-bottom: 30px !important; }
+            .hero-image-wrapper { transform: none; height: 400px; }
+        }
+        
+        /* FORCE INTER FONT EVERYWHERE */
+        * {
+            font-family: 'Inter', sans-serif !important;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 800 !important;
+            letter-spacing: -0.02em !important;
         }
     </style>
 </head>
