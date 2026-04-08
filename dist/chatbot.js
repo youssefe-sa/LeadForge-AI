@@ -61,17 +61,20 @@
             .chatbot-toggle {
                 width: 56px;
                 height: 56px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, #D4500A 0%, #FF6B35 100%);
+                border-radius: 50% !important;
+                background: var(--primary) !important;
                 border: none;
                 color: white;
                 font-size: 1.5rem;
                 cursor: pointer;
-                box-shadow: 0 12px 32px rgba(212, 80, 10, 0.3);
+                box-shadow: 0 12px 32px rgba(0,0,0,0.15);
                 transition: all 0.3s ease;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+            }
+            .chatbot-toggle.active {
+                right: 380px; /* move aside when window open */
             }
             
             .chatbot-toggle:hover {
@@ -98,7 +101,7 @@
             }
             
             .chatbot-header {
-                background: linear-gradient(135deg, #D4500A 0%, #FF6B35 100%);
+                background: var(--primary);
                 color: white;
                 padding: 15px;
                 display: flex;
@@ -166,7 +169,7 @@
             }
             
             .chat-message.user {
-                background: linear-gradient(135deg, #D4500A 0%, #FF6B35 100%);
+                background: var(--primary);
                 color: white;
                 border-bottom-right-radius: 5px;
                 margin-left: auto;
@@ -190,9 +193,9 @@
             }
             
             .chat-quick-actions button:hover {
-                background: #D4500A;
+                background: var(--primary);
                 color: white;
-                border-color: #D4500A;
+                border-color: var(--primary);
             }
             
             .chatbot-input-area {
@@ -213,14 +216,14 @@
             }
             
             .chatbot-input-area input:focus {
-                border-color: #D4500A;
+                border-color: var(--primary);
             }
             
             .chatbot-input-area button {
                 width: 40px;
                 height: 40px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, #D4500A 0%, #FF6B35 100%);
+                border-radius: 50% !important;
+                background: var(--primary);
                 border: none;
                 color: white;
                 cursor: pointer;
@@ -262,19 +265,31 @@
             body: document.getElementById('chatbotBody'),
             
             init: function() {
+                // ARIA attributes
+                this.toggle.setAttribute('aria-expanded', 'false');
+                this.toggle.setAttribute('aria-controls', 'chatbotWindow');
+                this.toggle.setAttribute('aria-label', 'Ouvrir le chat');
+                this.close.setAttribute('aria-label', 'Fermer le chat');
                 // Toggle chatbot
                 this.toggle.addEventListener('click', () => {
-                    this.window.classList.toggle('active');
-                    if (this.window.classList.contains('active')) {
+                    const isActive = this.window.classList.toggle('active');
+                    this.toggle.classList.toggle('active', isActive);
+                    this.toggle.setAttribute('aria-expanded', isActive);
+                    if (isActive) {
                         this.input.focus();
+                        // hide toggle when window open
+                        this.toggle.style.display = 'none';
+                    } else {
+                        this.toggle.style.display = 'flex';
                     }
                 });
-                
                 // Close chatbot
                 this.close.addEventListener('click', () => {
                     this.window.classList.remove('active');
+                    this.toggle.classList.remove('active');
+                    this.toggle.setAttribute('aria-expanded', 'false');
+                    this.toggle.style.display = 'flex';
                 });
-                
                 // Enter key to send
                 this.input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {

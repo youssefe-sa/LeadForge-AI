@@ -73,6 +73,9 @@
                 align-items: center;
                 justify-content: center;
             }
+            .chatbot-toggle.active {
+                right: 380px; /* move aside when window open */
+            }
             
             .chatbot-toggle:hover {
                 transform: scale(1.1);
@@ -262,19 +265,31 @@
             body: document.getElementById('chatbotBody'),
             
             init: function() {
+                // ARIA attributes
+                this.toggle.setAttribute('aria-expanded', 'false');
+                this.toggle.setAttribute('aria-controls', 'chatbotWindow');
+                this.toggle.setAttribute('aria-label', 'Ouvrir le chat');
+                this.close.setAttribute('aria-label', 'Fermer le chat');
                 // Toggle chatbot
                 this.toggle.addEventListener('click', () => {
-                    this.window.classList.toggle('active');
-                    if (this.window.classList.contains('active')) {
+                    const isActive = this.window.classList.toggle('active');
+                    this.toggle.classList.toggle('active', isActive);
+                    this.toggle.setAttribute('aria-expanded', isActive);
+                    if (isActive) {
                         this.input.focus();
+                        // hide toggle when window open
+                        this.toggle.style.display = 'none';
+                    } else {
+                        this.toggle.style.display = 'flex';
                     }
                 });
-                
                 // Close chatbot
                 this.close.addEventListener('click', () => {
                     this.window.classList.remove('active');
+                    this.toggle.classList.remove('active');
+                    this.toggle.setAttribute('aria-expanded', 'false');
+                    this.toggle.style.display = 'flex';
                 });
-                
                 // Enter key to send
                 this.input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {

@@ -6,12 +6,38 @@ import { generatePremiumSiteHtml } from '../lib/siteTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { supabase } from '../lib/supabase';
 
+const getCssVar = (name: string, fallback: string) => {
+  const val = getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim();
+  return val || fallback;
+};
+
+// Simple contrast helper (WCAG >= 4.5:1)
+const contrastColor = (bg: string, fg: string) => {
+  const luminance = (hex: string) => {
+    const rgb = hex.replace('#', '').match(/.{2}/g)!.map(v => parseInt(v, 16) / 255);
+    const a = rgb.map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+    return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+  };
+  const bgLum = luminance(bg);
+  const fgLum = luminance(fg);
+  const contrast = (Math.max(bgLum, fgLum) + 0.05) / (Math.min(bgLum, fgLum) + 0.05);
+  return contrast >= 4.5 ? fg : (bgLum > fgLum ? '#EEEEEE' : '#333333');
+};
+
 const C = {
-  bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
-  border: '#E4E2DA', tx: '#1C1B18', tx2:
-   '#5C5A53', tx3: '#9B9890',
-  accent: '#D4500A', accent2: '#F0E8DF',
-  green: '#1A7A4A', blue: '#1A4FA0', amber: '#B45309', red: '#C0392B',
+  bg: getCssVar('bg', '#F7F6F2'),
+  surface: getCssVar('surface', '#FFFFFF'),
+  surface2: getCssVar('surface2', '#F2F1EC'),
+  border: getCssVar('border', '#E4E2DA'),
+  tx: getCssVar('text', '#1C1B18'),
+  tx2: getCssVar('muted', '#5C5A53'),
+  tx3: contrastColor(getCssVar('surface2', '#F2F1EC'), getCssVar('subtle', '#9B9890')),
+  accent: getCssVar('primary', '#D4500A'),
+  accent2: getCssVar('secondary', '#F0E8DF'),
+  green: getCssVar('success', '#1A7A4A'),
+  blue: getCssVar('info', '#1A4FA0'),
+  amber: getCssVar('warning', '#B45309'),
+  red: getCssVar('error', '#C0392B'),
 };
 
 interface Props {
