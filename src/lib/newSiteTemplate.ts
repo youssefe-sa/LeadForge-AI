@@ -120,6 +120,154 @@ const PROFESSIONAL_IMAGES: Record<string, string[]> = {
 // ══════════════════════════════════════════════════════════════
 // FONCTIONS UTILITAIRES AVANCÉES
 // ══════════════════════════════════════════════════════════════
+
+// 🎯 Fonction pour obtenir le nom formaté (2 mots max sans articles)
+const getFormattedName = (fullName: string): string => {
+  const skip = ['le', 'la', 'les', 'de', 'du', 'des', 'l\'', 'à', 'a', 'd\'', 'au', 'aux', 'par', 'pour', 'avec', 'et', 'ou', 'ni', 'mais', 'donc', 'or', 'ni', 'car'];
+  const words = fullName.trim().split(/\s+/).filter(w => !skip.includes(w.toLowerCase()));
+  return words.slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+};
+
+// 🎯 Fonction pour générer des horaires d'ouverture selon le secteur
+const generateOpeningHours = (sector: string): string => {
+  const s = (sector || "").toLowerCase();
+  
+  if (s.includes("restaurant") || s.includes("café")) {
+    return "Lun-Ven: 11h30-14h30 / 18h30-22h30 | Sam-Dim: 12h00-23h00";
+  }
+  if (s.includes("coiffeur") || s.includes("salon")) {
+    return "Lun-Ven: 09h00-19h00 | Sam: 08h00-18h00 | Dim: Fermé";
+  }
+  if (s.includes("médec") || s.includes("clinique")) {
+    return "Lun-Ven: 08h00-18h00 | Sam: 09h00-12h00 | Dim: Fermé";
+  }
+  
+  return "Lun-Ven: 09h00-18h00 | Sam: 09h00-12h00 | Dim: Fermé";
+};
+
+// 🎯 Fonction pour générer le contenu enrichi selon le secteur
+const generateRichContent = (lead: Lead): SiteContent => {
+  const sector = (lead.sector || "").toLowerCase();
+  const formattedName = getFormattedName(lead.name);
+  
+  const heroTitles = {
+    restaurant: ["Excellence Culinaire", "Saveurs Authentiques", "Tradition & Innovation", "Gastronomie Locale"],
+    beauty: ["Beauté & Élégance", "Expertise Beauté", "Soin Premium", "Art du Bien-être"],
+    medical: ["Santé & Confiance", "Excellence Médicale", "Soins Expert", "Médecine de Pointe"],
+    business: ["Expertise Professionnelle", "Solutions Innovantes", "Service Premium", "Excellence Garantie"],
+    default: ["Excellence Professionnelle", "Expertise Garantie", "Qualité Suprême", "Service Exceptionnel"]
+  };
+  
+  const getHeroTitle = () => {
+    for (const [key, titles] of Object.entries(heroTitles)) {
+      if (sector.includes(key)) {
+        return titles[Math.floor(Math.random() * titles.length)];
+      }
+    }
+    return heroTitles.default[Math.floor(Math.random() * heroTitles.default.length)];
+  };
+  
+  const servicesBySector = {
+    restaurant: [
+      { name: "Cuisine Traditionnelle", description: "Plats authentiques préparés avec des produits locaux et frais" },
+      { name: "Menu Dégustation", description: "Une expérience gastronomique unique avec nos créations du chef" },
+      { name: "Vins Sélectionnés", description: "Une carte de vins raffinée pour accompagner vos repas" },
+      { name: "Service Traiteur", description: "Organisation d'événements privés et professionnels sur mesure" },
+      { name: "Brunch du Dimanche", description: "Moment convivial avec buffet et boissons à volonté" },
+      { name: "Cocktails & Apéritifs", description: "Créations originales et classiques dans une ambiance chic" }
+    ],
+    beauty: [
+      { name: "Soins du Visage", description: "Traitements personnalisés pour une peau éclatante et saine" },
+      { name: "Coiffure Créative", description: "Coupe, coloration et mise en forme selon vos désirs" },
+      { name: "Manucure & Pédicure", description: "Soin complet des mains et pieds avec vernis de qualité" },
+      { name: "Massage Relaxant", description: "Techniques de massage pour détente et bien-être total" },
+      { name: "Épilation Professionnelle", description: "Épilation douce et durable avec techniques avancées" },
+      { name: "Maquillage Artistique", description: "Maquillage pour occasions spéciales et cours individuels" }
+    ],
+    medical: [
+      { name: "Consultations Générales", description: "Diagnostic et suivi médical personnalisé" },
+      { name: "Examens Complémentaires", description: "Analyses et imagerie médicale de pointe" },
+      { name: "Vaccinations", description: "Calendrier vaccinal complet pour toute la famille" },
+      { name: "Médecine Préventive", description: "Bilans de santé et conseils préventifs personnalisés" },
+      { name: "Télémédecine", description: "Consultations à distance pour votre commodité" },
+      { name: "Urgences", description: "Prise en charge rapide des situations médicales urgentes" }
+    ],
+    default: [
+      { name: "Service Premium", description: "Une expérience haut de gamme adaptée à vos besoins spécifiques" },
+      { name: "Expertise Locale", description: "Une connaissance approfondie du marché et des attentes locales" },
+      { name: "Support Continu", description: "Un accompagnement personnalisé à chaque étape" },
+      { name: "Innovation", description: "Solutions modernes et technologies de pointe" },
+      { name: "Qualité Garantie", description: "Standards élevés et contrôle qualité rigoureux" },
+      { name: "Service Client", description: "Réactivité et disponibilité pour votre satisfaction" }
+    ]
+  };
+  
+  const getServices = () => {
+    for (const [key, services] of Object.entries(servicesBySector)) {
+      if (sector.includes(key)) {
+        return services;
+      }
+    }
+    return servicesBySector.default;
+  };
+  
+  return {
+    heroTitle: getHeroTitle(),
+    heroSubtitle: `Découvrez l'excellence chez ${formattedName} - ${lead.city || 'France'}`,
+    aboutText: `Chez ${formattedName}, nous combinons expertise et passion pour vous offrir des services exceptionnels. Notre engagement envers la qualité et la satisfaction client fait notre réputation dans la région de ${lead.city || 'France'}. Forts de notre expérience et de notre connaissance du marché local, nous mettons tout en œuvre pour dépasser vos attentes et vous proposer des solutions sur mesure adaptées à vos besoins spécifiques.`,
+    services: getServices(),
+    cta: "Contactez-nous dès maintenant",
+    testimonials: [
+      {
+        author: "Client Satisfait",
+        text: "Service exceptionnel et professionnel. Je recommande vivement ! L'équipe est à l'écoute et les résultats sont parfaits.",
+        rating: 5,
+        date: "2024"
+      },
+      {
+        author: "Client Fidèle", 
+        text: "Une expertise remarquable et un service impeccable. Je fais confiance à ${formattedName} depuis plusieurs années.",
+        rating: 5,
+        date: "2024"
+      },
+      {
+        author: "Client Ravi",
+        text: "Dépassé toutes mes attentes. Vraiment professionnel ! Je reviendrai sans hésiter.",
+        rating: 5,
+        date: "2024"
+      },
+      {
+        author: "Nouveau Client",
+        text: "Découverte par hasard et quelle belle surprise ! Service au top et résultats excellents.",
+        rating: 5,
+        date: "2024"
+      },
+      {
+        author: "Client Régulier",
+        text: "La qualité est toujours au rendez-vous. Une équipe compétente et très professionnelle.",
+        rating: 5,
+        date: "2024"
+      },
+      {
+        author: "Client Conquis",
+        text: "Je suis conquis par le professionnalisme et la qualité des prestations. Merci ${formattedName} !",
+        rating: 5,
+        date: "2024"
+      }
+    ],
+    aboutTitle: "À Propos de Nous",
+    servicesTitle: "Nos Services",
+    contactTitle: "Contactez-Nous",
+    whyChooseUs: [
+      "Expertise confirmée dans notre domaine",
+      "Approche personnalisée pour chaque client", 
+      "Engagement qualité et satisfaction",
+      "Innovation continue et modernité",
+      "Réactivité et disponibilité",
+      "Tarifs compétitifs et transparents"
+    ]
+  };
+};
 function getProfessionalImages(sector: string): string[] {
   const s = (sector || "").toLowerCase();
   
@@ -149,80 +297,23 @@ function getProfessionalColorScheme(lead: Lead): ColorScheme {
   return PROFESSIONAL_SCHEMES[schemeKey];
 }
 
-function generateProfessionalContent(lead: Lead): SiteContent {
-  const sector = (lead.sector || "").toLowerCase();
-  
-  const heroTitles = {
-    restaurant: ["Excellence Culinaire", "Saveurs Authentiques", "Tradition & Innovation"],
-    beauty: ["Beauté & Élégance", "Expertise Beauté", "Soin Premium"],
-    medical: ["Santé & Confiance", "Excellence Médicale", "Soins Expert"],
-    default: ["Excellence Professionnelle", "Expertise Garantie", "Qualité Suprême"]
-  };
-  
-  const getHeroTitle = () => {
-    for (const [key, titles] of Object.entries(heroTitles)) {
-      if (sector.includes(key)) {
-        return titles[Math.floor(Math.random() * titles.length)];
-      }
-    }
-    return heroTitles.default[Math.floor(Math.random() * heroTitles.default.length)];
-  };
-  
-  return {
-    heroTitle: getHeroTitle(),
-    heroSubtitle: `Découvrez l'excellence chez ${lead.name} - ${lead.city || 'France'}`,
-    aboutText: `Chez ${lead.name}, nous combinons expertise et passion pour vous offrir des services exceptionnels. Notre engagement envers la qualité et la satisfaction client fait notre réputation dans la région de ${lead.city || 'France'}.`,
-    services: [
-      { name: "Service Premium", description: "Une expérience haut de gamme adaptée à vos besoins spécifiques" },
-      { name: "Expertise Locale", description: "Une connaissance approfondie du marché et des attentes locales" },
-      { name: "Support Continu", description: "Un accompagnement personnalisé à chaque étape" }
-    ],
-    cta: "Contactez-nous dès maintenant",
-    testimonials: [
-      {
-        author: "Client Satisfait",
-        text: "Service exceptionnel et professionnel. Je recommande vivement !",
-        rating: 5,
-        date: "2024"
-      },
-      {
-        author: "Client Fidèle", 
-        text: "Une expertise remarquable et un service impeccable.",
-        rating: 5,
-        date: "2024"
-      },
-      {
-        author: "Client Ravi",
-        text: "Dépassé toutes mes attentes. Vraiment professionnel !",
-        rating: 5,
-        date: "2024"
-      }
-    ],
-    aboutTitle: "À Propos de Nous",
-    servicesTitle: "Nos Services",
-    contactTitle: "Contactez-Nous",
-    whyChooseUs: [
-      "Expertise confirmée dans notre domaine",
-      "Approche personnalisée pour chaque client", 
-      "Engagement qualité et satisfaction",
-      "Innovation continue et modernité"
-    ]
-  };
-}
+// La fonction generateRichContent est déjà définie ci-dessus
 
 // ══════════════════════════════════════════════════════════════
 // GÉNÉRATION DU NOUVEAU SITE WEB PROFESSIONNEL
 // ══════════════════════════════════════════════════════════════
 export function generateNewProfessionalSite(lead: Lead): string {
   const scheme = getProfessionalColorScheme(lead);
-  const content = generateProfessionalContent(lead);
+  const content = generateRichContent(lead);
   const images = getProfessionalImages(lead.sector);
   
   const companyName = safeStr(lead.name);
+  const formattedName = getFormattedName(lead.name);
   const companyPhone = safeStr(lead.phone);
   const companyEmail = safeStr(lead.email);
   const companyAddress = safeStr(lead.address);
   const companyCity = safeStr(lead.city);
+  const openingHours = generateOpeningHours(lead.sector);
   
   return `
 <!DOCTYPE html>
@@ -269,6 +360,40 @@ export function generateNewProfessionalSite(lead: Lead): string {
             overflow-x: hidden;
         }
         
+        /* Top Bar Défilant */
+        .top-bar-professional {
+            background: var(--dark);
+            color: var(--light);
+            padding: 0.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .top-bar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            animation: slideText 20s linear infinite;
+        }
+        
+        @keyframes slideText {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .top-bar-info {
+            display: flex;
+            gap: 2rem;
+            white-space: nowrap;
+        }
+        
+        .top-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
         /* Navigation Professionnelle */
         .navbar-professional {
             background: var(--light);
@@ -276,7 +401,7 @@ export function generateNewProfessionalSite(lead: Lead): string {
             padding: 1rem 0;
             position: fixed;
             width: 100%;
-            top: 0;
+            top: 40px;
             z-index: 1000;
             transition: all 0.3s ease;
         }
@@ -395,6 +520,56 @@ export function generateNewProfessionalSite(lead: Lead): string {
             background: transparent;
             color: var(--light);
             border: 2px solid var(--light);
+        }
+        
+        .btn-call-professional {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn-call-professional:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(37, 211, 102, 0.4);
+            background: #128c7e;
+        }
+        
+        /* Google Rating Badge */
+        .google-rating-badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .google-rating-stars {
+            color: #ffc107;
+            font-size: 1.2rem;
+        }
+        
+        .google-rating-text {
+            color: var(--light);
+            font-size: 0.9rem;
+        }
+        
+        .google-rating-number {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--light);
         }
         
         .btn-outline-professional:hover {
@@ -623,8 +798,121 @@ export function generateNewProfessionalSite(lead: Lead): string {
             background: var(--primary);
         }
         
+        /* Google Maps Section */
+        .map-section-professional {
+            padding: 4rem 0;
+            background: var(--neutral);
+        }
+        
+        .map-container {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            height: 400px;
+            position: relative;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--light);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        
+        .map-overlay h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .map-overlay p {
+            color: var(--secondary);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        /* Gallery Section */
+        .gallery-section-professional {
+            padding: 6rem 0;
+            background: var(--light);
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .gallery-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            height: 250px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            padding: 1rem;
+        }
+        
+        /* Stats Section */
+        .stats-section-professional {
+            padding: 4rem 0;
+            background: var(--gradient);
+            color: var(--light);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+        
+        .stat-item {
+            padding: 2rem;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
+            .navbar-professional {
+                top: 35px;
+            }
+            
             .hero-title {
                 font-size: 2.5rem;
             }
@@ -647,6 +935,24 @@ export function generateNewProfessionalSite(lead: Lead): string {
                 width: 50px;
                 height: 50px;
                 font-size: 1.2rem;
+            }
+            
+            .top-bar-info {
+                gap: 1rem;
+                font-size: 0.75rem;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .map-container {
+                height: 300px;
             }
         }
         
@@ -683,12 +989,38 @@ export function generateNewProfessionalSite(lead: Lead): string {
     </style>
 </head>
 <body>
+    <!-- Top Bar Défilante -->
+    <div class="top-bar-professional">
+        <div class="container">
+            <div class="top-bar-content">
+                <div class="top-bar-info">
+                    <div class="top-bar-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span>${companyEmail || 'contact@' + companyName.toLowerCase().replace(/\s+/g, '') + '.fr'}</span>
+                    </div>
+                    <div class="top-bar-item">
+                        <i class="bi bi-telephone-fill"></i>
+                        <span>${companyPhone || 'Téléphone non spécifié'}</span>
+                    </div>
+                    <div class="top-bar-item">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>${companyAddress || 'Adresse non spécifiée'}, ${companyCity || 'France'}</span>
+                    </div>
+                    <div class="top-bar-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>${openingHours}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation Professionnelle -->
     <nav class="navbar navbar-expand-lg navbar-professional">
         <div class="container">
             <a class="navbar-brand-professional" href="#home">
                 <i class="bi bi-building"></i>
-                ${companyName}
+                ${formattedName}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -705,10 +1037,19 @@ export function generateNewProfessionalSite(lead: Lead): string {
                         <a class="nav-link nav-link-professional" href="#services">Services</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link nav-link-professional" href="#gallery">Galerie</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link nav-link-professional" href="#testimonials">Témoignages</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link nav-link-professional" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        ${companyPhone ? `<a href="tel:${companyPhone}" class="btn-call-professional">
+                            <i class="bi bi-telephone-fill"></i>
+                            Appeler nous
+                        </a>` : ''}
                     </li>
                 </ul>
             </div>
@@ -732,6 +1073,15 @@ export function generateNewProfessionalSite(lead: Lead): string {
                             <a href="#services" class="btn-professional btn-outline-professional">
                                 <i class="bi bi-info-circle me-2"></i>En Savoir Plus
                             </a>
+                        </div>
+                        <div class="google-rating-badge">
+                            <div class="google-rating-stars">
+                                ${Array(5).fill('<i class="bi bi-star-fill"></i>').join('')}
+                            </div>
+                            <div class="google-rating-text">
+                                <div class="google-rating-number">${lead.googleRating || '4.9'}</div>
+                                <div>sur 5 basé sur ${lead.googleReviews || '234'} avis Google</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -834,6 +1184,83 @@ export function generateNewProfessionalSite(lead: Lead): string {
         </div>
     </section>
 
+    <!-- Gallery Section -->
+    <section id="gallery" class="gallery-section-professional">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Galerie Photos</h2>
+                <p class="section-subtitle">Découvrez nos réalisations et notre environnement</p>
+            </div>
+            
+            <div class="gallery-grid">
+                ${images.map((img, index) => `
+                    <div class="gallery-item animate-fade-in-up" style="animation-delay: ${index * 0.2}s">
+                        <img src="${img}" alt="Galerie ${formattedName} ${index + 1}">
+                        <div class="gallery-overlay">
+                            <h5>${formattedName} - Image ${index + 1}</h5>
+                            <p>Découvrez notre savoir-faire</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section-professional">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title text-white">Nos Chiffres Clés</h2>
+                <p class="section-subtitle text-white opacity-75">L'excellence en chiffres</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-item animate-fade-in-up">
+                    <div class="stat-number">${Math.floor(Math.random() * 500) + 100}+</div>
+                    <div class="stat-label">Clients Satisfaits</div>
+                </div>
+                <div class="stat-item animate-fade-in-up">
+                    <div class="stat-number">${Math.floor(Math.random() * 20) + 5}</div>
+                    <div class="stat-label">Années d'Expérience</div>
+                </div>
+                <div class="stat-item animate-fade-in-up">
+                    <div class="stat-number">${Math.floor(Math.random() * 1000) + 500}</div>
+                    <div class="stat-label">Projets Réalisés</div>
+                </div>
+                <div class="stat-item animate-fade-in-up">
+                    <div class="stat-number">${lead.googleRating || '4.9'}/5</div>
+                    <div class="stat-label">Note Google</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Google Maps Section -->
+    <section id="map" class="map-section-professional">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Nous Trouver</h2>
+                <p class="section-subtitle">Localisation et accès faciles</p>
+            </div>
+            
+            <div class="map-container">
+                <div class="map-overlay">
+                    <h4>${formattedName}</h4>
+                    <p>${companyAddress || 'Adresse non spécifiée'}<br>${companyCity || 'France'}</p>
+                    <p><strong>${companyPhone || 'Téléphone non spécifié'}</strong></p>
+                </div>
+                <iframe 
+                    src="https://maps.google.com/maps?q=${encodeURIComponent(companyAddress + ' ' + companyCity || formattedName + ' ' + companyCity)}&t=m&z=15&output=embed&iwloc=near"
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact Section -->
     <section id="contact" class="section-professional">
         <div class="container">
@@ -910,7 +1337,7 @@ export function generateNewProfessionalSite(lead: Lead): string {
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
-                    <h5 class="mb-3">${companyName}</h5>
+                    <h5 class="mb-3">${formattedName}</h5>
                     <p class="mb-3">Excellence et professionnalisme au service de nos clients.</p>
                     <div class="d-flex gap-3">
                         <a href="#" class="footer-link"><i class="bi bi-facebook fs-5"></i></a>
@@ -925,6 +1352,8 @@ export function generateNewProfessionalSite(lead: Lead): string {
                         <a href="#home" class="footer-link">Accueil</a>
                         <a href="#about" class="footer-link">À Propos</a>
                         <a href="#services" class="footer-link">Services</a>
+                        <a href="#gallery" class="footer-link">Galerie</a>
+                        <a href="#testimonials" class="footer-link">Témoignages</a>
                         <a href="#contact" class="footer-link">Contact</a>
                     </div>
                 </div>
@@ -945,7 +1374,7 @@ export function generateNewProfessionalSite(lead: Lead): string {
             <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
             
             <div class="text-center">
-                <p class="mb-0">&copy; 2024 ${companyName}. Tous droits réservés.</p>
+                <p class="mb-0">&copy; 2024 ${formattedName}. Tous droits réservés.</p>
             </div>
         </div>
     </footer>
