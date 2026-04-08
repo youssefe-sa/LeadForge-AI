@@ -11,7 +11,6 @@ const agents = [
   { id: 'dashboard', label: 'Lead Dashboard', icon: '📊', color: C.accent },
   { id: 'scorer', label: 'Scorer & Enrichissement', icon: '🧠', color: C.green },
   { id: 'website', label: 'Website Generator', icon: '🌐', color: C.blue },
-  { id: 'website-v2', label: 'Website Generator V2', icon: '🚀', color: '#7C3AED' },
   { id: 'outreach', label: 'Outreach Agent', icon: '📧', color: C.amber },
   { id: 'pipeline', label: 'Pipeline & Analytics', icon: '📈', color: C.red },
 ];
