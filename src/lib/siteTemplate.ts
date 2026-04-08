@@ -262,11 +262,14 @@ interface Scheme {
   accent: string;
 }
 const SCHEMES: Record<string, any> = {
-  "crystal-professional": { p: "#1e293b", p2: "#64748b", pRgb: "30,41,59", dark: "#0f172a", light: "#ffffff", grd: "linear-gradient(135deg, #1e293b, #64748b)", heroOverlay: "rgba(15,23,42,0.85)", accent: "#334155" },
-  "modern-elegance": { p: "#1e40af", p2: "#60a5fa", pRgb: "30,64,175", dark: "#1e3a8a", light: "#ffffff", grd: "linear-gradient(135deg, #1e40af, #60a5fa)", heroOverlay: "rgba(30,58,138,0.85)", accent: "#2563eb" },
-  "premium-slate": { p: "#475569", p2: "#94a3b8", pRgb: "71,85,105", dark: "#1e293b", light: "#ffffff", grd: "linear-gradient(135deg, #475569, #94a3b8)", heroOverlay: "rgba(30,41,59,0.85)", accent: "#64748b" },
-  "corporate-blue": { p: "#1e3a8a", p2: "#3b82f6", pRgb: "30,58,138", dark: "#1e293b", light: "#ffffff", grd: "linear-gradient(135deg, #1e3a8a, #3b82f6)", heroOverlay: "rgba(30,41,59,0.85)", accent: "#2563eb" },
-  "executive-gray": { p: "#374151", p2: "#9ca3af", pRgb: "55,65,81", dark: "#111827", light: "#ffffff", grd: "linear-gradient(135deg, #374151, #9ca3af)", heroOverlay: "rgba(17,24,39,0.85)", accent: "#6b7280" }
+  "professional-red": { p: "#dc2626", p2: "#ef4444", pRgb: "220,38,38", dark: "#000000", light: "#ffffff", grd: "linear-gradient(135deg, #dc2626, #ef4444)", heroOverlay: "rgba(0,0,0,0.85)", accent: "#991b1b" },
+  "professional-blue": { p: "#1e40af", p2: "#3b82f6", pRgb: "30,64,175", dark: "#000000", light: "#ffffff", grd: "linear-gradient(135deg, #1e40af, #3b82f6)", heroOverlay: "rgba(0,0,0,0.85)", accent: "#1d4ed8" },
+  "professional-black": { p: "#000000", p2: "#374151", pRgb: "0,0,0", dark: "#000000", light: "#ffffff", grd: "linear-gradient(135deg, #000000, #374151)", heroOverlay: "rgba(0,0,0,0.85)", accent: "#4b5563" },
+  "professional-white": { p: "#ffffff", p2: "#f3f4f6", pRgb: "255,255,255", dark: "#000000", light: "#ffffff", grd: "linear-gradient(135deg, #ffffff, #f3f4f6)", heroOverlay: "rgba(0,0,0,0.85)", accent: "#6b7280" },
+  "corporate-navy": { p: "#1e3a8a", p2: "#2563eb", pRgb: "30,58,138", dark: "#000000", light: "#ffffff", grd: "linear-gradient(135deg, #1e3a8a, #2563eb)", heroOverlay: "rgba(0,0,0,0.85)", accent: "#1d4ed8" },
+  "executive-charcoal": { p: "#374151", p2: "#4b5563", pRgb: "55,65,81", dark: "#000000", light: "#ffffff", grd: "linear-gradient(135deg, #374151, #4b5563)", heroOverlay: "rgba(0,0,0,0.85)", accent: "#6b7280" },
+  "modern-crimson": { p: "#b91c1c", p2: "#dc2626", pRgb: "185,28,28", dark: "#000000", light: "#ffffff", grd: "linear-gradient(135deg, #b91c1c, #dc2626)", heroOverlay: "rgba(0,0,0,0.85)", accent: "#991b1b" },
+  "classic-sapphire": { p: "#1e3a8a", p2: "#2563eb", pRgb: "30,58,138", dark: "#000000", light: "#ffffff", grd: "linear-gradient(135deg, #1e3a8a, #2563eb)", heroOverlay: "rgba(0,0,0,0.85)", accent: "#1d4ed8" }
 };
 
 // 🎯 GÉNÉRATION DE PHRASES UNIQUES POUR TITRE HERO
@@ -2359,14 +2362,14 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             right: 24px;
             background: #25d366;
             color: white;
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.25);
+            font-size: 1.4rem;
+            box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
             transition: all 0.3s ease;
             z-index: 999;
             text-decoration: none;
@@ -2383,7 +2386,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         [class*="chatbot"],
         [id*="chatbot"] {
             position: fixed !important;
-            bottom: 80px !important;
+            bottom: 90px !important;
             right: 24px !important;
             z-index: 9998 !important; /* En dessous de WhatsApp */
         }
@@ -2391,13 +2394,13 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         /* Chatbot toggle cristallin */
         .chatbot-toggle,
         .chat-widget {
-            width: 48px !important;
-            height: 48px !important;
-            border-radius: 12px !important;
+            width: 56px !important;
+            height: 56px !important;
+            border-radius: 50% !important;
             background: var(--primary) !important;
             color: white !important;
             border: none !important;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
             transition: all 0.3s ease !important;
         }
         
@@ -2883,10 +2886,10 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                     <div class="badge-text">${lead.googleRating || '4.9'} sur 5 basé sur ${lead.googleReviews || '234'} avis</div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row g-4 mb-4">
                 ${content.testimonials && content.testimonials.length > 0 ? 
                     content.testimonials.map((testimonial, index) => `
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-4 col-md-6 mb-4">
                             <div class="testimonial-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${index * 100}">
                                 <div class="testimonial-header">
                                     <div class="stars">${stars(testimonial.rating)}</div>
