@@ -3,7 +3,7 @@ import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, saf
 import { generateProfessionalSite } from '../lib/professionalTemplate';
 import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { generatePremiumSiteHtml } from '../lib/siteTemplate';
-import { generateHairnicSite } from '../lib/hairnicTemplate';
+import { generatePlumberzSite } from '../lib/plumberzTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { supabase } from '../lib/supabase';
 
@@ -531,8 +531,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const content = await generateContent(lead);
       console.log(`✅ Content generated for ${lead.name}`);
       
-      updateProgress({ step: '🎨 Génération du site web Hairnic...' });
-      const html = generateHairnicSite(lead);
+      updateProgress({ step: '🎨 Génération du site web Plumberz...' });
+      const html = generatePlumberzSite(lead);
       console.log(`✅ HTML generated for ${lead.name}`);
       
       updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
@@ -577,8 +577,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       updateProgress({ step: '🔄 Fallback template...' });
       
       try {
-        console.log(`🔄 Using new Hairnic template for ${lead.name}`);
-        const emergencyHtml = generateHairnicSite(lead);
+        console.log(`🔄 Using new Plumberz template for ${lead.name}`);
+        const emergencyHtml = generatePlumberzSite(lead);
         updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
         
         const fileName = `${lead.id}.html`;
