@@ -262,13 +262,11 @@ interface Scheme {
   accent: string;
 }
 const SCHEMES: Record<string, any> = {
-  "charcoal-blue": { p: "#65839a", p2: "#849cae", pRgb: "101,131,154", dark: "#141a1f", light: "#f0f3f5", grd: "linear-gradient(135deg, #65839a, #849cae)", heroOverlay: "rgba(20,26,31,0.85)", accent: "#51697b" },
-  "baltic-blue": { p: "#3e88c1", p2: "#65a0cd", pRgb: "62,136,193", dark: "#0c1b27", light: "#ecf3f9", grd: "linear-gradient(135deg, #3e88c1, #65a0cd)", heroOverlay: "rgba(12,27,39,0.85)", accent: "#326d9a" },
-  "oxford-navy": { p: "#0d78f2", p2: "#3d93f5", pRgb: "13,120,242", dark: "#031830", light: "#e7f1fe", grd: "linear-gradient(135deg, #0d78f2, #3d93f5)", heroOverlay: "rgba(3,24,48,0.85)", accent: "#0a60c2" },
-  "linen": { p: "#be8841", p2: "#cba067", pRgb: "190,136,65", dark: "#261b0d", light: "#f8f3ec", grd: "linear-gradient(135deg, #be8841, #cba067)", heroOverlay: "rgba(38,27,13,0.85)", accent: "#986d34" },
-  "lavender": { p: "#2f2fd0", p2: "#5959d9", pRgb: "47,47,208", dark: "#09092a", light: "#eaeafa", grd: "linear-gradient(135deg, #2f2fd0, #5959d9)", heroOverlay: "rgba(9,9,42,0.85)", accent: "#2626a6" },
-  "bright-ocean": { p: "#1d7fe2", p2: "#4a99e8", pRgb: "29,127,226", dark: "#06192d", light: "#e8f2fc", grd: "linear-gradient(135deg, #1d7fe2, #4a99e8)", heroOverlay: "rgba(6,25,45,0.85)", accent: "#1766b5" },
-  "celadon": { p: "#30cf80", p2: "#5ad899", pRgb: "48,207,128", dark: "#0a291a", light: "#eafaf2", grd: "linear-gradient(135deg, #30cf80, #5ad899)", heroOverlay: "rgba(10,41,26,0.85)", accent: "#27a566" }
+  "charcoal-blue": { p: "#51697b", p2: "#849cae", pRgb: "81,105,123", dark: "#141a1f", light: "#f8fafc", grd: "linear-gradient(135deg, #51697b, #849cae)", heroOverlay: "rgba(20,26,31,0.85)", accent: "#3c4f5d" },
+  "baltic-blue": { p: "#326d9a", p2: "#65a0cd", pRgb: "50,109,154", dark: "#0c1b27", light: "#f1f5f9", grd: "linear-gradient(135deg, #326d9a, #65a0cd)", heroOverlay: "rgba(12,27,39,0.85)", accent: "#255274" },
+  "oxford-navy": { p: "#0a60c2", p2: "#3d93f5", pRgb: "10,96,194", dark: "#031830", light: "#f0f7ff", grd: "linear-gradient(135deg, #0a60c2, #3d93f5)", heroOverlay: "rgba(3,24,48,0.85)", accent: "#084891" },
+  "deep-teal": { p: "#0d9488", p2: "#2dd4bf", pRgb: "13,148,136", dark: "#042f2e", light: "#f0fdfa", grd: "linear-gradient(135deg, #0d9488, #2dd4bf)", heroOverlay: "rgba(4,47,46,0.85)", accent: "#0f766e" },
+  "rich-slate": { p: "#475569", p2: "#94a3b8", pRgb: "71,85,105", dark: "#0f172a", light: "#f8fafc", grd: "linear-gradient(135deg, #475569, #94a3b8)", heroOverlay: "rgba(15,23,42,0.85)", accent: "#334155" }
 };
 
 // 🎯 GÉNÉRATION DE PHRASES UNIQUES POUR TITRE HERO
@@ -649,11 +647,12 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         
         /* Section titles - MÊME STYLE QUE HERO */
         .section-title {
-            font-family: ${headingFont};
-            font-size: ${h2Size}rem;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: ${baseSpacing * 2.5}px;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 800 !important;
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            letter-spacing: -0.02em;
         }
         
         p {
@@ -1416,108 +1415,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
         }
         
-        /* Gallery ultra-HD avec overlay */
-        .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        
-        .gallery-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(var(--primary-rgb), 0.9) 0%, rgba(var(--primary-rgb), 0.7) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        
-        .gallery-content {
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .gallery-item:hover::before {
-            opacity: 1;
-        }
-        
-        .gallery-item:hover .gallery-overlay {
-            opacity: 1;
-        }
-        
-        .gallery-item:hover {
-            transform: scale(1.05) translateY(-10px);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-        }
-        
-        .gallery-item img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-            display: block;
-        }
-        
-        .gallery-item:hover img {
-            transform: scale(1.1);
-        }
-        
-        .gallery-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(var(--primary-rgb), 0.95) 0%, rgba(var(--primary-rgb), 0.85) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            padding: 20px;
-        }
-        
-        .gallery-content {
-            color: white;
-            text-align: center;
-            transform: translateY(20px);
-            transition: transform 0.4s ease;
-        }
-        
-        .gallery-item:hover .gallery-overlay {
-            opacity: 1;
-        }
-        
-        .gallery-item:hover .gallery-content {
-            transform: translateY(0);
-        }
-        
-        .gallery-content h5 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: white;
-        }
-        
-        .gallery-content p {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin: 0;
-            color: rgba(255,255,255,0.95);
-        }
-        
-        .gallery-item:hover::before {
-            opacity: 1;
-        }
+
         
         /* Testimonials premium améliorés */
         .testimonials-header {
@@ -1812,105 +1710,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
             line-height: 1.6;
         }
         
-        /* Gallery Section Professionnelle */
-        .gallery-professional {
-            margin-top: 50px;
-        }
-        
-        .gallery-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-        
-        .gallery-item-pro {
-            flex: 1;
-            max-width: 280px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .gallery-item-pro:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-        }
-        
-        .gallery-image-wrapper {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            overflow: hidden;
-            border-radius: 15px;
-        }
-        
-        .gallery-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .gallery-item-pro:hover .gallery-image {
-            transform: scale(1.1);
-            filter: brightness(0.8);
-        }
-        
-        .gallery-overlay-pro {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.8) 0%, rgba(var(--accent-rgb), 0.9) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .gallery-item-pro:hover .gallery-overlay-pro {
-            opacity: 1;
-        }
-        
-        .gallery-number {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(255,255,255,0.9);
-            color: var(--primary);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-            z-index: 2;
-        }
-        
-        .gallery-icon {
-            background: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 1.2rem;
-            transform: translateY(30px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .gallery-item-pro:hover .gallery-icon {
-            transform: translateY(0);
-        }
+
         
         /* Technology Section */
         .tech-features {
@@ -3006,44 +2806,7 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
         </div>
     </section>
 
-    <!-- Gallery Section -->
-    <section class="section" id="gallery">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">${uniqueContent.galleryTitle}</h2>
-            <div class="gallery-professional">
-                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                    ${imgs.slice(2, 6).map((img, index) => `
-                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
-                            <div class="gallery-image-wrapper">
-                                <img src="${img}" alt="Réalisation ${index + 1}" loading="lazy" class="gallery-image">
-                                <div class="gallery-overlay-pro">
-                                    <div class="gallery-number">${index + 1}</div>
-                                    <div class="gallery-icon">
-                                        <i class="bi bi-search"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="gallery-row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                    ${imgs.slice(6, 10).map((img, index) => `
-                        <div class="gallery-item-pro" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="${index * 150}">
-                            <div class="gallery-image-wrapper">
-                                <img src="${img}" alt="Réalisation ${index + 5}" loading="lazy" class="gallery-image">
-                                <div class="gallery-overlay-pro">
-                                    <div class="gallery-number">${index + 5}</div>
-                                    <div class="gallery-icon">
-                                        <i class="bi bi-search"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Testimonials Section -->
     <section class="section bg-light" id="testimonials">
@@ -3309,7 +3072,6 @@ export function generatePremiumSiteHtml(lead: Lead, content: SiteContent, colorS
                         <li><a href="#about" class="footer-link">À Propos</a></li>
                         <li><a href="#services" class="footer-link">Services</a></li>
                         <li><a href="#process" class="footer-link">Notre Démarche</a></li>
-                        <li><a href="#gallery" class="footer-link">Nos Réalisations</a></li>
                         <li><a href="#testimonials" class="footer-link">Témoignages</a></li>
                         <li><a href="#contact" class="footer-link">Contact</a></li>
                     </ul>
