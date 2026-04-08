@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Scorer from './components/Scorer';
 import WebsiteGen from './components/WebsiteGen';
+import WebsiteGenV2 from './components/WebsiteGenV2';
 import Outreach from './components/Outreach';
 import Pipeline from './components/Pipeline';
 import Settings from './components/Settings';
@@ -14,7 +15,7 @@ import Login from './components/Login';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 
-type View = 'dashboard' | 'scorer' | 'website' | 'outreach' | 'pipeline' | 'campaigns' | 'settings';
+type View = 'dashboard' | 'scorer' | 'website' | 'website-v2' | 'outreach' | 'pipeline' | 'campaigns' | 'settings';
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -87,6 +88,9 @@ export default function App() {
             )}
             {view === 'website' && (
               <WebsiteGen leads={leads} updateLead={updateLead} apiConfig={config} loadLeads={loadLeads} />
+            )}
+            {view === 'website-v2' && (
+              <WebsiteGenV2 leads={leads} updateLead={updateLead} apiConfig={config} loadLeads={loadLeads} />
             )}
             {view === 'outreach' && (
               <Outreach leads={leads} updateLead={updateLead} apiConfig={config} templates={templates} />
