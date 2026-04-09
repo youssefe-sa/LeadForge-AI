@@ -4,6 +4,7 @@ import { generateProfessionalSite } from '../lib/professionalTemplate';
 import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { generatePremiumSiteHtml } from '../lib/siteTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
+import { fetchSectorImages } from '../lib/imageAgent';
 import { supabase } from '../lib/supabase';
 
 const getCssVar = (name: string, fallback: string) => {
@@ -521,7 +522,6 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
   // ── GENERATE SITE — TEMPLATE PREMIUM PROFESSIONNEL ──
   const generateSite = async (lead: Lead) => {
     console.log(`🔧 generateSite called for: ${lead.name}`);
-    const slug = lead.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 30);
     updateProgress({ step: '📝 Génération du contenu...' });
     
     try {
@@ -530,6 +530,31 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const content = await generateContent(lead);
       console.log(`✅ Content generated for ${lead.name}`);
       
+      updateProgress({ step: '🖼️ Recherche d\'images professionnelles...' });
+      // ── AGENT IMAGES : cherche des photos pro neutres via Unsplash/Pexels ──
+      // Si le prospect n'a pas assez d'images réelles (< 4), on complète avec des images
+      // professionnelles du même secteur, sans marque ni texte publicitaire.
+      const leadImages = [...(lead.images || []), ...(lead.websiteImages || [])].filter(Boolean);
+      if (leadImages.length < 4 && (apiConfig.unsplashKey || apiConfig.pexelsKey)) {
+        try {
+          const sectorImgs = await fetchSectorImages(
+            lead.sector || 'professionnel',
+            { unsplashKey: apiConfig.unsplashKey, pexelsKey: apiConfig.pexelsKey },
+            8
+          );
+          if (sectorImgs.length > 0) {
+            // Enrichir le lead avec les images trouvées (sans écraser les vraies photos)
+            lead = {
+              ...lead,
+              images: [...leadImages, ...sectorImgs].slice(0, 12)
+            };
+            console.log(`🖼️ ${sectorImgs.length} images professionnelles ajoutées pour ${lead.name}`);
+          }
+        } catch (imgErr) {
+          console.warn('⚠️ ImageAgent: Impossible de récupérer des images, on continue sans.', imgErr);
+        }
+      }
+
       updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
       const html = generateUltimateSite(lead, content);
       console.log(`✅ HTML generated for ${lead.name}`);
