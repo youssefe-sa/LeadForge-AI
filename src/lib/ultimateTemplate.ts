@@ -221,7 +221,7 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 }
 
 function buildUltimateHTML(content: UltimateContent, template: any): string {
-  const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, rating, reviews } = content;
+  const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews } = content;
   
   const hexToRgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '#ffffff');
@@ -1012,5 +1012,5 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         chatText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
     </script>
 </body>
-</html>\`;
+</html>`;
 }
