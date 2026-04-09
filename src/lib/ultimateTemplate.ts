@@ -1,5 +1,5 @@
 // ── TEMPLATE ULTIME - GARANTIE PROFESSIONNELLE 100% ──
-// Résultat professionnel garanti pour chaque prospect
+// Résultat professionnel garanti pour chaque prospect. Refonte Ultra-Premium (Dark Mode/Glassmorphism).
 
 export interface UltimateContent {
   companyName: string;
@@ -22,294 +22,282 @@ export interface UltimateContent {
 
 const SECTOR_ULTIMATE_TEMPLATES = {
   plomberie: {
-    primary: '#1e40af',
-    secondary: '#3b82f6',
+    primary: '#3b82f6',
+    secondary: '#1d4ed8',
     accent: '#60a5fa',
-    background: '#f8fafc',
-    heroBackground: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+    background: '#0B0A0F',
     services: [
       {
         name: 'Dépannage Urgence',
         description: 'Intervention rapide 24/7 pour toutes vos urgences de plomberie',
-        features: ['Disponible 24/7', 'Intervention sous 2h', 'Devis gratuit']
+        features: ['Disponible 24/7', 'Intervention sous 2h', 'Devis transparent']
       },
       {
         name: 'Installation Sanitaire',
         description: 'Pose professionnelle de tous vos équipements sanitaires',
-        features: ['Salle de bain complète', 'Cuisine équipée', 'WC et douche']
+        features: ['Salle de bain complète', 'Cuisine équipée', 'Dépannage']
       },
       {
         name: 'Chauffage & Climatisation',
         description: 'Installation et entretien de vos systèmes de chauffage',
-        features: ['Pompes à chaleur', 'Chaudières', 'Climatisation']
+        features: ['Pompes à chaleur', 'Chaudières', 'Economie d\'énergie']
       },
       {
         name: 'Diagnostic Fuites',
         description: 'Détection précise et réparation de toutes les fuites',
-        features: ['Caméra endoscopique', 'Détection thermique', 'Garantie 2 ans']
+        features: ['Recherche non destructive', 'Caméra endoscopique', 'Assurance']
       },
       {
-        name: 'Rénovation Salle de Bain',
-        description: 'Transformation complète de votre salle de bain',
-        features: ['Design sur mesure', 'Matériaux premium', 'Délai respecté']
+        name: 'Rénovation Complète',
+        description: 'Transformation haute de gamme de votre salle de bain',
+        features: ['Design sur mesure', 'Matériaux premium', 'Livraison clé en main']
       },
       {
         name: 'Plomberie Générale',
         description: 'Tous travaux de plomberie pour professionnels et particuliers',
-        features: ['Neuf et rénovation', 'Mise aux normes', 'Certification']
+        features: ['Mise aux normes', 'Garantie décennale', 'SAV réactif']
       }
     ],
-    heroTitle: 'Votre Plombier Expert',
-    heroSubtitle: 'Intervention rapide et garantie dans toute la région',
-    aboutText: 'Artisan plombier certifié avec 15 ans d\'expérience, nous garantissons un service d\'excellence avec des matériaux de qualité et une intervention rapide.',
-    ctaText: 'Appeler maintenant'
+    heroTitle: 'Votre Expert Plomberie',
+    heroSubtitle: 'Intervention d\'excellence et garantie dans toute la région',
+    aboutText: 'Artisan certifié spécialisé dans les interventions premium. Nous garantissons un service d\'excellence, réactif et doté d\'une finition parfaite.',
+    ctaText: 'Obtenir une intervention'
   },
   electricien: {
-    primary: '#dc2626',
-    secondary: '#ef4444',
+    primary: '#ef4444',
+    secondary: '#b91c1c',
     accent: '#f87171',
-    background: '#fef2f2',
-    heroBackground: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+    background: '#0B0A0F',
     services: [
       {
         name: 'Mise aux Normes',
-        description: 'Mise en conformité complète de votre installation électrique',
-        features: ['Consuel', 'Normes NFC 15-100', 'Diagnostic gratuit']
+        description: 'Mise en conformité totale de votre installation',
+        features: ['Consuel garanti', 'Normes NFC 15-100', 'Diagnostic de sécurité']
       },
       {
         name: 'Tableau Électrique',
-        description: 'Installation et remplacement de tableaux électriques',
-        features: ['Disjoncteurs différentiels', 'Parafoudres', 'Label Promotelec']
+        description: 'Installation et rénovation de tableaux électriques',
+        features: ['Sécurité certifiée', 'Marques premium', 'Protection optimale']
       },
       {
-        name: 'Éclairage Design',
-        description: 'Installation d\'éclairages modernes et design',
-        features: ['LED', 'Spots encastrés', 'Domotique']
+        name: 'Éclairage Architectonique',
+        description: 'Mise en lumière moderne et design',
+        features: ['LED Premium', 'Étude photométrique', 'Contrôle à distance']
       },
       {
-        name: 'Domotique',
+        name: 'Maison Connectée',
         description: 'Installation de systèmes domotiques intelligents',
-        features: ['Gestion smartphone', 'Scénarios personnalisés', 'Économie d\'énergie']
+        features: ['Gestion smartphone', 'Scénarios de vie', 'Sécurité']
       },
       {
         name: 'Dépannage Électrique',
-        description: 'Diagnostic et réparation de tous problèmes électriques',
-        features: ['Intervention 24/7', 'Diagnostic précis', 'Garantie']
+        description: 'Diagnostic pointu et réparation instantanée',
+        features: ['Intervention 24/7', 'Outils de précision', 'Fiabilité totale']
       },
       {
-        name: 'Diagnostic Électrique',
-        description: 'Bilan complet de votre installation électrique',
-        features: ['Rapport détaillé', 'Recommandations', 'Devis']
+        name: 'Diagnostic Complet',
+        description: 'Bilan de votre installation électrique',
+        features: ['Rapport détaillé', 'Conseil expert', 'Devis chiffré']
       }
     ],
-    heroTitle: 'Votre Électricien Qualifié',
-    heroSubtitle: 'Sécurité et performance pour toutes vos installations électriques',
-    aboutText: 'Électricien qualifié avec certification Qualifelec, nous assurons la sécurité et la performance de vos installations électriques.',
-    ctaText: 'Demander un devis'
+    heroTitle: 'Excellence Électrique',
+    heroSubtitle: 'L\'énergie sûre et connectée, maîtrisée par des experts',
+    aboutText: 'Entreprise d\'électricité qualifiée, nous concevons, installons et sécurisons vos réseaux avec des technologies de pointe.',
+    ctaText: 'Demander un diagnostic'
   },
   coiffeur: {
-    primary: '#7c3aed',
-    secondary: '#8b5cf6',
+    primary: '#8b5cf6',
+    secondary: '#6d28d9',
     accent: '#a78bfa',
-    background: '#faf5ff',
-    heroBackground: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
+    background: '#0B0A0F',
     services: [
       {
-        name: 'Coupe Femme',
-        description: 'Coupe moderne et tendance adaptée à votre style',
-        features: ['Conseil personnalisé', 'Produits premium', 'Coiffage inclus']
+        name: 'Création Femme',
+        description: 'Coupe tendance et sur-mesure pour sublimer votre visage',
+        features: ['Visagisme', 'Techniques modernes', 'Coiffage wavy']
       },
       {
-        name: 'Coupe Homme',
-        description: 'Coupe masculine moderne et soignée',
-        features: ['Barbe traditionnelle', 'Soins visage', 'Produits bio']
+        name: 'Barber & Homme',
+        description: 'Service barbier authentique et coupes structurées',
+        features: ['Tracé millimétré', 'Soins barbe bio', 'Finition rasoir']
       },
       {
-        name: 'Coloration',
-        description: 'Coloration professionnelle et sur-mesure',
-        features: ['Balayage', 'Mèches', 'Coloration complète']
+        name: 'Coloration Premium',
+        description: 'Nuances parfaites, balayages subtils et respect du cheveu',
+        features: ['Poudres naturelles', 'Ombré Hair', 'Protection Olaplex']
       },
       {
-        name: 'Soin Capillaire',
-        description: 'Soins profonds pour cheveux sains et brillants',
-        features: ['Masques nourrissants', 'Huiles essentielles', 'Rituel complet']
+        name: 'Soin Profond',
+        description: 'Rituels de soin luxueux pour une fibre capillaire réparée',
+        features: ['Botox capillaire', 'Bain hydratant', 'Massage crânien relaxant']
       },
       {
-        name: 'Extension Cheveux',
-        description: 'Pose d\'extensions de qualité professionnelle',
-        features: ['Extensions naturelles', 'Pose durable', 'Entretien']
+        name: 'Extensions',
+        description: 'Longueur et volume avec des extensions 100% naturelles',
+        features: ['Kératine ou bandes', 'Invisible', 'Durabilité maximum']
       },
       {
-        name: 'Coiffage Événement',
-        description: 'Coiffage spécial pour vos événements importants',
-        features: ['Mariage', 'Soirée', 'Maquillage inclus']
+        name: 'Haute Coiffure',
+        description: 'Chignons et attaches pour vos plus beaux événements',
+        features: ['Mariage', 'Essai personnalisé', 'Tenue parfaite']
       }
     ],
-    heroTitle: 'Votre Salon Coiffure',
-    heroSubtitle: 'Expert en coiffure et beauté pour sublimer votre style',
-    aboutText: 'Salon de coiffure moderne avec une équipe passionnée par l\'art de la coiffure et les dernières tendances.',
-    ctaText: 'Prendre rendez-vous'
+    heroTitle: 'L\'Atelier de Coiffure',
+    heroSubtitle: 'Révélez votre beauté entre les mains d\'experts passionnés',
+    aboutText: 'Un salon d\'exception où chaque détail est pensé pour votre bien-être. Notre équipe artistique maîtrise les techniques les plus sophistiquées.',
+    ctaText: 'Réserver mon moment'
   },
   restaurant: {
-    primary: '#ea580c',
-    secondary: '#f97316',
-    accent: '#fb923c',
-    background: '#fff7ed',
-    heroBackground: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)',
+    primary: '#f97316',
+    secondary: '#c2410c',
+    accent: '#fdba74',
+    background: '#0B0A0F',
     services: [
       {
-        name: 'Cuisine Traditionnelle',
-        description: 'Plats authentiques et recettes familiales',
-        features: ['Produits locaux', 'Recettes traditionnelles', 'Chef expérimenté']
+        name: 'Carte Signature',
+        description: 'Une cuisine d\'inspiration, moderne et de saison',
+        features: ['Produits exceptionnels', 'Ferme à l\'assiette', 'Végétarien disponible']
       },
       {
         name: 'Menu Dégustation',
-        description: 'Expérience gastronomique complète',
-        features: ['7 services', 'Accords mets-vins', 'Menu saisonnier']
+        description: 'Le voyage culinaire ultime en plusieurs temps',
+        features: ['Accord Mets & Vins', '7 services', 'Surprise du Chef']
+      },
+      {
+        name: 'Cave d\'Exception',
+        description: 'Notre sommelier vous guide à travers nos meilleurs flacons',
+        features: ['Vignobles rares', 'Grands crus', 'Mixologie créative']
+      },
+      {
+        name: 'Privatisation',
+        description: 'Des espaces élégants pour vos événements privés',
+        features: ['Service dédié', 'Menus personnalisés', 'Jusqu\'à 100 convives']
+      },
+      {
+        name: 'Brunch Premium',
+        description: 'Le rendez-vous dominical incontournable et généreux',
+        features: ['Buffet Signature', 'Viennoiseries maison', 'Jus détox fraîchement pressés']
       },
       {
         name: 'Service Traiteur',
-        description: 'Traiteur pour vos événements privés et professionnels',
-        features: ['Événements 50-500 pers', 'Personnalisation', 'Service sur place']
-      },
-      {
-        name: 'Vins Sélectionnés',
-        description: 'Carte de vins raffinée et conseils sommelier',
-        features: ['Vins locaux', 'Sélection mondiale', 'Dégustations']
-      },
-      {
-        name: 'Brunch Dominical',
-        description: 'Brunch gourmand et convivial le dimanche',
-        features: ['Formule complète', 'Produits frais', 'Ambiance familiale']
-      },
-      {
-        name: 'Événements Privés',
-        description: 'Organisation d\'événements sur mesure',
-        features: ['Salle privative', 'Menu personnalisé', 'Animation']
+        description: 'L\'excellence de notre cuisine où vous le souhaitez',
+        features: ['Cocktails chics', 'Dîners de gala', 'Mise en scène']
       }
     ],
-    heroTitle: 'Votre Restaurant Gastronomique',
-    heroSubtitle: 'Cuisine authentique et produits locaux pour une expérience inoubliable',
-    aboutText: 'Restaurant familial avec une cuisine authentique mettant en valeur les produits locaux et les recettes traditionnelles.',
+    heroTitle: 'Expérience Culinaire Unique',
+    heroSubtitle: 'L\'harmonie parfaite entre gastronomie moderne et atmosphère élégante',
+    aboutText: 'Nous repoussons les limites de la tradition culinaire pour offrir un moment inoubliable, où les produits nobles racontent une histoire dans chaque assiette.',
     ctaText: 'Réserver une table'
   },
   garage: {
-    primary: '#16a34a',
-    secondary: '#22c55e',
-    accent: '#4ade80',
-    background: '#f0fdf4',
-    heroBackground: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+    primary: '#10b981',
+    secondary: '#047857',
+    accent: '#34d399',
+    background: '#0B0A0F',
     services: [
       {
-        name: 'Diagnostic Moteur',
-        description: 'Diagnostic complet et précis de tous types de moteurs',
-        features: ['Valise diagnostic', 'Analyse électronique', 'Rapport détaillé']
+        name: 'Diagnostic Électronique',
+        description: 'Analyse précise de tous les calculateurs de votre véhicule',
+        features: ['Valises constructeurs', 'Lecture de codes pannes', 'Effacement']
       },
       {
-        name: 'Révision Complète',
-        description: 'Entretien complet pour garantir la longévité de votre véhicule',
-        features: ['Filtres huile/air', 'Bougies', 'Liquides']
+        name: 'Entretien Constructeur',
+        description: 'Révisions respectant scrupuleusement les cahiers des charges',
+        features: ['Maintien garantie', 'Pièces origine', 'Huile premium']
       },
       {
-        name: 'Pneumatique',
-        description: 'Vente et pose de pneus de qualité',
-        features: ['Toutes marques', 'Équilibrage', 'Géométrie']
+        name: 'Liaison au Sol',
+        description: 'Techniciens experts en pneumatique et comportement',
+        features: ['Géométrie 3D', 'Pneus Haute Perf', 'Amortisseurs']
       },
       {
-        name: 'Carrosserie',
-        description: 'Réparation carrosserie et peinture professionnelle',
-        features: ['Petits chocs', 'Peinture carrosserie', 'Garantie']
+        name: 'Carrosserie Premium',
+        description: 'Restauration esthétique parfaite sans différence de teinte',
+        features: ['Spectromètre', 'Cabine de chauffe', 'Detaling inclus']
       },
       {
-        name: 'Vidange Entretien',
-        description: 'Vidange et entretien régulier de votre véhicule',
-        features: ['Huile qualité', 'Contrôle 30 points', 'Carnet entretien']
+        name: 'Moteur & Boîte',
+        description: 'Interventions lourdes, remplacement de distribution ou embrayage',
+        features: ['Outillage spécifique', 'Reconditionnement', 'Vidange BVA']
       },
       {
-        name: 'Contrôle Technique',
-        description: 'Préparation et passage du contrôle technique',
-        features: ['Pré-CT', 'Réparations mineures', 'Convoyage']
+        name: 'Voitures de Prestige',
+        description: 'Une équipe spécialisée dans les véhicules sportifs et luxe',
+        features: ['Manipulation soigneuse', 'Local sécurisé', 'Expertise pointue']
       }
     ],
-    heroTitle: 'Votre Garage Automobile',
-    heroSubtitle: 'Entretien et réparation professionnels pour tous types de véhicules',
-    aboutText: 'Garage automobile certifié avec des mécaniciens expérimentés et des équipements modernes pour garantir un service de qualité.',
-    ctaText: 'Prendre rendez-vous'
+    heroTitle: 'Le Pôle Mécanique Prémium',
+    heroSubtitle: 'L\'expertise absolue pour sublimer et entretenir votre véhicule',
+    aboutText: 'Notre garage de pointe rassemble l\'élite des techniciens pour offrir à votre véhicule un entretien sans compromis.',
+    ctaText: 'Prendre rendez-vous atelier'
   },
   default: {
-    primary: '#1f2937',
-    secondary: '#374151',
-    accent: '#6b7280',
-    background: '#f9fafb',
-    heroBackground: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
+    primary: '#ffffff',
+    secondary: '#d4d4d4',
+    accent: '#f5f5f5',
+    background: '#0B0A0F',
     services: [
       {
-        name: 'Consultation',
-        description: 'Conseil professionnel personnalisé',
-        features: ['Analyse besoins', 'Recommandations', 'Devis détaillé']
+        name: 'Consultation Experte',
+        description: 'Analyse approfondie de vos besoins stratégiques',
+        features: ['Diagnostic sur mesure', 'Plan d\'action', 'Écoute active']
       },
       {
-        name: 'Service Premium',
-        description: 'Service haut de gamme adapté à vos exigences',
-        features: ['Qualité supérieure', 'Garantie étendue', 'Support prioritaire']
+        name: 'Solutions Premium',
+        description: 'Implémentation de services à forte valeur ajoutée',
+        features: ['Qualité irréprochable', 'Suivi de performance', 'Finitions parfaites']
       },
       {
-        name: 'Intervention Rapide',
-        description: 'Intervention express pour vos urgences',
-        features: ['Disponible 24/7', 'Intervention immédiate', 'Suivi continu']
+        name: 'Accompagnement VIP',
+        description: 'Un interlocuteur dédié tout au long du processus',
+        features: ['Ligne directe', 'RDV prioritaire', 'Bilan mensuel']
       },
       {
-        name: 'Devis Gratuit',
-        description: 'Estimation gratuite et sans engagement',
-        features: ['Analyse complète', 'Tarifs transparents', 'Comparatif options']
+        name: 'Innovation & Technologie',
+        description: 'Utilisation des meilleurs outils du marché',
+        features: ['Méthodes agiles', 'Veille constante', 'Equipement de pointe']
       },
       {
-        name: 'Garantie Satisfaction',
-        description: 'Garantie totale de satisfaction',
-        features: ['Satisfaction ou remboursé', 'Reprise gratuite', 'Assistance continue']
+        name: 'Stratégie Sur-Mesure',
+        description: 'Vos objectifs se transforment en résultats mesurables',
+        features: ['ROI assuré', 'Alignement parfait', 'Transparence absolue']
       },
       {
-        name: 'Support Client',
-        description: 'Support client disponible et réactif',
-        features: ['Téléphone', 'Email', 'Chat en ligne']
+        name: 'Service Client 24/7',
+        description: 'Une présence permanente quand vous avez besoin de nous',
+        features: ['Assistance immédiate', 'Proactivité', 'Garanties solides']
       }
     ],
-    heroTitle: 'Votre Service Professionnel',
-    heroSubtitle: 'Expertise et qualité pour un service d\'excellence',
-    aboutText: 'Professionnel expérimenté engagé à fournir un service de qualité supérieure avec une attention particulière aux détails.',
-    ctaText: 'Nous contacter'
+    heroTitle: 'Services Professionnels d\'Excellence',
+    heroSubtitle: 'L\'alliance de la rigueur et de l\'innovation pour votre réussite',
+    aboutText: 'Nous bâtissons des relations durables basées sur la performance et l\'intégrité. Notre ambition est d\'élever vos standards et de vous accompagner vers le succès absolu.',
+    ctaText: 'Initier notre collaboration'
   }
 };
 
 function getUltimateTemplate(sector: string) {
   const normalizedSector = (sector || '').toLowerCase();
-  
   for (const [key, template] of Object.entries(SECTOR_ULTIMATE_TEMPLATES)) {
-    if (normalizedSector.includes(key)) {
-      return template;
-    }
+    if (normalizedSector.includes(key)) return template;
   }
-  
-  // Vérifications spécifiques
-  if (normalizedSector.includes('médec') || normalizedSector.includes('clinique')) {
-    return SECTOR_ULTIMATE_TEMPLATES.default;
+  if (normalizedSector.includes('médec') || normalizedSector.includes('clinique') || normalizedSector.includes('dentiste')) {
+    return { ...SECTOR_ULTIMATE_TEMPLATES.default, primary: '#0ea5e9', secondary: '#0284c7' };
   }
-  if (normalizedSector.includes('avocat') || normalizedSector.includes('notaire')) {
-    return SECTOR_ULTIMATE_TEMPLATES.default;
+  if (normalizedSector.includes('avocat') || normalizedSector.includes('notaire') || normalizedSector.includes('juridi')) {
+    return { ...SECTOR_ULTIMATE_TEMPLATES.default, primary: '#cda652', secondary: '#9b7c3d' };
   }
-  if (normalizedSector.includes('beauté') || normalizedSector.includes('esthétique')) {
-    return SECTOR_ULTIMATE_TEMPLATES.coiffeur;
+  if (normalizedSector.includes('beauté') || normalizedSector.includes('esthétique') || normalizedSector.includes('spa')) {
+    return { ...SECTOR_ULTIMATE_TEMPLATES.coiffeur, primary: '#ec4899', secondary: '#be185d' };
   }
   if (normalizedSector.includes('boulanger') || normalizedSector.includes('pâtissier')) {
     return SECTOR_ULTIMATE_TEMPLATES.restaurant;
   }
-  
   return SECTOR_ULTIMATE_TEMPLATES.default;
 }
 
 export function generateUltimateSite(lead: any): string {
   const template = getUltimateTemplate(lead.sector);
-  const companyName = lead.name || 'Entreprise';
+  const companyName = lead.name || 'Entreprise Premium';
   const city = lead.city || '';
   const phone = lead.phone || '';
   const email = lead.email || '';
@@ -319,35 +307,17 @@ export function generateUltimateSite(lead: any): string {
   const reviews = lead.googleReviews || 0;
   const description = lead.description || template.aboutText;
   
-  // Témoignages avec texte par défaut si nécessaire
   const testimonials = (lead.googleReviewsData || []).slice(0, 3).map((review: any) => ({
-    author: review.author || 'Client satisfait',
-    text: review.text || 'Excellent service, très professionnel et disponible. Je recommande vivement !',
+    author: review.author || 'Client VIP',
+    text: review.text || 'Une prestation d\'une qualité rare. L\'équipe a su répondre à mes exigences avec une perfection remarquable. Je recommande les yeux fermés.',
     rating: review.rating || 5,
     date: review.date || ''
   }));
 
-  // Si pas de témoignages, en générer par défaut
   if (testimonials.length === 0) {
     testimonials.push(
-      {
-        author: 'Jean Dupont',
-        text: 'Service exceptionnel ! Professionnel, ponctuel et très compétent. Je recommande vivement.',
-        rating: 5,
-        date: 'Il y a 1 semaine'
-      },
-      {
-        author: 'Marie Martin',
-        text: 'Très satisfait du travail réalisé. Sérieux et disponible, je n\'hésiterai pas à faire appel à nouveau.',
-        rating: 5,
-        date: 'Il y a 2 semaines'
-      },
-      {
-        author: 'Pierre Bernard',
-        text: 'Excellente prestation de service. Travail soigné et respect des délais. Bravo !',
-        rating: 5,
-        date: 'Il y a 1 mois'
-      }
+      { author: 'Emma L.', text: 'Une expérience tout simplement majestueuse. Rapidité, précision et professionnalisme impressionnant.', rating: 5, date: 'Il y a 1 semaine' },
+      { author: 'Arthur D.', text: 'Service d\'excellence du début à la fin. Les promesses sont tenues et même dépassées. Merci à toute l\'équipe.', rating: 5, date: 'Il y a 2 semaines' }
     );
   }
 
@@ -365,7 +335,7 @@ export function generateUltimateSite(lead: any): string {
     services: template.services,
     testimonials,
     heroTitle: template.heroTitle,
-    heroSubtitle: `${template.heroSubtitle}${city ? ' à ' + city : ''}`,
+    heroSubtitle: \`\${template.heroSubtitle}\${city ? ' à ' + city : ''}\`,
     aboutText: description,
     ctaText: template.ctaText
   };
@@ -376,846 +346,566 @@ export function generateUltimateSite(lead: any): string {
 function buildUltimateHTML(content: UltimateContent, template: any): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, rating, reviews } = content;
   
-  return `<!DOCTYPE html>
-<html lang="fr">
+  // Extract RGB for glowing effects
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex || '#ffffff');
+    return result ? \`\${parseInt(result[1], 16)}, \${parseInt(result[2], 16)}, \${parseInt(result[3], 16)}\` : '255, 255, 255';
+  };
+  const primaryRgb = hexToRgb(template.primary);
+
+  return \`<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${companyName} - ${content.sector}${content.city ? ' à ' + content.city : ''}</title>
-    <meta name="description" content="${heroSubtitle.substring(0, 160)}">
-    <meta name="keywords" content="${companyName}, ${content.sector}, ${content.city || 'France'}">
+    <title>\${companyName} - \${content.sector}</title>
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
         :root {
-            --primary-color: ${template.primary};
-            --secondary-color: ${template.secondary};
-            --accent-color: ${template.accent};
-            --background-color: ${template.background};
-            --hero-background: ${template.heroBackground};
-            --text-dark: #1f2937;
-            --text-light: #6b7280;
-            --white: #ffffff;
-            --border-light: #e5e7eb;
+            --primary: \${template.primary};
+            --secondary: \${template.secondary};
+            --primary-rgb: \${primaryRgb};
+            
+            /* Premium Dark Mode Colors */
+            --bg-base: #0a0a0c;
+            --bg-surface: rgba(255, 255, 255, 0.03);
+            --bg-glass: rgba(18, 18, 20, 0.4);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            
+            --text-main: #FFFFFF;
+            --text-muted: #A1A1AA;
+            
+            --glow: 0 0 40px rgba(\${primaryRgb}, 0.2);
+            --glow-strong: 0 0 60px rgba(\${primaryRgb}, 0.4);
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background-color: var(--background-color);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
             overflow-x: hidden;
+            line-height: 1.7;
         }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            line-height: 1.2;
+
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'Outfit', sans-serif;
         }
-        
-        /* Navigation */
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
-            padding: 1rem 0;
+
+        /* Abstract Animated Background */
+        .bg-blobs {
             position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            transition: all 0.3s ease;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            z-index: -1;
+            background: #030305;
         }
-        
-        .navbar-brand {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--primary-color) !important;
-            text-decoration: none;
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .nav-link {
-            color: var(--text-dark) !important;
-            font-weight: 500;
-            margin: 0 1rem;
-            transition: all 0.3s ease;
-            position: relative;
-            font-size: 0.95rem;
-        }
-        
-        .nav-link:hover {
-            color: var(--primary-color) !important;
-        }
-        
-        .nav-link::after {
-            content: '';
+        .blob {
             position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 3px;
-            background: var(--primary-color);
-            transition: width 0.3s ease;
-            border-radius: 2px;
+            filter: blur(120px);
+            opacity: 0.3;
+            animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
         }
-        
-        .nav-link:hover::after {
-            width: 80%;
+        .blob-1 {
+            background: var(--primary);
+            width: 45vw; height: 45vw;
+            top: -10vw; left: -10vw;
         }
-        
+        .blob-2 {
+            background: var(--secondary);
+            width: 35vw; height: 35vw;
+            bottom: -5vw; right: -5vw;
+            animation-delay: -10s;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(15vw, 15vh) scale(1.1); }
+        }
+
+        /* Glassmorphism Components */
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            z-index: 50;
+            padding: 1.5rem 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        nav.scrolled {
+            padding: 1rem 0;
+            background: rgba(10, 10, 12, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glass);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .brand svg { color: var(--primary); }
+
+        .btn-call {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass);
+            color: white; padding: 0.5rem 1.25rem; border-radius: 100px;
+            text-decoration: none; font-weight: 600; transition: all 0.3s;
+        }
+        .btn-call:hover {
+            background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);
+        }
+
         /* Hero Section */
         .hero {
-            background: var(--hero-background);
             min-height: 100vh;
             display: flex;
             align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            opacity: 0.3;
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            color: var(--white);
-        }
-        
-        .hero h1 {
-            font-size: clamp(3rem, 8vw, 5.5rem);
-            font-weight: 800;
-            margin-bottom: 2rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            letter-spacing: -0.02em;
-        }
-        
-        .hero p {
-            font-size: 1.4rem;
-            margin-bottom: 3rem;
-            opacity: 0.95;
-            max-width: 600px;
-            font-weight: 300;
-        }
-        
-        .btn-hero {
-            background: var(--white);
-            color: var(--primary-color);
-            padding: 1.25rem 3rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-            letter-spacing: 0.01em;
-        }
-        
-        .btn-hero:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-            color: var(--primary-color);
-        }
-        
-        /* Sections */
-        .section {
-            padding: 6rem 0;
-        }
-        
-        .section-title {
+            justify-content: center;
             text-align: center;
-            margin-bottom: 4rem;
+            padding: 8rem 2rem 4rem;
+            position: relative;
         }
-        
-        .section-title h2 {
-            font-size: 3rem;
-            color: var(--text-dark);
-            margin-bottom: 1.5rem;
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            background: rgba(\${primaryRgb}, 0.1);
+            border: 1px solid rgba(\${primaryRgb}, 0.2);
+            color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            backdrop-filter: blur(10px);
+        }
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6.5rem);
             font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.5) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: clamp(1.125rem, 3vw, 1.375rem);
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 3.5rem;
+            font-weight: 400;
+        }
+        .btn-glow {
+            background: var(--primary);
+            color: \${template.primary === '#ffffff' ? '#000' : '#fff'};
+            padding: 1.25rem 2.5rem;
+            border-radius: 100px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--glow);
+            border: none;
+        }
+        .btn-glow:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--glow-strong);
+        }
+
+        /* Container & Sections */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+        .section-header h2 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            margin-bottom: 1.25rem;
+            font-weight: 700;
             letter-spacing: -0.02em;
         }
-        
-        .section-title p {
-            font-size: 1.2rem;
-            color: var(--text-light);
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
             max-width: 600px;
             margin: 0 auto;
         }
-        
-        /* Service Cards */
-        .service-card {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 2.5rem;
-            height: 100%;
-            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.08);
-            transition: all 0.4s ease;
-            border: 1px solid var(--border-light);
+
+        /* Services Grid */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        .card {
+            padding: 3rem;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
-        
-        .service-card::before {
+        .card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: var(--primary-color);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s ease;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        
-        .service-card:hover::before {
-            transform: scaleX(1);
-        }
-        
-        .service-card:hover {
+        .card:hover::before { opacity: 1; }
+        .card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+            border-color: rgba(\${primaryRgb}, 0.4);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--glow);
         }
+        .card > * { position: relative; z-index: 1; }
         
-        .service-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--primary-color);
+        .card-icon {
+            width: 70px; height: 70px;
             border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: linear-gradient(135deg, rgba(\${primaryRgb}, 0.2), rgba(\${primaryRgb}, 0.05));
+            border: 1px solid rgba(\${primaryRgb}, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
             margin-bottom: 2rem;
-            font-size: 1.8rem;
-            color: var(--white);
         }
+        .card-icon svg { width: 32px; height: 32px; }
         
-        .service-card h3 {
+        .card h3 {
             font-size: 1.5rem;
-            color: var(--text-dark);
             margin-bottom: 1rem;
-            font-weight: 600;
+            font-weight: 700;
         }
-        
-        .service-card p {
-            color: var(--text-light);
+        .card p {
+            color: var(--text-muted);
             margin-bottom: 2rem;
-            font-size: 1.05rem;
-            line-height: 1.7;
+            flex-grow: 1;
         }
-        
-        .service-features {
+        .feature-list {
             list-style: none;
-            padding: 0;
-            margin: 0;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 1.5rem;
         }
-        
-        .service-features li {
+        .feature-list li {
             display: flex;
             align-items: center;
-            margin-bottom: 0.8rem;
-            color: var(--text-light);
+            gap: 0.75rem;
+            color: #E4E4E7;
+            margin-bottom: 0.75rem;
             font-size: 0.95rem;
         }
-        
-        .service-features li::before {
-            content: '✓';
-            color: var(--primary-color);
-            font-weight: 700;
-            margin-right: 0.8rem;
-            font-size: 1.1rem;
+        .feature-list i {
+            color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
+            width: 18px; height: 18px;
         }
-        
-        /* About Section */
-        .about-section {
-            background: var(--white);
+
+        /* About Grid */
+        .about-wrap {
+            display: grid; grid-template-columns: 1.2fr 0.8fr;
+            gap: 5rem; align-items: center;
         }
+        @media (max-width: 992px) { .about-wrap { grid-template-columns: 1fr; gap: 3rem; } }
         
-        .about-content {
-            background: var(--background-color);
-            border-radius: 30px;
-            padding: 4rem;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.05);
+        .stat-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
         }
-        
-        .about-content h3 {
-            font-size: 2.2rem;
-            color: var(--text-dark);
-            margin-bottom: 2rem;
-            font-weight: 700;
+        .stat-card {
+            padding: 2.5rem; text-align: center;
+            display: flex; flex-direction: column; justify-content: center;
         }
-        
-        .about-content p {
-            font-size: 1.15rem;
-            line-height: 1.8;
-            color: var(--text-light);
-            margin-bottom: 2rem;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--primary-color);
+        .stat-num {
+            font-size: 3.5rem; font-weight: 800; font-family: 'Outfit';
+            background: linear-gradient(135deg, var(--text-main) 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
-            font-family: 'Playfair Display', serif;
+            line-height: 1;
         }
-        
-        .stat-label {
-            color: var(--text-light);
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        
+
         /* Testimonials */
         .testimonial-card {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 2.5rem;
-            height: 100%;
-            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.08);
-            position: relative;
-            border: 1px solid var(--border-light);
+            padding: 3rem;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+        }
+        .stars { display: flex; gap: 0.25rem; color: #FBBF24; margin-bottom: 1.5rem; }
+        .stars svg { width: 20px; height: 20px; fill: currentColor; }
+        
+        /* CTA */
+        .cta-box {
+            text-align: center; padding: 6rem 3rem;
+            background: radial-gradient(circle at center, rgba(\${primaryRgb}, 0.15) 0%, transparent 70%);
+            border: 1px solid var(--border-glass);
+            margin-top: 2rem;
+            position: relative; overflow: hidden;
         }
         
-        .testimonial-card::before {
-            content: '"';
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
-            font-size: 4rem;
-            color: var(--primary-color);
-            opacity: 0.1;
-            font-family: 'Playfair Display', serif;
-            font-weight: 800;
+        .contact-details {
+            display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; margin-top: 4rem;
         }
-        
-        .testimonial-text {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            margin-bottom: 2rem;
-            color: var(--text-dark);
-            font-style: italic;
-            position: relative;
-            z-index: 1;
+        .contact-item {
+            display: flex; align-items: center; gap: 0.75rem; font-size: 1.1rem;
+            color: var(--text-muted);
         }
-        
-        .testimonial-author {
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
+        .contact-item svg { color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'}; }
+
+        /* Animation classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        
-        .testimonial-rating {
-            color: #fbbf24;
-            font-size: 1.1rem;
-        }
-        
-        .testimonial-date {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-        }
-        
-        /* Contact Section */
-        .contact-section {
-            background: var(--hero-background);
-            color: var(--white);
-            position: relative;
-        }
-        
-        .contact-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid2" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid2)"/></svg>');
-            opacity: 0.3;
-        }
-        
-        .contact-content {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .contact-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 3.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-        }
-        
-        .contact-info-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        
-        .contact-info-item i {
-            font-size: 1.8rem;
-            margin-right: 1.5rem;
-            color: var(--white);
-            width: 50px;
-            text-align: center;
-        }
-        
-        .contact-info-item span {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-        
-        .btn-contact {
-            background: var(--white);
-            color: var(--primary-color);
-            padding: 1.25rem 3rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
-            margin-top: 1rem;
-        }
-        
-        .btn-contact:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.3);
-            color: var(--primary-color);
-        }
-        
-        /* Footer */
-        footer {
-            background: var(--text-dark);
-            color: var(--white);
-            padding: 4rem 0 2rem;
-        }
-        
-        .footer-brand {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--white);
-            margin-bottom: 1rem;
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .footer-description {
-            color: #9ca3af;
-            margin-bottom: 2rem;
-            font-size: 1.05rem;
-        }
-        
-        .footer-links {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .footer-links li {
-            margin-bottom: 1rem;
-        }
-        
-        .footer-links a {
-            color: #9ca3af;
-            text-decoration: none;
-            transition: color 0.3s ease;
-            font-size: 1rem;
-        }
-        
-        .footer-links a:hover {
-            color: var(--white);
-        }
-        
-        .footer-contact-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            color: #9ca3af;
-        }
-        
-        .footer-contact-item i {
-            margin-right: 1rem;
-            color: var(--primary-color);
-        }
-        
-        .footer-bottom {
-            border-top: 1px solid #374151;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            text-align: center;
-            color: #9ca3af;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: clamp(2.5rem, 6vw, 3.5rem);
-            }
-            
-            .hero p {
-                font-size: 1.1rem;
-            }
-            
-            .section {
-                padding: 4rem 0;
-            }
-            
-            .section-title h2 {
-                font-size: 2.2rem;
-            }
-            
-            .service-card {
-                padding: 2rem;
-            }
-            
-            .about-content {
-                padding: 2.5rem;
-            }
-            
-            .contact-card {
-                padding: 2.5rem;
-            }
-            
-            .nav-link {
-                margin: 0 0.5rem;
-                font-size: 0.9rem;
-            }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
+
+    <!-- Dynamic Background -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="#home">${companyName}</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#home">Accueil</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#services">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">À Propos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#testimonials">Avis</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
-                    </li>
-                </ul>
-            </div>
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#" class="brand">
+                <i data-lucide="zap"></i>\${companyName}
+            </a>
+            \${phone ? \`
+            <a href="tel:\${phone}" class="btn-call">
+                <i data-lucide="phone"></i> \${phone}
+            </a>\` : ''}
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="container">
-            <div class="hero-content text-center">
-                <h1>${heroTitle}</h1>
-                <p>${heroSubtitle}</p>
-                <a href="#contact" class="btn-hero">${content.ctaText}</a>
-                ${rating && rating > 0 ? `
-                <div class="mt-5">
-                    <div class="d-flex justify-content-center gap-4">
-                        <div class="text-center">
-                            <div class="display-4 fw-bold">${rating}</div>
-                            <div class="text-white-50">Note Google</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="display-4 fw-bold">${reviews}+</div>
-                            <div class="text-white-50">Avis clients</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="display-4 fw-bold">15+</div>
-                            <div class="text-white-50">Années d'exp</div>
-                        </div>
-                    </div>
-                </div>
-                ` : ''}
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content reveal active">
+            <div class="hero-badge">
+                <i data-lucide="star"></i> Service Premium Certifié
+            </div>
+            <h1>\${heroTitle}</h1>
+            <p>\${heroSubtitle}</p>
+            <div style="margin-top: 2rem;">
+                <a href="#services" class="btn-glow">
+                    Découvrir nos solutions <i data-lucide="arrow-right"></i>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- Services Section -->
-    <section class="section" id="services">
-        <div class="container">
-            <div class="section-title">
-                <h2>Nos Services</h2>
-                <p>Des solutions professionnelles complètes adaptées à vos besoins</p>
-            </div>
-            <div class="row g-4">
-                ${services.map((service, index) => `
-                <div class="col-md-6 col-lg-4">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <i class="bi bi-${getServiceIcon(index)}"></i>
-                        </div>
-                        <h3>${service.name}</h3>
-                        <p>${service.description}</p>
-                        <ul class="service-features">
-                            ${service.features.map(feature => `<li>${feature}</li>`).join('')}
-                        </ul>
-                    </div>
+    <!-- Services -->
+    <section class="container" id="services">
+        <div class="section-header reveal">
+            <h2>Notre Expertise</h2>
+            <p>L'alliance parfaite de l'innovation et du savoir-faire pour des résultats hors normes.</p>
+        </div>
+        
+        <div class="grid-3">
+            \${services.map((s, i) => \`
+            <div class="card glass reveal" style="transition-delay: \${i * 100}ms">
+                <div class="card-icon">
+                    <i data-lucide="\${['shield', 'layers', 'box', 'award', 'cpu', 'gem'][i%6]}"></i>
                 </div>
-                `).join('')}
+                <h3>\${s.name}</h3>
+                <p>\${s.description}</p>
+                <ul class="feature-list">
+                    \${s.features.map(f => \`
+                        <li><i data-lucide="check-circle-2"></i> \${f}</li>
+                    \`).join('')}
+                </ul>
             </div>
+            \`).join('')}
         </div>
     </section>
 
-    <!-- About Section -->
-    <section class="section about-section" id="about">
-        <div class="container">
-            <div class="section-title">
-                <h2>À Propos</h2>
-                <p>Notre histoire et notre engagement</p>
+    <!-- About / Stats -->
+    <section class="container">
+        <div class="about-wrap">
+            <div class="reveal">
+                <h2 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem;">
+                    Une vision axée sur <span style="color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};">l'excellence.</span>
+                </h2>
+                <p style="color: var(--text-muted); font-size: 1.125rem; margin-bottom: 2.5rem; line-height: 1.8;">
+                    \${aboutText}
+                </p>
+                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                    <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.05); padding: 0.75rem 1.5rem; border-radius: 100px; border: 1px solid var(--border-glass);">
+                        <i data-lucide="check" style="color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};"></i> <span>Équipe Dédiée</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.05); padding: 0.75rem 1.5rem; border-radius: 100px; border: 1px solid var(--border-glass);">
+                        <i data-lucide="check" style="color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};"></i> <span>Innovation</span>
+                    </div>
+                </div>
             </div>
-            <div class="about-content">
-                <h3>${companyName}</h3>
-                <p>${aboutText}</p>
-                <p>Nous sommes passionnés par notre métier et nous nous engageons à fournir un service d'excellence à chaque client. Notre expertise et notre savoir-faire garantissent des résultats durables et satisfaisants.</p>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number">15+</div>
-                        <div class="stat-label">Années d'expérience</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">500+</div>
-                        <div class="stat-label">Clients satisfaits</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">24/7</div>
-                        <div class="stat-label">Support disponible</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">Garantie satisfaction</div>
-                    </div>
+            
+            <div class="stat-grid reveal" style="transition-delay: 200ms">
+                \${rating > 0 ? \`
+                <div class="stat-card glass">
+                    <div class="stat-num">\${rating}</div>
+                    <div style="color:var(--text-muted); font-weight: 500;">Note Globale</div>
+                </div>\` : ''}
+                \${reviews > 0 ? \`
+                <div class="stat-card glass">
+                    <div class="stat-num">\${reviews}+</div>
+                    <div style="color:var(--text-muted); font-weight: 500;">Avis Vérifiés</div>
+                </div>\` : ''}
+                <div class="stat-card glass" \${(!rating && !reviews) ? 'style="grid-column: span 2;"' : ''}>
+                    <div class="stat-num">100%</div>
+                    <div style="color:var(--text-muted); font-weight: 500;">Satisfaction Client</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="section" id="testimonials">
-        <div class="container">
-            <div class="section-title">
-                <h2>Avis Clients</h2>
-                <p>Ce que nos clients disent de nous</p>
-            </div>
-            <div class="row g-4">
-                ${testimonials.map((testimonial, index) => `
-                <div class="col-md-6 col-lg-4">
-                    <div class="testimonial-card">
-                        <div class="testimonial-text">
-                            "${testimonial.text}"
-                        </div>
-                        <div class="testimonial-author">${testimonial.author}</div>
-                        <div class="testimonial-rating">
-                            ${'★'.repeat(testimonial.rating || 5)}${'☆'.repeat(5 - (testimonial.rating || 5))}
-                        </div>
-                        ${testimonial.date ? `<div class="testimonial-date">${testimonial.date}</div>` : ''}
-                    </div>
-                </div>
-                `).join('')}
-            </div>
+    <!-- Testimonials -->
+    \${testimonials && testimonials.length > 0 ? \`
+    <section class="container" id="testimonials">
+        <div class="section-header reveal">
+            <h2>Ils nous font confiance</h2>
+            <p>Rejoignez nos clients VIP et vivez une expérience sans précédent.</p>
         </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="section contact-section" id="contact">
-        <div class="container">
-            <div class="contact-content">
-                <div class="section-title">
-                    <h2 style="color: white;">Contact</h2>
-                    <p style="color: rgba(255,255,255,0.9);">Prenez contact pour votre projet</p>
+        <div class="grid-3">
+            \${testimonials.map((t, i) => \`
+            <div class="card testimonial-card glass reveal" style="transition-delay: \${i * 100}ms">
+                <div>
+                    <div class="stars">
+                        \${Array(t.rating).fill('<i data-lucide="star"></i>').join('')}
+                    </div>
+                    <p style="color: #fff; font-size: 1.125rem; font-style: italic; line-height: 1.8;">"\${t.text}"</p>
                 </div>
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="contact-card">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    ${phone ? `
-                                    <div class="contact-info-item">
-                                        <i class="bi bi-telephone-fill"></i>
-                                        <span>${phone}</span>
-                                    </div>
-                                    ` : ''}
-                                    ${email ? `
-                                    <div class="contact-info-item">
-                                        <i class="bi bi-envelope-fill"></i>
-                                        <span>${email}</span>
-                                    </div>
-                                    ` : ''}
-                                    ${address ? `
-                                    <div class="contact-info-item">
-                                        <i class="bi bi-geo-alt-fill"></i>
-                                        <span>${address}</span>
-                                    </div>
-                                    ` : ''}
-                                    ${website ? `
-                                    <div class="contact-info-item">
-                                        <i class="bi bi-globe"></i>
-                                        <span>${website}</span>
-                                    </div>
-                                    ` : ''}
-                                </div>
-                                <div class="col-md-6 text-center">
-                                    <h4 class="mb-4">Contactez-nous</h4>
-                                    <p class="mb-4">Nous sommes à votre disposition pour répondre à toutes vos questions</p>
-                                    ${phone ? `
-                                    <a href="tel:${phone}" class="btn-contact">
-                                        <i class="bi bi-telephone-fill me-2"></i>${content.ctaText}
-                                    </a>
-                                    ` : ''}
-                                    ${email ? `
-                                    <a href="mailto:${email}" class="btn-contact ms-2">
-                                        <i class="bi bi-envelope-fill me-2"></i>Envoyer un email
-                                    </a>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        </div>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 2rem; border-top: 1px solid var(--border-glass); padding-top: 1.5rem;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items:center; justify-content:center; font-weight: 700; color: \${template.primary === '#ffffff' ? '#000' : '#fff'}; font-size: 1.25rem;">
+                        \${t.author.charAt(0)}
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; color: #fff;">\${t.author}</div>
+                        \${t.date ? \`<div style="font-size: 0.875rem; color: var(--text-muted);">\${t.date}</div>\` : ''}
                     </div>
                 </div>
             </div>
+            \`).join('')}
         </div>
     </section>
+    \` : ''}
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <div class="footer-brand">${companyName}</div>
-                    <div class="footer-description">${content.sector} professionnel${content.city ? ' à ' + content.city : ''}</div>
-                </div>
-                <div class="col-lg-4 mb-4">
-                    <h5 class="mb-3">Services</h5>
-                    <ul class="footer-links">
-                        ${services.slice(0, 4).map(service => `<li><a href="#services">${service.name}</a></li>`).join('')}
-                    </ul>
-                </div>
-                <div class="col-lg-4 mb-4">
-                    <h5 class="mb-3">Contact</h5>
-                    ${phone ? `<div class="footer-contact-item"><i class="bi bi-telephone-fill"></i> ${phone}</div>` : ''}
-                    ${email ? `<div class="footer-contact-item"><i class="bi bi-envelope-fill"></i> ${email}</div>` : ''}
-                    ${address ? `<div class="footer-contact-item"><i class="bi bi-geo-alt-fill"></i> ${address}</div>` : ''}
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 ${companyName}. Tous droits réservés.</p>
+    <!-- CTA & Footer -->
+    <section class="container">
+        <div class="cta-box glass reveal">
+            <h2 style="font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1.5rem; font-weight: 800;">
+                Prêt à collaborer ensemble ?
+            </h2>
+            <p style="color: var(--text-muted); font-size: 1.25rem; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                \${content.ctaText} ou contactez-nous directement pour concevoir votre projet.
+            </p>
+            
+            \${phone ? \`<a href="tel:\${phone}" class="btn-glow" style="margin-bottom: 2rem;">
+                <i data-lucide="phone-call"></i> Appeler : \${phone}
+            </a>\` : ''}
+
+            <div class="contact-details">
+                \${email ? \`<div class="contact-item"><i data-lucide="mail"></i> \${email}</div>\` : ''}
+                \${address ? \`<div class="contact-item"><i data-lucide="map-pin"></i> \${address}</div>\` : ''}
+                \${website ? \`<div class="contact-item"><i data-lucide="globe"></i> \${website}</div>\` : ''}
             </div>
         </div>
-    </footer>
+        
+        <footer style="margin-top: 6rem; padding-top: 2rem; border-top: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); flex-wrap: wrap; gap: 1rem;">
+            <div class="brand" style="font-size: 1.25rem; color: var(--text-muted);">
+                \${companyName}
+            </div>
+            <p style="font-size: 0.9rem;">&copy; \${new Date().getFullYear()} Tous droits réservés.</p>
+        </footer>
+    </section>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+    <!-- Scripts -->
     <script>
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
+        // Init Lucide Icons
+        lucide.createIcons();
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if(window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
         });
 
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.style.padding = '0.5rem 0';
-                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
-                navbar.style.boxShadow = '0 8px 40px rgba(0, 0, 0, 0.12)';
-            } else {
-                navbar.style.padding = '1rem 0';
-                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-                navbar.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.08)';
-            }
-        });
-
-        // Animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
+        // Intersection Observer for Reveal Animations
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+        
+        reveals.forEach(reveal => observer.observe(reveal));
 
-        // Observe elements
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.service-card, .testimonial-card, .about-content').forEach(el => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(40px)';
-                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-                observer.observe(el);
+        // Hover Effect on Cards (Glow follow mouse)
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', \`\${x}px\`);
+                card.style.setProperty('--mouse-y', \`\${y}px\`);
             });
         });
     </script>
 </body>
-</html>`;
-}
-
-function getServiceIcon(index: number): string {
-  const icons = [
-    'tools', 'gear-fill', 'wrench', 'hammer', 'buildings', 'house-gear-fill',
-    'lightning-charge-fill', 'shield-check', 'award-fill', 'star-fill', 'heart-fill',
-    'telephone-fill', 'envelope-fill', 'geo-alt-fill', 'clock-fill', 'check-circle-fill'
-  ];
-  return icons[index % icons.length];
+</html>\`;
 }
