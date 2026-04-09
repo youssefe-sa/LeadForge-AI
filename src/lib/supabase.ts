@@ -334,7 +334,7 @@ export const configService = {
       gmail_smtp_from_email: config.gmailSmtpFromEmail || null,
       gmail_smtp_secure: Boolean(config.gmailSmtpSecure),
       whop_deposit_link: config.whopDepositLink || null,
-      whop_final_payment_link: config.whopFinalPaymentLink || null
+      whop_final_payment_link: config.whopFinalPaymentLink || null,
       unsplash_key: config.unsplashKey || null,
       pexels_key: config.pexelsKey || null,
     };
