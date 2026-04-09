@@ -1,4 +1,4 @@
-// ── TEMPLATE ULTIME 2026 - MULTI-THÈMES, COMPLET & INTELLIGENT ──
+// ── TEMPLATE ULTIME 2026 - REFONTE TOTALE HAUTE COUTURE ──
 
 export interface UltimateContent {
   companyName: string;
@@ -20,72 +20,38 @@ export interface UltimateContent {
   images: string[];
 }
 
-// ── BANQUE D'IMAGES CURÉES (2026) ──
 const CURATED: Record<string, string[]> = {
   restaurant: [
     "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&fit=crop",
     "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&fit=crop"
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&fit=crop"
   ],
   coiffeur: [
     "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&fit=crop",
     "https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=800&fit=crop"
+    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&fit=crop"
   ],
   garage: [
     "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&fit=crop",
     "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&fit=crop"
+    "https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=800&fit=crop"
   ],
   plomberie: [
     "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=800&fit=crop",
     "https://images.unsplash.com/photo-1607472586893-edb57cb64e2c?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&fit=crop"
+    "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&fit=crop"
   ],
   default: [
     "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&fit=crop",
     "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&fit=crop",
-    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&fit=crop"
+    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&fit=crop"
   ]
 };
 
-// ── THEMES MULTIPLES POUR EVITER DE SE REPETER ──
-const THEMES = {
-  modernLight: { 
-    bgBase: '#f8fafc', bgSurface: '#ffffff', textMain: '#0f172a', textMuted: '#64748b', 
-    glassCode: 'background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);'
-  },
-  premiumDark: {
-    bgBase: '#020617', bgSurface: '#0f172a', textMain: '#f8fafc', textMuted: '#94a3b8',
-    glassCode: 'background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);'
-  },
-  neonCyber: {
-    bgBase: '#09090b', bgSurface: '#18181b', textMain: '#fafafa', textMuted: '#a1a1aa',
-    glassCode: 'background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);'
-  },
-  natureBento: {
-    bgBase: '#fdfbf7', bgSurface: '#ffffff', textMain: '#1c1917', textMuted: '#78716c',
-    glassCode: 'background: #ffffff; border-radius: 24px; border: 1px solid #e7e5e4; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);'
-  }
-};
+// ── FONCTIONS UTILITAIRES POUR LOGO ET THEMES ──
 
-const SECTOR_ULTIMATE_TEMPLATES = {
-  plomberie: { theme: THEMES.modernLight, primary: '#0ea5e9', secondary: '#0284c7', bgTexture: 'water' },
-  electricien: { theme: THEMES.premiumDark, primary: '#f59e0b', secondary: '#d97706', bgTexture: 'grid' },
-  coiffeur: { theme: THEMES.natureBento, primary: '#ec4899', secondary: '#be185d', bgTexture: 'soft' },
-  restaurant: { theme: THEMES.premiumDark, primary: '#ef4444', secondary: '#b91c1c', bgTexture: 'grain' },
-  garage: { theme: THEMES.neonCyber, primary: '#3b82f6', secondary: '#1d4ed8', bgTexture: 'grid' },
-  default: { theme: THEMES.modernLight, primary: '#6366f1', secondary: '#4f46e5', bgTexture: 'soft' }
-};
-
-// ── FONCTIONS UTILITAIRES ──
 function getLogoName(fullName: string): string {
-  const skip = ['le', 'la', 'les', 'de', 'du', 'des', "l'"];
+  const skip = ['le', 'la', 'les', 'de', 'du', 'des', "l'", 'à', 'a'];
   const words = (fullName || 'Entreprise').trim().toLowerCase().split(/\s+/);
   const filtered = words.filter(w => !skip.includes(w));
   if (filtered.length === 0) return 'Logo';
@@ -98,49 +64,114 @@ function getInitials(fullName: string): string {
   return fullName.substring(0, 2).toUpperCase();
 }
 
-function getUltimateTemplate(sector: string) {
-  const normalizedSector = (sector || '').toLowerCase();
-  for (const [key, template] of Object.entries(SECTOR_ULTIMATE_TEMPLATES)) {
-    if (normalizedSector.includes(key)) return template;
+// Génère une couleur unique (HSL) basée sur le nom pour éviter que tous les sites inclassables se ressemblent
+function stringToHslColor(str: string, saturation: number, lightness: number) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  if (normalizedSector.includes('médec') || normalizedSector.includes('cliniq')) {
-    return { theme: THEMES.modernLight, primary: '#14b8a6', secondary: '#0d9488', bgTexture: 'soft' };
+  const hue = Math.abs(hash % 360);
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+// Convertisseur HSL vers HEX pour unifier le rendu
+function HSLToHex(h: number, s: number, l: number) {
+  s /= 100; l /= 100;
+  let c = (1 - Math.abs(2 * l - 1)) * s,
+      x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+      m = l - c/2,
+      r = 0, g = 0, b = 0;
+  if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+  else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+  else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+  else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+  else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+  else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+  r = Math.round((r + m) * 255);
+  g = Math.round((g + m) * 255);
+  b = Math.round((b + m) * 255);
+  return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+}
+
+function generateDynamicTheme(companyName: string) {
+  let hash = 0;
+  for (let i = 0; i < companyName.length; i++) hash = companyName.charCodeAt(i) + ((hash << 5) - hash);
+  const hue = Math.abs(hash % 360);
+  const primary = HSLToHex(hue, 80, 50);
+  const secondary = HSLToHex((hue + 30) % 360, 90, 40);
+  
+  // 50% de chance d'avoir un fond clair ou sombre pour casser la linéarité
+  const isDark = (hash % 2 === 0);
+  
+  const theme = isDark ? {
+    bgBase: '#050505', bgSurface: '#111111', textMain: '#f8fafc', textMuted: '#a1a1aa',
+    glassCode: 'background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);'
+  } : {
+    bgBase: '#fdfdfd', bgSurface: '#ffffff', textMain: '#0a0a0a', textMuted: '#52525b',
+    glassCode: 'background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(0, 0, 0, 0.04); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);'
+  };
+
+  return { theme, primary, secondary };
+}
+
+const PREDEFINED_THEMES = {
+  restaurant: {
+    theme: { bgBase: '#0c0a09', bgSurface: '#1c1917', textMain: '#fafaf9', textMuted: '#a8a29e', glassCode: 'background: rgba(28, 25, 23, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05);' },
+    primary: '#f97316', secondary: '#c2410c'
+  },
+  plomberie: {
+    theme: { bgBase: '#f0f9ff', bgSurface: '#ffffff', textMain: '#082f49', textMuted: '#0284c7', glassCode: 'background: #ffffff; border: 1px solid #e0f2fe; box-shadow: 0 10px 30px rgba(2, 132, 199, 0.08);' },
+    primary: '#0ea5e9', secondary: '#0369a1'
+  },
+  electricien: {
+    theme: { bgBase: '#020617', bgSurface: '#0f172a', textMain: '#f8fafc', textMuted: '#94a3b8', glassCode: 'background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);' },
+    primary: '#eab308', secondary: '#b45309'
+  },
+  coiffeur: {
+    theme: { bgBase: '#fdf4ff', bgSurface: '#ffffff', textMain: '#4a044e', textMuted: '#a21caf', glassCode: 'background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid #fae8ff; box-shadow: 0 10px 30px rgba(162, 28, 175, 0.05);' },
+    primary: '#c026d3', secondary: '#86198f'
   }
-  if (normalizedSector.includes('avocat') || normalizedSector.includes('notaire')) {
-    return { theme: THEMES.natureBento, primary: '#b45309', secondary: '#92400e', bgTexture: 'grain' };
+};
+
+function getUltimateTemplate(sector: string, name: string) {
+  const norm = (sector || '').toLowerCase();
+  for (const [key, tpl] of Object.entries(PREDEFINED_THEMES)) {
+    if (norm.includes(key)) return tpl;
   }
-  return SECTOR_ULTIMATE_TEMPLATES.default;
+  return generateDynamicTheme(name || 'LeadForge');
 }
 
 // 🎯 GENERATEUR PRINCIPAL
 export function generateUltimateSite(lead: any, aiContent?: any): string {
-  const template = getUltimateTemplate(lead.sector);
+  const template = getUltimateTemplate(lead.sector, lead.name);
   const companyName = lead.name || 'Entreprise Premium';
+  const logoName = getLogoName(companyName);
   const city = lead.city || 'votre ville';
   const phone = lead.phone || '01 23 45 67 89';
-  const email = lead.email || 'contact@' + (lead.website ? lead.website.replace('https://', '').replace('http://', '').replace(/\/.*$/, '') : 'site.fr');
-  const address = lead.address || `Centre-ville, ${city}`;
-  const website = lead.website || '';
-  const rating = lead.googleRating || 5;
-  const reviews = lead.googleReviews || 124;
+  const email = lead.email || 'contact@site.fr';
+  const address = lead.address || `Avenue du centre, ${city}`;
+  
+  // Note de base excellente si aucune info
+  const rating = lead.googleRating && lead.googleRating > 0 ? lead.googleRating : 4.9;
+  const reviews = lead.googleReviews && lead.googleReviews > 0 ? lead.googleReviews : 134;
   
   // Utiliser le contenu IA
-  const description = aiContent?.aboutText || lead.description || `Expertise professionnelle reconnue à ${city}. Nous vous accompagnons dans tous vos projets avec passion et rigueur.`;
-  const heroTitle = aiContent?.heroTitle || `L'excellence professionnelle à ${city}`;
+  const description = aiContent?.aboutText || lead.description || `L'exigence au service de votre satisfaction. Nous réunissons les meilleurs talents pour vous livrer une prestation exceptionnelle à ${city}.`;
+  
   const heroSubtitle = aiContent?.heroSubtitle || "Nous combinons savoir-faire d'exception et service client haut de gamme pour des résultats garantis.";
-  const ctaText = aiContent?.cta || "Contactez-nous aujourd'hui";
+  const ctaText = aiContent?.cta || "Obtenir un devis gratuit";
   
   // Services
   let finalServices = [
-    { name: 'Consultation Sur Mesure', description: 'Une approche 100% personnalisée pour comprendre et répondre à vos attentes exactes.', features: ['Devis gratuit', 'Diagnostic complet', 'Écoute active'] },
-    { name: 'Intervention Rapide', description: 'Une réactivité sans faille pour traiter vos demandes dans les meilleurs délais possibles.', features: ['Disponibilité 7j/7', 'Service prioritaire', 'Délais respectés'] },
-    { name: 'Garantie Qualité', description: "Des finitions impeccables et des garanties solides pour votre totale tranquillité d'esprit.", features: ['Matériaux premium', 'Garantie décennale', 'Suivi rigoureux'] }
+    { name: 'Expertise Sur Mesure', description: 'Une approche 100% personnalisée pour répondre à vos attentes.', features: ['Devis détaillé gratuit', 'Planification précise'] },
+    { name: 'Exécution Parfaite', description: 'Une réalisation soignée par nos équipes hautement qualifiées.', features: ['Matériaux premium', 'Finition irréprochable'] },
+    { name: 'Assistance & Garanti', description: "Un suivi complet même après l'intervention pour votre tranquillité.", features: ['Service réactif', 'Garanties solides'] }
   ];
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length >= 3) {
     finalServices = aiContent.services.slice(0, 6).map((s: any) => ({
       name: s.name || 'Service Premium',
-      description: s.description || 'Description du service',
-      features: ['Qualité supérieure', 'Intervention rapide', 'Satisfaction garantie']
+      description: s.description || '',
+      features: ['Qualité supérieure', 'Intervention rapide']
     }));
   }
 
@@ -153,23 +184,23 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
       if (s.includes(k)) { rawImgs = CURATED[k]; break; }
     }
   }
-  const images = rawImgs.slice(0, 6);
+  const images = [...rawImgs, ...CURATED.default]; // Fallback if lack of images
 
-  // Avis
+  // Avis VIP
   let testimonials = (lead.googleReviewsData || []).slice(0, 4).map((r: any) => ({
-    author: r.author || 'Client Vérifié', text: r.text || 'Service magnifique et très professionnel. Je recommande vivement !', rating: r.rating || 5, date: r.date || ''
+    author: r.author || 'Client VIP', text: r.text || 'Une expérience magnifique et incroyablement fluide, je recommande chaudement.', rating: r.rating || 5
   }));
   if (testimonials.length === 0) {
     testimonials = [
-      { author: 'Sophie M.', text: "Un travail vraiment remarquable. L'équipe a été très à l'écoute et le résultat dépasse mes attentes.", rating: 5 },
-      { author: 'Thomas J.', text: "Je suis entièrement satisfait de la prestation. Rapidité, efficacité et professionnalisme de bout en bout.", rating: 5 },
-      { author: 'Marie D.', text: "Excellent rapport qualité/prix. Des artisans qui connaissent vraiment leur métier.", rating: 5 }
+      { author: 'Emma L.', text: "Une prestation parfaite ! L'équipe a été très à l'écoute.", rating: 5 },
+      { author: 'Thomas J.', text: "Qualité exceptionnelle et délais respectés. Je suis ravi.", rating: 5 },
+      { author: 'Marie D.', text: "Hautement professionnel ! Une des meilleures expériences que j'ai eues.", rating: 5 }
     ];
   }
 
   const content: UltimateContent = {
-    companyName, sector: lead.sector || 'Expert', city, description, phone, email, address, website,
-    rating, reviews, services: finalServices, testimonials, heroTitle, heroSubtitle, aboutText: description, ctaText, images
+    companyName, sector: lead.sector || 'Expert', city, description, phone, email, address, website: lead.website || '',
+    rating, reviews, services: finalServices, testimonials, heroTitle: logoName, heroSubtitle, aboutText: description, ctaText, images
   };
 
   return buildUltimateHTML(content, template);
@@ -178,7 +209,6 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 function buildUltimateHTML(content: UltimateContent, template: any): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, ctaText, services, testimonials, phone, email, address, images, rating, reviews } = content;
   const th = template.theme;
-  const logoName = getLogoName(companyName);
   const initials = getInitials(companyName);
   const waPhone = phone.replace(/[^0-9]/g, '');
 
@@ -187,14 +217,14 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${companyName} - ${content.sector} ${content.city ? 'à '+content.city : ''}</title>
+    <title>${heroTitle} | Excellence & Expertise</title>
     
-    <!-- Polices 2026 : Outfit (Titres) et Plus Jakarta Sans (Corps de texte) -->
+    <!-- Polices 2026 : Syne (Titres Premium) et Inter (Corps) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
     
-    <!-- Icônes Lucide -->
+    <!-- Icônes -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
@@ -211,525 +241,278 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-base);
             color: var(--text-main);
-            line-height: 1.7;
             overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        h1, h2, h3, h4, h5, h6, .brand-font {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
+        h1, h2, h3, .brand-font {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
         }
 
-        /* ── MARQUEE TOP BAR ── */
-        .top-bar {
-            background-color: var(--primary);
-            color: #fff;
-            padding: 8px 0;
-            font-size: 0.85rem;
-            font-weight: 600;
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-            z-index: 100;
+        /* ── BACKGROUNDS ANIMÉS AVANCÉS ── */
+        .decor-mesh {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; opacity: 0.4; overflow: hidden; pointer-events: none;
+            background-image: radial-gradient(var(--secondary) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
-        .marquee-content {
-            display: inline-block;
-            animation: marquee 30s linear infinite;
+        .decor-blob {
+            position: absolute; filter: blur(140px); opacity: 0.6;
+            animation: breathe 25s ease-in-out infinite alternate;
+            border-radius: 50%;
         }
-        .marquee-content span { margin-right: 40px; display: inline-flex; align-items: center; gap: 6px; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .decor-blob.b1 { background: var(--primary); width: 60vw; height: 60vw; top: -20vh; left: -10vw; }
+        .decor-blob.b2 { background: var(--secondary); width: 40vw; height: 40vw; bottom: -10vh; right: -10vw; animation-delay: -10s; }
+        @keyframes breathe {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(5vw, 5vh); }
+        }
 
-        /* ── NAVBAR ── */
-        nav {
-            position: sticky;
-            top: 0;
-            width: 100%;
-            z-index: 90;
-            padding: 1rem 0;
-            transition: all 0.3s;
-            ${th.glassCode}
-            border-top: none; border-left: none; border-right: none;
-            border-radius: 0;
+        /* ── ANIMATIONS TENDANCE 2026 ── */
+        @keyframes revealUp {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
-        .nav-container {
-            max-width: 1300px; margin: 0 auto; padding: 0 2rem;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .brand {
-            display: flex; align-items: center; gap: 12px;
-            font-size: 1.5rem; color: var(--text-main); text-decoration: none; font-weight: 800;
-        }
-        .logo-svg {
-            width: 44px; height: 44px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-links a { color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
-        .nav-links a:hover { color: var(--primary); }
+        .reveal { opacity: 0; animation-duration: 1s; animation-fill-mode: both; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .reveal.active { animation-name: revealUp; }
         
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #fff; padding: 0.8rem 1.8rem; border-radius: 100px;
-            font-weight: 600; text-decoration: none; border: none; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 8px;
-            transition: transform 0.2s, box-shadow 0.2s;
+        .pulse-btn {
+            animation: pulse-ring 2s infinite;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(var(--primary), 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(var(--primary), 0); }
+            100% { box-shadow: 0 0 0 0 rgba(var(--primary), 0); }
+        }
 
-        /* ── HERO ── */
-        .hero {
-            padding: 8rem 2rem 5rem;
-            text-align: center;
-            position: relative;
+        /* ── HEADER & MARQUEE ── */
+        .marquee {
+            background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #fff;
+            padding: 8px 0; font-size: 0.85rem; font-weight: 500; font-family: 'Syne'; letter-spacing: 0.5px;
+            white-space: nowrap; overflow: hidden; position: relative; z-index: 100;
         }
-        .hero h1 {
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1px;
-            background: linear-gradient(135deg, var(--text-main), var(--text-muted));
+        .marquee span { display: inline-block; animation: scroll-left 25s linear infinite; padding-left: 100%; }
+        @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        nav {
+            position: sticky; top: 0; z-index: 90; padding: 1.5rem; transition: 0.4s;
+            border-bottom: 1px solid rgba(128,128,128,0.1);
+            ${th.glassCode} border-left: none; border-right: none; border-top: none;
+        }
+        nav.shrunk { padding: 0.7rem 1.5rem; }
+        .nav-c { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display:flex; align-items:center; gap: 15px; font-size:1.8rem; text-decoration:none; color:var(--text-main); }
+        .logo-mark {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); color:#fff;
+            display:flex; align-items:center; justify-content:center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .nav-btn {
+            background: var(--text-main); color: var(--bg-base); padding: 0.8rem 1.5rem;
+            border-radius: 100px; font-weight: 600; text-decoration: none; transition: 0.3s;
+        }
+        .nav-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        /* ── SECTION HERO "Magazine" Split Screen ── */
+        .hero {
+            max-width: 1400px; margin: 4rem auto; padding: 0 2rem;
+            display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 4rem; align-items: center; min-height: 70vh;
+        }
+        @media (max-width: 1000px) { .hero { grid-template-columns: 1fr; margin: 2rem auto; } }
+        .hero-left h1 {
+            font-size: clamp(3.5rem, 8vw, 6rem); line-height: 0.95; margin-bottom: 1.5rem;
+            letter-spacing: -2px; padding-bottom: 10px;
+            background: linear-gradient(135deg, var(--text-main) 0%, var(--primary) 150%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .hero p {
-            font-size: clamp(1.1rem, 2vw, 1.25rem); color: var(--text-muted);
-            max-width: 700px; margin: 0 auto 2.5rem;
+        .hero-stars { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; font-size: 1.1rem; font-weight: 600; }
+        .stars-svg { color: #eab308; display: flex; }
+        .stars-svg svg { fill: #eab308; }
+        .hero-left p { font-size: 1.3rem; color: var(--text-muted); margin-bottom: 3rem; max-width: 600px; line-height: 1.5; }
+        .hero-img {
+            position: relative; width: 100%; height: 600px; border-radius: 30px; overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
         }
-        .hero-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .hero-img img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-badge {
+            position: absolute; bottom: 30px; left: -30px;
+            ${th.glassCode} padding: 1.5rem; border-radius: 20px; display: flex; align-items: center; gap: 15px;
+        }
+        .icon-circle { width: 50px; height: 50px; border-radius: 50%; background: var(--primary); display:flex; align-items:center; justify-content:center; color:#fff; }
 
-        /* ── CONTAINERS & SECTIONS ── */
-        .section { padding: 6rem 2rem; }
-        .container { max-width: 1300px; margin: 0 auto; }
-        .section-header { text-align: center; margin-bottom: 4rem; }
-        .section-header h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1rem; }
-        
-        /* ── CARDS (Services) ── */
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
-        .card {
-            padding: 2.5rem;
-            ${th.glassCode}
-            border-radius: 24px;
-            transition: transform 0.3s;
-            height: 100%; display: flex; flex-direction: column;
+        .btn-call {
+            background: var(--primary); color: #fff; text-decoration: none;
+            padding: 1rem 2rem; border-radius: 100px; font-weight: 600; font-size: 1.1rem;
+            display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: 0.3s;
         }
-        .card:hover { transform: translateY(-8px); border-color: var(--primary); }
-        .card-icon {
-            width: 50px; height: 50px; border-radius: 14px;
-            background: rgba(var(--primary), 0.1); color: var(--primary);
-            display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
-        }
-        
-        /* ── GALLERY / BENTO ── */
-        .bento-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-        .bento-item {
-            border-radius: 24px; overflow: hidden; position: relative;
-            height: 300px;
-        }
-        .bento-item img {
-            width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;
-        }
-        .bento-item:hover img { transform: scale(1.05); }
+        .btn-call:hover { transform: translateY(-4px); filter: brightness(1.1); }
 
-        /* ── MAP & CONTACT FORM ── */
-        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
-        @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
-        .map-container { border-radius: 24px; overflow: hidden; height: 100%; min-height: 400px; }
-        .form-container { ${th.glassCode}; padding: 3rem; border-radius: 24px; }
-        .input-group { margin-bottom: 1.5rem; }
-        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
-        .input-group input, .input-group textarea {
-            width: 100%; padding: 1rem; border-radius: 12px;
-            background: var(--bg-base); border: 1px solid var(--text-muted); color: var(--text-main);
-            font-family: inherit;
+        /* ── SECTION "NOTRE ENGAGEMENT" ── */
+        .about-section {
+            background: var(--bg-surface); padding: 8rem 2rem; border-top: 1px solid rgba(128,128,128,0.1); border-bottom: 1px solid rgba(128,128,128,0.1);
         }
+        .about-grid {
+            max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+        }
+        @media (max-width: 1000px) { .about-grid { grid-template-columns: 1fr; } }
+        .about-images { position: relative; height: 600px; }
+        .img-main { position: absolute; top:0; left:0; width: 80%; height: 80%; border-radius: 24px; object-fit: cover; z-index: 1; }
+        .img-sub { position: absolute; bottom:0; right:0; width: 60%; height: 60%; border-radius: 24px; object-fit: cover; z-index: 2; border: 8px solid var(--bg-surface); }
+        .about-content h2 { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 1.5rem; line-height: 1.1; }
+        .about-content p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2rem; }
+        .checklist { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+        .checklist li { display: flex; align-items: center; gap: 12px; font-size: 1.1rem; font-weight: 500; }
+        .checklist i { color: var(--primary); }
+
+        /* ── SERVICES BENTO ── */
+        .services-section { padding: 8rem 2rem; max-width: 1400px; margin: 0 auto; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+        .srv-card {
+            ${th.glassCode} padding: 3rem; border-radius: 30px; transition: 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .srv-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+        .srv-icon { width: 60px; height: 60px; border-radius: 16px; background: rgba(128,128,128,0.1); color: var(--primary); display:flex; align-items:center; justify-content:center; margin-bottom: 2rem; }
+        .srv-card h3 { font-size: 1.8rem; margin-bottom: 1rem; }
+        .srv-card p { color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        /* ── CONTACT & MAPS COMPACT ── */
+        .contact-wrap {
+            max-width: 1400px; margin: 0 auto 4rem; padding: 4rem;
+            background: linear-gradient(to right, var(--bg-surface), var(--bg-base));
+            border-radius: 40px; border: 1px solid rgba(128,128,128,0.1);
+            display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+        }
+        @media (max-width: 900px) { .contact-wrap { grid-template-columns: 1fr; padding: 2rem; } }
+        .map-box { height: 100%; min-height: 400px; border-radius: 20px; overflow: hidden; }
 
         /* ── FOOTER ── */
-        footer {
-            background: #0f172a; color: #94a3b8;
-            padding: 5rem 2rem 2rem; border-top: 1px solid #1e293b;
-        }
-        .footer-grid {
-            max-width: 1300px; margin: 0 auto; display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem;
-        }
-        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; } }
-        @media (max-width: 500px) { .footer-grid { grid-template-columns: 1fr; } }
-        
-        .footer-logo { color: #fff; font-size: 1.5rem; font-weight: 800; font-family: 'Outfit'; margin-bottom: 1rem; display: block; }
-        .footer-title { color: #fff; font-weight: 700; margin-bottom: 1.5rem; font-family: 'Outfit'; }
-        .footer-links { list-style: none; }
-        .footer-links li { margin-bottom: 0.75rem; }
-        .footer-links a { color: #94a3b8; text-decoration: none; transition: color 0.2s; }
-        .footer-links a:hover { color: #fff; }
-        
-        /* ── WHATSAPP & BOT WIDGETS ── */
-        .bot-widget {
-            position: fixed; bottom: 20px; right: 20px; z-index: 999;
-            width: 60px; height: 60px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.3s;
-        }
-        .bot-widget:hover { transform: scale(1.1); }
-        .wa-widget {
-            position: fixed; bottom: 95px; right: 20px; z-index: 999;
-            width: 60px; height: 60px; border-radius: 50%;
-            background: #25D366; color: white; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.3s; text-decoration: none;
-        }
-        .wa-widget:hover { transform: scale(1.1); }
+        footer { padding: 4rem 2rem; text-align: center; border-top: 1px solid rgba(128,128,128,0.2); margin-top: 4rem; }
 
-        /* Window Chat */
-        .chat-window {
-            position: fixed; bottom: 90px; right: 20px; width: 350px; max-width: calc(100vw - 40px);
-            background: var(--bg-surface); border-radius: 20px; overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 1000;
-            display: none; flex-direction: column; border: 1px solid var(--text-muted);
-        }
-        .chat-window.active { display: flex; }
-        .chat-header { background: var(--primary); color: #fff; padding: 15px 20px; font-weight: 600; display: flex; justify-content: space-between; }
-        .chat-body { padding: 20px; height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 15px; border-radius: 12px; max-width: 85%; font-size: 0.9rem; }
-        .msg.bot { background: rgba(var(--primary), 0.1); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 0; }
-        .msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
-        .chat-input { display: flex; padding: 10px; border-top: 1px solid var(--text-muted); }
-        .chat-input input { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-main); outline: none; }
-        .chat-input button { background: transparent; border: none; color: var(--primary); cursor: pointer; padding: 0 10px; }
-
-        .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        /* Widgets */
+        .wa-float { position: fixed; bottom: 25px; left: 25px; background: #25D366; color: white; width: 65px; height: 65px; border-radius: 50%; display:flex; align-items:center; justify-content:center; z-index: 1000; box-shadow: 0 10px 30px rgba(37,211,102,0.4); transition:0.3s; }
+        .wa-float:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
+    <div class="decor-mesh"></div>
+    <div class="decor-blob b1"></div>
+    <div class="decor-blob b2"></div>
 
-    <!-- MARQUEE -->
-    <div class="top-bar">
-        <div class="marquee-content">
-            <!-- Double pour effet infini -->
-            <span><i data-lucide="mail" size="14"></i> ${email}</span>
-            <span><i data-lucide="phone" size="14"></i> ${phone}</span>
-            <span><i data-lucide="map-pin" size="14"></i> ${address}</span>
-            <span><i data-lucide="clock" size="14"></i> Ouvert aujourd'hui 09:00 - 18:00</span>
-            <span><i data-lucide="mail" size="14"></i> ${email}</span>
-            <span><i data-lucide="phone" size="14"></i> ${phone}</span>
-            <span><i data-lucide="map-pin" size="14"></i> ${address}</span>
-            <span><i data-lucide="clock" size="14"></i> Ouvert aujourd'hui 09:00 - 18:00</span>
-        </div>
+    <div class="marquee">
+        <span>INFO VIP : <i data-lucide="phone" size="14"></i> ${phone} &nbsp;|&nbsp; <i data-lucide="mail" size="14"></i> ${email} &nbsp;|&nbsp; <i data-lucide="map-pin" size="14"></i> ${address} &nbsp;|&nbsp; <i data-lucide="clock" size="14"></i> OUVRE ET REÇOIT AUJOURD'HUI.</span>
     </div>
 
-    <!-- NAVBAR -->
-    <nav>
-        <div class="nav-container">
-            <a href="#" class="brand">
-                <div class="logo-svg brand-font">${initials}</div>
-                <span class="brand-font">${logoName}</span>
+    <nav id="nav">
+        <div class="nav-c">
+            <a href="#" class="logo">
+                <div class="logo-mark brand-font">${initials}</div>
+                <span class="brand-font">${heroTitle}</span>
             </a>
-            <div class="nav-links">
-                <a href="#services">Services</a>
-                <a href="#galerie">Réalisations</a>
-                <a href="#avis">Avis</a>
-            </div>
-            <a href="#contact" class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">
-                Devis Gratuit
-            </a>
+            <a href="#contact" class="nav-btn">Lancer votre projet</a>
         </div>
     </nav>
 
-    <!-- HERO -->
-    <section class="hero reveal active">
-        <h1>${heroTitle}</h1>
-        <p>${heroSubtitle}</p>
-        <div class="hero-actions">
-            <a href="#contact" class="btn-primary">
-                ${ctaText} <i data-lucide="arrow-right"></i>
-            </a>
-            <a href="tel:${phone.replace(/\s/g, '')}" class="btn-primary" style="background: transparent; color: var(--text-main); border: 1px solid var(--text-muted); box-shadow: none;">
-                <i data-lucide="phone"></i> ${phone}
-            </a>
-        </div>
-        
-        <div style="margin-top: 4rem; display: flex; justify-content: center; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">
-            <span style="display:flex;align-items:center;gap:6px"><i data-lucide="check-circle-2" style="color:var(--primary)"></i> ${(rating || 0) > 0 ? `${rating}/5 Note Générale` : '100% Satisfaction'}</span>
-            <span style="display:flex;align-items:center;gap:6px"><i data-lucide="shield-check" style="color:var(--primary)"></i> Professionnel Confirmé</span>
-        </div>
-    </section>
-
-    <!-- A PROPOS -->
-    <section class="section" style="background: rgba(0,0,0,0.02);">
-        <div class="container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
-            <div class="reveal">
-                <h2 class="brand-font">Notre Engagement Professionnel</h2>
-                <p style="font-size: 1.1rem; margin-bottom: 2rem;">${aboutText}</p>
-                <a href="#contact" style="color: var(--primary); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 8px;">
-                    En savoir plus <i data-lucide="arrow-right" size="18"></i>
-                </a>
+    <section class="hero">
+        <div class="hero-left reveal" style="animation-delay: 0.1s;">
+            <div class="hero-stars">
+                <div class="stars-svg">${'<i data-lucide="star"></i>'.repeat(Math.floor(rating))}</div>
+                <span style="color:var(--text-main)">${rating} / 5</span> 
+                <span style="color:var(--text-muted)">(${reviews} avis vérifiés Google)</span>
             </div>
-            <div class="reveal" style="position:relative; height: 400px; border-radius: 24px; overflow: hidden;">
-                <img src="${images[0] || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&fit=crop'}" alt="A propos" style="width: 100%; height: 100%; object-fit: cover;">
+            <h1>${heroTitle}</h1>
+            <p>${heroSubtitle}</p>
+            <a href="tel:${phone.replace(/\s/g, '')}" class="btn-call pulse-btn">
+                <i data-lucide="phone"></i> Appeler le ${phone}
+            </a>
+        </div>
+        <div class="hero-img reveal" style="animation-delay: 0.3s;">
+            <img src="${images[images.length - 1] || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&fit=crop'}" alt="Presentation">
+            <div class="hero-badge">
+                <div class="icon-circle"><i data-lucide="check-circle-2"></i></div>
+                <div>
+                    <div style="font-family:'Syne'; font-weight:700; color:var(--text-main);">Certifié Premium</div>
+                    <div style="font-size:0.9rem; color:var(--text-muted);">Savoir-Faire Garanti</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- SERVICES -->
-    <section class="section container" id="services">
-        <div class="section-header reveal">
-            <h2 class="brand-font">Nos Domaines d'Expertise</h2>
-            <p>Découvrez l'ensemble de nos prestations conçues pour répondre à vos exigences.</p>
+    <!-- SECTION A PROPOS REFAITE -->
+    <section class="about-section">
+        <div class="about-grid">
+            <div class="about-images reveal">
+                <img src="${images[0]}" class="img-main" alt="Atelier/Bureau">
+                <img src="${images[1] || images[0]}" class="img-sub" alt="Équipe">
+            </div>
+            <div class="about-content reveal" style="animation-delay: 0.3s;">
+                <h2>Notre Engagement.<br><span style="color:var(--primary);">Votre Succès.</span></h2>
+                <p>${aboutText} Nous plaçons la perfection au c&oelig;ur de chaque détail pour vous offrir un résultat indiscutable.</p>
+                <ul class="checklist">
+                    <li><i data-lucide="check-circle"></i> Service exclusif et personnalisé de A à Z</li>
+                    <li><i data-lucide="check-circle"></i> Intervention maîtrisée, propre et ponctuelle</li>
+                    <li><i data-lucide="check-circle"></i> Devis transparent sans aucun frais caché</li>
+                    <li><i data-lucide="check-circle"></i> Finitions ultra haut de gamme garanties</li>
+                </ul>
+            </div>
         </div>
-        <div class="grid-cards">
+    </section>
+
+    <section class="services-section" id="services">
+        <div style="text-align:center; margin-bottom:5rem;" class="reveal">
+            <h2 style="font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom:1rem;">Prestations d'Excellence</h2>
+            <p style="color:var(--text-muted); font-size:1.2rem; max-width:600px; margin:0 auto;">Une expertise de pointe pour réaliser vos envies les plus exigeantes.</p>
+        </div>
+        <div class="grid-3">
             ${services.map((s, i) => `
-            <div class="card reveal" style="transition-delay: ${(i%3) * 100}ms">
-                <div class="card-icon"><i data-lucide="${['briefcase','layers','check-square','trending-up','star','shield'][i%6]}"></i></div>
-                <h3 style="margin-bottom: 1rem;">${s.name}</h3>
-                <p style="flex-grow: 1;">${s.description}</p>
-            </div>
-            `).join('')}
+            <div class="srv-card reveal" style="animation-delay: ${(i%3)*0.1}s;">
+                <div class="srv-icon"><i data-lucide="${['shield','zap','award','briefcase','layers','star'][i%6]}"></i></div>
+                <h3>${s.name}</h3>
+                <p>${s.description}</p>
+                <div style="border-top:1px solid rgba(128,128,128,0.2); padding-top:1rem; margin-top:1rem;">
+                    ${s.features.map(f => `<div style="display:flex;align-items:center;gap:8px;font-size:0.9rem;margin-bottom:6px;"><i data-lucide="check" size="14" style="color:var(--primary)"></i>${f}</div>`).join('')}
+                </div>
+            </div>`).join('')}
         </div>
     </section>
 
-    <!-- GALERIE -->
-    ${images.length > 1 ? `
-    <section class="section container" id="galerie">
-        <div class="section-header reveal">
-            <h2 class="brand-font">Nos Réalisations</h2>
-            <p>Un aperçu concret de notre savoir-faire en images.</p>
+    <div class="contact-wrap reveal" id="contact">
+        <div>
+            <h2 style="font-size: 3rem; margin-bottom:1.5rem; line-height:1;">Passez à<br>l'action.</h2>
+            <p style="color:var(--text-muted); font-size:1.1rem; margin-bottom:3rem;">Remplissez rapidement ce formulaire ou contactez-nous directement pour démarrer une collaboration d'excellence.</p>
+            <form onsubmit="event.preventDefault(); alert('Devis envoyé !');">
+                <input type="text" placeholder="Nom complet" required style="width:100%; padding:1.2rem; border-radius:16px; margin-bottom:1rem; border:1px solid rgba(128,128,128,0.2); background:var(--bg-base); color:var(--text-main);">
+                <input type="tel" placeholder="Téléphone direct" required style="width:100%; padding:1.2rem; border-radius:16px; margin-bottom:1rem; border:1px solid rgba(128,128,128,0.2); background:var(--bg-base); color:var(--text-main);">
+                <textarea rows="4" placeholder="Votre projet..." required style="width:100%; padding:1.2rem; border-radius:16px; margin-bottom:1.5rem; border:1px solid rgba(128,128,128,0.2); background:var(--bg-base); color:var(--text-main);"></textarea>
+                <button class="nav-btn" style="width:100%; padding:1.2rem; border:none; cursor:pointer;">${ctaText}</button>
+            </form>
         </div>
-        <div class="bento-gallery">
-            ${images.slice(1, 5).map((img, i) => `
-            <div class="bento-item reveal" style="transition-delay: ${i * 100}ms">
-                <img src="${img}" alt="Réalisation ${i+1}" loading="lazy">
-            </div>
-            `).join('')}
+        <div class="map-box">
+             <iframe width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen src="https://www.google.com/maps?q=${encodeURIComponent(companyName + ' ' + address)}&output=embed"></iframe>
         </div>
-    </section>` : ''}
+    </div>
 
-    <!-- AVIS / FAQ -->
-    <section class="section" id="avis" style="background: var(--bg-surface); border-top: 1px solid var(--text-muted); border-bottom: 1px solid var(--text-muted);">
-        <div class="container">
-            <div class="section-header reveal">
-                <h2 class="brand-font">Ce qu'ils pensent de nous</h2>
-            </div>
-            <div class="grid-cards">
-                ${testimonials.map((t, i) => `
-                <div class="card reveal" style="transition-delay: ${i * 100}ms">
-                    <div style="display:flex; gap: 4px; color:#f59e0b; margin-bottom:1rem;">${'<i data-lucide="star" style="fill:#f59e0b"></i>'.repeat(t.rating)}</div>
-                    <p style="font-style: italic; margin-bottom: 1.5rem; flex-grow:1;">"${t.text}"</p>
-                    <div style="font-weight:700;">${t.author}</div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>
-
-    <!-- CONTACT & MAPS -->
-    <section class="section container" id="contact">
-        <div class="contact-grid">
-            <div class="reveal">
-                <h2 class="brand-font" style="font-size: 2.5rem; margin-bottom: 1.5rem;">Prêt à avancer ensemble ?</h2>
-                <p style="margin-bottom: 3rem;">Remplissez le formulaire ci-dessous ou venez nous rendre visite directement. Notre équipe vous répondra sous 24h ouvrées.</p>
-                
-                <div style="display:flex; flex-direction:column; gap:1.5rem; margin-bottom: 3rem;">
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <span class="card-icon" style="margin:0;width:40px;height:40px;"><i data-lucide="phone" size="18"></i></span>
-                        <span style="font-weight:600;">${phone}</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <span class="card-icon" style="margin:0;width:40px;height:40px;"><i data-lucide="mail" size="18"></i></span>
-                        <span style="font-weight:600;">${email}</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <span class="card-icon" style="margin:0;width:40px;height:40px;"><i data-lucide="map-pin" size="18"></i></span>
-                        <span style="font-weight:600;">${address}</span>
-                    </div>
-                </div>
-                
-                <!-- Google Maps (Embarqué dynamique) -->
-                <div class="map-container">
-                    <iframe 
-                        width="100%" 
-                        height="100%" 
-                        style="border:0;" 
-                        loading="lazy" 
-                        allowfullscreen 
-                        src="https://www.google.com/maps?q=${encodeURIComponent(companyName + ' ' + address)}&output=embed">
-                    </iframe>
-                </div>
-            </div>
-            
-            <div class="form-container reveal" style="transition-delay: 200ms;">
-                <h3 class="brand-font" style="margin-bottom: 2rem;">Demander un contact</h3>
-                <form onsubmit="event.preventDefault(); alert('Message envoyé avec succès ! Nous vous recontacterons très vite.');">
-                    <div class="input-group">
-                        <label>Votre nom complet</label>
-                        <input type="text" required placeholder="Jean Dupont">
-                    </div>
-                    <div class="input-group">
-                        <label>Numéro de téléphone</label>
-                        <input type="tel" required placeholder="06 00 00 00 00">
-                    </div>
-                    <div class="input-group">
-                        <label>Adresse Email</label>
-                        <input type="email" required placeholder="jean@email.com">
-                    </div>
-                    <div class="input-group">
-                        <label>Votre message ou demande détaillée</label>
-                        <textarea rows="4" required placeholder="Bonjour, j'aimerais obtenir un devis pour..."></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
-                        Envoyer ma demande
-                    </button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER PROFESSIONNEL -->
     <footer>
-        <div class="footer-grid">
-            <div>
-                <a href="#" class="footer-logo">${companyName}</a>
-                <p style="margin-bottom: 1.5rem; max-width: 300px;">${aboutText.substring(0, 120)}...</p>
-                <div style="display:flex; gap:15px;">
-                    <a href="#" style="color:#94a3b8;"><i data-lucide="facebook"></i></a>
-                    <a href="#" style="color:#94a3b8;"><i data-lucide="instagram"></i></a>
-                    <a href="#" style="color:#94a3b8;"><i data-lucide="linkedin"></i></a>
-                </div>
-            </div>
-            <div>
-                <div class="footer-title">Liens Rapides</div>
-                <ul class="footer-links">
-                    <li><a href="#">Accueil</a></li>
-                    <li><a href="#services">Nos Services</a></li>
-                    <li><a href="#galerie">Réalisations</a></li>
-                    <li><a href="#avis">Témoignages</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </div>
-            <div>
-                <div class="footer-title">Légal</div>
-                <ul class="footer-links">
-                    <li><a href="#">Mentions Légales</a></li>
-                    <li><a href="#">Politique de confidentialité</a></li>
-                    <li><a href="#">CGV / CGU</a></li>
-                    <li><a href="#">Cookies</a></li>
-                </ul>
-            </div>
-            <div>
-                <div class="footer-title">Horaires</div>
-                <ul class="footer-links">
-                    <li><strong style="color:#fff">Lundi - Vendredi:</strong><br>09:00 - 18:00</li>
-                    <li><strong style="color:#fff">Samedi:</strong><br>10:00 - 16:00</li>
-                    <li><strong style="color:#fff">Dimanche:</strong><br>Fermé</li>
-                </ul>
-            </div>
-        </div>
-        <div style="text-align:center; padding-top:2rem; border-top:1px solid #1e293b; color:#64748b; font-size:0.9rem;">
-            &copy; 2026 ${companyName}. Tous droits réservés. Créé par LeadForge AI.
-        </div>
+        <h2 class="brand-font" style="font-size: 2rem; margin-bottom:1rem;">${heroTitle}</h2>
+        <p style="color:var(--text-muted); margin-bottom: 2rem;">${address} — ${phone}</p>
+        <p style="font-size: 0.9rem; color: rgba(128,128,128,0.5);">© 2026 Tous droits réservés. Création IA Ultra-Premium.</p>
     </footer>
 
-    <!-- WIDGETS FLOTTANTS (WHATSAPP & CHATBOT) -->
-    <a href="https://wa.me/${waPhone}" target="_blank" class="wa-widget" aria-label="WhatsApp">
-        <i data-lucide="message-circle" size="28"></i>
-    </a>
-    
-    <div class="bot-widget" onclick="toggleChat()" aria-label="Chatbot IA">
-        <i data-lucide="bot" size="28"></i>
-    </div>
+    <!-- WIDGET WHATSAPP -->
+    <a href="https://wa.me/${waPhone}" target="_blank" class="wa-float"><i data-lucide="message-circle" size="32"></i></a>
 
-    <!-- FENETRE DU CHATBOT -->
-    <div class="chat-window" id="chatWindow">
-        <div class="chat-header">
-            <span style="display:flex;align-items:center;gap:8px;"><i data-lucide="bot" size="18"></i> Assistant ${logoName}</span>
-            <i data-lucide="x" style="cursor:pointer;" onclick="toggleChat()"></i>
-        </div>
-        <div class="chat-body" id="chatBody">
-            <div class="msg bot">Bonjour ! Je suis l'assistant virtuel de ${companyName}. Comment puis-je vous aider aujourd'hui ? (Adresse, horaires, devis...)</div>
-        </div>
-        <form class="chat-input" onsubmit="handleChatSubmit(event)">
-            <input type="text" id="chatInput" placeholder="Posez votre question..." required>
-            <button type="submit"><i data-lucide="send" size="20"></i></button>
-        </form>
-    </div>
-
-    <!-- SCRIPTS INTERACTIFS -->
     <script>
-        // Init Icônes
         lucide.createIcons();
-
-        // Animation au défilement
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('active');
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-        // CHATBOT LOGIC (VANILLA JS INTELLIGENT)
-        const chatWindow = document.getElementById('chatWindow');
-        const chatBody = document.getElementById('chatBody');
-        const chatInput = document.getElementById('chatInput');
+        window.addEventListener('scroll', () => document.getElementById('nav').classList.toggle('shrunk', window.scrollY > 50));
         
-        // Données d'entreprise pour le bot
-        const botKnowledge = {
-            address: "${address.replace(/"/g, '')}",
-            phone: "${phone}",
-            email: "${email}",
-            services: \`Nous proposons les services suivants : ${services.map(s => s.name).join(', ')}.\`,
-            about: "${aboutText.replace(/"/g, '').substring(0, 200)}..."
-        };
-
-        function toggleChat() {
-            chatWindow.classList.toggle('active');
-            if(chatWindow.classList.contains('active')) chatInput.focus();
-        }
-
-        function handleChatSubmit(e) {
-            e.preventDefault();
-            const text = chatInput.value.trim();
-            if(!text) return;
-            
-            // Message Utilisateur
-            appendMessage(text, 'user');
-            chatInput.value = '';
-            
-            // Simulation temps de réflexion
-            setTimeout(() => {
-                const answer = generateBotResponse(text.toLowerCase());
-                appendMessage(answer, 'bot');
-            }, 800);
-        }
-
-        function appendMessage(text, type) {
-            const div = document.createElement('div');
-            div.className = 'msg ' + type;
-            div.textContent = text;
-            chatBody.appendChild(div);
-            // Auto-scroll to bottom
-            chatBody.scrollTop = chatBody.scrollHeight;
-        }
-
-        function generateBotResponse(q) {
-            if(q.includes('adresse') || q.includes('ou') || q.includes('local')) 
-                return "Nous sommes situés à l'adresse suivante : " + botKnowledge.address;
-            if(q.includes('prix') || q.includes('devis') || q.includes('tarif')) 
-                return "Chaque projet étant unique, le mieux est de demander un devis gratuit via le formulaire sur cette page ou de nous appeler au " + botKnowledge.phone;
-            if(q.includes('service') || q.includes('fait') || q.includes('prestation')) 
-                return botKnowledge.services;
-            if(q.includes('horaire') || q.includes('ouvert') || q.includes('heure')) 
-                return "Nous sommes ouverts du lundi au vendredi de 09h00 à 18h00, et le samedi de 10h00 à 16h00.";
-            if(q.includes('contact') || q.includes('tel') || q.includes('mail')) 
-                return "Vous pouvez nous joindre au " + botKnowledge.phone + " ou par email à " + botKnowledge.email;
-            
-            return "Merci pour votre message. Pour une réponse précise, je vous invite à remplir le formulaire de contact ou à nous appeler directement. Puis-je vous aider avec autre chose (horaires, adresse, services...) ?";
-        }
+        const observer = new IntersectionObserver(e => e.forEach(entry => {
+            if(entry.isIntersecting) entry.target.classList.add('active');
+        }), { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     </script>
 </body>
 </html>`;
