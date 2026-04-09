@@ -18,6 +18,8 @@ export interface UltimateContent {
   heroSubtitle: string;
   aboutText: string;
   ctaText: string;
+  slogan: string;
+  heroImage: string;
 }
 
 const SECTOR_ULTIMATE_TEMPLATES = {
@@ -212,16 +214,19 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   }
   testimonials = testimonials.slice(0, 6);
 
+  const slogan = aiContent?.slogan || "L'excellence à votre service";
+  const heroImage = lead.imageUrl || (lead.photos && lead.photos[0]) || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80';
+
   const content: UltimateContent = {
     companyName, sector: lead.sector || 'Professionnel', city, description, phone, email, address, website, rating, reviews,
-    services: finalServices, testimonials, heroTitle, heroSubtitle, aboutText: description, ctaText
+    services: finalServices, testimonials, heroTitle, heroSubtitle, aboutText: description, ctaText, slogan, heroImage
   };
 
   return buildUltimateHTML(content, template);
 }
 
 function buildUltimateHTML(content: UltimateContent, template: any): string {
-  const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews } = content;
+  const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage } = content;
   
   const hexToRgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '#ffffff');
@@ -435,6 +440,17 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             background: var(--primary); color: white;
             box-shadow: var(--glow);
         }
+
+        /* Stats Banner */
+        .stats-banner { padding: 4rem 2rem; background: var(--primary); color: white; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center; border-radius: 30px; margin: 0 auto; position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(var(--primary-rgb), 0.2); }
+        .stats-banner::after { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent); pointer-events:none;}
+        .stat-banner-item h3 { font-size: 3rem; font-weight: 800; font-family: 'Outfit'; margin-bottom: 0.5rem; line-height: 1; }
+        
+        /* Valeurs */
+        .valeurs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; }
+        .valeur-card { padding: 2.5rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; border-radius: 20px; background: white; border: 1px solid rgba(0,0,0,0.04); transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .valeur-card:hover { transform: translateY(-5px); box-shadow: var(--glow); }
+        .valeur-icon { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, rgba(${primaryRgb}, 0.15), rgba(${primaryRgb}, 0.05)); color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
 
         /* Hero Section */
         .hero {
@@ -732,30 +748,34 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
-            <a href="#" class="brand">
+            <a href="#" class="brand" style="text-decoration: none; display: flex; align-items: center; gap: 1rem;">
                 <div class="logo-svg">${logoInfo.initials}</div>
-                ${logoInfo.text}
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <div style="font-weight: 800; font-family: 'Outfit'; color: var(--text-main); font-size: 1.5rem; line-height: 1.1;">${logoInfo.text}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">${slogan}</div>
+                </div>
             </a>
             <div style="display: flex; gap: 1.5rem; align-items: center;">
-                <div style="display: none; align-items: center; gap: 2rem; font-weight: 500;" class="desktop-menu">
+                <div style="display: none; align-items: center; gap: 1.5rem; font-weight: 500;" class="desktop-menu">
+                    <a href="#about" style="text-decoration: none; color: var(--text-main);">À propos</a>
+                    <a href="#valeurs" style="text-decoration: none; color: var(--text-main);">Valeurs</a>
                     <a href="#services" style="text-decoration: none; color: var(--text-main);">Services</a>
-                    <a href="#process" style="text-decoration: none; color: var(--text-main);">Démarche</a>
                     <a href="#testimonials" style="text-decoration: none; color: var(--text-main);">Avis</a>
                 </div>
-                ${phone ? `<a href="tel:${phone}" class="btn-call"><i data-lucide="phone" width="18"></i> Nous appeler</a>` : ''}
+                ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-call"><i data-lucide="phone" width="18"></i> Nous appeler</a>` : ''}
             </div>
         </div>
     </nav>
 
     <!-- Hero -->
     <section class="hero">
-        <div class="pattern-waves"></div>
         <div class="hero-content reveal active" style="position: relative; z-index: 1;">
             <div class="hero-badge"><i data-lucide="shield-check" width="18"></i> 2026 Innovation Premium</div>
-            <h1 style="text-align: left;">${heroTitle.replace(/ (.*?)$/, ' <span>$1</span>')}</h1>
-            <p style="text-align: left;">${heroSubtitle}</p>
+            <h1 style="text-align: left; font-size: clamp(3rem, 6vw, 5.5rem); margin-bottom: 0.5rem;"><span style="background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${companyName}</span></h1>
+            <h2 style="text-align: left; font-size: clamp(1.2rem, 3vw, 2rem); font-family: 'Outfit'; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem;">${slogan}</h2>
+            <p style="text-align: left; margin-bottom: 2.5rem; font-size: 1.15rem;">${heroSubtitle}</p>
             
-            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-bottom: 2rem; justify-content: flex-start; ${rating === 0 && reviews === 0 ? 'display: none;' : ''}">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-bottom: 2rem; justify-content: flex-start; ${(rating || 0) === 0 && (reviews || 0) === 0 ? 'display: none;' : ''}">
                 <div style="display: flex; color: #f59e0b;">
                     <i data-lucide="star" fill="currentColor"></i>
                     <i data-lucide="star" fill="currentColor"></i>
@@ -774,38 +794,99 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             </div>
         </div>
         <div class="hero-image-col reveal active" style="position: relative; z-index: 1;">
-            <div style="position: relative; border-radius: 40px; overflow: hidden; box-shadow: var(--glow-strong); animation: float 10s ease-in-out infinite;">
-                <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80" alt="Innovation Professionnelle" style="width: 100%; height: auto; display: block; object-fit: cover;">
-                <div style="position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(135deg, var(--primary), transparent); opacity: 0.15;"></div>
+            <div style="position: relative; border-radius: 40px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.05); padding: 1rem; background: white;">
+                <img src="${heroImage}" alt="${companyName}" style="width: 100%; height: 500px; display: block; object-fit: cover; border-radius: 30px;">
+                <div style="position: absolute; top:0; left:0; right:0; bottom:0; background: radial-gradient(circle at center, transparent 40%, rgba(var(--primary-rgb), 0.05)); pointer-events: none;"></div>
+                <!-- Motifs professionnels sur l'image -->
+                <div style="position: absolute; bottom: 2rem; left: -2rem; background: var(--primary); height: 100px; width: 100px; border-radius: 50%; opacity: 0.1; filter: blur(20px);"></div>
+                <div style="position: absolute; top: -1rem; right: 2rem; background: var(--secondary); height: 80px; width: 80px; border-radius: 30px; transform: rotate(45deg); opacity: 0.1; filter: blur(10px);"></div>
             </div>
         </div>
     </section>
 
     <!-- A Propos -->
     <section class="container" id="about">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: center; position: relative; z-index: 1;">
-            <div class="reveal">
-                <div style="position: relative; border-radius: 30px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.05);">
-                    <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80" alt="À propos de nous" style="width: 100%; border-radius: 30px; display: block;">
+        <div class="section-header reveal">
+            <h2>L'art de l'excellence professionnelle</h2>
+            <p>Une histoire d'expertise et d'engagement envers notre métier et nos clients.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem; align-items: center; position: relative; z-index: 1;">
+            <div class="reveal" style="position: relative;">
+                <!-- Decorative background elements -->
+                <div style="position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; background: radial-gradient(var(--primary) 2px, transparent 2px); background-size: 10px 10px; z-index: 0; opacity: 0.2;"></div>
+                <div style="position: absolute; bottom: -20px; right: -20px; border: 4px solid var(--primary); width: 80%; height: 80%; border-radius: 30px; z-index: 0; opacity: 0.1;"></div>
+                
+                <div style="position: relative; border-radius: 30px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.1); z-index: 1; border: 8px solid white;">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Notre équipe" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 </div>
             </div>
             <div class="reveal" style="transition-delay: 200ms">
+                <div style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); font-weight: 700; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem;"><i data-lucide="award" width="16"></i> Votre Partenaire Confiance</div>
                 <h2 style="font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; margin-bottom: 1.5rem; font-family: 'Outfit';">
                     À propos de <span style="color: var(--primary);">${companyName}</span>
                 </h2>
                 <p style="color: var(--text-muted); font-size: 1.125rem; line-height: 1.8; margin-bottom: 2.5rem;">
                     ${aboutText}
                 </p>
-                <div style="display: flex; gap: 3rem;">
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 2.5rem; font-weight: 800; color: var(--text-main); font-family: 'Outfit';">100%</span>
-                        <span style="color: var(--primary); font-weight: 600;">Pro</span>
-                    </div>
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 2.5rem; font-weight: 800; color: var(--text-main); font-family: 'Outfit';">${reviews}+</span>
-                        <span style="color: var(--primary); font-weight: 600;">Clients Google</span>
-                    </div>
-                </div>
+                <ul style="list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: var(--primary);"></i> Expertise reconnue</li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: var(--primary);"></i> Solutions sur-mesure</li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: var(--primary);"></i> Accompagnement total</li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: var(--primary);"></i> Réactivité garantie</li>
+                </ul>
+                <a href="#contact" class="btn-glow" style="padding: 1rem 2rem; font-size: 1rem;">Nous contacter <i data-lucide="arrow-right" width="18"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nos Valeurs -->
+    <section class="container" id="valeurs">
+        <div class="section-header reveal">
+            <h2>Les valeurs qui nous animent</h2>
+            <p>Ce qui fait de nous le partenaire idéal pour vos projets ambitieux.</p>
+        </div>
+        <div class="valeurs-grid">
+            <div class="valeur-card reveal" style="transition-delay: 100ms">
+                <div class="valeur-icon"><i data-lucide="shield" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">Fiabilité</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Nous tenons nos promesses. La confiance de nos clients est notre bien le plus précieux.</p>
+            </div>
+            <div class="valeur-card reveal" style="transition-delay: 200ms">
+                <div class="valeur-icon"><i data-lucide="lightbulb" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">Innovation</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Nous utilisons les approches les plus modernes pour garantir des résultats durables.</p>
+            </div>
+            <div class="valeur-card reveal" style="transition-delay: 300ms">
+                <div class="valeur-icon"><i data-lucide="heart" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">Passion</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Un amour profond du travail bien fait et une implication totale dans chaque détail.</p>
+            </div>
+            <div class="valeur-card reveal" style="transition-delay: 400ms">
+                <div class="valeur-icon"><i data-lucide="gem" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">Excellence</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Le standard minimum : une qualité irréprochable et un niveau de finition parfait.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nos Chiffres Clés -->
+    <section class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+        <div class="stats-banner reveal">
+            <div class="stat-banner-item">
+                <h3>${reviews}+</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Clients Satisfaits</div>
+            </div>
+            <div class="stat-banner-item">
+                <h3>10+</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Ans d'Expérience</div>
+            </div>
+            <div class="stat-banner-item">
+                <h3>${(reviews || 42) * 5}+</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Projets Réalisés</div>
+            </div>
+            <div class="stat-banner-item">
+                <h3>100%</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Satisfaction Garantie</div>
             </div>
         </div>
     </section>
