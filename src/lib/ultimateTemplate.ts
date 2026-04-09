@@ -307,34 +307,39 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   ];
   const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
 
-  // Récupération exhaustive des images d'enrichissement
-  const rawImages = [
+  // ── COLLECTE IMAGES RÉELLES (champs existants dans Lead) ──
+  const realImagesRaw = [
     ...(lead.images || []),
-    ...(lead.websiteImages || []),
-    ...(lead.photos || []),
-    ...(lead.serperSnippetsImages || []),
-    lead.imageUrl,
-    lead.logo
+    ...(lead.websiteImages || [])
   ].filter(img => {
     if (!img || typeof img !== 'string') return false;
     if (!img.startsWith('http')) return false;
-    // Filtrer les icônes et petites images inutiles
-    const skip = ['icon', 'logo', 'fav', 'avatar', 'small', 'thumb', 'marker', 'pixel'];
-    if (skip.some(s => img.toLowerCase().includes(s))) return false;
+    // Filtrer uniquement les artefacts techniques (pas le logo si c'est la seule image)
+    const hardSkip = ['favicon', 'sprite', 'pixel', 'tracking', 'beacon', '.gif', '1x1'];
+    if (hardSkip.some(s => img.toLowerCase().includes(s))) return false;
     return true;
   });
 
-  // Nettoyage des doublons
-  let allImages = [...new Set(rawImages)];
-  
-  // Complétion avec des images métier SI pas assez d'images réelles
+  const realImages = [...new Set(realImagesRaw)];
+
+  // ── FALLBACKS SECTORIELS NEUTRES (sans branding concurrent) ──
   const fallbacks = getSectorImagesFallback(lead.sector);
-  if (allImages.length < 5) {
-    allImages = [...allImages, ...fallbacks];
-  }
+
+  // ── DISTRIBUTION PAR SECTION (7 slots: Hero + About + 5 Services) ──
+  // Priorité: image réelle du prospect → fallback sectoriel
+  const getSlotImage = (slot: number): string => {
+    if (realImages[slot]) return realImages[slot];
+    const fallbackIndex = slot % fallbacks.length;
+    return fallbacks[fallbackIndex];
+  };
+
+  // Image Hero = première image réelle, sinon premier fallback
+  const heroImage = realImages[0] || fallbacks[0];
   
-  // Garantir une image Hero impactante (priorité à la première image réelle si elle existe)
-  const heroImage = aiContent?.heroImage || allImages[0] || fallbacks[0];
+  // Pool complet = réelles d'abord, complétées par fallbacks
+  const allImages = realImages.length >= 6
+    ? realImages
+    : [...realImages, ...fallbacks].slice(0, Math.max(6, realImages.length + fallbacks.length));
 
   const content: UltimateContent = {
     companyName, 
@@ -358,10 +363,10 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
     allImages
   };
 
-  return buildUltimateHTML(content, template);
+  return buildUltimateHTML(content, template, fallbacks);
 }
 
-function buildUltimateHTML(content: UltimateContent, template: any): string {
+function buildUltimateHTML(content: UltimateContent, template: any, sectorFallbacks: string[] = []): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   
   // Dynamic Unique Vibe Generator
@@ -373,24 +378,35 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
   const accentColor = `hsl(${(hue + 200) % 360}, 80%, 60%)`;
   
   // Variation Logic
-  const patternType = nameHash % 4; // 0=dots, 1=grid, 2=waves, 3=lines
-  const fontPair = nameHash % 3; // 0=Outfit/Inter, 1=Plus Jakarta/Inter, 2=Roboto/Inter
-  const animStyle = nameHash % 2; // 0=Slide, 1=Zoom/Fade
-  const shapesType = nameHash % 3; // 0=Circles, 1=Squares, 2=Polygons
+  const patternType = nameHash % 4;
+  const fontPair = nameHash % 3;
+  const animStyle = nameHash % 2;
+  const shapesType = nameHash % 3;
 
   const logoInfo = getLogoInfo(companyName);
   const primaryRgb = `${hue}, 70%, 45%`;
   const cleanPhoneLink = phone ? phone.replace(/[^0-9+]/g, '') : '';
   const mapQuery = encodeURIComponent(address + (content.city ? ', ' + content.city : ''));
 
-  // Image Distribution Logic
-  const getImg = (index: number) => {
-    if (allImages.length > 0) return allImages[index % allImages.length];
-    if (heroImage) return heroImage;
-    // No choice but to use a high-quality abstract if absolutely nothing exists, 
-    // but the user's prompt implies they have real photos.
-    return '';
+  // ── IMAGE DISTRIBUTION INTELLIGENTE PAR SLOT ──
+  // Chaque section a sa propre image, pas de rotation aveugle.
+  // Si une image réelle existe pour ce slot → on l'utilise.
+  // Sinon → fallback sectoriel neutre garanti.
+  const emergencyFallback = sectorFallbacks[0] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80';
+  
+  const getImg = (slot: number): string => {
+    // Priorité 1 : image réelle du prospect pour ce slot
+    if (allImages[slot]) return allImages[slot];
+    // Priorité 2 : image réelle en rotation si pool insuffisant
+    if (allImages.length > 0) return allImages[slot % allImages.length];
+    // Priorité 3 : fallback sectoriel neutre
+    if (sectorFallbacks.length > 0) return sectorFallbacks[slot % sectorFallbacks.length];
+    return emergencyFallback;
   };
+
+  // onerror JS inline pour chaque <img> — 3 niveaux de fallback
+  const imgErr = (fallbackSlot: number) =>
+    `onerror="this.onerror=null;this.src='${sectorFallbacks[fallbackSlot % Math.max(sectorFallbacks.length,1)] || emergencyFallback}'"`;
 
   return `<!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
@@ -1016,7 +1032,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         </div>
         <div class="hero-image-col reveal active" style="position: relative; z-index: 1;">
             <div style="position: relative; border-radius: 40px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.05); padding: 1rem; background: white;">
-                <img src="${heroImage}" alt="${companyName}" style="width: 100%; height: 500px; display: block; object-fit: cover; border-radius: 30px;">
+                <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" style="width: 100%; height: 500px; display: block; object-fit: cover; border-radius: 30px;">
                 <div style="position: absolute; top:0; left:0; right:0; bottom:0; background: radial-gradient(circle at center, transparent 40%, rgba(var(--primary-rgb), 0.05)); pointer-events: none;"></div>
                 <!-- Motifs professionnels sur l'image -->
                 <div style="position: absolute; bottom: 2rem; left: -2rem; background: var(--primary); height: 100px; width: 100px; border-radius: 50%; opacity: 0.1; filter: blur(20px);"></div>
@@ -1038,7 +1054,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
                 <div style="position: absolute; bottom: -20px; right: -20px; border: 4px solid var(--primary); width: 80%; height: 80%; border-radius: 30px; z-index: 0; opacity: 0.1;"></div>
                 
                 <div style="position: relative; border-radius: 30px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.1); z-index: 1; border: 8px solid white;">
-                    <img src="${getImg(7)}" alt="Notre équipe" style="width: 100%; height: 100%; object-fit: cover; display: block; filter: ${allImages.length === 0 ? 'grayscale(100%)' : 'none'};">
+                    <img src="${getImg(1)}" ${imgErr(1)} alt="${companyName}" style="width: 100%; height: 450px; object-fit: cover; display: block;">
                 </div>
             </div>
             <div class="reveal reveal-right">
@@ -1177,12 +1193,12 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         <div class="grid-3">
             ${services.map((s, i) => `
             <div class="card glass reveal zoom-hover" style="transition-delay: ${i * 100}ms">
-                ${getImg(i) ? `
+                ${getImg(i + 2) ? `
                 <div style="height: 200px; margin: -3rem -3rem 2rem; border-radius: 20px 20px 0 0; overflow: hidden; position: relative;">
-                    <img src="${getImg(i)}" alt="${s.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="${getImg(i + 2)}" ${imgErr(i + 2)} alt="${s.name}" style="width: 100%; height: 100%; object-fit: cover;">
                     <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100%; background: linear-gradient(to top, rgba(255,255,255,0.4), transparent);"></div>
                 </div>` : ''}
-                <div class="card-icon" style="${getImg(i) ? 'margin-top: -1rem;' : ''} background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
+                <div class="card-icon" style="${getImg(i + 2) ? 'margin-top: -1rem;' : ''} background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
                     <i data-lucide="${['shield', 'layers', 'box', 'award', 'cpu', 'gem'][i%6]}" width="32" height="32"></i>
                 </div>
                 <h3>${s.name}</h3>
