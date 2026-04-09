@@ -531,27 +531,39 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       console.log(`✅ Content generated for ${lead.name}`);
       
       updateProgress({ step: '🖼️ Recherche d\'images professionnelles...' });
-      // ── AGENT IMAGES : cherche des photos pro neutres via Unsplash/Pexels ──
-      // Si le prospect n'a pas assez d'images réelles (< 4), on complète avec des images
-      // professionnelles du même secteur, sans marque ni texte publicitaire.
-      const leadImages = [...(lead.images || []), ...(lead.websiteImages || [])].filter(Boolean);
-      if (leadImages.length < 4 && (apiConfig.unsplashKey || apiConfig.pexelsKey)) {
+      
+      // ── FILTRAGE DES IMAGES EXISTANTES ──
+      // On ne compte que les images qui vont réellement s'afficher (HTTPS + non bloquées)
+      const BLOCKED_DOMAINS = ['pagesjaunes.fr', 'justacote.', 'lafourchette.', 'tripadvisor.', 'yelp.', 'facebook.', 'fbcdn.', 'instagram.', 'gstatic.com'];
+      const validLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])].filter(img => {
+        if (!img || typeof img !== 'string') return false;
+        if (!img.startsWith('https://')) return false;
+        const low = img.toLowerCase();
+        if (BLOCKED_DOMAINS.some(d => low.includes(d))) return false;
+        const hardSkip = ['favicon', 'sprite', 'pixel', 'tracking', 'beacon', '1x1', '.svg', '.gif'];
+        if (hardSkip.some(s => low.includes(s))) return false;
+        return true;
+      });
+
+      // Si le prospect n'a pas assez d'images valides (< 4), on complète avec l'agent
+      if (validLeadImages.length < 6 && (apiConfig.unsplashKey || apiConfig.pexelsKey)) {
         try {
+          console.log(`🖼️ ImageAgent: ${validLeadImages.length} images valides seulement. Recherche de photos pro pour le secteur: ${lead.sector}`);
           const sectorImgs = await fetchSectorImages(
             lead.sector || 'professionnel',
             { unsplashKey: apiConfig.unsplashKey, pexelsKey: apiConfig.pexelsKey },
-            8
+            10
           );
           if (sectorImgs.length > 0) {
-            // Enrichir le lead avec les images trouvées (sans écraser les vraies photos)
+            // On privilégie les images pro trouvées pour s'assurer d'un rendu impeccable
             lead = {
               ...lead,
-              images: [...leadImages, ...sectorImgs].slice(0, 12)
+              images: [...validLeadImages, ...sectorImgs].slice(0, 15)
             };
             console.log(`🖼️ ${sectorImgs.length} images professionnelles ajoutées pour ${lead.name}`);
           }
         } catch (imgErr) {
-          console.warn('⚠️ ImageAgent: Impossible de récupérer des images, on continue sans.', imgErr);
+          console.warn('⚠️ ImageAgent: Erreur lors de la recherche.', imgErr);
         }
       }
 

@@ -308,15 +308,37 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
 
   // ── COLLECTE IMAGES RÉELLES (champs existants dans Lead) ──
+  // Domaines connus pour bloquer l'intégration externe (CORS/Hotlinking)
+  const BLOCKED_DOMAINS = [
+    'pagesjaunes.fr', 
+    'justacote.com', 
+    'justacote.fr', 
+    'lafourchette.com', 
+    'tripadvisor.', 
+    'yelp.com',
+    'facebook.com',
+    'fbcdn.net',
+    'instagram.com'
+  ];
+
   const realImagesRaw = [
     ...(lead.images || []),
     ...(lead.websiteImages || [])
   ].filter(img => {
     if (!img || typeof img !== 'string') return false;
-    if (!img.startsWith('http')) return false;
-    // Filtrer uniquement les artefacts techniques (pas le logo si c'est la seule image)
-    const hardSkip = ['favicon', 'sprite', 'pixel', 'tracking', 'beacon', '.gif', '1x1'];
-    if (hardSkip.some(s => img.toLowerCase().includes(s))) return false;
+    
+    // 1. Forcer HTTPS pour éviter le Mixed Content
+    if (!img.startsWith('https://')) return false;
+
+    const lowerImg = img.toLowerCase();
+
+    // 2. Bloquer les domaines avec protection anti-hotlink
+    if (BLOCKED_DOMAINS.some(d => lowerImg.includes(d))) return false;
+
+    // 3. Filtrer les artefacts techniques et logos de concurrents
+    const hardSkip = ['favicon', 'sprite', 'pixel', 'tracking', 'beacon', '.gif', '1x1', '.svg'];
+    if (hardSkip.some(s => lowerImg.includes(s))) return false;
+    
     return true;
   });
 
