@@ -134,10 +134,82 @@ const SECTOR_ULTIMATE_TEMPLATES = {
   }
 };
 
+// --- RÉFÉRENTIEL D'IMAGES PREMIUM PAR SECTEUR (2026) ---
+// Ces images sont utilisées en fallback pour garantir un résultat professionnel sans faute.
+const SECTOR_IMAGES: Record<string, string[]> = {
+  plomberie: [
+    'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=1200&q=80',
+    'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=80',
+    'https://images.unsplash.com/photo-1504148455328-497c5efdf13a?w=1200&q=80',
+    'https://images.unsplash.com/photo-1542013936693-884638332954?w=1200&q=80'
+  ],
+  electricien: [
+    'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&q=80',
+    'https://images.unsplash.com/photo-1558210857-39d4a984f246?w=1200&q=80',
+    'https://images.unsplash.com/photo-1563770660941-20978e87081b?w=1200&q=80',
+    'https://images.unsplash.com/photo-1517646272502-7102e33054fd?w=1200&q=80'
+  ],
+  coiffeur: [
+    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80',
+    'https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=1200&q=80',
+    'https://images.unsplash.com/photo-1590439471364-192aa70c0b53?w=1200&q=80',
+    'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1200&q=80'
+  ],
+  restaurant: [
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80',
+    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80',
+    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80',
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80'
+  ],
+  garage: [
+    'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200&q=80',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80',
+    'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=1200&q=80',
+    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80'
+  ],
+  climatisation: [
+    'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=1200&q=80',
+    'https://images.unsplash.com/photo-1581094288338-2314dddb7ec4?w=1200&q=80',
+    'https://images.unsplash.com/photo-1590408591871-36473183570c?w=1200&q=80'
+  ],
+  renovation: [
+    'https://images.unsplash.com/photo-1581578731522-a0034a49f763?w=1200&q=80',
+    'https://images.unsplash.com/photo-1503387762-592dee58c460?w=1200&q=80',
+    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80'
+  ],
+  medical: [
+    'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80',
+    'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1200&q=80',
+    'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&q=80'
+  ],
+  avocat: [
+    'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=80',
+    'https://images.unsplash.com/photo-1521791055366-0d553872125f?w=1200&q=80',
+    'https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=1200&q=80'
+  ],
+  default: [
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80',
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&q=80',
+    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80'
+  ]
+};
+
+function getSectorImagesFallback(sector: string): string[] {
+  const normalizedSector = (sector || '').toLowerCase();
+  for (const [key, images] of Object.entries(SECTOR_IMAGES)) {
+    if (normalizedSector.includes(key)) return images;
+  }
+  return SECTOR_IMAGES.default;
+}
+
 function getUltimateTemplate(sector: string) {
   const normalizedSector = (sector || '').toLowerCase();
   for (const [key, template] of Object.entries(SECTOR_ULTIMATE_TEMPLATES)) {
     if (normalizedSector.includes(key)) return template;
+  }
+  if (normalizedSector.includes('climat') || normalizedSector.includes('frigo') || normalizedSector.includes('chauffage')) {
+    return SECTOR_ULTIMATE_TEMPLATES.plomberie;
   }
   if (normalizedSector.includes('médec') || normalizedSector.includes('clinique') || normalizedSector.includes('dentiste')) {
     return { ...SECTOR_ULTIMATE_TEMPLATES.default, primary: '#0284c7', secondary: '#0369a1' };
@@ -235,11 +307,26 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
     ...(lead.serperSnippetsImages || []),
     lead.imageUrl,
     lead.logo
-  ].filter(img => img && typeof img === 'string' && (img.startsWith('http') || img.startsWith('https')));
+  ].filter(img => {
+    if (!img || typeof img !== 'string') return false;
+    if (!img.startsWith('http')) return false;
+    // Filtrer les icônes et petites images inutiles
+    const skip = ['icon', 'logo', 'fav', 'avatar', 'small', 'thumb', 'marker', 'pixel'];
+    if (skip.some(s => img.toLowerCase().includes(s))) return false;
+    return true;
+  });
 
   // Nettoyage des doublons
-  const allImages = [...new Set(rawImages)];
-  const heroImage = aiContent?.heroImage || allImages[0] || '';
+  let allImages = [...new Set(rawImages)];
+  
+  // Complétion avec des images métier SI pas assez d'images réelles
+  const fallbacks = getSectorImagesFallback(lead.sector);
+  if (allImages.length < 5) {
+    allImages = [...allImages, ...fallbacks];
+  }
+  
+  // Garantir une image Hero impactante (priorité à la première image réelle si elle existe)
+  const heroImage = aiContent?.heroImage || allImages[0] || fallbacks[0];
 
   const content: UltimateContent = {
     companyName, 
