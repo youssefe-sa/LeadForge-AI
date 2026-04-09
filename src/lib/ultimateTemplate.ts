@@ -700,6 +700,25 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         .footer-col ul li a:hover { color: white; padding-left: 5px; }
         .footer-bottom { text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; color: var(--text-light); font-size: 0.9rem; }
 
+        /* Modal Styles */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background-color: #fff; margin: 3% auto; padding: 4rem; border-radius: 32px;
+            width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto; position: relative;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.3); border: 1px solid rgba(0,0,0,0.05);
+        }
+        .close-modal {
+            position: absolute; right: 2rem; top: 2rem; color: #000; font-size: 32px; font-weight: 300; cursor: pointer; transition: 0.3s;
+            width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f1f5f9;
+        }
+        .close-modal:hover { background: var(--primary); color: white; }
+        .modal h2 { margin-bottom: 2.5rem; font-family: 'Outfit'; font-weight: 800; color: var(--text-main); font-size: 2.5rem; letter-spacing: -1px; }
+        .modal h3 { margin-bottom: 1rem; margin-top: 2.5rem; font-family: 'Outfit'; font-weight: 700; color: var(--text-main); }
+        .modal p { margin-bottom: 1.5rem; line-height: 1.8; color: var(--text-muted); font-size: 1.05rem; }
+
         /* Floating Widgets */
         .float-whatsapp {
             position: fixed; bottom: 110px; right: 30px;
@@ -830,7 +849,6 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
     <section class="container" id="about">
         <div class="section-header reveal">
             <h2>L'art de l'excellence professionnelle</h2>
-            <p>Une histoire d'expertise et d'engagement envers notre métier et nos clients.</p>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem; align-items: center; position: relative; z-index: 1;">
             <div class="reveal" style="position: relative;">
@@ -978,7 +996,18 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         <div class="grid-3">
             ${services.map((s, i) => `
             <div class="card glass reveal" style="transition-delay: ${i * 100}ms">
-                <div class="card-icon">
+                <div style="height: 200px; margin: -3rem -3rem 2rem; border-radius: 20px 20px 0 0; overflow: hidden; position: relative;">
+                    <img src="https://images.unsplash.com/photo-${[
+                        '1581094794329-c8112a89af12',
+                        '1504307651254-35680f3366d4',
+                        '1621905251189-08b45d6a269e',
+                        '1517646272502-d4992fc444d3',
+                        '1504917595217-d4dc5f566fab',
+                        '1530124560677-bdaeaeb15001'
+                    ][i % 6]}?auto=format&fit=crop&w=500&q=80" alt="${s.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to top, rgba(255,255,255,1), transparent);"></div>
+                </div>
+                <div class="card-icon" style="margin-top: -1rem; background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
                     <i data-lucide="${['shield', 'layers', 'box', 'award', 'cpu', 'gem'][i%6]}" width="32" height="32"></i>
                 </div>
                 <h3>${s.name}</h3>
@@ -1091,8 +1120,8 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
                 <ul>
                     <li><a href="#process">Notre Démarche</a></li>
                     <li><a href="#testimonials">Avis Clients</a></li>
-                    <li><a href="#">Mentions Légales</a></li>
-                    <li><a href="#">Confidentialité</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal('modal-mentions')">Mentions Légales</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal('modal-policy')">Confidentialité</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -1105,7 +1134,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 ${logoInfo.text}. Tous droits réservés. Créé avec les dernières technologies du web.</p>
+            <p>&copy; 2026 ${companyName}. Tous droits réservés. Créé Services-Siteup.</p>
         </div>
     </footer>
 
@@ -1130,6 +1159,45 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         <div class="chat-input">
             <input type="text" id="chat-text" placeholder="Écrivez votre message...">
             <button onclick="sendMsg()" style="background: none; border: none; color: var(--primary); cursor: pointer;"><i data-lucide="send"></i></button>
+        </div>
+    </div>
+
+    <!-- Modals for Policies -->
+    <div id="modal-mentions" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modal-mentions')">&times;</span>
+            <h2>Mentions Légales</h2>
+            <h3>1. Édition du site</h3>
+            <p>Le présent site est édité par l'entreprise <strong>${companyName}</strong>, située au <strong>${address}</strong>.</p>
+            <p>Directeur de la publication : Le Gérant de ${companyName}.</p>
+            <h3>2. Hébergement</h3>
+            <p>Le site est hébergé par Vercel Inc., dont le siège social est situé au 340 S Lemon Ave #4133 Walnut, CA 91789, USA.</p>
+            <h3>3. Propriété intellectuelle</h3>
+            <p>Tous les éléments du site (textes, logos, images, icônes) sont la propriété exclusive de ${companyName} ou de ses partenaires. Toute reproduction, représentation, modification ou adaptation totale ou partielle de tout ou partie du site est interdite.</p>
+            <h3>4. Contact</h3>
+            <p>Pour toute question ou demande d'information, vous pouvez nous contacter :</p>
+            <ul>
+                <li>Par téléphone au : <strong>${phone}</strong></li>
+                <li>Par e-mail à : <strong>${email}</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="modal-policy" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modal-policy')">&times;</span>
+            <h2>Politique de Confidentialité</h2>
+            <p>Chez <strong>${companyName}</strong>, nous accordons une importance capitale à la protection de vos données personnelles.</p>
+            <h3>1. Collecte des données</h3>
+            <p>Nous collectons les données que vous nous soumettez via nos formulaires de contact : Nom, Prénom, Numéro de téléphone et Adresse e-mail.</p>
+            <h3>2. Finalité du traitement</h3>
+            <p>Ces données sont uniquement utilisées pour répondre à vos demandes de renseignements, établir des devis personnalisés ou assurer le suivi de nos interventions.</p>
+            <h3>3. Conservation des données</h3>
+            <p>Les données sont conservées pendant une durée de 3 ans après notre dernier contact avec vous. Elles ne sont jamais cédées ou vendues à des tiers.</p>
+            <h3>4. Vos droits (RGPD)</h3>
+            <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles. Pour exercer ce droit, écrivez-nous à <strong>${email}</strong>.</p>
+            <h3>5. Cookies</h3>
+            <p>Notre site peut utiliser des cookies de confort pour améliorer votre expérience utilisateur. Vous pouvez les désactiver dans les paramètres de votre navigateur.</p>
         </div>
     </div>
 
@@ -1217,6 +1285,22 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             }, 1000);
         }
         chatText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
+
+        // Modal Management
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
     </script>
 </body>
 </html>`;
