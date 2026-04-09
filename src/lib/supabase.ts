@@ -335,9 +335,10 @@ export const configService = {
       gmail_smtp_secure: Boolean(config.gmailSmtpSecure),
       whop_deposit_link: config.whopDepositLink || null,
       whop_final_payment_link: config.whopFinalPaymentLink || null
+      unsplash_key: config.unsplashKey || null,
+      pexels_key: config.pexelsKey || null,
     };
 
-    // Note: openrouter_key, unsplash_key, pexels_key sont exclus car manquants dans la DB actuelle
     console.log('🚀 Updating api_config (id=1):', row);
 
     const { error } = await supabase
