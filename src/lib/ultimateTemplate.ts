@@ -164,7 +164,7 @@ function getLogoInfo(name: string) {
   if (finalWords.length === 1) finalWords.push("Pro");
   const initials = finalWords[0].charAt(0) + finalWords[1].charAt(0);
   const text = finalWords.join(' ');
-  return { initials: initials.toUpperCase(), text };
+  return { initials: initials.toUpperCase(), text, word1: finalWords[0], word2: finalWords[1] };
 }
 
 export function generateUltimateSite(lead: any, aiContent?: any): string {
@@ -350,6 +350,21 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             opacity: 0.15;
             animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 50%;
+        }
+        .anim-shape {
+            position: absolute; opacity: 0.08; pointer-events: none; z-index: 0;
+            animation: floatShape 14s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+        }
+        @keyframes floatShape {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            100% { transform: translateY(-80px) rotate(180deg) scale(1.2); }
+        }
+        .bg-grid {
+            background-image: radial-gradient(rgba(${primaryRgb}, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .bg-alternate {
+            background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(var(--primary-rgb), 0.03) 50%, rgba(255,255,255,0) 100%);
         }
         .blob-1 {
             background: var(--primary);
@@ -768,11 +783,18 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
     </nav>
 
     <!-- Hero -->
-    <section class="hero">
+    <section class="hero bg-grid">
+        <!-- Floating animated decorations -->
+        <div class="anim-shape" style="top: 15%; left: 8%; width: 60px; height: 60px; border: 6px solid var(--primary); border-radius: 50%;"></div>
+        <div class="anim-shape" style="bottom: 20%; right: 45%; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 50px solid var(--secondary); animation-duration: 18s;"></div>
+        <div class="pattern-waves"></div>
         <div class="hero-content reveal active" style="position: relative; z-index: 1;">
             <div class="hero-badge"><i data-lucide="shield-check" width="18"></i> 2026 Innovation Premium</div>
-            <h1 style="text-align: left; font-size: clamp(3rem, 6vw, 5.5rem); margin-bottom: 0.5rem;"><span style="background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${companyName}</span></h1>
-            <h2 style="text-align: left; font-size: clamp(1.2rem, 3vw, 2rem); font-family: 'Outfit'; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem;">${slogan}</h2>
+            <h1 style="text-align: left; font-size: clamp(3rem, 6vw, 5.5rem); margin-bottom: 0.5rem; line-height: 1.1;">
+                <span style="color: var(--primary);">${logoInfo.word1}</span><br>
+                <span style="background: linear-gradient(135deg, var(--secondary), #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${logoInfo.word2}</span>
+            </h1>
+            <h2 style="text-align: left; font-size: clamp(1.2rem, 3vw, 2rem); font-family: 'Outfit'; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem; opacity: 0.8;">${slogan}</h2>
             <p style="text-align: left; margin-bottom: 2.5rem; font-size: 1.15rem;">${heroSubtitle}</p>
             
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-bottom: 2rem; justify-content: flex-start; ${(rating || 0) === 0 && (reviews || 0) === 0 ? 'display: none;' : ''}">
@@ -821,27 +843,26 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
                 </div>
             </div>
             <div class="reveal" style="transition-delay: 200ms">
-                <div style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); font-weight: 700; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem;"><i data-lucide="award" width="16"></i> Votre Partenaire Confiance</div>
                 <h2 style="font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; margin-bottom: 1.5rem; font-family: 'Outfit';">
-                    À propos de <span style="color: var(--primary);">${companyName}</span>
+                    Qui sommes-nous ?
                 </h2>
                 <p style="color: var(--text-muted); font-size: 1.125rem; line-height: 1.8; margin-bottom: 2.5rem;">
                     ${aboutText}
                 </p>
                 <ul style="list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
                     <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: var(--primary);"></i> Expertise reconnue</li>
-                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: var(--primary);"></i> Solutions sur-mesure</li>
-                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: var(--primary);"></i> Accompagnement total</li>
-                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: var(--primary);"></i> Réactivité garantie</li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: #10b981;"></i> Solutions sur-mesure</li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: #f59e0b;"></i> Accompagnement total</li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: #8b5cf6;"></i> Réactivité garantie</li>
                 </ul>
-                <a href="#contact" class="btn-glow" style="padding: 1rem 2rem; font-size: 1rem;">Nous contacter <i data-lucide="arrow-right" width="18"></i></a>
             </div>
         </div>
     </section>
 
     <!-- Nos Valeurs -->
-    <section class="container" id="valeurs">
-        <div class="section-header reveal">
+    <section class="container bg-alternate" id="valeurs">
+        <div class="anim-shape" style="top: -5%; right: -5%; width: 120px; height: 120px; background: rgba(var(--primary-rgb), 0.1); border-radius: 30%;"></div>
+        <div class="section-header reveal" style="position: relative; z-index: 1;">
             <h2>Les valeurs qui nous animent</h2>
             <p>Ce qui fait de nous le partenaire idéal pour vos projets ambitieux.</p>
         </div>
@@ -891,8 +912,35 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         </div>
     </section>
 
+    <!-- Garanties & Assurances -->
+    <section class="container bg-alternate" id="garanties" style="background: rgba(255,255,255,0.4); backdrop-filter: blur(10px); margin: 3rem auto; border-radius: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);">
+        <div class="section-header reveal">
+            <h2>Garanties & Assurances</h2>
+            <p>Travaillez l'esprit serein grâce à nos couvertures complètes conformes à la législation.</p>
+        </div>
+        <div class="valeurs-grid">
+            <div class="valeur-card reveal" style="border-top: 4px solid #10b981; transition-delay: 100ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(16,185,129,0.1); color: #10b981;"><i data-lucide="shield-check" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Garantie Décennale</h3>
+            </div>
+            <div class="valeur-card reveal" style="border-top: 4px solid #3b82f6; transition-delay: 200ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;"><i data-lucide="briefcase" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Assurance RC Pro</h3>
+            </div>
+            <div class="valeur-card reveal" style="border-top: 4px solid #f59e0b; transition-delay: 300ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;"><i data-lucide="award" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Certification Qualité</h3>
+            </div>
+            <div class="valeur-card reveal" style="border-top: 4px solid #8b5cf6; transition-delay: 400ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(139,92,246,0.1); color: #8b5cf6;"><i data-lucide="lock" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Assurance Tous Risques</h3>
+            </div>
+        </div>
+    </section>
+
     <!-- Process (4 Démarches) -->
     <section class="container" id="process">
+        <div class="anim-shape" style="bottom: 10%; left: 0%; width: 80px; height: 80px; border: 4px solid var(--secondary); transform: rotate(20deg); opacity: 0.1;"></div>
         <div class="section-header reveal">
             <h2>Notre démarche en 4 étapes</h2>
             <p>Une méthodologie claire et transparente pour garantir le succès de votre projet.</p>
@@ -922,8 +970,8 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
     </section>
 
     <!-- Services -->
-    <section class="container" id="services">
-        <div class="section-header reveal">
+    <section class="container bg-alternate" id="services">
+        <div class="section-header reveal" style="position: relative; z-index: 1;">
             <h2>Notre Expertise Premium</h2>
             <p>L'alliance parfaite de la maîtrise technique et des outils les plus modernes.</p>
         </div>
