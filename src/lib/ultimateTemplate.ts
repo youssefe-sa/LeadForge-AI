@@ -227,13 +227,40 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   ];
   const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
 
-  const heroImage = lead.imageUrl || (lead.photos && lead.photos[0]) || '';
-  const allImages = (lead.photos || []).filter((p: any) => p && typeof p === 'string');
-  if (heroImage && !allImages.includes(heroImage)) allImages.unshift(heroImage);
+  // Récupération exhaustive des images d'enrichissement
+  const rawImages = [
+    ...(lead.images || []),
+    ...(lead.websiteImages || []),
+    ...(lead.photos || []),
+    ...(lead.serperSnippetsImages || []),
+    lead.imageUrl,
+    lead.logo
+  ].filter(img => img && typeof img === 'string' && (img.startsWith('http') || img.startsWith('https')));
+
+  // Nettoyage des doublons
+  const allImages = [...new Set(rawImages)];
+  const heroImage = aiContent?.heroImage || allImages[0] || '';
 
   const content: UltimateContent = {
-    companyName, sector: lead.sector || 'Professionnel', city, description, phone, email, address, website, rating, reviews,
-    services: finalServices, testimonials, heroTitle, heroSubtitle, aboutText: description, ctaText, slogan: finalSlogan, heroImage, allImages
+    companyName, 
+    sector: lead.sector || 'Professionnel', 
+    city, 
+    description, 
+    phone, 
+    email, 
+    address, 
+    website, 
+    rating, 
+    reviews,
+    services: finalServices, 
+    testimonials, 
+    heroTitle, 
+    heroSubtitle, 
+    aboutText: description, 
+    ctaText, 
+    slogan: finalSlogan, 
+    heroImage, 
+    allImages
   };
 
   return buildUltimateHTML(content, template);
@@ -774,28 +801,24 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         .modal h3 { margin-bottom: 1rem; margin-top: 2.5rem; font-family: 'Outfit'; font-weight: 700; color: var(--text-main); }
         .modal p { margin-bottom: 1.5rem; line-height: 1.8; color: var(--text-muted); font-size: 1.05rem; }
 
-        /* Floating Widgets */
-        .float-whatsapp {
-            position: fixed; bottom: 110px; right: 30px;
-            width: 60px; height: 60px;
-            background: #25D366; color: white;
+        /* Floating Widgets (Unified Style 2026) */
+        .float-widget {
+            position: fixed; right: 25px;
+            width: 50px; height: 50px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 30px; box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
-            z-index: 999; transition: transform 0.3s; text-decoration: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 1000; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none; border: none; cursor: pointer;
         }
-        .float-whatsapp:hover { transform: scale(1.1) translateY(-5px); color: white; }
+        .float-widget:hover { transform: scale(1.1) translateY(-5px); }
+        .float-widget i, .float-widget svg { width: 24px; height: 24px; }
 
-        /* Fake Chatbot UI */
-        .chatbot-btn {
-            position: fixed; bottom: 30px; right: 30px;
-            width: 65px; height: 65px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: var(--glow-strong); z-index: 999; cursor: pointer; transition: 0.3s; border: none;
-        }
-        .chatbot-btn:hover { transform: scale(1.1) translateY(-5px); }
+        .float-phone { bottom: 30px; background: white; color: var(--primary); border: 2px solid var(--primary); }
+        .float-chatbot { bottom: 90px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .float-whatsapp { bottom: 150px; background: #25D366; color: white; }
+
         .chat-window {
-            position: fixed; bottom: 100px; right: 30px;
+            position: fixed; bottom: 85px; right: 85px;
             width: 350px; height: 500px;
             background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
             z-index: 998; display: flex; flex-direction: column; overflow: hidden;
@@ -1195,14 +1218,18 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         </div>
     </footer>
 
-    <!-- Floating Buttons -->
-    <a href="https://wa.me/${cleanPhoneLink}?text=Bonjour, je souhaite avoir plus d'informations." target="_blank" class="float-whatsapp" title="Discuter sur WhatsApp">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
+    <!-- Floating Buttons (Aligned Vertical) -->
+    <a href="tel:${cleanPhoneLink}" class="float-widget float-phone" title="Appeler maintenant">
+        <i data-lucide="phone"></i>
     </a>
 
-    <button id="chatbot-toggle" class="chatbot-btn">
-        <i data-lucide="message-circle" width="30" height="30"></i>
+    <button id="chatbot-toggle" class="float-widget float-chatbot" title="Discuter avec notre IA">
+        <i data-lucide="message-circle"></i>
     </button>
+
+    <a href="https://wa.me/${cleanPhoneLink}?text=Bonjour, je souhaite avoir plus d'informations." target="_blank" class="float-widget float-whatsapp" title="Discuter sur WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
+    </a>
 
     <!-- Chatbot Window -->
     <div class="chat-window" id="chat-window">
