@@ -40,7 +40,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       {
         name: 'Chauffage & Climatisation',
         description: 'Installation et entretien de vos systèmes de chauffage',
-        features: ['Pompes à chaleur', 'Chaudières', 'Economie d\\'énergie']
+        features: ['Pompes à chaleur', 'Chaudières', "Economie d'énergie"]
       },
       {
         name: 'Diagnostic Fuites',
@@ -59,8 +59,8 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       }
     ],
     heroTitle: 'Votre Expert Plomberie',
-    heroSubtitle: 'Intervention d\\'excellence et garantie dans toute la région',
-    aboutText: 'Artisan certifié spécialisé dans les interventions premium. Nous garantissons un service d\\'excellence, réactif et doté d\\'une finition parfaite.',
+    heroSubtitle: "Intervention d'excellence et garantie dans toute la région",
+    aboutText: "Artisan certifié spécialisé dans les interventions premium. Nous garantissons un service d'excellence, réactif et doté d'une finition parfaite.",
     ctaText: 'Obtenir une intervention'
   },
   electricien: {
@@ -101,8 +101,8 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       }
     ],
     heroTitle: 'Excellence Électrique',
-    heroSubtitle: 'L\\'énergie sûre et connectée, maîtrisée par des experts',
-    aboutText: 'Entreprise d\\'électricité qualifiée, nous concevons, installons et sécurisons vos réseaux avec des technologies de pointe.',
+    heroSubtitle: "L'énergie sûre et connectée, maîtrisée par des experts",
+    aboutText: "Entreprise d'électricité qualifiée, nous concevons, installons et sécurisons vos réseaux avec des technologies de pointe.",
     ctaText: 'Demander un diagnostic'
   },
   coiffeur: {
@@ -142,9 +142,9 @@ const SECTOR_ULTIMATE_TEMPLATES = {
         features: ['Mariage', 'Essai personnalisé', 'Tenue parfaite']
       }
     ],
-    heroTitle: 'L\\'Atelier de Coiffure',
-    heroSubtitle: 'Révélez votre beauté entre les mains d\\'experts passionnés',
-    aboutText: 'Un salon d\\'exception où chaque détail est pensé pour votre bien-être. Notre équipe artistique maîtrise les techniques les plus sophistiquées.',
+    heroTitle: "L'Atelier de Coiffure",
+    heroSubtitle: "Révélez votre beauté entre les mains d'experts passionnés",
+    aboutText: "Un salon d'exception où chaque détail est pensé pour votre bien-être. Notre équipe artistique maîtrise les techniques les plus sophistiquées.",
     ctaText: 'Réserver mon moment'
   },
   restaurant: {
@@ -155,8 +155,8 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     services: [
       {
         name: 'Carte Signature',
-        description: 'Une cuisine d\\'inspiration, moderne et de saison',
-        features: ['Produits exceptionnels', 'Ferme à l\\'assiette', 'Végétarien disponible']
+        description: "Une cuisine d'inspiration, moderne et de saison",
+        features: ['Produits exceptionnels', "Ferme à l'assiette", 'Végétarien disponible']
       },
       {
         name: 'Menu Dégustation',
@@ -164,14 +164,14 @@ const SECTOR_ULTIMATE_TEMPLATES = {
         features: ['Accord Mets & Vins', '7 services', 'Surprise du Chef']
       },
       {
-        name: 'Cave d\\'Exception',
+        name: "Cave d'Exception",
         description: 'Notre sommelier vous guide à travers nos meilleurs flacons',
         features: ['Vignobles rares', 'Grands crus', 'Mixologie créative']
       },
       {
         name: 'Privatisation',
         description: 'Des espaces élégants pour vos événements privés',
-        features: ['Service dédié', 'Menus personnalisés', 'Jusqu\\'à 100 convives']
+        features: ['Service dédié', 'Menus personnalisés', "Jusqu'à 100 convives"]
       },
       {
         name: 'Brunch Premium',
@@ -180,12 +180,12 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       },
       {
         name: 'Service Traiteur',
-        description: 'L\\'excellence de notre cuisine où vous le souhaitez',
+        description: "L'excellence de notre cuisine où vous le souhaitez",
         features: ['Cocktails chics', 'Dîners de gala', 'Mise en scène']
       }
     ],
     heroTitle: 'Expérience Culinaire Unique',
-    heroSubtitle: 'L\\'harmonie parfaite entre gastronomie moderne et atmosphère élégante',
+    heroSubtitle: "L'harmonie parfaite entre gastronomie moderne et atmosphère élégante",
     aboutText: 'Nous repoussons les limites de la tradition culinaire pour offrir un moment inoubliable, où les produits nobles racontent une histoire dans chaque assiette.',
     ctaText: 'Réserver une table'
   },
@@ -227,8 +227,8 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       }
     ],
     heroTitle: 'Le Pôle Mécanique Prémium',
-    heroSubtitle: 'L\\'expertise absolue pour sublimer et entretenir votre véhicule',
-    aboutText: 'Notre garage de pointe rassemble l\\'élite des techniciens pour offrir à votre véhicule un entretien sans compromis.',
+    heroSubtitle: "L'expertise absolue pour sublimer et entretenir votre véhicule",
+    aboutText: "Notre garage de pointe rassemble l'élite des techniciens pour offrir à votre véhicule un entretien sans compromis.",
     ctaText: 'Prendre rendez-vous atelier'
   },
   default: {
@@ -240,7 +240,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       {
         name: 'Consultation Experte',
         description: 'Analyse approfondie de vos besoins stratégiques',
-        features: ['Diagnostic sur mesure', 'Plan d\\'action', 'Écoute active']
+        features: ['Diagnostic sur mesure', "Plan d'action", 'Écoute active']
       },
       {
         name: 'Solutions Premium',
@@ -268,9 +268,9 @@ const SECTOR_ULTIMATE_TEMPLATES = {
         features: ['Assistance immédiate', 'Proactivité', 'Garanties solides']
       }
     ],
-    heroTitle: 'Services Professionnels d\\'Excellence',
-    heroSubtitle: 'L\\'alliance de la rigueur et de l\\'innovation pour votre réussite',
-    aboutText: 'Nous bâtissons des relations durables basées sur la performance et l\\'intégrité. Notre ambition est d\\'élever vos standards et de vous accompagner vers le succès absolu.',
+    heroTitle: "Services Professionnels d'Excellence",
+    heroSubtitle: "L'alliance de la rigueur et de l'innovation pour votre réussite",
+    aboutText: "Nous bâtissons des relations durables basées sur la performance et l'intégrité. Notre ambition est d'élever vos standards et de vous accompagner vers le succès absolu.",
     ctaText: 'Initier notre collaboration'
   }
 };
@@ -326,15 +326,15 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   // Avis Google réels
   const testimonials = (lead.googleReviewsData || []).slice(0, 3).map((review: any) => ({
     author: review.author || 'Client VIP',
-    text: review.text || 'Une prestation d\\'une qualité rare. L\\'équipe a su répondre à mes exigences avec une perfection remarquable. Je recommande les yeux fermés.',
+    text: review.text || "Une prestation d'une qualité rare. L'équipe a su répondre à mes exigences avec une perfection remarquable. Je recommande les yeux fermés.",
     rating: review.rating || 5,
     date: review.date || ''
   }));
 
   if (testimonials.length === 0) {
     testimonials.push(
-      { author: 'Emma L.', text: 'Une expérience tout simplement majestueuse. Rapidité, précision et professionnalisme impressionnant.', rating: 5, date: 'Il y a 1 semaine' },
-      { author: 'Arthur D.', text: 'Service d\\'excellence du début à la fin. Les promesses sont tenues et même dépassées. Merci à toute l\\'équipe.', rating: 5, date: 'Il y a 2 semaines' }
+      { author: 'Emma L.', text: "Une expérience tout simplement majestueuse. Rapidité, précision et professionnalisme impressionnant.", rating: 5, date: 'Il y a 1 semaine' },
+      { author: 'Arthur D.', text: "Service d'excellence du début à la fin. Les promesses sont tenues et même dépassées. Merci à toute l'équipe.", rating: 5, date: 'Il y a 2 semaines' }
     );
   }
 
@@ -364,7 +364,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, rating, reviews } = content;
   
   const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex || '#ffffff');
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '#ffffff');
     return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 255, 255';
   };
   const primaryRgb = hexToRgb(template.primary);
@@ -808,12 +808,12 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             </div>
             
             <div class="stat-grid reveal" style="transition-delay: 200ms">
-                ${rating > 0 ? `
+                ${(rating || 0) > 0 ? `
                 <div class="stat-card glass">
                     <div class="stat-num">${rating}</div>
                     <div style="color:var(--text-muted); font-weight: 500;">Note Globale</div>
                 </div>` : ''}
-                ${reviews > 0 ? `
+                ${(reviews || 0) > 0 ? `
                 <div class="stat-card glass">
                     <div class="stat-num">${reviews}+</div>
                     <div style="color:var(--text-muted); font-weight: 500;">Avis Vérifiés</div>
