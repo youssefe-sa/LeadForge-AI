@@ -914,7 +914,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             <h2>L'art de l'excellence professionnelle</h2>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem; align-items: center; position: relative; z-index: 1;">
-            <div class="reveal-left" style="position: relative;">
+            <div class="reveal reveal-left" style="position: relative;">
                 <!-- Decorative background elements -->
                 <div style="position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; background: radial-gradient(var(--primary) 2px, transparent 2px); background-size: 10px 10px; z-index: 0; opacity: 0.2;"></div>
                 <div style="position: absolute; bottom: -20px; right: -20px; border: 4px solid var(--primary); width: 80%; height: 80%; border-radius: 30px; z-index: 0; opacity: 0.1;"></div>
@@ -923,7 +923,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
                     <img src="${getImg(7)}" alt="Notre équipe" style="width: 100%; height: 100%; object-fit: cover; display: block; filter: ${allImages.length === 0 ? 'grayscale(100%)' : 'none'};">
                 </div>
             </div>
-            <div class="reveal-right">
+            <div class="reveal reveal-right">
                 <h2 style="font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; margin-bottom: 1.5rem; font-family: 'Outfit';">
                     Qui sommes-nous ?
                 </h2>
