@@ -20,6 +20,7 @@ export interface UltimateContent {
   ctaText: string;
   slogan: string;
   heroImage: string;
+  allImages: string[];
 }
 
 const SECTOR_ULTIMATE_TEMPLATES = {
@@ -214,29 +215,60 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   }
   testimonials = testimonials.slice(0, 6);
 
-  const slogan = aiContent?.slogan || "L'excellence à votre service";
-  const heroImage = lead.imageUrl || (lead.photos && lead.photos[0]) || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80';
+  let nameHash = 0;
+  for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
+  const baseSlogan = aiContent?.slogan || "L'excellence à votre service";
+  const sloganVariations = [
+    baseSlogan,
+    `${companyName} : Excellence & Passion`,
+    `Votre partenaire de confiance à ${city}`,
+    "L'art de la perfection au quotidien",
+    "Solutions premium sur-mesure"
+  ];
+  const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
+
+  const heroImage = lead.imageUrl || (lead.photos && lead.photos[0]) || '';
+  const allImages = (lead.photos || []).filter((p: any) => p && typeof p === 'string');
+  if (heroImage && !allImages.includes(heroImage)) allImages.unshift(heroImage);
 
   const content: UltimateContent = {
     companyName, sector: lead.sector || 'Professionnel', city, description, phone, email, address, website, rating, reviews,
-    services: finalServices, testimonials, heroTitle, heroSubtitle, aboutText: description, ctaText, slogan, heroImage
+    services: finalServices, testimonials, heroTitle, heroSubtitle, aboutText: description, ctaText, slogan: finalSlogan, heroImage, allImages
   };
 
   return buildUltimateHTML(content, template);
 }
 
 function buildUltimateHTML(content: UltimateContent, template: any): string {
-  const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage } = content;
+  const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   
-  const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '#ffffff');
-    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 255, 255';
-  };
-  const primaryRgb = hexToRgb(template.primary);
+  // Dynamic Unique Vibe Generator
+  let nameHash = 0;
+  for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
+  const hue = (nameHash % 360);
+  const primaryColor = `hsl(${hue}, 70%, 45%)`;
+  const secondaryColor = `hsl(${(hue + 60) % 360}, 65%, 40%)`;
+  const accentColor = `hsl(${(hue + 200) % 360}, 80%, 60%)`;
+  
+  // Variation Logic
+  const patternType = nameHash % 4; // 0=dots, 1=grid, 2=waves, 3=lines
+  const fontPair = nameHash % 3; // 0=Outfit/Inter, 1=Plus Jakarta/Inter, 2=Roboto/Inter
+  const animStyle = nameHash % 2; // 0=Slide, 1=Zoom/Fade
+  const shapesType = nameHash % 3; // 0=Circles, 1=Squares, 2=Polygons
+
   const logoInfo = getLogoInfo(companyName);
-  
+  const primaryRgb = `${hue}, 70%, 45%`;
   const cleanPhoneLink = phone ? phone.replace(/[^0-9+]/g, '') : '';
   const mapQuery = encodeURIComponent(address + (content.city ? ', ' + content.city : ''));
+
+  // Image Distribution Logic
+  const getImg = (index: number) => {
+    if (allImages.length > 0) return allImages[index % allImages.length];
+    if (heroImage) return heroImage;
+    // No choice but to use a high-quality abstract if absolutely nothing exists, 
+    // but the user's prompt implies they have real photos.
+    return '';
+  };
 
   return `<!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
@@ -245,32 +277,30 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${companyName} - ${content.sector}</title>
     
-    <!-- Google Fonts: Outfit & Inter -->
+    <!-- Google Fonts: Diverse Dynamic Pairings -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    ${fontPair === 0 ? `<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">` :
+      fontPair === 1 ? `<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">` :
+      `<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">`}
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
-            --primary: ${template.primary};
-            --secondary: ${template.secondary};
-            --primary-rgb: ${primaryRgb};
+            --primary: ${primaryColor};
+            --secondary: ${secondaryColor};
+            --accent: ${accentColor};
+            --primary-rgb: ${hue}, 70%, 45%;
             
-            /* Modern Light Glassmorphism Colors 2026 */
             --bg-base: #f8fafc;
-            --bg-surface: rgba(255, 255, 255, 0.7);
-            --bg-glass: rgba(255, 255, 255, 0.65);
-            --border-glass: rgba(255, 255, 255, 0.8);
-            
+            --bg-glass: rgba(255, 255, 255, 0.7);
             --text-main: #0f172a;
             --text-muted: #475569;
-            --text-light: #94a3b8;
+            --font-head: ${fontPair === 0 ? "'Outfit'" : fontPair === 1 ? "'Plus Jakarta Sans'" : "'Lexend'"}, sans-serif;
             
-            --glow: 0 10px 40px rgba(${primaryRgb}, 0.08);
-            --glow-strong: 0 15px 50px rgba(${primaryRgb}, 0.15);
+            --glow: 0 10px 40px hsla(${hue}, 70%, 45%, 0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -283,8 +313,33 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             line-height: 1.7;
         }
 
-        h1, h2, h3, h4, .brand-font {
-            font-family: 'Outfit', sans-serif;
+        h1, h2, h3, h4 { font-family: var(--font-head); }
+
+        /* ADVANCED DYNAMIC ANIMATIONS 2026 */
+        .reveal { 
+            opacity: 0; 
+            transform: ${animStyle === 0 ? 'translateY(50px)' : 'scale(0.9) blur(10px)'}; 
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
+        .reveal.active { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+
+        .reveal-left { opacity: 0; transform: translateX(-60px); transition: all 1.2s ease-out; }
+        .reveal-left.active { opacity: 1; transform: translateX(0); }
+
+        .reveal-right { opacity: 0; transform: translateX(60px); transition: all 1.2s ease-out; }
+        .reveal-right.active { opacity: 1; transform: translateX(0); }
+
+        .stagger-item { opacity: 0; transform: translateY(20px); transition: 0.5s ease-out; }
+        .active .stagger-item { opacity: 1; transform: translateY(0); }
+
+        /* DYNAMIC PATTERN INJECTION */
+        .bg-pattern {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            pointer-events: none; opacity: 0.05; z-index: 0;
+            ${patternType === 0 ? `background-image: radial-gradient(var(--primary) 1.5px, transparent 1.5px); background-size: 25px 25px;` : 
+              patternType === 1 ? `background-image: linear-gradient(var(--primary) 1px, transparent 1px), linear-gradient(90deg, var(--primary) 1px, transparent 1px); background-size: 40px 40px;` :
+              patternType === 2 ? `background: repeating-linear-gradient(45deg, var(--primary), var(--primary) 1px, transparent 1px, transparent 12px);` :
+              `background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px); background-size: 15px 15px;`}
         }
 
         /* Top Marquee Defilant */
@@ -756,8 +811,6 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         .chat-input { padding: 1rem; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
         .chat-input input { flex: 1; border: none; outline: none; background: #f1f5f9; padding: 0.75rem 1rem; border-radius: 100px; font-family: 'Inter'; }
         
-        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
@@ -803,9 +856,18 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
 
     <!-- Hero -->
     <section class="hero bg-grid">
-        <!-- Floating animated decorations -->
-        <div class="anim-shape" style="top: 15%; left: 8%; width: 60px; height: 60px; border: 6px solid var(--primary); border-radius: 50%;"></div>
-        <div class="anim-shape" style="bottom: 20%; right: 45%; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 50px solid var(--secondary); animation-duration: 18s;"></div>
+        <div class="bg-pattern"></div>
+        <!-- Floating animated decorations - Specialized per site -->
+        ${shapesType === 0 ? `
+            <div class="anim-shape" style="top: 10%; left: 5%; width: 100px; height: 100px; border-radius: 50%; border: 15px solid hsla(${hue}, 70%, 50%, 0.1);"></div>
+            <div class="anim-shape" style="bottom: 15%; right: 10%; width: 150px; height: 150px; border-radius: 50%; background: hsla(${hue}, 70%, 50%, 0.05);"></div>
+        ` : shapesType === 1 ? `
+            <div class="anim-shape" style="top: 15%; right: 5%; width: 80px; height: 80px; background: hsla(${hue}, 70%, 50%, 0.1); transform: rotate(45deg);"></div>
+            <div class="anim-shape" style="bottom: 20%; left: 8%; width: 120px; height: 120px; border: 10px solid hsla(${hue}, 70%, 50%, 0.05); transform: rotate(15deg);"></div>
+        ` : `
+            <div class="anim-shape" style="top: 10%; left: 50%; width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 100px solid hsla(${hue}, 70%, 50%, 0.08);"></div>
+            <div class="anim-shape" style="bottom: 10%; right: 40%; width: 100px; height: 100px; border: 4px solid var(--secondary); opacity: 0.1; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+        `}
         <div class="pattern-waves"></div>
         <div class="hero-content reveal active" style="position: relative; z-index: 1;">
             <div class="hero-badge"><i data-lucide="shield-check" width="18"></i> 2026 Innovation Premium</div>
@@ -847,20 +909,21 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
 
     <!-- A Propos -->
     <section class="container" id="about">
+        <div class="bg-pattern"></div>
         <div class="section-header reveal">
             <h2>L'art de l'excellence professionnelle</h2>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem; align-items: center; position: relative; z-index: 1;">
-            <div class="reveal" style="position: relative;">
+            <div class="reveal-left" style="position: relative;">
                 <!-- Decorative background elements -->
                 <div style="position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; background: radial-gradient(var(--primary) 2px, transparent 2px); background-size: 10px 10px; z-index: 0; opacity: 0.2;"></div>
                 <div style="position: absolute; bottom: -20px; right: -20px; border: 4px solid var(--primary); width: 80%; height: 80%; border-radius: 30px; z-index: 0; opacity: 0.1;"></div>
                 
                 <div style="position: relative; border-radius: 30px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.1); z-index: 1; border: 8px solid white;">
-                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Notre équipe" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    <img src="${getImg(7)}" alt="Notre équipe" style="width: 100%; height: 100%; object-fit: cover; display: block; filter: ${allImages.length === 0 ? 'grayscale(100%)' : 'none'};">
                 </div>
             </div>
-            <div class="reveal" style="transition-delay: 200ms">
+            <div class="reveal-right">
                 <h2 style="font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; margin-bottom: 1.5rem; font-family: 'Outfit';">
                     Qui sommes-nous ?
                 </h2>
@@ -995,19 +1058,13 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         </div>
         <div class="grid-3">
             ${services.map((s, i) => `
-            <div class="card glass reveal" style="transition-delay: ${i * 100}ms">
+            <div class="card glass reveal zoom-hover" style="transition-delay: ${i * 100}ms">
+                ${getImg(i) ? `
                 <div style="height: 200px; margin: -3rem -3rem 2rem; border-radius: 20px 20px 0 0; overflow: hidden; position: relative;">
-                    <img src="https://images.unsplash.com/photo-${[
-                        '1581094794329-c8112a89af12',
-                        '1504307651254-35680f3366d4',
-                        '1621905251189-08b45d6a269e',
-                        '1517646272502-d4992fc444d3',
-                        '1504917595217-d4dc5f566fab',
-                        '1530124560677-bdaeaeb15001'
-                    ][i % 6]}?auto=format&fit=crop&w=500&q=80" alt="${s.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to top, rgba(255,255,255,1), transparent);"></div>
-                </div>
-                <div class="card-icon" style="margin-top: -1rem; background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
+                    <img src="${getImg(i)}" alt="${s.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100%; background: linear-gradient(to top, rgba(255,255,255,0.4), transparent);"></div>
+                </div>` : ''}
+                <div class="card-icon" style="${getImg(i) ? 'margin-top: -1rem;' : ''} background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
                     <i data-lucide="${['shield', 'layers', 'box', 'award', 'cpu', 'gem'][i%6]}" width="32" height="32"></i>
                 </div>
                 <h3>${s.name}</h3>
