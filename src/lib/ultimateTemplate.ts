@@ -1,406 +1,211 @@
-// ── TEMPLATE ULTIME - GARANTIE PROFESSIONNELLE 100% ──
-// Résultat professionnel garanti pour chaque prospect. Refonte Ultra-Premium (Dark Mode/Glassmorphism).
+// ── TEMPLATE ULTIME 2026 - MULTI-THÈMES, COMPLET & INTELLIGENT ──
 
 export interface UltimateContent {
   companyName: string;
   sector: string;
   city: string;
   description: string;
-  phone?: string;
-  email?: string;
-  address?: string;
-  website?: string;
-  rating?: number;
-  reviews?: number;
+  phone: string;
+  email: string;
+  address: string;
+  website: string;
+  rating: number;
+  reviews: number;
   services: Array<{ name: string; description: string; features: string[] }>;
   testimonials: Array<{ author: string; text: string; rating: number; date?: string }>;
   heroTitle: string;
   heroSubtitle: string;
   aboutText: string;
   ctaText: string;
+  images: string[];
 }
 
-const SECTOR_ULTIMATE_TEMPLATES = {
-  plomberie: {
-    primary: '#3b82f6',
-    secondary: '#1d4ed8',
-    accent: '#60a5fa',
-    background: '#0B0A0F',
-    services: [
-      {
-        name: 'Dépannage Urgence',
-        description: 'Intervention rapide 24/7 pour toutes vos urgences de plomberie',
-        features: ['Disponible 24/7', 'Intervention sous 2h', 'Devis transparent']
-      },
-      {
-        name: 'Installation Sanitaire',
-        description: 'Pose professionnelle de tous vos équipements sanitaires',
-        features: ['Salle de bain complète', 'Cuisine équipée', 'Dépannage']
-      },
-      {
-        name: 'Chauffage & Climatisation',
-        description: 'Installation et entretien de vos systèmes de chauffage',
-        features: ['Pompes à chaleur', 'Chaudières', "Economie d'énergie"]
-      },
-      {
-        name: 'Diagnostic Fuites',
-        description: 'Détection précise et réparation de toutes les fuites',
-        features: ['Recherche non destructive', 'Caméra endoscopique', 'Assurance']
-      },
-      {
-        name: 'Rénovation Complète',
-        description: 'Transformation haute de gamme de votre salle de bain',
-        features: ['Design sur mesure', 'Matériaux premium', 'Livraison clé en main']
-      },
-      {
-        name: 'Plomberie Générale',
-        description: 'Tous travaux de plomberie pour professionnels et particuliers',
-        features: ['Mise aux normes', 'Garantie décennale', 'SAV réactif']
-      }
-    ],
-    heroTitle: 'Votre Expert Plomberie',
-    heroSubtitle: "Intervention d'excellence et garantie dans toute la région",
-    aboutText: "Artisan certifié spécialisé dans les interventions premium. Nous garantissons un service d'excellence, réactif et doté d'une finition parfaite.",
-    ctaText: 'Obtenir une intervention'
+// ── BANQUE D'IMAGES CURÉES (2026) ──
+const CURATED: Record<string, string[]> = {
+  restaurant: [
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&fit=crop"
+  ],
+  coiffeur: [
+    "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=800&fit=crop"
+  ],
+  garage: [
+    "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&fit=crop"
+  ],
+  plomberie: [
+    "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1607472586893-edb57cb64e2c?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&fit=crop"
+  ],
+  default: [
+    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&fit=crop"
+  ]
+};
+
+// ── THEMES MULTIPLES POUR EVITER DE SE REPETER ──
+const THEMES = {
+  modernLight: { 
+    bgBase: '#f8fafc', bgSurface: '#ffffff', textMain: '#0f172a', textMuted: '#64748b', 
+    glassCode: 'background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);'
   },
-  electricien: {
-    primary: '#ef4444',
-    secondary: '#b91c1c',
-    accent: '#f87171',
-    background: '#0B0A0F',
-    services: [
-      {
-        name: 'Mise aux Normes',
-        description: 'Mise en conformité totale de votre installation',
-        features: ['Consuel garanti', 'Normes NFC 15-100', 'Diagnostic de sécurité']
-      },
-      {
-        name: 'Tableau Électrique',
-        description: 'Installation et rénovation de tableaux électriques',
-        features: ['Sécurité certifiée', 'Marques premium', 'Protection optimale']
-      },
-      {
-        name: 'Éclairage Architectonique',
-        description: 'Mise en lumière moderne et design',
-        features: ['LED Premium', 'Étude photométrique', 'Contrôle à distance']
-      },
-      {
-        name: 'Maison Connectée',
-        description: 'Installation de systèmes domotiques intelligents',
-        features: ['Gestion smartphone', 'Scénarios de vie', 'Sécurité']
-      },
-      {
-        name: 'Dépannage Électrique',
-        description: 'Diagnostic pointu et réparation instantanée',
-        features: ['Intervention 24/7', 'Outils de précision', 'Fiabilité totale']
-      },
-      {
-        name: 'Diagnostic Complet',
-        description: 'Bilan de votre installation électrique',
-        features: ['Rapport détaillé', 'Conseil expert', 'Devis chiffré']
-      }
-    ],
-    heroTitle: 'Excellence Électrique',
-    heroSubtitle: "L'énergie sûre et connectée, maîtrisée par des experts",
-    aboutText: "Entreprise d'électricité qualifiée, nous concevons, installons et sécurisons vos réseaux avec des technologies de pointe.",
-    ctaText: 'Demander un diagnostic'
+  premiumDark: {
+    bgBase: '#020617', bgSurface: '#0f172a', textMain: '#f8fafc', textMuted: '#94a3b8',
+    glassCode: 'background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);'
   },
-  coiffeur: {
-    primary: '#8b5cf6',
-    secondary: '#6d28d9',
-    accent: '#a78bfa',
-    background: '#0B0A0F',
-    services: [
-      {
-        name: 'Création Femme',
-        description: 'Coupe tendance et sur-mesure pour sublimer votre visage',
-        features: ['Visagisme', 'Techniques modernes', 'Coiffage wavy']
-      },
-      {
-        name: 'Barber & Homme',
-        description: 'Service barbier authentique et coupes structurées',
-        features: ['Tracé millimétré', 'Soins barbe bio', 'Finition rasoir']
-      },
-      {
-        name: 'Coloration Premium',
-        description: 'Nuances parfaites, balayages subtils et respect du cheveu',
-        features: ['Poudres naturelles', 'Ombré Hair', 'Protection Olaplex']
-      },
-      {
-        name: 'Soin Profond',
-        description: 'Rituels de soin luxueux pour une fibre capillaire réparée',
-        features: ['Botox capillaire', 'Bain hydratant', 'Massage crânien relaxant']
-      },
-      {
-        name: 'Extensions',
-        description: 'Longueur et volume avec des extensions 100% naturelles',
-        features: ['Kératine ou bandes', 'Invisible', 'Durabilité maximum']
-      },
-      {
-        name: 'Haute Coiffure',
-        description: 'Chignons et attaches pour vos plus beaux événements',
-        features: ['Mariage', 'Essai personnalisé', 'Tenue parfaite']
-      }
-    ],
-    heroTitle: "L'Atelier de Coiffure",
-    heroSubtitle: "Révélez votre beauté entre les mains d'experts passionnés",
-    aboutText: "Un salon d'exception où chaque détail est pensé pour votre bien-être. Notre équipe artistique maîtrise les techniques les plus sophistiquées.",
-    ctaText: 'Réserver mon moment'
+  neonCyber: {
+    bgBase: '#09090b', bgSurface: '#18181b', textMain: '#fafafa', textMuted: '#a1a1aa',
+    glassCode: 'background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);'
   },
-  restaurant: {
-    primary: '#d97706',
-    secondary: '#b45309',
-    accent: '#f59e0b',
-    background: '#0B0A0F',
-    services: [
-      {
-        name: 'Carte Signature',
-        description: "Une cuisine d'inspiration, moderne et de saison",
-        features: ['Produits exceptionnels', "Ferme à l'assiette", 'Végétarien disponible']
-      },
-      {
-        name: 'Menu Dégustation',
-        description: 'Le voyage culinaire ultime en plusieurs temps',
-        features: ['Accord Mets & Vins', '7 services', 'Surprise du Chef']
-      },
-      {
-        name: "Cave d'Exception",
-        description: 'Notre sommelier vous guide à travers nos meilleurs flacons',
-        features: ['Vignobles rares', 'Grands crus', 'Mixologie créative']
-      },
-      {
-        name: 'Privatisation',
-        description: 'Des espaces élégants pour vos événements privés',
-        features: ['Service dédié', 'Menus personnalisés', "Jusqu'à 100 convives"]
-      },
-      {
-        name: 'Brunch Premium',
-        description: 'Le rendez-vous dominical incontournable et généreux',
-        features: ['Buffet Signature', 'Viennoiseries maison', 'Jus fraîchement pressés']
-      },
-      {
-        name: 'Service Traiteur',
-        description: "L'excellence de notre cuisine où vous le souhaitez",
-        features: ['Cocktails chics', 'Dîners de gala', 'Mise en scène']
-      }
-    ],
-    heroTitle: 'Expérience Culinaire Unique',
-    heroSubtitle: "L'harmonie parfaite entre gastronomie moderne et atmosphère élégante",
-    aboutText: 'Nous repoussons les limites de la tradition culinaire pour offrir un moment inoubliable, où les produits nobles racontent une histoire dans chaque assiette.',
-    ctaText: 'Réserver une table'
-  },
-  garage: {
-    primary: '#10b981',
-    secondary: '#047857',
-    accent: '#34d399',
-    background: '#0B0A0F',
-    services: [
-      {
-        name: 'Diagnostic Électronique',
-        description: 'Analyse précise de tous les calculateurs de votre véhicule',
-        features: ['Valises constructeurs', 'Lecture de codes pannes', 'Effacement']
-      },
-      {
-        name: 'Entretien Constructeur',
-        description: 'Révisions respectant scrupuleusement les cahiers des charges',
-        features: ['Maintien garantie', 'Pièces origine', 'Huile premium']
-      },
-      {
-        name: 'Liaison au Sol',
-        description: 'Techniciens experts en pneumatique et comportement',
-        features: ['Géométrie 3D', 'Pneus Haute Perf', 'Amortisseurs']
-      },
-      {
-        name: 'Carrosserie Premium',
-        description: 'Restauration esthétique parfaite sans différence de teinte',
-        features: ['Spectromètre', 'Cabine de chauffe', 'Detaling inclus']
-      },
-      {
-        name: 'Moteur & Boîte',
-        description: 'Interventions lourdes, remplacement de distribution ou embrayage',
-        features: ['Outillage spécifique', 'Reconditionnement', 'Vidange BVA']
-      },
-      {
-        name: 'Voitures de Prestige',
-        description: 'Une équipe spécialisée dans les véhicules sportifs et luxe',
-        features: ['Manipulation soigneuse', 'Local sécurisé', 'Expertise pointue']
-      }
-    ],
-    heroTitle: 'Le Pôle Mécanique Prémium',
-    heroSubtitle: "L'expertise absolue pour sublimer et entretenir votre véhicule",
-    aboutText: "Notre garage de pointe rassemble l'élite des techniciens pour offrir à votre véhicule un entretien sans compromis.",
-    ctaText: 'Prendre rendez-vous atelier'
-  },
-  default: {
-    primary: '#ffffff',
-    secondary: '#d4d4d4',
-    accent: '#f5f5f5',
-    background: '#0B0A0F',
-    services: [
-      {
-        name: 'Consultation Experte',
-        description: 'Analyse approfondie de vos besoins stratégiques',
-        features: ['Diagnostic sur mesure', "Plan d'action", 'Écoute active']
-      },
-      {
-        name: 'Solutions Premium',
-        description: 'Implémentation de services à forte valeur ajoutée',
-        features: ['Qualité irréprochable', 'Suivi de performance', 'Finitions parfaites']
-      },
-      {
-        name: 'Accompagnement VIP',
-        description: 'Un interlocuteur dédié tout au long du processus',
-        features: ['Ligne directe', 'RDV prioritaire', 'Bilan mensuel']
-      },
-      {
-        name: 'Innovation & Technologie',
-        description: 'Utilisation des meilleurs outils du marché',
-        features: ['Méthodes agiles', 'Veille constante', 'Equipement de pointe']
-      },
-      {
-        name: 'Stratégie Sur-Mesure',
-        description: 'Vos objectifs se transforment en résultats mesurables',
-        features: ['ROI assuré', 'Alignement parfait', 'Transparence absolue']
-      },
-      {
-        name: 'Service Client 24/7',
-        description: 'Une présence permanente quand vous avez besoin de nous',
-        features: ['Assistance immédiate', 'Proactivité', 'Garanties solides']
-      }
-    ],
-    heroTitle: "Services Professionnels d'Excellence",
-    heroSubtitle: "L'alliance de la rigueur et de l'innovation pour votre réussite",
-    aboutText: "Nous bâtissons des relations durables basées sur la performance et l'intégrité. Notre ambition est d'élever vos standards et de vous accompagner vers le succès absolu.",
-    ctaText: 'Initier notre collaboration'
+  natureBento: {
+    bgBase: '#fdfbf7', bgSurface: '#ffffff', textMain: '#1c1917', textMuted: '#78716c',
+    glassCode: 'background: #ffffff; border-radius: 24px; border: 1px solid #e7e5e4; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);'
   }
 };
+
+const SECTOR_ULTIMATE_TEMPLATES = {
+  plomberie: { theme: THEMES.modernLight, primary: '#0ea5e9', secondary: '#0284c7', bgTexture: 'water' },
+  electricien: { theme: THEMES.premiumDark, primary: '#f59e0b', secondary: '#d97706', bgTexture: 'grid' },
+  coiffeur: { theme: THEMES.natureBento, primary: '#ec4899', secondary: '#be185d', bgTexture: 'soft' },
+  restaurant: { theme: THEMES.premiumDark, primary: '#ef4444', secondary: '#b91c1c', bgTexture: 'grain' },
+  garage: { theme: THEMES.neonCyber, primary: '#3b82f6', secondary: '#1d4ed8', bgTexture: 'grid' },
+  default: { theme: THEMES.modernLight, primary: '#6366f1', secondary: '#4f46e5', bgTexture: 'soft' }
+};
+
+// ── FONCTIONS UTILITAIRES ──
+function getLogoName(fullName: string): string {
+  const skip = ['le', 'la', 'les', 'de', 'du', 'des', "l'"];
+  const words = (fullName || 'Entreprise').trim().toLowerCase().split(/\s+/);
+  const filtered = words.filter(w => !skip.includes(w));
+  if (filtered.length === 0) return 'Logo';
+  return filtered.slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+function getInitials(fullName: string): string {
+  const words = getLogoName(fullName).split(' ');
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  return fullName.substring(0, 2).toUpperCase();
+}
 
 function getUltimateTemplate(sector: string) {
   const normalizedSector = (sector || '').toLowerCase();
   for (const [key, template] of Object.entries(SECTOR_ULTIMATE_TEMPLATES)) {
     if (normalizedSector.includes(key)) return template;
   }
-  if (normalizedSector.includes('médec') || normalizedSector.includes('clinique') || normalizedSector.includes('dentiste')) {
-    return { ...SECTOR_ULTIMATE_TEMPLATES.default, primary: '#0ea5e9', secondary: '#0284c7' };
+  if (normalizedSector.includes('médec') || normalizedSector.includes('cliniq')) {
+    return { theme: THEMES.modernLight, primary: '#14b8a6', secondary: '#0d9488', bgTexture: 'soft' };
   }
-  if (normalizedSector.includes('avocat') || normalizedSector.includes('notaire') || normalizedSector.includes('juridi')) {
-    return { ...SECTOR_ULTIMATE_TEMPLATES.default, primary: '#cda652', secondary: '#9b7c3d' };
-  }
-  if (normalizedSector.includes('beauté') || normalizedSector.includes('esthétique') || normalizedSector.includes('spa')) {
-    return { ...SECTOR_ULTIMATE_TEMPLATES.coiffeur, primary: '#ec4899', secondary: '#be185d' };
-  }
-  if (normalizedSector.includes('boulanger') || normalizedSector.includes('pâtissier')) {
-    return SECTOR_ULTIMATE_TEMPLATES.restaurant;
+  if (normalizedSector.includes('avocat') || normalizedSector.includes('notaire')) {
+    return { theme: THEMES.natureBento, primary: '#b45309', secondary: '#92400e', bgTexture: 'grain' };
   }
   return SECTOR_ULTIMATE_TEMPLATES.default;
 }
 
-// 🎯 On accepte maintenant le contenu généré par l'IA (aiContent)
+// 🎯 GENERATEUR PRINCIPAL
 export function generateUltimateSite(lead: any, aiContent?: any): string {
   const template = getUltimateTemplate(lead.sector);
   const companyName = lead.name || 'Entreprise Premium';
-  const city = lead.city || '';
-  const phone = lead.phone || '';
-  const email = lead.email || '';
-  const address = lead.address || '';
+  const city = lead.city || 'votre ville';
+  const phone = lead.phone || '01 23 45 67 89';
+  const email = lead.email || 'contact@' + (lead.website ? lead.website.replace('https://', '').replace('http://', '').replace(/\/.*$/, '') : 'site.fr');
+  const address = lead.address || `Centre-ville, ${city}`;
   const website = lead.website || '';
-  const rating = lead.googleRating || 0;
-  const reviews = lead.googleReviews || 0;
+  const rating = lead.googleRating || 5;
+  const reviews = lead.googleReviews || 124;
   
-  // Utiliser le contenu IA s'il existe, sinon fallback au template
-  const description = aiContent?.aboutText || lead.description || template.aboutText;
-  const heroTitle = aiContent?.heroTitle || template.heroTitle;
-  const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle}${city ? ' à ' + city : ''}`;
-  const ctaText = aiContent?.cta || template.ctaText;
+  // Utiliser le contenu IA
+  const description = aiContent?.aboutText || lead.description || `Expertise professionnelle reconnue à ${city}. Nous vous accompagnons dans tous vos projets avec passion et rigueur.`;
+  const heroTitle = aiContent?.heroTitle || `L'excellence professionnelle à ${city}`;
+  const heroSubtitle = aiContent?.heroSubtitle || "Nous combinons savoir-faire d'exception et service client haut de gamme pour des résultats garantis.";
+  const ctaText = aiContent?.cta || "Contactez-nous aujourd'hui";
   
-  // Utiliser les services IA s'ils existent et ont le bon format
-  let finalServices = template.services;
-  if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
-    finalServices = aiContent.services.map((s: any, idx: number) => ({
-      name: s.name || `Service ${idx+1}`,
-      description: s.description || '',
-      features: template.services[idx % template.services.length].features // garder les belles features HTML par défaut
+  // Services
+  let finalServices = [
+    { name: 'Consultation Sur Mesure', description: 'Une approche 100% personnalisée pour comprendre et répondre à vos attentes exactes.', features: ['Devis gratuit', 'Diagnostic complet', 'Écoute active'] },
+    { name: 'Intervention Rapide', description: 'Une réactivité sans faille pour traiter vos demandes dans les meilleurs délais possibles.', features: ['Disponibilité 7j/7', 'Service prioritaire', 'Délais respectés'] },
+    { name: 'Garantie Qualité', description: "Des finitions impeccables et des garanties solides pour votre totale tranquillité d'esprit.", features: ['Matériaux premium', 'Garantie décennale', 'Suivi rigoureux'] }
+  ];
+  if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length >= 3) {
+    finalServices = aiContent.services.slice(0, 6).map((s: any) => ({
+      name: s.name || 'Service Premium',
+      description: s.description || 'Description du service',
+      features: ['Qualité supérieure', 'Intervention rapide', 'Satisfaction garantie']
     }));
   }
 
-  // Avis Google réels
-  const testimonials = (lead.googleReviewsData || []).slice(0, 3).map((review: any) => ({
-    author: review.author || 'Client VIP',
-    text: review.text || "Une prestation d'une qualité rare. L'équipe a su répondre à mes exigences avec une perfection remarquable. Je recommande les yeux fermés.",
-    rating: review.rating || 5,
-    date: review.date || ''
-  }));
+  // Images (Lead ou Curées)
+  let rawImgs = lead.images || lead.websiteImages || [];
+  if (!Array.isArray(rawImgs) || rawImgs.length === 0) {
+    const s = (lead.sector || '').toLowerCase();
+    rawImgs = CURATED.default;
+    for (const k of Object.keys(CURATED)) {
+      if (s.includes(k)) { rawImgs = CURATED[k]; break; }
+    }
+  }
+  const images = rawImgs.slice(0, 6);
 
+  // Avis
+  let testimonials = (lead.googleReviewsData || []).slice(0, 4).map((r: any) => ({
+    author: r.author || 'Client Vérifié', text: r.text || 'Service magnifique et très professionnel. Je recommande vivement !', rating: r.rating || 5, date: r.date || ''
+  }));
   if (testimonials.length === 0) {
-    testimonials.push(
-      { author: 'Emma L.', text: "Une expérience tout simplement majestueuse. Rapidité, précision et professionnalisme impressionnant.", rating: 5, date: 'Il y a 1 semaine' },
-      { author: 'Arthur D.', text: "Service d'excellence du début à la fin. Les promesses sont tenues et même dépassées. Merci à toute l'équipe.", rating: 5, date: 'Il y a 2 semaines' }
-    );
+    testimonials = [
+      { author: 'Sophie M.', text: "Un travail vraiment remarquable. L'équipe a été très à l'écoute et le résultat dépasse mes attentes.", rating: 5 },
+      { author: 'Thomas J.', text: "Je suis entièrement satisfait de la prestation. Rapidité, efficacité et professionnalisme de bout en bout.", rating: 5 },
+      { author: 'Marie D.', text: "Excellent rapport qualité/prix. Des artisans qui connaissent vraiment leur métier.", rating: 5 }
+    ];
   }
 
   const content: UltimateContent = {
-    companyName,
-    sector: lead.sector || 'Professionnel',
-    city,
-    description,
-    phone,
-    email,
-    address,
-    website,
-    rating,
-    reviews,
-    services: finalServices,
-    testimonials,
-    heroTitle,
-    heroSubtitle,
-    aboutText: description,
-    ctaText
+    companyName, sector: lead.sector || 'Expert', city, description, phone, email, address, website,
+    rating, reviews, services: finalServices, testimonials, heroTitle, heroSubtitle, aboutText: description, ctaText, images
   };
 
   return buildUltimateHTML(content, template);
 }
 
 function buildUltimateHTML(content: UltimateContent, template: any): string {
-  const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, rating, reviews } = content;
-  
-  const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '#ffffff');
-    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 255, 255';
-  };
-  const primaryRgb = hexToRgb(template.primary);
+  const { companyName, heroTitle, heroSubtitle, aboutText, ctaText, services, testimonials, phone, email, address, images, rating, reviews } = content;
+  const th = template.theme;
+  const logoName = getLogoName(companyName);
+  const initials = getInitials(companyName);
+  const waPhone = phone.replace(/[^0-9]/g, '');
 
   return `<!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${companyName} - ${content.sector}</title>
+    <title>${companyName} - ${content.sector} ${content.city ? 'à '+content.city : ''}</title>
     
-    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+    <!-- Polices 2026 : Outfit (Titres) et Plus Jakarta Sans (Corps de texte) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Lucide Icons -->
+    <!-- Icônes Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
             --primary: ${template.primary};
             --secondary: ${template.secondary};
-            --primary-rgb: ${primaryRgb};
-            
-            /* Premium Dark Mode Colors */
-            --bg-base: #0a0a0c;
-            --bg-surface: rgba(255, 255, 255, 0.03);
-            --bg-glass: rgba(18, 18, 20, 0.4);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            
-            --text-main: #FFFFFF;
-            --text-muted: #A1A1AA;
-            
-            --glow: 0 0 40px rgba(${primaryRgb}, 0.2);
-            --glow-strong: 0 0 60px rgba(${primaryRgb}, 0.4);
+            --bg-base: ${th.bgBase};
+            --bg-surface: ${th.bgSurface};
+            --text-main: ${th.textMain};
+            --text-muted: ${th.textMuted};
+            --glass: ${th.glassCode};
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -409,518 +214,522 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-base);
             color: var(--text-main);
-            overflow-x: hidden;
             line-height: 1.7;
+            overflow-x: hidden;
         }
 
-        h1, h2, h3, h4, .brand-font {
+        h1, h2, h3, h4, h5, h6, .brand-font {
             font-family: 'Outfit', sans-serif;
+            font-weight: 700;
         }
 
-        /* Abstract Animated Background */
-        .bg-blobs {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+        /* ── MARQUEE TOP BAR ── */
+        .top-bar {
+            background-color: var(--primary);
+            color: #fff;
+            padding: 8px 0;
+            font-size: 0.85rem;
+            font-weight: 600;
             overflow: hidden;
-            z-index: -1;
-            background: #030305;
+            white-space: nowrap;
+            position: relative;
+            z-index: 100;
         }
-        .blob {
-            position: absolute;
-            filter: blur(120px);
-            opacity: 0.3;
-            animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 50%;
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
         }
-        .blob-1 {
-            background: var(--primary);
-            width: 45vw; height: 45vw;
-            top: -10vw; left: -10vw;
-        }
-        .blob-2 {
-            background: var(--secondary);
-            width: 35vw; height: 35vw;
-            bottom: -5vw; right: -5vw;
-            animation-delay: -10s;
-        }
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(15vw, 15vh) scale(1.1); }
-        }
+        .marquee-content span { margin-right: 40px; display: inline-flex; align-items: center; gap: 6px; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* Glassmorphism Components */
-        .glass {
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Navigation */
+        /* ── NAVBAR ── */
         nav {
-            position: fixed;
-            top: 0; width: 100%;
-            z-index: 50;
-            padding: 1.5rem 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        nav.scrolled {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 90;
             padding: 1rem 0;
-            background: rgba(10, 10, 12, 0.85);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-glass);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            ${th.glassCode}
+            border-top: none; border-left: none; border-right: none;
+            border-radius: 0;
         }
         .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            max-width: 1300px; margin: 0 auto; padding: 0 2rem;
+            display: flex; justify-content: space-between; align-items: center;
         }
         .brand {
-            font-size: 1.75rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: #fff;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            display: flex; align-items: center; gap: 12px;
+            font-size: 1.5rem; color: var(--text-main); text-decoration: none; font-weight: 800;
         }
-        .brand svg { color: var(--primary); }
+        .logo-svg {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+        .nav-links a:hover { color: var(--primary); }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff; padding: 0.8rem 1.8rem; border-radius: 100px;
+            font-weight: 600; text-decoration: none; border: none; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
 
-        .btn-call {
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass);
-            color: white; padding: 0.5rem 1.25rem; border-radius: 100px;
-            text-decoration: none; font-weight: 600; transition: all 0.3s;
-        }
-        .btn-call:hover {
-            background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);
-        }
-
-        /* Hero Section */
+        /* ── HERO ── */
         .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 8rem 2rem 5rem;
             text-align: center;
-            padding: 8rem 2rem 4rem;
             position: relative;
-        }
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1.25rem;
-            border-radius: 100px;
-            background: rgba(${primaryRgb}, 0.1);
-            border: 1px solid rgba(${primaryRgb}, 0.2);
-            color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            backdrop-filter: blur(10px);
         }
         .hero h1 {
-            font-size: clamp(3rem, 8vw, 6.5rem);
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -0.04em;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.5) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--text-main), var(--text-muted));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         .hero p {
-            font-size: clamp(1.125rem, 3vw, 1.375rem);
-            color: var(--text-muted);
-            max-width: 700px;
-            margin: 0 auto 3.5rem;
-            font-weight: 400;
+            font-size: clamp(1.1rem, 2vw, 1.25rem); color: var(--text-muted);
+            max-width: 700px; margin: 0 auto 2.5rem;
         }
-        .btn-glow {
-            background: var(--primary);
-            color: ${template.primary === '#ffffff' ? '#000' : '#fff'};
-            padding: 1.25rem 2.5rem;
-            border-radius: 100px;
-            font-size: 1.125rem;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: var(--glow);
-            border: none;
-        }
-        .btn-glow:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: var(--glow-strong);
-        }
+        .hero-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
 
-        /* Container & Sections */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 6rem 2rem;
-            position: relative;
-            z-index: 10;
-        }
-        .section-header {
-            text-align: center;
-            margin-bottom: 5rem;
-        }
-        .section-header h2 {
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
-            margin-bottom: 1.25rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 1.125rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Services Grid */
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-        }
+        /* ── CONTAINERS & SECTIONS ── */
+        .section { padding: 6rem 2rem; }
+        .container { max-width: 1300px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-header h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1rem; }
+        
+        /* ── CARDS (Services) ── */
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
         .card {
-            padding: 3rem;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            padding: 2.5rem;
+            ${th.glassCode}
+            border-radius: 24px;
+            transition: transform 0.3s;
+            height: 100%; display: flex; flex-direction: column;
         }
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
-            z-index: 0;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .card:hover::before { opacity: 1; }
-        .card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(${primaryRgb}, 0.4);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--glow);
-        }
-        .card > * { position: relative; z-index: 1; }
-        
+        .card:hover { transform: translateY(-8px); border-color: var(--primary); }
         .card-icon {
-            width: 70px; height: 70px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, rgba(${primaryRgb}, 0.2), rgba(${primaryRgb}, 0.05));
-            border: 1px solid rgba(${primaryRgb}, 0.2);
-            display: flex; align-items: center; justify-content: center;
-            color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
-            margin-bottom: 2rem;
+            width: 50px; height: 50px; border-radius: 14px;
+            background: rgba(var(--primary), 0.1); color: var(--primary);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
         }
-        .card-icon svg { width: 32px; height: 32px; }
         
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            font-weight: 700;
+        /* ── GALLERY / BENTO ── */
+        .bento-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
-        .card p {
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            flex-grow: 1;
+        .bento-item {
+            border-radius: 24px; overflow: hidden; position: relative;
+            height: 300px;
         }
-        .feature-list {
-            list-style: none;
-            border-top: 1px solid var(--border-glass);
-            padding-top: 1.5rem;
+        .bento-item img {
+            width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;
         }
-        .feature-list li {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: #E4E4E7;
-            margin-bottom: 0.75rem;
-            font-size: 0.95rem;
-        }
-        .feature-list i {
-            color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
-            width: 18px; height: 18px;
+        .bento-item:hover img { transform: scale(1.05); }
+
+        /* ── MAP & CONTACT FORM ── */
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+        @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
+        .map-container { border-radius: 24px; overflow: hidden; height: 100%; min-height: 400px; }
+        .form-container { ${th.glassCode}; padding: 3rem; border-radius: 24px; }
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        .input-group input, .input-group textarea {
+            width: 100%; padding: 1rem; border-radius: 12px;
+            background: var(--bg-base); border: 1px solid var(--text-muted); color: var(--text-main);
+            font-family: inherit;
         }
 
-        /* About Grid */
-        .about-wrap {
-            display: grid; grid-template-columns: 1.2fr 0.8fr;
-            gap: 5rem; align-items: center;
+        /* ── FOOTER ── */
+        footer {
+            background: #0f172a; color: #94a3b8;
+            padding: 5rem 2rem 2rem; border-top: 1px solid #1e293b;
         }
-        @media (max-width: 992px) { .about-wrap { grid-template-columns: 1fr; gap: 3rem; } }
+        .footer-grid {
+            max-width: 1300px; margin: 0 auto; display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem;
+        }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+        @media (max-width: 500px) { .footer-grid { grid-template-columns: 1fr; } }
         
-        .stat-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+        .footer-logo { color: #fff; font-size: 1.5rem; font-weight: 800; font-family: 'Outfit'; margin-bottom: 1rem; display: block; }
+        .footer-title { color: #fff; font-weight: 700; margin-bottom: 1.5rem; font-family: 'Outfit'; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.75rem; }
+        .footer-links a { color: #94a3b8; text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: #fff; }
+        
+        /* ── WHATSAPP & BOT WIDGETS ── */
+        .bot-widget {
+            position: fixed; bottom: 20px; right: 20px; z-index: 999;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.3s;
         }
-        .stat-card {
-            padding: 2.5rem; text-align: center;
-            display: flex; flex-direction: column; justify-content: center;
+        .bot-widget:hover { transform: scale(1.1); }
+        .wa-widget {
+            position: fixed; bottom: 95px; right: 20px; z-index: 999;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: #25D366; color: white; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.3s; text-decoration: none;
         }
-        .stat-num {
-            font-size: 3.5rem; font-weight: 800; font-family: 'Outfit';
-            background: linear-gradient(135deg, var(--text-main) 0%, var(--text-muted) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-            line-height: 1;
-        }
+        .wa-widget:hover { transform: scale(1.1); }
 
-        /* Testimonials */
-        .testimonial-card {
-            padding: 3rem;
-            display: flex; flex-direction: column;
-            justify-content: space-between;
+        /* Window Chat */
+        .chat-window {
+            position: fixed; bottom: 90px; right: 20px; width: 350px; max-width: calc(100vw - 40px);
+            background: var(--bg-surface); border-radius: 20px; overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 1000;
+            display: none; flex-direction: column; border: 1px solid var(--text-muted);
         }
-        .stars { display: flex; gap: 0.25rem; color: #FBBF24; margin-bottom: 1.5rem; }
-        .stars svg { width: 20px; height: 20px; fill: currentColor; }
-        
-        /* CTA */
-        .cta-box {
-            text-align: center; padding: 6rem 3rem;
-            background: radial-gradient(circle at center, rgba(${primaryRgb}, 0.15) 0%, transparent 70%);
-            border: 1px solid var(--border-glass);
-            margin-top: 2rem;
-            position: relative; overflow: hidden;
-        }
-        
-        .contact-details {
-            display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; margin-top: 4rem;
-        }
-        .contact-item {
-            display: flex; align-items: center; gap: 0.75rem; font-size: 1.1rem;
-            color: var(--text-muted);
-        }
-        .contact-item svg { color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'}; }
+        .chat-window.active { display: flex; }
+        .chat-header { background: var(--primary); color: #fff; padding: 15px 20px; font-weight: 600; display: flex; justify-content: space-between; }
+        .chat-body { padding: 20px; height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 12px; max-width: 85%; font-size: 0.9rem; }
+        .msg.bot { background: rgba(var(--primary), 0.1); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 0; }
+        .msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
+        .chat-input { display: flex; padding: 10px; border-top: 1px solid var(--text-muted); }
+        .chat-input input { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-main); outline: none; }
+        .chat-input button { background: transparent; border: none; color: var(--primary); cursor: pointer; padding: 0 10px; }
 
-        /* Animation classes */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <!-- Dynamic Background -->
-    <div class="bg-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
+    <!-- MARQUEE -->
+    <div class="top-bar">
+        <div class="marquee-content">
+            <!-- Double pour effet infini -->
+            <span><i data-lucide="mail" size="14"></i> ${email}</span>
+            <span><i data-lucide="phone" size="14"></i> ${phone}</span>
+            <span><i data-lucide="map-pin" size="14"></i> ${address}</span>
+            <span><i data-lucide="clock" size="14"></i> Ouvert aujourd'hui 09:00 - 18:00</span>
+            <span><i data-lucide="mail" size="14"></i> ${email}</span>
+            <span><i data-lucide="phone" size="14"></i> ${phone}</span>
+            <span><i data-lucide="map-pin" size="14"></i> ${address}</span>
+            <span><i data-lucide="clock" size="14"></i> Ouvert aujourd'hui 09:00 - 18:00</span>
+        </div>
     </div>
 
-    <!-- Navigation -->
-    <nav id="navbar">
+    <!-- NAVBAR -->
+    <nav>
         <div class="nav-container">
             <a href="#" class="brand">
-                <i data-lucide="zap"></i>${companyName}
+                <div class="logo-svg brand-font">${initials}</div>
+                <span class="brand-font">${logoName}</span>
             </a>
-            ${phone ? `
-            <a href="tel:${phone}" class="btn-call">
-                <i data-lucide="phone"></i> ${phone}
-            </a>` : ''}
+            <div class="nav-links">
+                <a href="#services">Services</a>
+                <a href="#galerie">Réalisations</a>
+                <a href="#avis">Avis</a>
+            </div>
+            <a href="#contact" class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">
+                Devis Gratuit
+            </a>
         </div>
     </nav>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-content reveal active">
-            <div class="hero-badge">
-                <i data-lucide="star"></i> Service Premium Certifié
-            </div>
-            <h1>${heroTitle}</h1>
-            <p>${heroSubtitle}</p>
-            <div style="margin-top: 2rem;">
-                <a href="#services" class="btn-glow">
-                    Découvrir nos solutions <i data-lucide="arrow-right"></i>
+    <!-- HERO -->
+    <section class="hero reveal active">
+        <h1>${heroTitle}</h1>
+        <p>${heroSubtitle}</p>
+        <div class="hero-actions">
+            <a href="#contact" class="btn-primary">
+                ${ctaText} <i data-lucide="arrow-right"></i>
+            </a>
+            <a href="tel:${phone.replace(/\s/g, '')}" class="btn-primary" style="background: transparent; color: var(--text-main); border: 1px solid var(--text-muted); box-shadow: none;">
+                <i data-lucide="phone"></i> ${phone}
+            </a>
+        </div>
+        
+        <div style="margin-top: 4rem; display: flex; justify-content: center; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">
+            <span style="display:flex;align-items:center;gap:6px"><i data-lucide="check-circle-2" style="color:var(--primary)"></i> ${(rating || 0) > 0 ? `${rating}/5 Note Générale` : '100% Satisfaction'}</span>
+            <span style="display:flex;align-items:center;gap:6px"><i data-lucide="shield-check" style="color:var(--primary)"></i> Professionnel Confirmé</span>
+        </div>
+    </section>
+
+    <!-- A PROPOS -->
+    <section class="section" style="background: rgba(0,0,0,0.02);">
+        <div class="container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+            <div class="reveal">
+                <h2 class="brand-font">Notre Engagement Professionnel</h2>
+                <p style="font-size: 1.1rem; margin-bottom: 2rem;">${aboutText}</p>
+                <a href="#contact" style="color: var(--primary); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                    En savoir plus <i data-lucide="arrow-right" size="18"></i>
                 </a>
             </div>
+            <div class="reveal" style="position:relative; height: 400px; border-radius: 24px; overflow: hidden;">
+                <img src="${images[0] || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&fit=crop'}" alt="A propos" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
         </div>
     </section>
 
-    <!-- Services -->
-    <section class="container" id="services">
+    <!-- SERVICES -->
+    <section class="section container" id="services">
         <div class="section-header reveal">
-            <h2>Notre Expertise</h2>
-            <p>L'alliance parfaite de l'innovation et du savoir-faire pour des résultats hors normes.</p>
+            <h2 class="brand-font">Nos Domaines d'Expertise</h2>
+            <p>Découvrez l'ensemble de nos prestations conçues pour répondre à vos exigences.</p>
         </div>
-        
-        <div class="grid-3">
+        <div class="grid-cards">
             ${services.map((s, i) => `
-            <div class="card glass reveal" style="transition-delay: ${i * 100}ms">
-                <div class="card-icon">
-                    <i data-lucide="${['shield', 'layers', 'box', 'award', 'cpu', 'gem'][i%6]}"></i>
+            <div class="card reveal" style="transition-delay: ${(i%3) * 100}ms">
+                <div class="card-icon"><i data-lucide="${['briefcase','layers','check-square','trending-up','star','shield'][i%6]}"></i></div>
+                <h3 style="margin-bottom: 1rem;">${s.name}</h3>
+                <p style="flex-grow: 1;">${s.description}</p>
+            </div>
+            `).join('')}
+        </div>
+    </section>
+
+    <!-- GALERIE -->
+    ${images.length > 1 ? `
+    <section class="section container" id="galerie">
+        <div class="section-header reveal">
+            <h2 class="brand-font">Nos Réalisations</h2>
+            <p>Un aperçu concret de notre savoir-faire en images.</p>
+        </div>
+        <div class="bento-gallery">
+            ${images.slice(1, 5).map((img, i) => `
+            <div class="bento-item reveal" style="transition-delay: ${i * 100}ms">
+                <img src="${img}" alt="Réalisation ${i+1}" loading="lazy">
+            </div>
+            `).join('')}
+        </div>
+    </section>` : ''}
+
+    <!-- AVIS / FAQ -->
+    <section class="section" id="avis" style="background: var(--bg-surface); border-top: 1px solid var(--text-muted); border-bottom: 1px solid var(--text-muted);">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2 class="brand-font">Ce qu'ils pensent de nous</h2>
+            </div>
+            <div class="grid-cards">
+                ${testimonials.map((t, i) => `
+                <div class="card reveal" style="transition-delay: ${i * 100}ms">
+                    <div style="display:flex; gap: 4px; color:#f59e0b; margin-bottom:1rem;">${'<i data-lucide="star" style="fill:#f59e0b"></i>'.repeat(t.rating)}</div>
+                    <p style="font-style: italic; margin-bottom: 1.5rem; flex-grow:1;">"${t.text}"</p>
+                    <div style="font-weight:700;">${t.author}</div>
                 </div>
-                <h3>${s.name}</h3>
-                <p>${s.description}</p>
-                <ul class="feature-list">
-                    ${s.features.map(f => `
-                        <li><i data-lucide="check-circle-2"></i> ${f}</li>
-                    `).join('')}
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT & MAPS -->
+    <section class="section container" id="contact">
+        <div class="contact-grid">
+            <div class="reveal">
+                <h2 class="brand-font" style="font-size: 2.5rem; margin-bottom: 1.5rem;">Prêt à avancer ensemble ?</h2>
+                <p style="margin-bottom: 3rem;">Remplissez le formulaire ci-dessous ou venez nous rendre visite directement. Notre équipe vous répondra sous 24h ouvrées.</p>
+                
+                <div style="display:flex; flex-direction:column; gap:1.5rem; margin-bottom: 3rem;">
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <span class="card-icon" style="margin:0;width:40px;height:40px;"><i data-lucide="phone" size="18"></i></span>
+                        <span style="font-weight:600;">${phone}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <span class="card-icon" style="margin:0;width:40px;height:40px;"><i data-lucide="mail" size="18"></i></span>
+                        <span style="font-weight:600;">${email}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <span class="card-icon" style="margin:0;width:40px;height:40px;"><i data-lucide="map-pin" size="18"></i></span>
+                        <span style="font-weight:600;">${address}</span>
+                    </div>
+                </div>
+                
+                <!-- Google Maps (Embarqué dynamique) -->
+                <div class="map-container">
+                    <iframe 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        loading="lazy" 
+                        allowfullscreen 
+                        src="https://www.google.com/maps?q=${encodeURIComponent(companyName + ' ' + address)}&output=embed">
+                    </iframe>
+                </div>
+            </div>
+            
+            <div class="form-container reveal" style="transition-delay: 200ms;">
+                <h3 class="brand-font" style="margin-bottom: 2rem;">Demander un contact</h3>
+                <form onsubmit="event.preventDefault(); alert('Message envoyé avec succès ! Nous vous recontacterons très vite.');">
+                    <div class="input-group">
+                        <label>Votre nom complet</label>
+                        <input type="text" required placeholder="Jean Dupont">
+                    </div>
+                    <div class="input-group">
+                        <label>Numéro de téléphone</label>
+                        <input type="tel" required placeholder="06 00 00 00 00">
+                    </div>
+                    <div class="input-group">
+                        <label>Adresse Email</label>
+                        <input type="email" required placeholder="jean@email.com">
+                    </div>
+                    <div class="input-group">
+                        <label>Votre message ou demande détaillée</label>
+                        <textarea rows="4" required placeholder="Bonjour, j'aimerais obtenir un devis pour..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                        Envoyer ma demande
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER PROFESSIONNEL -->
+    <footer>
+        <div class="footer-grid">
+            <div>
+                <a href="#" class="footer-logo">${companyName}</a>
+                <p style="margin-bottom: 1.5rem; max-width: 300px;">${aboutText.substring(0, 120)}...</p>
+                <div style="display:flex; gap:15px;">
+                    <a href="#" style="color:#94a3b8;"><i data-lucide="facebook"></i></a>
+                    <a href="#" style="color:#94a3b8;"><i data-lucide="instagram"></i></a>
+                    <a href="#" style="color:#94a3b8;"><i data-lucide="linkedin"></i></a>
+                </div>
+            </div>
+            <div>
+                <div class="footer-title">Liens Rapides</div>
+                <ul class="footer-links">
+                    <li><a href="#">Accueil</a></li>
+                    <li><a href="#services">Nos Services</a></li>
+                    <li><a href="#galerie">Réalisations</a></li>
+                    <li><a href="#avis">Témoignages</a></li>
+                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </div>
-            `).join('')}
-        </div>
-    </section>
-
-    <!-- About / Stats -->
-    <section class="container">
-        <div class="about-wrap">
-            <div class="reveal">
-                <h2 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem;">
-                    Une vision axée sur <span style="color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};">l'excellence.</span>
-                </h2>
-                <p style="color: var(--text-muted); font-size: 1.125rem; margin-bottom: 2.5rem; line-height: 1.8;">
-                    ${aboutText}
-                </p>
-                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-                    <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.05); padding: 0.75rem 1.5rem; border-radius: 100px; border: 1px solid var(--border-glass);">
-                        <i data-lucide="check" style="color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};"></i> <span>Équipe Dédiée</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.05); padding: 0.75rem 1.5rem; border-radius: 100px; border: 1px solid var(--border-glass);">
-                        <i data-lucide="check" style="color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};"></i> <span>Innovation</span>
-                    </div>
-                </div>
+            <div>
+                <div class="footer-title">Légal</div>
+                <ul class="footer-links">
+                    <li><a href="#">Mentions Légales</a></li>
+                    <li><a href="#">Politique de confidentialité</a></li>
+                    <li><a href="#">CGV / CGU</a></li>
+                    <li><a href="#">Cookies</a></li>
+                </ul>
             </div>
-            
-            <div class="stat-grid reveal" style="transition-delay: 200ms">
-                ${(rating || 0) > 0 ? `
-                <div class="stat-card glass">
-                    <div class="stat-num">${rating}</div>
-                    <div style="color:var(--text-muted); font-weight: 500;">Note Globale</div>
-                </div>` : ''}
-                ${(reviews || 0) > 0 ? `
-                <div class="stat-card glass">
-                    <div class="stat-num">${reviews}+</div>
-                    <div style="color:var(--text-muted); font-weight: 500;">Avis Vérifiés</div>
-                </div>` : ''}
-                <div class="stat-card glass" ${(!rating && !reviews) ? 'style="grid-column: span 2;"' : ''}>
-                    <div class="stat-num">100%</div>
-                    <div style="color:var(--text-muted); font-weight: 500;">Satisfaction Client</div>
-                </div>
+            <div>
+                <div class="footer-title">Horaires</div>
+                <ul class="footer-links">
+                    <li><strong style="color:#fff">Lundi - Vendredi:</strong><br>09:00 - 18:00</li>
+                    <li><strong style="color:#fff">Samedi:</strong><br>10:00 - 16:00</li>
+                    <li><strong style="color:#fff">Dimanche:</strong><br>Fermé</li>
+                </ul>
             </div>
         </div>
-    </section>
-
-    <!-- Testimonials -->
-    ${testimonials && testimonials.length > 0 ? `
-    <section class="container" id="testimonials">
-        <div class="section-header reveal">
-            <h2>Ils nous font confiance</h2>
-            <p>Rejoignez nos clients VIP et vivez une expérience sans précédent.</p>
+        <div style="text-align:center; padding-top:2rem; border-top:1px solid #1e293b; color:#64748b; font-size:0.9rem;">
+            &copy; 2026 ${companyName}. Tous droits réservés. Créé par LeadForge AI.
         </div>
-        <div class="grid-3">
-            ${testimonials.map((t, i) => `
-            <div class="card testimonial-card glass reveal" style="transition-delay: ${i * 100}ms">
-                <div>
-                    <div class="stars">
-                        ${Array(t.rating).fill('<i data-lucide="star"></i>').join('')}
-                    </div>
-                    <p style="color: #fff; font-size: 1.125rem; font-style: italic; line-height: 1.8;">"${t.text}"</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 2rem; border-top: 1px solid var(--border-glass); padding-top: 1.5rem;">
-                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items:center; justify-content:center; font-weight: 700; color: ${template.primary === '#ffffff' ? '#000' : '#fff'}; font-size: 1.25rem;">
-                        ${t.author.charAt(0)}
-                    </div>
-                    <div>
-                        <div style="font-weight: 600; color: #fff;">${t.author}</div>
-                        ${t.date ? `<div style="font-size: 0.875rem; color: var(--text-muted);">${t.date}</div>` : ''}
-                    </div>
-                </div>
-            </div>
-            `).join('')}
+    </footer>
+
+    <!-- WIDGETS FLOTTANTS (WHATSAPP & CHATBOT) -->
+    <a href="https://wa.me/${waPhone}" target="_blank" class="wa-widget" aria-label="WhatsApp">
+        <i data-lucide="message-circle" size="28"></i>
+    </a>
+    
+    <div class="bot-widget" onclick="toggleChat()" aria-label="Chatbot IA">
+        <i data-lucide="bot" size="28"></i>
+    </div>
+
+    <!-- FENETRE DU CHATBOT -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span style="display:flex;align-items:center;gap:8px;"><i data-lucide="bot" size="18"></i> Assistant ${logoName}</span>
+            <i data-lucide="x" style="cursor:pointer;" onclick="toggleChat()"></i>
         </div>
-    </section>
-    ` : ''}
-
-    <!-- CTA & Footer -->
-    <section class="container">
-        <div class="cta-box glass reveal">
-            <h2 style="font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1.5rem; font-weight: 800;">
-                Prêt à collaborer ensemble ?
-            </h2>
-            <p style="color: var(--text-muted); font-size: 1.25rem; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-                ${content.ctaText} ou contactez-nous directement pour concevoir votre projet.
-            </p>
-            
-            ${phone ? `<a href="tel:${phone}" class="btn-glow" style="margin-bottom: 2rem;">
-                <i data-lucide="phone-call"></i> Appeler : ${phone}
-            </a>` : ''}
-
-            <div class="contact-details">
-                ${email ? `<div class="contact-item"><i data-lucide="mail"></i> ${email}</div>` : ''}
-                ${address ? `<div class="contact-item"><i data-lucide="map-pin"></i> ${address}</div>` : ''}
-                ${website ? `<div class="contact-item"><i data-lucide="globe"></i> ${website}</div>` : ''}
-            </div>
+        <div class="chat-body" id="chatBody">
+            <div class="msg bot">Bonjour ! Je suis l'assistant virtuel de ${companyName}. Comment puis-je vous aider aujourd'hui ? (Adresse, horaires, devis...)</div>
         </div>
-        
-        <footer style="margin-top: 6rem; padding-top: 2rem; border-top: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); flex-wrap: wrap; gap: 1rem;">
-            <div class="brand" style="font-size: 1.25rem; color: var(--text-muted);">
-                ${companyName}
-            </div>
-            <p style="font-size: 0.9rem;">&copy; ${new Date().getFullYear()} Tous droits réservés.</p>
-        </footer>
-    </section>
+        <form class="chat-input" onsubmit="handleChatSubmit(event)">
+            <input type="text" id="chatInput" placeholder="Posez votre question..." required>
+            <button type="submit"><i data-lucide="send" size="20"></i></button>
+        </form>
+    </div>
 
-    <!-- Scripts -->
+    <!-- SCRIPTS INTERACTIFS -->
     <script>
-        // Init Lucide Icons
+        // Init Icônes
         lucide.createIcons();
 
-        // Navbar Scroll Effect
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if(window.scrollY > 50) nav.classList.add('scrolled');
-            else nav.classList.remove('scrolled');
-        });
-
-        // Intersection Observer for Reveal Animations
-        const reveals = document.querySelectorAll('.reveal');
+        // Animation au défilement
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    observer.unobserve(entry.target);
-                }
+                if (entry.isIntersecting) entry.target.classList.add('active');
             });
-        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-        
-        reveals.forEach(reveal => observer.observe(reveal));
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        // Hover Effect on Cards (Glow follow mouse)
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.setProperty('--mouse-x', \`\${x}px\`);
-                card.style.setProperty('--mouse-y', \`\${y}px\`);
-            });
-        });
+        // CHATBOT LOGIC (VANILLA JS INTELLIGENT)
+        const chatWindow = document.getElementById('chatWindow');
+        const chatBody = document.getElementById('chatBody');
+        const chatInput = document.getElementById('chatInput');
+        
+        // Données d'entreprise pour le bot
+        const botKnowledge = {
+            address: "${address.replace(/"/g, '')}",
+            phone: "${phone}",
+            email: "${email}",
+            services: \`Nous proposons les services suivants : ${services.map(s => s.name).join(', ')}.\`,
+            about: "${aboutText.replace(/"/g, '').substring(0, 200)}..."
+        };
+
+        function toggleChat() {
+            chatWindow.classList.toggle('active');
+            if(chatWindow.classList.contains('active')) chatInput.focus();
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if(!text) return;
+            
+            // Message Utilisateur
+            appendMessage(text, 'user');
+            chatInput.value = '';
+            
+            // Simulation temps de réflexion
+            setTimeout(() => {
+                const answer = generateBotResponse(text.toLowerCase());
+                appendMessage(answer, 'bot');
+            }, 800);
+        }
+
+        function appendMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = 'msg ' + type;
+            div.textContent = text;
+            chatBody.appendChild(div);
+            // Auto-scroll to bottom
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function generateBotResponse(q) {
+            if(q.includes('adresse') || q.includes('ou') || q.includes('local')) 
+                return "Nous sommes situés à l'adresse suivante : " + botKnowledge.address;
+            if(q.includes('prix') || q.includes('devis') || q.includes('tarif')) 
+                return "Chaque projet étant unique, le mieux est de demander un devis gratuit via le formulaire sur cette page ou de nous appeler au " + botKnowledge.phone;
+            if(q.includes('service') || q.includes('fait') || q.includes('prestation')) 
+                return botKnowledge.services;
+            if(q.includes('horaire') || q.includes('ouvert') || q.includes('heure')) 
+                return "Nous sommes ouverts du lundi au vendredi de 09h00 à 18h00, et le samedi de 10h00 à 16h00.";
+            if(q.includes('contact') || q.includes('tel') || q.includes('mail')) 
+                return "Vous pouvez nous joindre au " + botKnowledge.phone + " ou par email à " + botKnowledge.email;
+            
+            return "Merci pour votre message. Pour une réponse précise, je vous invite à remplir le formulaire de contact ou à nous appeler directement. Puis-je vous aider avec autre chose (horaires, adresse, services...) ?";
+        }
     </script>
 </body>
 </html>`;
