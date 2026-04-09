@@ -101,23 +101,23 @@ export async function fetchSectorImages(
 
   console.log(`🖼️ ImageAgent: Searching images for sector "${sector}" | keywords: ${keywords[0]}`);
 
-  // Essayer Unsplash d'abord
-  if (config.unsplashKey && config.unsplashKey.length > 5) {
-    for (const keyword of keywords) {
-      if (results.length >= targetCount) break;
-      const imgs = await fetchUnsplashImages(keyword, config.unsplashKey, 4);
-      results.push(...imgs);
-      console.log(`🖼️ Unsplash "${keyword}": ${imgs.length} images trouvées`);
-    }
-  }
-
-  // Essayer Pexels si pas assez d'images
-  if (results.length < targetCount && config.pexelsKey && config.pexelsKey.length > 5) {
+  // Essayer Pexels EN PREMIER (pas de restriction de domaine, 200 req/h gratuit)
+  if (config.pexelsKey && config.pexelsKey.length > 5) {
     for (const keyword of keywords) {
       if (results.length >= targetCount) break;
       const imgs = await fetchPexelsImages(keyword, config.pexelsKey, 4);
       results.push(...imgs);
       console.log(`🖼️ Pexels "${keyword}": ${imgs.length} images trouvées`);
+    }
+  }
+
+  // Essayer Unsplash en SECOND (peut être bloqué en local/demo mode)
+  if (results.length < targetCount && config.unsplashKey && config.unsplashKey.length > 5) {
+    for (const keyword of keywords) {
+      if (results.length >= targetCount) break;
+      const imgs = await fetchUnsplashImages(keyword, config.unsplashKey, 4);
+      results.push(...imgs);
+      console.log(`🖼️ Unsplash "${keyword}": ${imgs.length} images trouvées`);
     }
   }
 
