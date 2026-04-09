@@ -530,8 +530,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const content = await generateContent(lead);
       console.log(`✅ Content generated for ${lead.name}`);
       
-      updateProgress({ step: '🎨 Génération du site premium...' });
-      const html = generatePremiumSiteHtml(lead, content);
+      updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
+      const html = generateUltimateSite(lead, content);
       console.log(`✅ HTML generated for ${lead.name}`);
       
       updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });

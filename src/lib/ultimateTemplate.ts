@@ -40,7 +40,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       {
         name: 'Chauffage & Climatisation',
         description: 'Installation et entretien de vos systèmes de chauffage',
-        features: ['Pompes à chaleur', 'Chaudières', 'Economie d\'énergie']
+        features: ['Pompes à chaleur', 'Chaudières', 'Economie d\\'énergie']
       },
       {
         name: 'Diagnostic Fuites',
@@ -59,8 +59,8 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       }
     ],
     heroTitle: 'Votre Expert Plomberie',
-    heroSubtitle: 'Intervention d\'excellence et garantie dans toute la région',
-    aboutText: 'Artisan certifié spécialisé dans les interventions premium. Nous garantissons un service d\'excellence, réactif et doté d\'une finition parfaite.',
+    heroSubtitle: 'Intervention d\\'excellence et garantie dans toute la région',
+    aboutText: 'Artisan certifié spécialisé dans les interventions premium. Nous garantissons un service d\\'excellence, réactif et doté d\\'une finition parfaite.',
     ctaText: 'Obtenir une intervention'
   },
   electricien: {
@@ -101,8 +101,8 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       }
     ],
     heroTitle: 'Excellence Électrique',
-    heroSubtitle: 'L\'énergie sûre et connectée, maîtrisée par des experts',
-    aboutText: 'Entreprise d\'électricité qualifiée, nous concevons, installons et sécurisons vos réseaux avec des technologies de pointe.',
+    heroSubtitle: 'L\\'énergie sûre et connectée, maîtrisée par des experts',
+    aboutText: 'Entreprise d\\'électricité qualifiée, nous concevons, installons et sécurisons vos réseaux avec des technologies de pointe.',
     ctaText: 'Demander un diagnostic'
   },
   coiffeur: {
@@ -142,21 +142,21 @@ const SECTOR_ULTIMATE_TEMPLATES = {
         features: ['Mariage', 'Essai personnalisé', 'Tenue parfaite']
       }
     ],
-    heroTitle: 'L\'Atelier de Coiffure',
-    heroSubtitle: 'Révélez votre beauté entre les mains d\'experts passionnés',
-    aboutText: 'Un salon d\'exception où chaque détail est pensé pour votre bien-être. Notre équipe artistique maîtrise les techniques les plus sophistiquées.',
+    heroTitle: 'L\\'Atelier de Coiffure',
+    heroSubtitle: 'Révélez votre beauté entre les mains d\\'experts passionnés',
+    aboutText: 'Un salon d\\'exception où chaque détail est pensé pour votre bien-être. Notre équipe artistique maîtrise les techniques les plus sophistiquées.',
     ctaText: 'Réserver mon moment'
   },
   restaurant: {
-    primary: '#f97316',
-    secondary: '#c2410c',
-    accent: '#fdba74',
+    primary: '#d97706',
+    secondary: '#b45309',
+    accent: '#f59e0b',
     background: '#0B0A0F',
     services: [
       {
         name: 'Carte Signature',
-        description: 'Une cuisine d\'inspiration, moderne et de saison',
-        features: ['Produits exceptionnels', 'Ferme à l\'assiette', 'Végétarien disponible']
+        description: 'Une cuisine d\\'inspiration, moderne et de saison',
+        features: ['Produits exceptionnels', 'Ferme à l\\'assiette', 'Végétarien disponible']
       },
       {
         name: 'Menu Dégustation',
@@ -164,28 +164,28 @@ const SECTOR_ULTIMATE_TEMPLATES = {
         features: ['Accord Mets & Vins', '7 services', 'Surprise du Chef']
       },
       {
-        name: 'Cave d\'Exception',
+        name: 'Cave d\\'Exception',
         description: 'Notre sommelier vous guide à travers nos meilleurs flacons',
         features: ['Vignobles rares', 'Grands crus', 'Mixologie créative']
       },
       {
         name: 'Privatisation',
         description: 'Des espaces élégants pour vos événements privés',
-        features: ['Service dédié', 'Menus personnalisés', 'Jusqu\'à 100 convives']
+        features: ['Service dédié', 'Menus personnalisés', 'Jusqu\\'à 100 convives']
       },
       {
         name: 'Brunch Premium',
         description: 'Le rendez-vous dominical incontournable et généreux',
-        features: ['Buffet Signature', 'Viennoiseries maison', 'Jus détox fraîchement pressés']
+        features: ['Buffet Signature', 'Viennoiseries maison', 'Jus fraîchement pressés']
       },
       {
         name: 'Service Traiteur',
-        description: 'L\'excellence de notre cuisine où vous le souhaitez',
+        description: 'L\\'excellence de notre cuisine où vous le souhaitez',
         features: ['Cocktails chics', 'Dîners de gala', 'Mise en scène']
       }
     ],
     heroTitle: 'Expérience Culinaire Unique',
-    heroSubtitle: 'L\'harmonie parfaite entre gastronomie moderne et atmosphère élégante',
+    heroSubtitle: 'L\\'harmonie parfaite entre gastronomie moderne et atmosphère élégante',
     aboutText: 'Nous repoussons les limites de la tradition culinaire pour offrir un moment inoubliable, où les produits nobles racontent une histoire dans chaque assiette.',
     ctaText: 'Réserver une table'
   },
@@ -227,8 +227,8 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       }
     ],
     heroTitle: 'Le Pôle Mécanique Prémium',
-    heroSubtitle: 'L\'expertise absolue pour sublimer et entretenir votre véhicule',
-    aboutText: 'Notre garage de pointe rassemble l\'élite des techniciens pour offrir à votre véhicule un entretien sans compromis.',
+    heroSubtitle: 'L\\'expertise absolue pour sublimer et entretenir votre véhicule',
+    aboutText: 'Notre garage de pointe rassemble l\\'élite des techniciens pour offrir à votre véhicule un entretien sans compromis.',
     ctaText: 'Prendre rendez-vous atelier'
   },
   default: {
@@ -240,7 +240,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       {
         name: 'Consultation Experte',
         description: 'Analyse approfondie de vos besoins stratégiques',
-        features: ['Diagnostic sur mesure', 'Plan d\'action', 'Écoute active']
+        features: ['Diagnostic sur mesure', 'Plan d\\'action', 'Écoute active']
       },
       {
         name: 'Solutions Premium',
@@ -268,9 +268,9 @@ const SECTOR_ULTIMATE_TEMPLATES = {
         features: ['Assistance immédiate', 'Proactivité', 'Garanties solides']
       }
     ],
-    heroTitle: 'Services Professionnels d\'Excellence',
-    heroSubtitle: 'L\'alliance de la rigueur et de l\'innovation pour votre réussite',
-    aboutText: 'Nous bâtissons des relations durables basées sur la performance et l\'intégrité. Notre ambition est d\'élever vos standards et de vous accompagner vers le succès absolu.',
+    heroTitle: 'Services Professionnels d\\'Excellence',
+    heroSubtitle: 'L\\'alliance de la rigueur et de l\\'innovation pour votre réussite',
+    aboutText: 'Nous bâtissons des relations durables basées sur la performance et l\\'intégrité. Notre ambition est d\\'élever vos standards et de vous accompagner vers le succès absolu.',
     ctaText: 'Initier notre collaboration'
   }
 };
@@ -295,7 +295,8 @@ function getUltimateTemplate(sector: string) {
   return SECTOR_ULTIMATE_TEMPLATES.default;
 }
 
-export function generateUltimateSite(lead: any): string {
+// 🎯 On accepte maintenant le contenu généré par l'IA (aiContent)
+export function generateUltimateSite(lead: any, aiContent?: any): string {
   const template = getUltimateTemplate(lead.sector);
   const companyName = lead.name || 'Entreprise Premium';
   const city = lead.city || '';
@@ -305,11 +306,27 @@ export function generateUltimateSite(lead: any): string {
   const website = lead.website || '';
   const rating = lead.googleRating || 0;
   const reviews = lead.googleReviews || 0;
-  const description = lead.description || template.aboutText;
   
+  // Utiliser le contenu IA s'il existe, sinon fallback au template
+  const description = aiContent?.aboutText || lead.description || template.aboutText;
+  const heroTitle = aiContent?.heroTitle || template.heroTitle;
+  const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle}${city ? ' à ' + city : ''}`;
+  const ctaText = aiContent?.cta || template.ctaText;
+  
+  // Utiliser les services IA s'ils existent et ont le bon format
+  let finalServices = template.services;
+  if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
+    finalServices = aiContent.services.map((s: any, idx: number) => ({
+      name: s.name || `Service ${idx+1}`,
+      description: s.description || '',
+      features: template.services[idx % template.services.length].features // garder les belles features HTML par défaut
+    }));
+  }
+
+  // Avis Google réels
   const testimonials = (lead.googleReviewsData || []).slice(0, 3).map((review: any) => ({
     author: review.author || 'Client VIP',
-    text: review.text || 'Une prestation d\'une qualité rare. L\'équipe a su répondre à mes exigences avec une perfection remarquable. Je recommande les yeux fermés.',
+    text: review.text || 'Une prestation d\\'une qualité rare. L\\'équipe a su répondre à mes exigences avec une perfection remarquable. Je recommande les yeux fermés.',
     rating: review.rating || 5,
     date: review.date || ''
   }));
@@ -317,7 +334,7 @@ export function generateUltimateSite(lead: any): string {
   if (testimonials.length === 0) {
     testimonials.push(
       { author: 'Emma L.', text: 'Une expérience tout simplement majestueuse. Rapidité, précision et professionnalisme impressionnant.', rating: 5, date: 'Il y a 1 semaine' },
-      { author: 'Arthur D.', text: 'Service d\'excellence du début à la fin. Les promesses sont tenues et même dépassées. Merci à toute l\'équipe.', rating: 5, date: 'Il y a 2 semaines' }
+      { author: 'Arthur D.', text: 'Service d\\'excellence du début à la fin. Les promesses sont tenues et même dépassées. Merci à toute l\\'équipe.', rating: 5, date: 'Il y a 2 semaines' }
     );
   }
 
@@ -332,12 +349,12 @@ export function generateUltimateSite(lead: any): string {
     website,
     rating,
     reviews,
-    services: template.services,
+    services: finalServices,
     testimonials,
-    heroTitle: template.heroTitle,
-    heroSubtitle: \`\${template.heroSubtitle}\${city ? ' à ' + city : ''}\`,
+    heroTitle,
+    heroSubtitle,
     aboutText: description,
-    ctaText: template.ctaText
+    ctaText
   };
 
   return buildUltimateHTML(content, template);
@@ -346,19 +363,18 @@ export function generateUltimateSite(lead: any): string {
 function buildUltimateHTML(content: UltimateContent, template: any): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, rating, reviews } = content;
   
-  // Extract RGB for glowing effects
   const hexToRgb = (hex: string) => {
     const result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex || '#ffffff');
-    return result ? \`\${parseInt(result[1], 16)}, \${parseInt(result[2], 16)}, \${parseInt(result[3], 16)}\` : '255, 255, 255';
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 255, 255';
   };
   const primaryRgb = hexToRgb(template.primary);
 
-  return \`<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>\${companyName} - \${content.sector}</title>
+    <title>${companyName} - ${content.sector}</title>
     
     <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -370,9 +386,9 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
 
     <style>
         :root {
-            --primary: \${template.primary};
-            --secondary: \${template.secondary};
-            --primary-rgb: \${primaryRgb};
+            --primary: ${template.primary};
+            --secondary: ${template.secondary};
+            --primary-rgb: ${primaryRgb};
             
             /* Premium Dark Mode Colors */
             --bg-base: #0a0a0c;
@@ -383,8 +399,8 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             --text-main: #FFFFFF;
             --text-muted: #A1A1AA;
             
-            --glow: 0 0 40px rgba(\${primaryRgb}, 0.2);
-            --glow-strong: 0 0 60px rgba(\${primaryRgb}, 0.4);
+            --glow: 0 0 40px rgba(${primaryRgb}, 0.2);
+            --glow-strong: 0 0 60px rgba(${primaryRgb}, 0.4);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -503,9 +519,9 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             gap: 0.5rem;
             padding: 0.5rem 1.25rem;
             border-radius: 100px;
-            background: rgba(\${primaryRgb}, 0.1);
-            border: 1px solid rgba(\${primaryRgb}, 0.2);
-            color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
+            background: rgba(${primaryRgb}, 0.1);
+            border: 1px solid rgba(${primaryRgb}, 0.2);
+            color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
             font-size: 0.875rem;
             font-weight: 600;
             margin-bottom: 2rem;
@@ -532,7 +548,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         }
         .btn-glow {
             background: var(--primary);
-            color: \${template.primary === '#ffffff' ? '#000' : '#fff'};
+            color: ${template.primary === '#ffffff' ? '#000' : '#fff'};
             padding: 1.25rem 2.5rem;
             border-radius: 100px;
             font-size: 1.125rem;
@@ -603,7 +619,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         .card:hover::before { opacity: 1; }
         .card:hover {
             transform: translateY(-8px);
-            border-color: rgba(\${primaryRgb}, 0.4);
+            border-color: rgba(${primaryRgb}, 0.4);
             box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--glow);
         }
         .card > * { position: relative; z-index: 1; }
@@ -611,10 +627,10 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         .card-icon {
             width: 70px; height: 70px;
             border-radius: 20px;
-            background: linear-gradient(135deg, rgba(\${primaryRgb}, 0.2), rgba(\${primaryRgb}, 0.05));
-            border: 1px solid rgba(\${primaryRgb}, 0.2);
+            background: linear-gradient(135deg, rgba(${primaryRgb}, 0.2), rgba(${primaryRgb}, 0.05));
+            border: 1px solid rgba(${primaryRgb}, 0.2);
             display: flex; align-items: center; justify-content: center;
-            color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
+            color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
             margin-bottom: 2rem;
         }
         .card-icon svg { width: 32px; height: 32px; }
@@ -643,7 +659,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             font-size: 0.95rem;
         }
         .feature-list i {
-            color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
+            color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};
             width: 18px; height: 18px;
         }
 
@@ -682,7 +698,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         /* CTA */
         .cta-box {
             text-align: center; padding: 6rem 3rem;
-            background: radial-gradient(circle at center, rgba(\${primaryRgb}, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle at center, rgba(${primaryRgb}, 0.15) 0%, transparent 70%);
             border: 1px solid var(--border-glass);
             margin-top: 2rem;
             position: relative; overflow: hidden;
@@ -695,7 +711,7 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             display: flex; align-items: center; gap: 0.75rem; font-size: 1.1rem;
             color: var(--text-muted);
         }
-        .contact-item svg { color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'}; }
+        .contact-item svg { color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'}; }
 
         /* Animation classes */
         .reveal {
@@ -721,12 +737,12 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
     <nav id="navbar">
         <div class="nav-container">
             <a href="#" class="brand">
-                <i data-lucide="zap"></i>\${companyName}
+                <i data-lucide="zap"></i>${companyName}
             </a>
-            \${phone ? \`
-            <a href="tel:\${phone}" class="btn-call">
-                <i data-lucide="phone"></i> \${phone}
-            </a>\` : ''}
+            ${phone ? `
+            <a href="tel:${phone}" class="btn-call">
+                <i data-lucide="phone"></i> ${phone}
+            </a>` : ''}
         </div>
     </nav>
 
@@ -736,8 +752,8 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
             <div class="hero-badge">
                 <i data-lucide="star"></i> Service Premium Certifié
             </div>
-            <h1>\${heroTitle}</h1>
-            <p>\${heroSubtitle}</p>
+            <h1>${heroTitle}</h1>
+            <p>${heroSubtitle}</p>
             <div style="margin-top: 2rem;">
                 <a href="#services" class="btn-glow">
                     Découvrir nos solutions <i data-lucide="arrow-right"></i>
@@ -754,20 +770,20 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         </div>
         
         <div class="grid-3">
-            \${services.map((s, i) => \`
-            <div class="card glass reveal" style="transition-delay: \${i * 100}ms">
+            ${services.map((s, i) => `
+            <div class="card glass reveal" style="transition-delay: ${i * 100}ms">
                 <div class="card-icon">
-                    <i data-lucide="\${['shield', 'layers', 'box', 'award', 'cpu', 'gem'][i%6]}"></i>
+                    <i data-lucide="${['shield', 'layers', 'box', 'award', 'cpu', 'gem'][i%6]}"></i>
                 </div>
-                <h3>\${s.name}</h3>
-                <p>\${s.description}</p>
+                <h3>${s.name}</h3>
+                <p>${s.description}</p>
                 <ul class="feature-list">
-                    \${s.features.map(f => \`
-                        <li><i data-lucide="check-circle-2"></i> \${f}</li>
-                    \`).join('')}
+                    ${s.features.map(f => `
+                        <li><i data-lucide="check-circle-2"></i> ${f}</li>
+                    `).join('')}
                 </ul>
             </div>
-            \`).join('')}
+            `).join('')}
         </div>
     </section>
 
@@ -776,33 +792,33 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         <div class="about-wrap">
             <div class="reveal">
                 <h2 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem;">
-                    Une vision axée sur <span style="color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};">l'excellence.</span>
+                    Une vision axée sur <span style="color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};">l'excellence.</span>
                 </h2>
                 <p style="color: var(--text-muted); font-size: 1.125rem; margin-bottom: 2.5rem; line-height: 1.8;">
-                    \${aboutText}
+                    ${aboutText}
                 </p>
                 <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
                     <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.05); padding: 0.75rem 1.5rem; border-radius: 100px; border: 1px solid var(--border-glass);">
-                        <i data-lucide="check" style="color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};"></i> <span>Équipe Dédiée</span>
+                        <i data-lucide="check" style="color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};"></i> <span>Équipe Dédiée</span>
                     </div>
                     <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.05); padding: 0.75rem 1.5rem; border-radius: 100px; border: 1px solid var(--border-glass);">
-                        <i data-lucide="check" style="color: \${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};"></i> <span>Innovation</span>
+                        <i data-lucide="check" style="color: ${template.primary === '#ffffff' ? '#ffffff' : 'var(--primary)'};"></i> <span>Innovation</span>
                     </div>
                 </div>
             </div>
             
             <div class="stat-grid reveal" style="transition-delay: 200ms">
-                \${rating > 0 ? \`
+                ${rating > 0 ? `
                 <div class="stat-card glass">
-                    <div class="stat-num">\${rating}</div>
+                    <div class="stat-num">${rating}</div>
                     <div style="color:var(--text-muted); font-weight: 500;">Note Globale</div>
-                </div>\` : ''}
-                \${reviews > 0 ? \`
+                </div>` : ''}
+                ${reviews > 0 ? `
                 <div class="stat-card glass">
-                    <div class="stat-num">\${reviews}+</div>
+                    <div class="stat-num">${reviews}+</div>
                     <div style="color:var(--text-muted); font-weight: 500;">Avis Vérifiés</div>
-                </div>\` : ''}
-                <div class="stat-card glass" \${(!rating && !reviews) ? 'style="grid-column: span 2;"' : ''}>
+                </div>` : ''}
+                <div class="stat-card glass" ${(!rating && !reviews) ? 'style="grid-column: span 2;"' : ''}>
                     <div class="stat-num">100%</div>
                     <div style="color:var(--text-muted); font-weight: 500;">Satisfaction Client</div>
                 </div>
@@ -811,35 +827,35 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
     </section>
 
     <!-- Testimonials -->
-    \${testimonials && testimonials.length > 0 ? \`
+    ${testimonials && testimonials.length > 0 ? `
     <section class="container" id="testimonials">
         <div class="section-header reveal">
             <h2>Ils nous font confiance</h2>
             <p>Rejoignez nos clients VIP et vivez une expérience sans précédent.</p>
         </div>
         <div class="grid-3">
-            \${testimonials.map((t, i) => \`
-            <div class="card testimonial-card glass reveal" style="transition-delay: \${i * 100}ms">
+            ${testimonials.map((t, i) => `
+            <div class="card testimonial-card glass reveal" style="transition-delay: ${i * 100}ms">
                 <div>
                     <div class="stars">
-                        \${Array(t.rating).fill('<i data-lucide="star"></i>').join('')}
+                        ${Array(t.rating).fill('<i data-lucide="star"></i>').join('')}
                     </div>
-                    <p style="color: #fff; font-size: 1.125rem; font-style: italic; line-height: 1.8;">"\${t.text}"</p>
+                    <p style="color: #fff; font-size: 1.125rem; font-style: italic; line-height: 1.8;">"${t.text}"</p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem; margin-top: 2rem; border-top: 1px solid var(--border-glass); padding-top: 1.5rem;">
-                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items:center; justify-content:center; font-weight: 700; color: \${template.primary === '#ffffff' ? '#000' : '#fff'}; font-size: 1.25rem;">
-                        \${t.author.charAt(0)}
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items:center; justify-content:center; font-weight: 700; color: ${template.primary === '#ffffff' ? '#000' : '#fff'}; font-size: 1.25rem;">
+                        ${t.author.charAt(0)}
                     </div>
                     <div>
-                        <div style="font-weight: 600; color: #fff;">\${t.author}</div>
-                        \${t.date ? \`<div style="font-size: 0.875rem; color: var(--text-muted);">\${t.date}</div>\` : ''}
+                        <div style="font-weight: 600; color: #fff;">${t.author}</div>
+                        ${t.date ? `<div style="font-size: 0.875rem; color: var(--text-muted);">${t.date}</div>` : ''}
                     </div>
                 </div>
             </div>
-            \`).join('')}
+            `).join('')}
         </div>
     </section>
-    \` : ''}
+    ` : ''}
 
     <!-- CTA & Footer -->
     <section class="container">
@@ -848,25 +864,25 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
                 Prêt à collaborer ensemble ?
             </h2>
             <p style="color: var(--text-muted); font-size: 1.25rem; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-                \${content.ctaText} ou contactez-nous directement pour concevoir votre projet.
+                ${content.ctaText} ou contactez-nous directement pour concevoir votre projet.
             </p>
             
-            \${phone ? \`<a href="tel:\${phone}" class="btn-glow" style="margin-bottom: 2rem;">
-                <i data-lucide="phone-call"></i> Appeler : \${phone}
-            </a>\` : ''}
+            ${phone ? `<a href="tel:${phone}" class="btn-glow" style="margin-bottom: 2rem;">
+                <i data-lucide="phone-call"></i> Appeler : ${phone}
+            </a>` : ''}
 
             <div class="contact-details">
-                \${email ? \`<div class="contact-item"><i data-lucide="mail"></i> \${email}</div>\` : ''}
-                \${address ? \`<div class="contact-item"><i data-lucide="map-pin"></i> \${address}</div>\` : ''}
-                \${website ? \`<div class="contact-item"><i data-lucide="globe"></i> \${website}</div>\` : ''}
+                ${email ? `<div class="contact-item"><i data-lucide="mail"></i> ${email}</div>` : ''}
+                ${address ? `<div class="contact-item"><i data-lucide="map-pin"></i> ${address}</div>` : ''}
+                ${website ? `<div class="contact-item"><i data-lucide="globe"></i> ${website}</div>` : ''}
             </div>
         </div>
         
         <footer style="margin-top: 6rem; padding-top: 2rem; border-top: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); flex-wrap: wrap; gap: 1rem;">
             <div class="brand" style="font-size: 1.25rem; color: var(--text-muted);">
-                \${companyName}
+                ${companyName}
             </div>
-            <p style="font-size: 0.9rem;">&copy; \${new Date().getFullYear()} Tous droits réservés.</p>
+            <p style="font-size: 0.9rem;">&copy; ${new Date().getFullYear()} Tous droits réservés.</p>
         </footer>
     </section>
 
@@ -907,5 +923,5 @@ function buildUltimateHTML(content: UltimateContent, template: any): string {
         });
     </script>
 </body>
-</html>\`;
+</html>`;
 }
