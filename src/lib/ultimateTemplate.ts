@@ -612,35 +612,25 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             position: fixed;
             top: 36px; /* Below marquee */
             width: 100%;
-            z-index: 1000;
-            padding: 1rem 0;
+            z-index: 50;
+            padding: 1.5rem 0;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         nav.scrolled {
             top: 0;
-            padding: 0.75rem 0;
-            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 0;
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
         }
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 1.5rem;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text-main);
-            cursor: pointer;
-            padding: 0.5rem;
-            z-index: 1001;
         }
         
         .logo-svg {
@@ -692,57 +682,22 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         .valeur-card:hover { transform: translateY(-5px); box-shadow: var(--glow); }
         .valeur-icon { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, rgba(${primaryRgb}, 0.15), rgba(${primaryRgb}, 0.05)); color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
 
-        .desktop-menu {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            font-weight: 600;
-        }
-        .desktop-menu a {
-            text-decoration: none;
-            color: var(--text-main);
-            transition: 0.3s;
-            position: relative;
-        }
-        .desktop-menu a:hover { color: var(--primary); }
-        .desktop-menu a::after {
-            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px;
-            background: var(--primary); transition: 0.3s;
-        }
-        .desktop-menu a:hover::after { width: 100%; }
-
-        @media (max-width: 600px) {
-            .hide-mobile { display: none; }
-            .btn-call { padding: 0.5rem !important; width: 40px; height: 40px; justify-content: center; }
-        }
-
         /* Hero Section */
         .hero {
             min-height: 100vh;
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
+            grid-template-columns: 1fr 1fr;
             gap: 4rem;
             align-items: center;
-            padding: 12rem 1.5rem 4rem;
+            padding: 10rem 2rem 4rem;
             position: relative;
             max-width: 1200px;
             margin: 0 auto;
             z-index: 10;
         }
-        @media (max-width: 991px) {
-            .hero { 
-                grid-template-columns: 1fr; 
-                text-align: center; 
-                padding-top: 10rem;
-            }
-            .hero-content { display: flex; flex-direction: column; align-items: center; text-align: center !important; }
-            .hero-content h1, .hero-content h2, .hero-content p, .hero-content div { text-align: center !important; justify-content: center !important; }
-            .hero-image-col { 
-                order: -1; 
-                margin-bottom: 3rem;
-                display: block !important; 
-            }
-            .hero-image-col img { height: 350px !important; }
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; text-align: center; }
+            .hero .hero-image-col { display: none; }
         }
         .hero-badge {
             display: inline-flex;
@@ -981,65 +936,37 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
 
         /* Floating Widgets (Unified Style 2026) */
         .float-widget {
-            position: fixed; right: 20px;
-            width: 45px; height: 45px;
+            position: fixed; right: 25px;
+            width: 50px; height: 50px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            z-index: 900; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none; border: none; cursor: pointer;
         }
         .float-widget:hover { transform: scale(1.1) translateY(-5px); }
-        .float-widget i, .float-widget svg { width: 22px; height: 22px; }
+        .float-widget i, .float-widget svg { width: 24px; height: 24px; }
 
-        .float-phone { bottom: 20px; background: white; color: var(--primary); border: 2px solid var(--primary); }
-        .float-chatbot { bottom: 75px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
-        .float-whatsapp { bottom: 130px; background: #25D366; color: white; }
+        .float-phone { bottom: 30px; background: white; color: var(--primary); border: 2px solid var(--primary); }
+        .float-chatbot { bottom: 90px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .float-whatsapp { bottom: 150px; background: #25D366; color: white; }
 
         .chat-window {
-            position: fixed; bottom: 85px; right: 20px;
-            width: 350px; max-width: calc(100vw - 40px); height: 500px;
-            max-height: 70vh;
+            position: fixed; bottom: 85px; right: 85px;
+            width: 350px; height: 500px;
             background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
             z-index: 998; display: flex; flex-direction: column; overflow: hidden;
             opacity: 0; pointer-events: none; transform: translateY(20px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .top-marquee { font-size: 0.75rem; }
-            .marquee-content { gap: 1.5rem; }
-            
-            .desktop-menu {
-                position: fixed;
-                top: 0; right: -100%;
-                width: 80%; height: 100vh;
-                background: white;
-                flex-direction: column;
-                padding: 6rem 2rem;
-                transition: 0.4s;
-                box-shadow: -10px 0 30px rgba(0,0,0,0.05);
-                z-index: 1000;
-                display: flex !important;
-            }
-            .desktop-menu.active { right: 0; }
-            .desktop-menu a { font-size: 1.25rem; font-weight: 700; }
-            
-            .mobile-menu-toggle { display: block; }
-            
-            .container { padding: 4rem 1.25rem; }
-            .section-header { margin-bottom: 2.5rem; }
-            
-            .stats-banner { grid-template-columns: 1fr 1fr; padding: 2.5rem 1rem; border-radius: 20px; }
-            .stat-banner-item h3 { font-size: 2rem; }
-            
-            .card { padding: 2rem; }
-            .contact-form-side { padding: 2rem 1.5rem; }
-            
-            .float-widget { width: 40px; height: 40px; right: 15px; }
-            .float-phone { bottom: 15px; }
-            .float-chatbot { bottom: 65px; }
-            .float-whatsapp { bottom: 115px; }
+        .chat-window.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;
+            padding: 1.25rem; font-family: 'Outfit'; font-weight: 700; display: flex; align-items: center; gap: 10px;
         }
+        .chat-body { flex: 1; padding: 1.5rem; overflow-y: auto; background: #f8fafc; }
+        .chat-msg { background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1rem; font-size: 0.95rem; }
+        .chat-input { padding: 1rem; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
+        .chat-input input { flex: 1; border: none; outline: none; background: #f1f5f9; padding: 0.75rem 1rem; border-radius: 100px; font-family: 'Inter'; }
+        
     </style>
 </head>
 <body>
@@ -1064,24 +991,21 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
-            <a href="#" class="brand">
+            <a href="#" class="brand" style="text-decoration: none; display: flex; align-items: center; gap: 1rem;">
                 <div class="logo-svg">${logoInfo.initials}</div>
                 <div style="display: flex; flex-direction: column; justify-content: center;">
-                    <div style="font-weight: 800; font-family: 'Outfit'; color: var(--text-main); font-size: 1.35rem; line-height: 1.1;">${logoInfo.text}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">${slogan.substring(0, 30)}${slogan.length > 30 ? '...' : ''}</div>
+                    <div style="font-weight: 800; font-family: 'Outfit'; color: var(--text-main); font-size: 1.5rem; line-height: 1.1;">${logoInfo.text}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">${slogan}</div>
                 </div>
             </a>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <div class="desktop-menu" id="nav-menu">
-                    <a href="#about" onclick="toggleMenu(false)">À propos</a>
-                    <a href="#services" onclick="toggleMenu(false)">Services</a>
-                    <a href="#testimonials" onclick="toggleMenu(false)">Avis</a>
-                    <a href="#contact" onclick="toggleMenu(false)">Contact</a>
+            <div style="display: flex; gap: 1.5rem; align-items: center;">
+                <div style="display: none; align-items: center; gap: 1.5rem; font-weight: 500;" class="desktop-menu">
+                    <a href="#about" style="text-decoration: none; color: var(--text-main);">À propos</a>
+                    <a href="#valeurs" style="text-decoration: none; color: var(--text-main);">Valeurs</a>
+                    <a href="#services" style="text-decoration: none; color: var(--text-main);">Services</a>
+                    <a href="#testimonials" style="text-decoration: none; color: var(--text-main);">Avis</a>
                 </div>
-                ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-call"><i data-lucide="phone" width="16"></i> <span class="hide-mobile">Appeler</span></a>` : ''}
-                <button class="mobile-menu-toggle" id="menu-toggle" onclick="toggleMenu()">
-                    <i data-lucide="menu" id="menu-icon"></i>
-                </button>
+                ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-call"><i data-lucide="phone" width="18"></i> Nous appeler</a>` : ''}
             </div>
         </div>
     </nav>
@@ -1505,20 +1429,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             else nav.classList.remove('scrolled');
         });
 
-        // Navbar Mobile Toggle
-        function toggleMenu(force) {
-            const menu = document.getElementById('nav-menu');
-            const icon = document.getElementById('menu-icon');
-            const isActive = force !== undefined ? force : !menu.classList.contains('active');
-            
-            if (isActive) {
-                menu.classList.add('active');
-                icon.setAttribute('data-lucide', 'x');
-            } else {
-                menu.classList.remove('active');
-                icon.setAttribute('data-lucide', 'menu');
-            }
-            lucide.createIcons();
+        // CSS Media query JS equivalent for desktop menu
+        if (window.innerWidth > 768) {
+            document.querySelector('.desktop-menu').style.display = 'flex';
         }
 
         // Intersection Observer for Reveal Animations
