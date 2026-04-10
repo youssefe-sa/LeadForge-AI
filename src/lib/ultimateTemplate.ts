@@ -832,23 +832,32 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         .btn-glow {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 1.25rem 2.5rem;
+            padding: 1rem 2.5rem;
             border-radius: 100px;
-            font-size: 1.125rem;
-            font-weight: 600;
+            font-weight: 700;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.75rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: var(--glow-strong);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 40px -10px var(--primary);
             border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
         }
         .btn-glow:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(${primaryRgb}, 0.3);
-            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px -10px var(--primary);
+        }
+        
+        /* Mobile Buttons */
+        @media (max-width: 768px) {
+            .btn-glow {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         /* Container & Sections */
@@ -1095,50 +1104,56 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             
             /* Container Mobile */
             .container {
-                padding: 4rem 1.5rem;
+                padding: 3rem 1.25rem;
             }
             .section-header h2 {
-                font-size: clamp(2rem, 6vw, 2.5rem);
+                font-size: clamp(1.75rem, 5vw, 2.25rem);
             }
             .section-header p {
-                font-size: 1rem;
+                font-size: 0.95rem;
             }
             
             /* Grid Mobile */
             .grid-3 {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
+                gap: 1.25rem;
             }
             .valeurs-grid {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
+                gap: 1.25rem;
             }
             .process-grid {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
+                gap: 1.25rem;
             }
             
             /* Cards Mobile */
             .card {
-                padding: 2rem;
+                padding: 1.5rem;
             }
             .card-icon {
-                width: 60px;
-                height: 60px;
-                margin-bottom: 1.5rem;
+                width: 50px;
+                height: 50px;
+                margin-bottom: 1rem;
             }
             .card h3 {
-                font-size: 1.25rem;
+                font-size: 1.15rem;
+            }
+            .card p {
+                font-size: 0.95rem;
             }
             
             /* Stats Banner Mobile */
             .stats-banner {
                 grid-template-columns: 1fr 1fr;
-                gap: 1.5rem;
-                padding: 3rem 1.5rem;
+                gap: 1rem;
+                padding: 2rem 1.25rem;
             }
             .stat-banner-item h3 {
-                font-size: 2.5rem;
+                font-size: 2rem;
+            }
+            .stat-banner-item p {
+                font-size: 0.9rem;
             }
             
             /* Contact Grid Mobile */
@@ -1146,19 +1161,19 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
                 grid-template-columns: 1fr;
             }
             .contact-form-side {
-                padding: 2.5rem 1.5rem;
+                padding: 2rem 1.25rem;
             }
             .map-side iframe {
-                min-height: 300px;
+                min-height: 250px;
             }
             
             /* Footer Mobile */
             .footer-grid {
                 grid-template-columns: 1fr;
-                gap: 2rem;
+                gap: 1.5rem;
             }
             footer {
-                padding: 4rem 1.5rem 2rem;
+                padding: 3rem 1.25rem 2rem;
             }
             
             /* Navigation Mobile */
@@ -1276,10 +1291,10 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             /* About Section Mobile */
             [id="about"] [style*="grid-template-columns"] {
                 grid-template-columns: 1fr;
-                gap: 2rem;
+                gap: 1.5rem;
             }
             [id="about"] img {
-                height: 350px;
+                height: 280px;
             }
         }
         
