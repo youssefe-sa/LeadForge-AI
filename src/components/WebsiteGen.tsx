@@ -567,10 +567,9 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         }
       }
 
-      // 🏆 TEMPLATE ULTIMATE - Template principal (Design glassmorphism 2026)
-      updateProgress({ step: '🎨 Génération du site ULTIMATE (Template principal)...' });
+      updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
       const html = generateUltimateSite(lead, content);
-      console.log(`✅ Template ULTIMATE généré pour ${lead.name}`);
+      console.log(`✅ HTML generated for ${lead.name}`);
       
       updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
       const fileName = `${lead.id}.html`;
@@ -610,11 +609,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       console.log(`✅ Site généré avec succès pour: ${lead.name}`);
       
     } catch (e) {
-      console.error(`❌ Erreur lors de la génération du site ULTIMATE pour ${lead.name}:`, e);
-      updateProgress({ step: '🔄 Fallback template Professional...' });
+      console.error(`❌ Erreur lors de la génération du site pour ${lead.name}:`, e);
+      updateProgress({ step: '🔄 Fallback template...' });
       
       try {
-        console.log(`🔄 Using fallback template Professional pour ${lead.name} (garantie 100%)`);
+        console.log(`🔄 Using fallback template for ${lead.name}`);
         const emergencyHtml = generateProfessionalSite(lead);
         updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
         
