@@ -1,8 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, safeStr, proxyImg } from '../lib/supabase-store';
-import { generateProfessionalSite } from '../lib/professionalTemplate';
 import { generateUltimateSite } from '../lib/ultimateTemplate';
-import { generatePremiumSiteHtml } from '../lib/siteTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { fetchSectorImages } from '../lib/imageAgent';
 import { supabase } from '../lib/supabase';
@@ -614,7 +612,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       
       try {
         console.log(`🔄 Using fallback template for ${lead.name}`);
-        const emergencyHtml = generateProfessionalSite(lead);
+        const emergencyHtml = generateUltimateSite(lead);
         updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
         
         const fileName = `${lead.id}.html`;
@@ -892,7 +890,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       }
 
       // Re-générer instantanément le HTML localement. Le Design n'est jamais cassé !
-      const newHtml = generatePremiumSiteHtml(previewLead, newContent);
+      const newHtml = generateUltimateSite(previewLead, newContent);
       await updateLead(previewLead.id, { siteHtml: newHtml });
       
       setChatMessages(prev => [...prev, { role: 'assistant', text: "✅ J'ai méticuleusement appliqué tes modifications: \"" + msg + "\". Mon design Premium est préservé ! ❤️" }]);
@@ -911,11 +909,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     updateProgress({ current: 1, total: 1, name: previewLead.name, step: '🎨 Changement de palette...' });
     
     try {
-      // PROPOSITION 3: Mathématique Seed Offset (Correction du bug de Titre)
-      const newOffset = Math.floor(Math.random() * 1000) + 1;
-      
       const content = await generateContent(previewLead);
-      const html = generatePremiumSiteHtml(previewLead, content, newOffset);
+      const html = generateUltimateSite(previewLead, content);
       
       const fileName = `${previewLead.id}.html`;
       await supabase.storage.from('websites').upload(fileName, html, { contentType: 'text/html', cacheControl: '3600', upsert: true });
