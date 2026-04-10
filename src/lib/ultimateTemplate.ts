@@ -523,6 +523,13 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             color: var(--text-main);
             overflow-x: hidden;
             line-height: 1.7;
+            width: 100%;
+            max-width: 100vw;
+        }
+        
+        * {
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         h1, h2, h3, h4 { font-family: var(--font-head); }
@@ -667,6 +674,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             z-index: 50;
             padding: 1.5rem 0;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mobile-menu-toggle {
+            display: none;
         }
         nav.scrolled {
             top: 0;
