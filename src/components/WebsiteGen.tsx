@@ -1,6 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, safeStr, proxyImg } from '../lib/supabase-store';
-import { generateUltimateSiteV2 } from '../lib/ultimateTemplateV2';
+import { generateProfessionalSite } from '../lib/professionalTemplate';
+import { generateUltimateSite } from '../lib/ultimateTemplate';
+import { generatePremiumSiteHtml } from '../lib/siteTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { fetchSectorImages } from '../lib/imageAgent';
 import { supabase } from '../lib/supabase';
@@ -389,7 +391,7 @@ Retourne UNIQUEMENT le HTML complet.`;
   const generateContent = async (lead: Lead) => {
     type SC = {
       heroTitle: string; heroSubtitle: string; aboutText: string;
-      services: Array<{ name: string; description: string; features: string[] }>;
+      services: Array<{ name: string; description: string; icon?: string }>;
       cta: string; testimonials: Array<{ author: string; text: string; rating: number; date: string }>;
       galleryTitle?: string; aboutTitle?: string; servicesTitle?: string; contactTitle?: string;
       whyChooseUs?: string[];
@@ -434,7 +436,7 @@ Retourne UNIQUEMENT le HTML complet.`;
       services: getServices().map((name, i) => ({ 
         name, 
         description: `Solution professionnelle ${name.toLowerCase()} adaptée à vos besoins spécifiques.`,
-        features: ['Qualité premium', 'Rapide et efficace', 'Garantie satisfaction', 'Support dédié', 'Prix compétitif', 'Expertise certifiée'].slice(0, 3)
+        icon: ['⚡', '🔧', '🏆', '💎', '🛡️', '📞'][i] 
       })),
       cta: 'Demander un devis',
       testimonials: (lead.googleReviewsData || []).map(r => ({ author: safeStr(r.author), text: safeStr(r.text), rating: r.rating || 5, date: safeStr(r.date) })),
@@ -565,8 +567,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         }
       }
 
-      updateProgress({ step: '🎨 Génération du site ULTIMATE V2...' });
-      const html = generateUltimateSiteV2(lead, content);
+      updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
+      const html = generateUltimateSite(lead, content);
       console.log(`✅ HTML generated for ${lead.name}`);
       
       updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
@@ -611,8 +613,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       updateProgress({ step: '🔄 Fallback template...' });
       
       try {
-        console.log(`🔄 Using fallback template V2 for ${lead.name}`);
-        const emergencyHtml = generateUltimateSiteV2(lead);
+        console.log(`🔄 Using fallback template for ${lead.name}`);
+        const emergencyHtml = generateProfessionalSite(lead);
         updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
         
         const fileName = `${lead.id}.html`;
@@ -890,10 +892,10 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       }
 
       // Re-générer instantanément le HTML localement. Le Design n'est jamais cassé !
-      const newHtml = generateUltimateSiteV2(previewLead, newContent);
+      const newHtml = generatePremiumSiteHtml(previewLead, newContent);
       await updateLead(previewLead.id, { siteHtml: newHtml });
       
-      setChatMessages(prev => [...prev, { role: 'assistant', text: "✅ J'ai méticuleusement appliqué tes modifications: \"" + msg + "\". Mon design Ultimate V2 est préservé ! ❤️" }]);
+      setChatMessages(prev => [...prev, { role: 'assistant', text: "✅ J'ai méticuleusement appliqué tes modifications: \"" + msg + "\". Mon design Premium est préservé ! ❤️" }]);
     } catch {
       setChatMessages(prev => [...prev, { role: 'assistant', text: "❌ Erreur de réseau ou problème d'API." }]);
     }
@@ -913,7 +915,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const newOffset = Math.floor(Math.random() * 1000) + 1;
       
       const content = await generateContent(previewLead);
-      const html = generateUltimateSiteV2(previewLead, content);
+      const html = generatePremiumSiteHtml(previewLead, content, newOffset);
       
       const fileName = `${previewLead.id}.html`;
       await supabase.storage.from('websites').upload(fileName, html, { contentType: 'text/html', cacheControl: '3600', upsert: true });
