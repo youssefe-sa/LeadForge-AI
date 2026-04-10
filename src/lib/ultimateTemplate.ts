@@ -1021,10 +1021,10 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         
         /* Mobile Responsive Design */
         @media (max-width: 768px) {
-            /* Hero Section Mobile */
+            /* Hero Section Mobile - Fix padding to avoid overlap with marquee + navbar */
             .hero {
                 grid-template-columns: 1fr;
-                padding: 8rem 1.5rem 3rem;
+                padding: 14rem 1.5rem 3rem;
                 text-align: center;
             }
             .hero .hero-image-col {
@@ -1121,22 +1121,26 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             
             /* Navigation Mobile */
             nav {
-                top: 0;
-                padding: 1rem 0;
+                top: 32px;
+                padding: 0.75rem 0;
             }
             .nav-container {
-                padding: 0 1.5rem;
+                padding: 0 1rem;
             }
             .desktop-menu {
                 display: none !important;
             }
             .brand {
-                font-size: 1.25rem;
+                font-size: 1rem;
             }
             .logo-svg {
-                width: 40px;
-                height: 40px;
-                font-size: 1.1rem;
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+                border-radius: 8px;
+            }
+            .btn-call {
+                display: none !important;
             }
             
             /* Floating Widgets Mobile */
@@ -1182,11 +1186,11 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             
             /* Top Marquee Mobile */
             .top-marquee {
-                font-size: 0.75rem;
-                padding: 6px 0;
+                font-size: 0.7rem;
+                padding: 5px 0;
             }
             .marquee-content {
-                gap: 2rem;
+                gap: 1.5rem;
             }
             
             /* About Section Mobile */
@@ -1202,7 +1206,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         @media (max-width: 480px) {
             /* Extra Small Mobile */
             .hero {
-                padding: 7rem 1rem 2rem;
+                padding: 14rem 1rem 2rem;
             }
             .hero h1 {
                 font-size: 2rem;
@@ -1245,15 +1249,19 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
                 right: 10px;
             }
             .nav-container {
-                padding: 0 1rem;
+                padding: 0 0.75rem;
             }
             .brand {
-                font-size: 1.1rem;
+                font-size: 0.9rem;
             }
             .logo-svg {
-                width: 36px;
-                height: 36px;
-                font-size: 1rem;
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+                border-radius: 6px;
+            }
+            .btn-call {
+                display: none !important;
             }
         }
         
