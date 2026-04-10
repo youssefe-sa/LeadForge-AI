@@ -262,7 +262,11 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const description = aiContent?.aboutText || lead.description || template.aboutText;
   const heroTitle = aiContent?.heroTitle || template.heroTitle;
   const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle}${city ? ' à ' + city : ''}`;
-  const ctaText = aiContent?.cta || template.ctaText;
+  
+  // Limiter le CTA à 2 mots maximum
+  let rawCtaText = aiContent?.cta || template.ctaText;
+  const ctaWords = rawCtaText.split(/\s+/).filter((w: string) => w.length > 0);
+  const ctaText = ctaWords.slice(0, 2).join(' ');
   
   let finalServices = template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
@@ -1062,7 +1066,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             /* Hero Section Mobile - Fix padding to avoid overlap with marquee + navbar */
             .hero {
                 grid-template-columns: 1fr;
-                padding: 3rem 1.5rem 3rem;
+                padding: 5rem 1.5rem 3rem;
                 text-align: center;
             }
             .hero .hero-image-col {
@@ -1282,7 +1286,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         @media (max-width: 480px) {
             /* Extra Small Mobile */
             .hero {
-                padding: 3rem 1rem 2rem;
+                padding: 5rem 1rem 2rem;
             }
             .hero h1 {
                 font-size: 2rem;
