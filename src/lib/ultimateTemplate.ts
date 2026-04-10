@@ -1062,7 +1062,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             /* Hero Section Mobile - Fix padding to avoid overlap with marquee + navbar */
             .hero {
                 grid-template-columns: 1fr;
-                padding: 7rem 1.5rem 3rem;
+                padding: 3rem 1.5rem 3rem;
                 text-align: center;
             }
             .hero .hero-image-col {
@@ -1159,8 +1159,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             
             /* Navigation Mobile */
             nav {
-                top: 32px;
-                padding: 0.75rem 0;
+                top: 28px;
+                padding: 0.5rem 0;
             }
             .nav-container {
                 padding: 0 1rem;
@@ -1282,7 +1282,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         @media (max-width: 480px) {
             /* Extra Small Mobile */
             .hero {
-                padding: 7rem 1rem 2rem;
+                padding: 3rem 1rem 2rem;
             }
             .hero h1 {
                 font-size: 2rem;
