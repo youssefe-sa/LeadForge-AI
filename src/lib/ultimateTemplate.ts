@@ -1142,6 +1142,44 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             .btn-call {
                 display: none !important;
             }
+            .mobile-menu-toggle {
+                display: block !important;
+            }
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                border-bottom: 1px solid rgba(0,0,0,0.05);
+                z-index: 100;
+            }
+            .mobile-menu.open {
+                display: block;
+            }
+            .mobile-menu-link {
+                display: block;
+                padding: 1rem;
+                text-decoration: none;
+                color: var(--text-main);
+                font-weight: 500;
+                border-bottom: 1px solid rgba(0,0,0,0.05);
+                transition: all 0.3s;
+            }
+            .mobile-menu-link:hover {
+                color: var(--primary);
+                padding-left: 1.5rem;
+            }
+            .mobile-menu-link:last-child {
+                border-bottom: none;
+            }
+            .mobile-call-link {
+                color: var(--primary);
+                font-weight: 700;
+            }
             
             /* Floating Widgets Mobile */
             .float-widget {
@@ -1304,7 +1342,19 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
                     <a href="#testimonials" style="text-decoration: none; color: var(--text-main);">Avis</a>
                 </div>
                 ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-call"><i data-lucide="phone" width="18"></i> Nous appeler</a>` : ''}
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" style="display: none; background: none; border: none; cursor: pointer; padding: 0.5rem;">
+                    <i data-lucide="menu" width="28" height="28" style="color: var(--text-main);"></i>
+                </button>
             </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="#about" class="mobile-menu-link">À propos</a>
+            <a href="#valeurs" class="mobile-menu-link">Valeurs</a>
+            <a href="#services" class="mobile-menu-link">Services</a>
+            <a href="#testimonials" class="mobile-menu-link">Avis</a>
+            <a href="#contact" class="mobile-menu-link">Contact</a>
+            ${phone ? `<a href="tel:${cleanPhoneLink}" class="mobile-menu-link mobile-call-link"><i data-lucide="phone" width="18" style="margin-right: 8px;"></i> ${phone}</a>` : ''}
         </div>
     </nav>
 
@@ -1730,6 +1780,30 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         // CSS Media query JS equivalent for desktop menu
         if (window.innerWidth > 768) {
             document.querySelector('.desktop-menu').style.display = 'flex';
+        }
+
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('open');
+            });
+            
+            // Close menu when clicking on a link
+            mobileMenu.querySelectorAll('.mobile-menu-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('open');
+                });
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    mobileMenu.classList.remove('open');
+                }
+            });
         }
 
         // Intersection Observer for Reveal Animations
