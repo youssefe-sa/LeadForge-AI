@@ -40,7 +40,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     heroTitle: 'Votre Expert Plomberie',
     heroSubtitle: "Intervention d'excellence et garantie dans toute la région",
     aboutText: "Artisan certifié spécialisé dans les interventions premium. Nous garantissons un service d'excellence, réactif et doté d'une finition parfaite.",
-    ctaText: 'Obtenir une intervention'
+    ctaText: 'Intervention'
   },
   electricien: {
     primary: '#dc2626',
@@ -58,7 +58,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     heroTitle: 'Excellence Électrique',
     heroSubtitle: "L'énergie sûre et connectée, maîtrisée par des experts",
     aboutText: "Entreprise d'électricité qualifiée, nous concevons, installons et sécurisons vos réseaux avec des technologies de pointe.",
-    ctaText: 'Demander un diagnostic'
+    ctaText: 'Diagnostic'
   },
   coiffeur: {
     primary: '#7c3aed',
@@ -76,7 +76,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     heroTitle: "L'Atelier de Coiffure",
     heroSubtitle: "Révélez votre beauté entre les mains d'experts passionnés",
     aboutText: "Un salon d'exception où chaque détail est pensé pour votre bien-être. Notre équipe artistique maîtrise les techniques les plus sophistiquées.",
-    ctaText: 'Réserver mon moment'
+    ctaText: 'Réserver'
   },
   restaurant: {
     primary: '#ea580c',
@@ -94,7 +94,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     heroTitle: 'Expérience Culinaire Unique',
     heroSubtitle: "L'harmonie parfaite entre gastronomie moderne et atmosphère élégante",
     aboutText: 'Nous repoussons les limites de la tradition culinaire pour offrir un moment inoubliable, où les produits nobles racontent une histoire dans chaque assiette.',
-    ctaText: 'Réserver une table'
+    ctaText: 'Réserver'
   },
   garage: {
     primary: '#059669',
@@ -112,7 +112,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     heroTitle: 'Le Pôle Mécanique Prémium',
     heroSubtitle: "L'expertise absolue pour sublimer et entretenir votre véhicule",
     aboutText: "Notre garage de pointe rassemble l'élite des techniciens pour offrir à votre véhicule un entretien sans compromis.",
-    ctaText: 'Prendre rendez-vous atelier'
+    ctaText: 'Rendez-vous'
   },
   default: {
     primary: '#334155',
@@ -130,7 +130,7 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     heroTitle: "Services Professionnels d'Excellence",
     heroSubtitle: "L'alliance de la rigueur et de l'innovation pour votre réussite",
     aboutText: "Nous bâtissons des relations durables basées sur la performance et l'intégrité. Notre ambition est d'élever vos standards et de vous accompagner vers le succès absolu.",
-    ctaText: 'Initier notre collaboration'
+    ctaText: 'Démarrer'
   }
 };
 
@@ -1062,7 +1062,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             /* Hero Section Mobile - Fix padding to avoid overlap with marquee + navbar */
             .hero {
                 grid-template-columns: 1fr;
-                padding: 14rem 1.5rem 3rem;
+                padding: 10rem 1.5rem 3rem;
                 text-align: center;
             }
             .hero .hero-image-col {
@@ -1282,7 +1282,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         @media (max-width: 480px) {
             /* Extra Small Mobile */
             .hero {
-                padding: 14rem 1rem 2rem;
+                padding: 10rem 1rem 2rem;
             }
             .hero h1 {
                 font-size: 2rem;
