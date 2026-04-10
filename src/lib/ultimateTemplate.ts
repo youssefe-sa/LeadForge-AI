@@ -431,10 +431,10 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     `onerror="this.onerror=null;this.src='${sectorFallbacks[fallbackSlot % Math.max(sectorFallbacks.length,1)] || emergencyFallback}'"`;
 
   return `<!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html lang="fr" class="scroll-smooth" style="overflow-x: hidden;">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>${companyName} - ${content.sector} à ${city} | Services Professionnels</title>
     
     <!-- SEO Meta Tags -->
@@ -525,14 +525,40 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             line-height: 1.7;
             width: 100%;
             max-width: 100vw;
+            min-width: 320px;
         }
         
         * {
             max-width: 100%;
             box-sizing: border-box;
         }
+        
+        img, video, iframe {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .top-marquee {
+            width: 100%;
+            max-width: 100vw;
+            overflow: hidden;
+        }
+        
+        .marquee-content {
+            min-width: max-content;
+        }
 
         h1, h2, h3, h4 { font-family: var(--font-head); }
+
+        /* Desktop specific - ensure mobile menu is hidden */
+        @media (min-width: 769px) {
+            .mobile-menu-toggle {
+                display: none !important;
+            }
+            .mobile-menu {
+                display: none !important;
+            }
+        }
 
         /* ADVANCED DYNAMIC ANIMATIONS 2026 */
         .reveal { 
@@ -572,6 +598,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             overflow: hidden;
             position: relative;
             z-index: 100;
+            width: 100%;
+            max-width: 100vw;
         }
         .marquee-content {
             display: inline-flex;
