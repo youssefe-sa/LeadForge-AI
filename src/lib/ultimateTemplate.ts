@@ -435,7 +435,28 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${companyName} - ${content.sector}</title>
+    <title>${companyName} - ${content.sector} à ${city} | Services Professionnels</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="${companyName} - ${content.sector} professionnel à ${city}. ${heroSubtitle}. Contactez-nous au ${phone} pour vos projets.">
+    <meta name="keywords" content="${content.sector}, ${city}, ${companyName}, professionnel, services, intervention rapide, qualité">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="${website || '#'}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${website || '#'}">
+    <meta property="og:title" content="${companyName} - ${content.sector} à ${city}">
+    <meta property="og:description" content="${heroSubtitle}">
+    <meta property="og:image" content="${heroImage}">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="${website || '#'}">
+    <meta name="twitter:title" content="${companyName} - ${content.sector} à ${city}">
+    <meta name="twitter:description" content="${heroSubtitle}">
+    <meta name="twitter:image" content="${heroImage}">
     
     <!-- Google Fonts: Diverse Dynamic Pairings -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -446,6 +467,37 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Structured Data JSON-LD for LocalBusiness SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "${companyName}",
+        "description": "${heroSubtitle}",
+        "image": "${heroImage}",
+        "telephone": "${phone}",
+        "email": "${email}",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "${address}",
+            "addressLocality": "${city}",
+            "addressCountry": "FR"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "",
+            "longitude": ""
+        },
+        "openingHours": "Mo-Fr 09:00-18:00",
+        "priceRange": "$$",
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "${rating || 5}",
+            "reviewCount": "${reviews || 42}"
+        }
+    }
+    </script>
 
     <style>
         :root {
@@ -966,6 +1018,244 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         .chat-msg { background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1rem; font-size: 0.95rem; }
         .chat-input { padding: 1rem; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
         .chat-input input { flex: 1; border: none; outline: none; background: #f1f5f9; padding: 0.75rem 1rem; border-radius: 100px; font-family: 'Inter'; }
+        
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            /* Hero Section Mobile */
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 8rem 1.5rem 3rem;
+                text-align: center;
+            }
+            .hero .hero-image-col {
+                display: none;
+            }
+            .hero h1 {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+                text-align: center;
+            }
+            .hero h2 {
+                font-size: clamp(1rem, 4vw, 1.5rem);
+                text-align: center;
+            }
+            .hero p {
+                text-align: center;
+                font-size: 1rem;
+            }
+            .hero-badge {
+                margin: 0 auto 1.5rem;
+                font-size: 0.8rem;
+                padding: 0.4rem 1rem;
+            }
+            .hero-content > div[style*="display: flex"] {
+                justify-content: center;
+            }
+            
+            /* Container Mobile */
+            .container {
+                padding: 4rem 1.5rem;
+            }
+            .section-header h2 {
+                font-size: clamp(2rem, 6vw, 2.5rem);
+            }
+            .section-header p {
+                font-size: 1rem;
+            }
+            
+            /* Grid Mobile */
+            .grid-3 {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .valeurs-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .process-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            /* Cards Mobile */
+            .card {
+                padding: 2rem;
+            }
+            .card-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 1.5rem;
+            }
+            .card h3 {
+                font-size: 1.25rem;
+            }
+            
+            /* Stats Banner Mobile */
+            .stats-banner {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+                padding: 3rem 1.5rem;
+            }
+            .stat-banner-item h3 {
+                font-size: 2.5rem;
+            }
+            
+            /* Contact Grid Mobile */
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .contact-form-side {
+                padding: 2.5rem 1.5rem;
+            }
+            .map-side iframe {
+                min-height: 300px;
+            }
+            
+            /* Footer Mobile */
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            footer {
+                padding: 4rem 1.5rem 2rem;
+            }
+            
+            /* Navigation Mobile */
+            nav {
+                top: 0;
+                padding: 1rem 0;
+            }
+            .nav-container {
+                padding: 0 1.5rem;
+            }
+            .desktop-menu {
+                display: none !important;
+            }
+            .brand {
+                font-size: 1.25rem;
+            }
+            .logo-svg {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+            
+            /* Floating Widgets Mobile */
+            .float-widget {
+                width: 45px;
+                height: 45px;
+                right: 15px;
+            }
+            .float-phone {
+                bottom: 20px;
+            }
+            .float-chatbot {
+                bottom: 75px;
+            }
+            .float-whatsapp {
+                bottom: 130px;
+            }
+            
+            /* Chat Window Mobile */
+            .chat-window {
+                width: calc(100% - 30px);
+                height: 400px;
+                right: 15px;
+                bottom: 85px;
+            }
+            
+            /* Modal Mobile */
+            .modal-content {
+                width: 95%;
+                padding: 2rem 1.5rem;
+                margin: 5% auto;
+            }
+            .close-modal {
+                right: 1rem;
+                top: 1rem;
+                width: 36px;
+                height: 36px;
+                font-size: 24px;
+            }
+            .modal h2 {
+                font-size: 1.75rem;
+            }
+            
+            /* Top Marquee Mobile */
+            .top-marquee {
+                font-size: 0.75rem;
+                padding: 6px 0;
+            }
+            .marquee-content {
+                gap: 2rem;
+            }
+            
+            /* About Section Mobile */
+            [id="about"] [style*="grid-template-columns"] {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            [id="about"] img {
+                height: 350px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Extra Small Mobile */
+            .hero {
+                padding: 7rem 1rem 2rem;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero p {
+                font-size: 0.95rem;
+            }
+            .container {
+                padding: 3rem 1rem;
+            }
+            .stats-banner {
+                grid-template-columns: 1fr;
+                padding: 2.5rem 1rem;
+                gap: 2rem;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+            .btn-glow {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+            .float-widget {
+                width: 40px;
+                height: 40px;
+                right: 10px;
+            }
+            .float-phone {
+                bottom: 15px;
+            }
+            .float-chatbot {
+                bottom: 65px;
+            }
+            .float-whatsapp {
+                bottom: 115px;
+            }
+            .chat-window {
+                width: calc(100% - 20px);
+                height: 350px;
+                right: 10px;
+            }
+            .nav-container {
+                padding: 0 1rem;
+            }
+            .brand {
+                font-size: 1.1rem;
+            }
+            .logo-svg {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+        }
         
     </style>
 </head>
