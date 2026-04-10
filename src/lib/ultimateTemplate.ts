@@ -304,10 +304,10 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const baseSlogan = aiContent?.slogan || "L'excellence à votre service";
   const sloganVariations = [
     baseSlogan,
-    `${companyName} : Excellence & Passion`,
-    `Votre partenaire de confiance à ${city}`,
     "L'art de la perfection au quotidien",
-    "Solutions premium sur-mesure"
+    "Solutions premium sur-mesure",
+    "Excellence & Passion",
+    "Votre partenaire de confiance"
   ];
   const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
 
