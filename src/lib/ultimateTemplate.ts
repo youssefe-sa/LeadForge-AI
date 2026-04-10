@@ -564,7 +564,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             white-space: nowrap;
             overflow: hidden;
             position: relative;
-            z-index: 60;
+            z-index: 100;
         }
         .marquee-content {
             display: inline-flex;
@@ -1130,68 +1130,13 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             .desktop-menu {
                 display: none !important;
             }
-            .btn-call {
-                display: none !important;
-            }
             .brand {
                 font-size: 1.25rem;
             }
             .logo-svg {
-                width: 32px;
-                height: 32px;
-                font-size: 0.9rem;
-                border-radius: 8px;
-            }
-            
-            /* Mobile Menu Hamburger Button */
-            .mobile-menu-btn {
-                display: flex !important;
-                align-items: center;
-                justify-content: center;
-                width: 44px;
-                height: 44px;
-                background: var(--primary);
-                border-radius: 12px;
-                color: white;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .mobile-menu-btn:hover {
-                transform: scale(1.05);
-                box-shadow: 0 4px 15px rgba(${primaryRgb}, 0.3);
-            }
-            
-            /* Mobile Menu Dropdown */
-            .mobile-menu {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                border-radius: 20px;
-                margin-top: 1rem;
-                padding: 1.5rem;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-                border: 1px solid rgba(0,0,0,0.05);
-                z-index: 100;
-            }
-            .mobile-menu.open {
-                display: block;
-            }
-            .mobile-menu a {
-                display: block;
-                padding: 1rem;
-                color: var(--text-main);
-                text-decoration: none;
-                font-weight: 600;
-                border-radius: 12px;
-                transition: all 0.3s;
-                margin-bottom: 0.5rem;
-            }
-            .mobile-menu a:hover {
-                background: rgba(${primaryRgb}, 0.1);
-                color: var(--primary);
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
             }
             
             /* Floating Widgets Mobile */
@@ -1343,7 +1288,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
                     <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">${slogan}</div>
                 </div>
             </a>
-            <div style="display: flex; gap: 1.5rem; align-items: center; position: relative;">
+            <div style="display: flex; gap: 1.5rem; align-items: center;">
                 <div style="display: none; align-items: center; gap: 1.5rem; font-weight: 500;" class="desktop-menu">
                     <a href="#about" style="text-decoration: none; color: var(--text-main);">À propos</a>
                     <a href="#valeurs" style="text-decoration: none; color: var(--text-main);">Valeurs</a>
@@ -1351,21 +1296,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
                     <a href="#testimonials" style="text-decoration: none; color: var(--text-main);">Avis</a>
                 </div>
                 ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-call"><i data-lucide="phone" width="18"></i> Nous appeler</a>` : ''}
-                
-                <!-- Mobile Menu Button (Hamburger) -->
-                <button class="mobile-menu-btn" style="display: none;" onclick="toggleMobileMenu()">
-                    <i data-lucide="menu" width="24" height="24"></i>
-                </button>
-                
-                <!-- Mobile Menu Dropdown -->
-                <div class="mobile-menu" id="mobile-menu">
-                    <a href="#about" onclick="toggleMobileMenu()">À propos</a>
-                    <a href="#valeurs" onclick="toggleMobileMenu()">Valeurs</a>
-                    <a href="#services" onclick="toggleMobileMenu()">Services</a>
-                    <a href="#testimonials" onclick="toggleMobileMenu()">Avis</a>
-                    <a href="#contact" onclick="toggleMobileMenu()">Contact</a>
-                    ${phone ? `<a href="tel:${cleanPhoneLink}" onclick="toggleMobileMenu()" style="color: var(--primary);">📞 ${phone}</a>` : ''}
-                </div>
             </div>
         </div>
     </nav>
@@ -1793,21 +1723,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         if (window.innerWidth > 768) {
             document.querySelector('.desktop-menu').style.display = 'flex';
         }
-        
-        // Mobile Menu Toggle
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobile-menu');
-            mobileMenu.classList.toggle('open');
-        }
-        
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            const mobileMenu = document.getElementById('mobile-menu');
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            if (mobileMenu && mobileMenuBtn && !mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                mobileMenu.classList.remove('open');
-            }
-        });
 
         // Intersection Observer for Reveal Animations
         const reveals = document.querySelectorAll('.reveal');
