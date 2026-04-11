@@ -69,100 +69,81 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
     return lead.name;
   };
 
-  // Fonction de personnalisation pour nouveaux templates
-  const personalizeOutreachTemplate = (templateId: string, lead: Lead) => {
-    const template = getTemplateById(templateId);
-    if (!template) return { subject: '', htmlContent: '', textContent: '' };
-
-    const variables: Record<string, string> = {
-      firstName: getSalutation(lead), // contactName si disponible, sinon name
-      id: getSalutation(lead), // Toujours égal à firstName
-      companyName: lead.name,
-      websiteLink: lead.siteUrl || '#', // Toujours depuis site_url de la table leads
-      price: '146', // Prix par défaut
-      agentName: apiConfig.gmailSmtpFromName || 'Solutions Web',
-      agentEmail: apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai',
-      amount: '146',
-      validityDays: '7',
-      deliveryDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
-      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
-      devisLink: devisLinks[lead.id] || '#',
-      paymentLink: paymentLinks[lead.id]?.link || '#',
-      invoiceLink: invoiceLinks[lead.id] || '#',
-      invoiceNumber: `INV-${lead.id}-${Date.now()}`,
-      invoiceDate: new Date().toLocaleDateString('fr-FR'),
-      sector: lead.sector || 'votre secteur',
-      city: lead.city || 'votre ville'
-    };
-
-    let subject = template.subject;
-    let htmlContent = template.htmlContent;
-    let textContent = template.textContent;
-
-    // Remplacer les variables {{variable}}
-    for (const [key, val] of Object.entries(variables)) {
-      const regex = new RegExp(`{{${key}}}`, 'g');
-      subject = subject.replace(regex, val);
-      htmlContent = htmlContent.replace(regex, val);
-      textContent = textContent.replace(regex, val);
-    }
-
-    return { subject, htmlContent, textContent };
-  };
-
-  const personalizeTemplate = (template: EmailTemplate, lead: Lead, apiConfig: ApiConfig) => {
+  // Fonction de personnalisation partagée et robuste
+  const personalizeTemplateContent = (template: EmailTemplate, lead: Lead, config: ApiConfig) => {
+    // 1. Définir toutes les variables de remplacement
     const replacements: Record<string, string> = {
-      '{{name}}': lead.name,
-      '{{firstName}}': getSalutation(lead), // contactName si disponible, sinon name
-      '{{id}}': getSalutation(lead), // Toujours égal à firstName
-      '{{companyName}}': lead.name, // Toujours depuis la table leads
+      '{{name}}': lead.name || '',
+      '{{firstName}}': (lead.contactName || lead.name || '').trim(),
+      '{{id}}': (lead.contactName || lead.name || '').trim(),
+      '{{companyName}}': lead.name || '',
       '{{city}}': lead.city || 'votre ville',
       '{{sector}}': lead.sector || 'votre secteur',
-      '{{websiteLink}}': lead.siteUrl || '#', // Toujours depuis site_url de la table leads
+      '{{websiteLink}}': lead.siteUrl || '#',
       '{{landingUrl}}': lead.landingUrl || lead.siteUrl || '#',
       '{{email}}': lead.email || '',
-      // Variables de paiement Whop
-      '{{paymentLink}}': apiConfig.whopDepositLink || '#',
-      '{{finalPaymentLink}}': apiConfig.whopFinalPaymentLink || '#',
-      // Variables agent depuis Supabase
-      '{{agentName}}': apiConfig.gmailSmtpFromName || 'Solutions Web',
-      '{{agentEmail}}': apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai',
+      
+      // Liens de paiement dynamiques (Supabase api_config)
+      '{{paymentLink}}': config.whopDepositLink || '#',
+      '{{finalPaymentLink}}': config.whopFinalPaymentLink || '#',
+      
+      // Devis et Factures (URLs propres)
+      '{{devisLink}}': lead.id ? `https://leadforge.ai/api/docs/devis?id=${lead.id}` : '#',
+      '{{invoiceLink}}': lead.id ? `https://leadforge.ai/api/docs/invoice?id=${lead.id}` : '#',
+      
+      // Infos Agent (Supabase config)
+      '{{agentName}}': config.gmailSmtpFromName || 'Solutions Web',
+      '{{agentEmail}}': config.gmailSmtpFromEmail || 'contact@leadforge.ai',
+      
+      // Données dynamiques de vente
+      '{{price}}': '146',
+      '{{amount}}': '146',
+      '{{validityDays}}': '7',
+      '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+      '{{expiryDate}}': new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
     };
-    let subject = template.subject;
-    let body = template.htmlContent || template.textContent || template.subject; // Utiliser htmlContent en priorité
+
+    let subject = template.subject || '';
+    // Priorité au HTML pour la structure pro, fallback sur le texte
+    let body = template.htmlContent || template.textContent || ''; 
+
+    // 2. Remplacement massif et sécurisé
     for (const [key, val] of Object.entries(replacements)) {
       subject = subject.split(key).join(val);
       body = body.split(key).join(val);
     }
+
     return { subject, body };
   };
 
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
-    const allTemplates = [...salesTemplates, ...reminderTemplates];
+    const allTemplates = [...salesTemplates, ...reminderTemplates, ...templates];
     const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
-    const base = personalizeTemplate(template, lead, apiConfig);
+    
+    // Utiliser la nouvelle fonction de personnalisation robuste
+    const base = personalizeTemplateContent(template, lead, apiConfig);
 
     if (hasLLM) {
       try {
-        const prompt = `Personnalise cet email de prospection B2B. Garde le même format et le lien de la landing page. Réponds UNIQUEMENT en JSON.
+        const prompt = `Personnalise cet email de prospection B2B. Garde le même format HTML et tous les liens intacts (landing, devis, paiement). Réponds UNIQUEMENT en JSON.
 Lead: ${lead.name}, ${lead.sector || 'secteur inconnu'}, ${lead.city || 'ville inconnue'}
-Landing: ${lead.landingUrl || lead.siteUrl}
+Template: ${template.name}
 
 Email de base:
 Sujet: ${base.subject}
 Corps: ${base.body}
 
-JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le lien"}`;
+JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les liens inchangés"}`;
 
-        const response = await callLLM(apiConfig, prompt, 'Tu personnalises des emails de prospection en français. Garde toujours le lien de la landing page. Réponds en JSON.');
+        const response = await callLLM(apiConfig, prompt, 'Tu personnalises des emails de prospection pro. Tu ne modifies JAMAIS les balises HTML ou les liens href. Réponds en JSON.');
         if (response) {
           try {
             const cleaned = response.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
             const data = JSON.parse(cleaned);
             if (data.subject && data.body) return data;
-          } catch { /* use base */ }
+          } catch { /* fallback base */ }
         }
-      } catch { /* use base */ }
+      } catch { /* fallback base */ }
     }
 
     return base;
@@ -173,17 +154,20 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
     setPreviewEmail({ lead, subject, body });
   };
 
-  // Envoyer un email avec nouveau template
   const sendWorkflowEmail = async (lead: Lead, templateId: string) => {
     if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
     if (!lead.email) { alert("Ce lead n'a pas d'email"); return; }
 
-    const { subject, htmlContent } = personalizeOutreachTemplate(templateId, lead);
+    const template = [...salesTemplates, ...reminderTemplates].find(t => t.id === templateId);
+    if (!template) return;
+
+    const { subject, body } = personalizeTemplateContent(template, lead, apiConfig);
+    
     const result = await sendEmailViaApi({
       to: lead.email,
       toName: lead.name,
       subject,
-      html: htmlContent,
+      html: body, // Plus de replace br ici !
       leadId: lead.id,
     });
 
@@ -194,23 +178,24 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         stage: 'email_sent',
         lastContact: new Date().toISOString(),
       });
-      setLogs(prev => [...prev, `✅ ${templateId} envoyé à ${lead.name} (${lead.email})`]);
+      setLogs(prev => [...prev, `✅ ${template.name} envoyé à ${lead.name}`]);
       
-      // Logique workflow selon template
-        // Programmer rappel 3 jours après dans la base de données
+      // Programmer l'étape suivante si nécessaire
+      if (templateId === 'email1_presentation') {
         const scheduledDate = new Date();
         scheduledDate.setDate(scheduledDate.getDate() + 3);
         
         supabase.from('scheduled_emails').insert([{
           lead_id: lead.id,
           template_id: 'reminder1_after_email1',
-          scheduled_for: scheduledDate.toISOString()
+          scheduled_for: scheduledDate.toISOString(),
+          status: 'pending'
         }]).then(({ error }) => {
-          if (error) console.error("Erreur de planification du rappel 1:", error);
-          else setLogs(prev => [...prev, `📅 Rappel 1 programmé pour le ${scheduledDate.toLocaleDateString()}`]);
+          if (!error) setLogs(prev => [...prev, `📅 Rappel 1 programmé pour le ${scheduledDate.toLocaleDateString()}`]);
         });
+      }
     } else {
-      setLogs(prev => [...prev, `❌ Échec d'envoi ${templateId} à ${lead.name}: ${result.message}`]);
+      setLogs(prev => [...prev, `❌ Échec ${templateId} : ${result.message}`]);
     }
   };
 
@@ -291,7 +276,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
       to: lead.email,
       toName: lead.name,
       subject,
-      html: body.replace(/\n/g, '<br/>'),
+      html: body, // On envoie le HTML pur sans altération
       leadId: lead.id,
     });
 
@@ -302,7 +287,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         stage: 'email_sent',
         lastContact: new Date().toISOString(),
       });
-      setLogs(prev => [...prev, `✅ Email envoyé à ${lead.name} (${lead.email})`]);
+      setLogs(prev => [...prev, `✅ Email envoyé à ${lead.name}`]);
     } else {
       setLogs(prev => [...prev, `❌ Échec d'envoi à ${lead.name}: ${result.message}`]);
     }
@@ -325,7 +310,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
         to: lead.email!,
         toName: lead.name,
         subject,
-        html: body.replace(/\n/g, '<br/>'),
+        html: body,
         leadId: lead.id,
       });
 

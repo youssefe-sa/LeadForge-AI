@@ -140,12 +140,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const fromName = config.gmail_smtp_from_name || 'LeadForge AI';
     const fromEmail = config.gmail_smtp_from_email || config.gmail_smtp_user;
 
+    // Injection du pixel de tracking d'ouverture
+    let trackedHtml = html;
+    if (leadId) {
+      const trackingPixel = `<img src="https://leadforge.ai/api/track?id=${leadId}&type=email_opened" width="1" height="1" style="display:none !important;" />`;
+      if (trackedHtml.includes('</body>')) {
+        trackedHtml = trackedHtml.replace('</body>', `${trackingPixel}</body>`);
+      } else {
+        trackedHtml += trackingPixel;
+      }
+    }
+
     const info = await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
       to: `"${toName || to}" <${to}>`,
       subject,
-      html,
-      text: text || html.replace(/<[^>]*>/g, '')
+      html: trackedHtml,
+      text: text || trackedHtml.replace(/<[^>]*>/g, '')
     });
 
     await supabase.from('email_logs').insert([{

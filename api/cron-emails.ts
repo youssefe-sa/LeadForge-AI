@@ -68,16 +68,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           throw new Error('Lead has no email address');
         }
 
-        // Dans un environnement complet, on compilerait le template depuis supabase_store
-        // Pour simuler, on envoie un mail de base (à améliorer en utilisant les templates réels)
-        const html = `<p>Bonjour ${lead.name},</p><p>Ceci est un rappel automatique de LeadForge.</p>`;
-        const subject = `Rappel pour ${lead.name}`;
+        // Récupérer le template spécifique depuis la base ou utiliser un fallback
+        let subject = `Suivi de votre projet - ${lead.name}`;
+        let html = `<p>Bonjour ${lead.name},</p><p>Ceci est un suivi de LeadForge pour votre site web.</p>`;
+
+        const { data: template } = await supabase
+          .from('email_templates')
+          .select('*')
+          .eq('id', job.template_id)
+          .single();
+
+        if (template) {
+          subject = template.subject;
+          html = template.body;
+        }
+
+        // Fonction de personnalisation équivalente au frontend
+        const replacements: Record<string, string> = {
+          '{{name}}': lead.name || '',
+          '{{firstName}}': lead.name || '',
+          '{{companyName}}': lead.name || '',
+          '{{websiteLink}}': lead.site_url || '#',
+          '{{paymentLink}}': config.whop_deposit_link || '#',
+          '{{finalPaymentLink}}': config.whop_final_payment_link || '#',
+          '{{agentName}}': config.gmail_smtp_from_name || 'Solutions Web',
+          '{{agentEmail}}': config.gmail_smtp_from_email || config.gmail_smtp_user,
+          '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+        };
+
+        for (const [key, val] of Object.entries(replacements)) {
+          subject = subject.split(key).join(val as string);
+          html = html.split(key).join(val as string);
+        }
+
+        // Injection du pixel de tracking
+        const trackingPixel = `<img src="https://leadforge.ai/api/track?id=${lead.id}&type=email_opened" width="1" height="1" style="display:none;" />`;
+        html = html.includes('</body>') ? html.replace('</body>', `${trackingPixel}</body>`) : html + trackingPixel;
 
         const info = await transporter.sendMail({
           from: `"${fromName}" <${fromEmail}>`,
           to: `"${lead.name}" <${lead.email}>`,
-          subject: subject,
-          html: html,
+          subject,
+          html,
           text: html.replace(/<[^>]*>/g, '')
         });
 
