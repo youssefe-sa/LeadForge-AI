@@ -1,2 +1,8 @@
 .vercel
-.env*.local
+.env.local
+.env.*.local
+.env
+node_modules/
+dist/
+coverage/
+tsconfig.tsbuildinfo
