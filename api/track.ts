@@ -45,6 +45,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (Object.keys(updateData).length > 0) {
         await supabase.from('leads').update(updateData).eq('id', leadId);
+        
+        // --- LOGIQUE DE CHAINAGE INTELLIGENT ---
+        if (trackType === 'site_clicked') {
+          // 1. Annuler toutes les relances (reminders) programmées
+          await supabase.from('scheduled_emails')
+            .delete()
+            .eq('lead_id', leadId)
+            .eq('status', 'pending');
+            
+          // 2. Vérifier si l'Email 2 (Devis) a déjà été programmé ou envoyé
+          const { data: existingStep2 } = await supabase
+            .from('scheduled_emails')
+            .select('id')
+            .eq('lead_id', leadId)
+            .eq('template_id', 'email2_devis_paiement')
+            .limit(1);
+
+          if (!existingStep2 || existingStep2.length === 0) {
+            // 3. Programmer l'Email 2 (Devis & Paiement) pour +2 heures
+            const sendDate = new Date();
+            sendDate.setHours(sendDate.getHours() + 2);
+            
+            await supabase.from('scheduled_emails').insert([{
+              lead_id: leadId,
+              template_id: 'email2_devis_paiement',
+              scheduled_for: sendDate.toISOString(),
+              status: 'pending'
+            }]);
+          }
+        }
       }
 
       // Si c'est un clic sur un lien, on redirige

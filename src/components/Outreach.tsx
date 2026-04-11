@@ -206,67 +206,46 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     }
   };
 
-  // Générer lien de paiement Whop (simulation)
-  const generatePaymentLink = async (lead: Lead, amount: number = 146) => {
-    // Utiliser les vrais liens Whop s'ils sont configurés, sinon fallback sur simulation
-    const baseLink = amount === 46 ? apiConfig.whopDepositLink : apiConfig.whopFinalPaymentLink;
-    const paymentLink = baseLink || `https://whop.com/pay/leadforge-${lead.id}-${Date.now()}`;
+  const confirmDeposit = async (lead: Lead) => {
+    // 1. Annuler toutes les relances (reminders) programmées car le client a payé l'acompte
+    await supabase.from('scheduled_emails').delete().eq('lead_id', lead.id).eq('status', 'pending');
     
-    setPaymentLinks(prev => ({
-      ...prev,
-      [lead.id]: { link: paymentLink, amount, created: new Date().toISOString() }
-    }));
+    // 2. Envoyer immédiatement l'Email 3 (Confirmation Dépôt)
+    await sendWorkflowEmail(lead, 'email3_confirmation_depot');
     
-    setLogs(prev => [...prev, `💳 Lien paiement généré pour ${lead.name}: ${paymentLink}`]);
-    
-    return paymentLink;
-  };
-
-  // Générer lien de devis (simulation)
-  const generateDevisLink = async (lead: Lead) => {
-    const devisLink = `https://leadforge.ai/devis/${lead.id}-${Date.now()}.pdf`;
-    
-    setDevisLinks(prev => ({
-      ...prev,
-      [lead.id]: devisLink
-    }));
-    
-    setLogs(prev => [...prev, `📄 Lien devis généré pour ${lead.name}: ${devisLink}`]);
-    
-    return devisLink;
-  };
-
-  // Envoyer Email 2 avec devis et paiement
-  const sendEmail2WithPayment = async (lead: Lead) => {
-    const devisLink = await generateDevisLink(lead);
-    const paymentLink = await generatePaymentLink(lead);
-    
-    await sendWorkflowEmail(lead, 'email2_devis');
-    
-    // Programmer rappel expiration 5 jours après (2 jours avant fin)
+    // 3. Programmer le solde final (Email 4) dans 3 jours (périodes de dev standard)
     const scheduledDate = new Date();
-    scheduledDate.setDate(scheduledDate.getDate() + 5);
+    scheduledDate.setDate(scheduledDate.getDate() + 3);
     
-    supabase.from('scheduled_emails').insert([{
+    await supabase.from('scheduled_emails').insert([{
       lead_id: lead.id,
-      template_id: 'reminder2_before_expiry',
-      scheduled_for: scheduledDate.toISOString()
-    }]).then(({ error }) => {
-      if (error) console.error("Erreur de planification du rappel 2:", error);
-      else setLogs(prev => [...prev, `📅 Rappel 2 programmé pour le ${scheduledDate.toLocaleDateString()}`]);
-    });
+      template_id: 'email4_paiement_final',
+      scheduled_for: scheduledDate.toISOString(),
+      status: 'pending'
+    }]);
+
+    setLogs(prev => [...prev, `💵 Acompte validé pour ${lead.name}. Email 3 envoyé et Email 4 programmé.`]);
   };
 
-  // Envoyer Email 3 après paiement
-  const sendEmail3Confirmation = async (lead: Lead) => {
-    const invoiceLink = `https://leadforge.ai/invoice/${lead.id}-${Date.now()}.pdf`;
+  const confirmFinalPayment = async (lead: Lead) => {
+    // 1. Annuler toutes les relances programmées
+    await supabase.from('scheduled_emails').delete().eq('lead_id', lead.id).eq('status', 'pending');
     
-    setInvoiceLinks(prev => ({
-      ...prev,
-      [lead.id]: invoiceLink
-    }));
+    // 2. Envoyer immédiatement l'Email 5 (Confirmation Solde Final)
+    await sendWorkflowEmail(lead, 'email5_confirmation_paiement_final');
     
-    await sendWorkflowEmail(lead, 'email3_confirmation');
+    // 3. Programmer l'Email 6 (Livraison) pour dans 1 heure (le temps du déploiement final)
+    const deliveryDate = new Date();
+    deliveryDate.setHours(deliveryDate.getHours() + 1);
+    
+    await supabase.from('scheduled_emails').insert([{
+      lead_id: lead.id,
+      template_id: 'email6_livraison_documentation',
+      scheduled_for: deliveryDate.toISOString(),
+      status: 'pending'
+    }]);
+
+    setLogs(prev => [...prev, `🏆 Solde final validé pour ${lead.name}. Email 5 envoyé et Livraison (E6) programmée.`]);
     
     updateLead(lead.id, {
       stage: 'converted',
@@ -732,9 +711,16 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                     {lead.emailSentDate ? new Date(lead.emailSentDate).toLocaleDateString('fr-FR') : ''} — {lead.email}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 4 }}>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                   {lead.emailOpened && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 3, background: '#dbeafe', color: C.blue, fontWeight: 600 }}>Ouvert</span>}
-                  {lead.emailClicked && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 3, background: '#e8f5e9', color: C.green, fontWeight: 600 }}>Cliqué</span>}
+                  <button onClick={() => confirmDeposit(lead)} style={{
+                    padding: '4px 8px', borderRadius: 4, border: 'none',
+                    background: C.green, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                  }}>💰 Valider Acompte</button>
+                  <button onClick={() => confirmFinalPayment(lead)} style={{
+                    padding: '4px 8px', borderRadius: 4, border: 'none',
+                    background: C.amber, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                  }}>🏆 Valider Solde</button>
                 </div>
               </div>
             ))}
