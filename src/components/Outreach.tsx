@@ -69,6 +69,33 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
     return lead.name;
   };
 
+  // Fonction pour générer un mot de passe temporaire
+  const generateTemporaryPassword = (lead: Lead): string => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
+  // Fonction pour calculer une date en ajoutant des jours ouvrables (exclut samedi et dimanche)
+  const addBusinessDays = (date: Date, days: number): Date => {
+    const result = new Date(date);
+    let addedDays = 0;
+    
+    while (addedDays < days) {
+      result.setDate(result.getDate() + 1);
+      const dayOfWeek = result.getDay();
+      // 0 = dimanche, 6 = samedi
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        addedDays++;
+      }
+    }
+    
+    return result;
+  };
+
   // Fonction de personnalisation pour nouveaux templates
   const personalizeOutreachTemplate = (templateId: string, lead: Lead) => {
     const template = getTemplateById(templateId);
@@ -79,16 +106,21 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       id: getSalutation(lead), // Toujours égal à firstName
       companyName: lead.name,
       websiteLink: lead.siteUrl || '#', // Toujours depuis site_url de la table leads
-      price: '146', // Prix par défaut
+      price: '146€ HT', // Prix par défaut
       agentName: apiConfig.gmailSmtpFromName || 'Solutions Web',
       agentEmail: apiConfig.gmailSmtpFromEmail || 'contact@leadforge.ai',
-      amount: '146',
+      amount: '146€ HT',
       validityDays: '7',
       deliveryDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
       expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
       devisLink: devisLinks[lead.id] || '#',
       paymentLink: paymentLinks[lead.id]?.link || '#',
       invoiceLink: invoiceLinks[lead.id] || '#',
+      finalPaymentLink: apiConfig.whopFinalPaymentLink || '#',
+      adminLink: lead.siteUrl ? `${lead.siteUrl}/admin` : '#',
+      adminUsername: lead.email || 'admin',
+      adminPassword: generateTemporaryPassword(lead),
+      documentationLink: 'https://docs.leadforge.ai',
       invoiceNumber: `INV-${lead.id}-${Date.now()}`,
       invoiceDate: new Date().toLocaleDateString('fr-FR'),
       sector: lead.sector || 'votre secteur',
@@ -173,10 +205,64 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
     setPreviewEmail({ lead, subject, body });
   };
 
+  // Valider et générer les liens avant envoi
+  const validateAndGenerateLinks = async (lead: Lead, templateId: string) => {
+    const issues = [];
+    
+    // Générer devis si nécessaire
+    if (templateId === 'email2_devis' && !devisLinks[lead.id]) {
+      await generateDevisLink(lead);
+    }
+    
+    // Générer paiement si nécessaire
+    if ((templateId === 'email2_devis' || templateId === 'reminder1_after_email1') && !paymentLinks[lead.id]) {
+      await generatePaymentLink(lead, 46);
+    }
+    
+    // Générer facture si nécessaire
+    if (templateId === 'email3_confirmation' && !invoiceLinks[lead.id]) {
+      try {
+        const { generateAndSaveInvoice } = await import('../lib/generateDocuments');
+        const invoiceLink = await generateAndSaveInvoice(lead, '146€ HT', 'deposit');
+        setInvoiceLinks(prev => ({ ...prev, [lead.id]: invoiceLink }));
+      } catch (error) {
+        console.error('Erreur génération facture:', error);
+        issues.push('Erreur lors de la génération de la facture');
+      }
+    }
+    
+    // Générer paiement final si nécessaire
+    if ((templateId === 'email4_final_payment' || templateId === 'reminder3_final_payment') && !paymentLinks[lead.id]) {
+      await generatePaymentLink(lead, 100);
+    }
+    
+    // Valider les liens critiques
+    if (!lead.siteUrl || lead.siteUrl === '#') {
+      issues.push('Le site doit être généré avant l\'envoi');
+    }
+    
+    if (!apiConfig.whopDepositLink || apiConfig.whopDepositLink.trim() === '') {
+      issues.push('Le lien de dépôt 46€ n\'est pas configuré dans Supabase (api_config.whop_deposit_link)');
+    }
+    
+    if (!apiConfig.whopFinalPaymentLink || apiConfig.whopFinalPaymentLink.trim() === '') {
+      issues.push('Le lien de paiement final 100€ n\'est pas configuré dans Supabase (api_config.whop_final_payment_link)');
+    }
+    
+    return issues;
+  };
+
   // Envoyer un email avec nouveau template
   const sendWorkflowEmail = async (lead: Lead, templateId: string) => {
     if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
     if (!lead.email) { alert("Ce lead n'a pas d'email"); return; }
+
+    // Valider et générer les liens avant envoi
+    const issues = await validateAndGenerateLinks(lead, templateId);
+    if (issues.length > 0) {
+      alert('Erreur : ' + issues.join(', '));
+      return;
+    }
 
     const { subject, htmlContent } = personalizeOutreachTemplate(templateId, lead);
     const result = await sendEmailViaApi({
@@ -197,9 +283,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
       setLogs(prev => [...prev, `✅ ${templateId} envoyé à ${lead.name} (${lead.email})`]);
       
       // Logique workflow selon template
-        // Programmer rappel 3 jours après dans la base de données
-        const scheduledDate = new Date();
-        scheduledDate.setDate(scheduledDate.getDate() + 3);
+        // Programmer rappel 3 jours ouvrables après dans la base de données
+        const scheduledDate = addBusinessDays(new Date(), 3);
         
         supabase.from('scheduled_emails').insert([{
           lead_id: lead.id,
@@ -214,34 +299,43 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec le li
     }
   };
 
-  // Générer lien de paiement Whop (simulation)
+  // Générer lien de paiement Whop (utilise les vrais liens Supabase)
   const generatePaymentLink = async (lead: Lead, amount: number = 146) => {
-    // Utiliser les vrais liens Whop s'ils sont configurés, sinon fallback sur simulation
     const baseLink = amount === 46 ? apiConfig.whopDepositLink : apiConfig.whopFinalPaymentLink;
-    const paymentLink = baseLink || `https://whop.com/pay/leadforge-${lead.id}-${Date.now()}`;
+    
+    if (!baseLink || baseLink.trim() === '') {
+      throw new Error(`Lien Whop pour ${amount}€ non configuré dans Supabase (api_config)`);
+    }
     
     setPaymentLinks(prev => ({
       ...prev,
-      [lead.id]: { link: paymentLink, amount, created: new Date().toISOString() }
+      [lead.id]: { link: baseLink, amount, created: new Date().toISOString() }
     }));
     
-    setLogs(prev => [...prev, `💳 Lien paiement généré pour ${lead.name}: ${paymentLink}`]);
+    setLogs(prev => [...prev, `💳 Lien paiement ${amount}€ récupéré pour ${lead.name}`]);
     
-    return paymentLink;
+    return baseLink;
   };
 
-  // Générer lien de devis (simulation)
+  // Générer lien de devis (utilise la fonction réelle)
   const generateDevisLink = async (lead: Lead) => {
-    const devisLink = `https://leadforge.ai/devis/${lead.id}-${Date.now()}.pdf`;
-    
-    setDevisLinks(prev => ({
-      ...prev,
-      [lead.id]: devisLink
-    }));
-    
-    setLogs(prev => [...prev, `📄 Lien devis généré pour ${lead.name}: ${devisLink}`]);
-    
-    return devisLink;
+    try {
+      const { generateAndSaveDevis } = await import('../lib/generateDocuments');
+      const devisLink = await generateAndSaveDevis(lead, '146€ HT');
+      
+      setDevisLinks(prev => ({
+        ...prev,
+        [lead.id]: devisLink
+      }));
+      
+      setLogs(prev => [...prev, `📄 Devis généré pour ${lead.name}: ${devisLink}`]);
+      
+      return devisLink;
+    } catch (error) {
+      console.error('Erreur génération devis:', error);
+      setLogs(prev => [...prev, `❌ Erreur génération devis pour ${lead.name}`]);
+      throw error;
+    }
   };
 
   // Envoyer Email 2 avec devis et paiement
