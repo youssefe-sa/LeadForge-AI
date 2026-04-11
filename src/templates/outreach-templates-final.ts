@@ -187,25 +187,22 @@ export const salesTemplates: EmailTemplate[] = [
     textContent: `
 Bonjour {{firstName}},
 
-=== NOTRE PROPOSITION POUR {{companyName}} ===
+Notre proposition pour {{companyName}}
 
 Nous avons finalisé le développement de votre site web professionnel pour {{companyName}}. Notre équipe a créé une présence en ligne optimisée pour générer des conversions.
 
-VOTRE SITE WEB EST PRÊT :
-{{websiteLink}}
+Votre site web est prêt :
+VOTRE SITE WEB ICI
 
-=== QUI SOMMES-NOUS ? ===
-{{agentName}} est une agence web spécialisée dans la création de sites web professionnels pour les entreprises qui souhaitent se développer en ligne. Notre mission est de rendre le web accessible à tous les entrepreneurs avec des solutions performantes et abordables.
+Qui sommes-nous ? {{agentName}} est une agence web spécialisée dans la création de sites web professionnels pour les entreprises qui souhaitent se développer en ligne. Notre mission est de rendre le web accessible à tous les entrepreneurs avec des solutions performantes et abordables.
 
-=== POURQUOI CETTE INITIATIVE ? ===
-Nous avons remarqué que de nombreuses entreprises comme la vôtre méritent une présence en ligne professionnelle mais sont souvent découragées par les coûts élevés des agences traditionnelles. C'est pourquoi nous avons créé une solution adaptée : des sites web de qualité professionnelle à un prix accessible, avec un accompagnement personnalisé.
+Pourquoi cette initiative ? Nous avons remarqué que de nombreuses entreprises comme la vôtre méritent une présence en ligne professionnelle mais sont souvent découragées par les coûts élevés des agences traditionnelles. C'est pourquoi nous avons créé une solution adaptée : des sites web de qualité professionnelle à un prix accessible, avec un accompagnement personnalisé.
 
-=== NOTRE APPROCHE ===
-Nous analysons votre marché, comprenons vos objectifs, et créons un site web qui non seulement représente votre entreprise mais surtout qui génère des résultats concrets.
+Notre approche : Nous analysons votre marché, comprenons vos objectifs, et créons un site web qui non seulement représente votre entreprise mais surtout qui génère des résultats concrets.
 
-=== NOTRE PROPOSITION INCLUT ===
+Notre proposition inclut :
 
-🌐 SITE WEB PROFESSIONNEL COMPLET
+🌐 Site Web Professionnel Complet
 • Design sur mesure : Création unique adaptée à votre image et votre secteur d'activité
 • Responsive design : Affichage parfait sur ordinateur, tablette et smartphone
 • Pages essentielles : Accueil, Présentation, Services, Contact...
@@ -213,24 +210,24 @@ Nous analysons votre marché, comprenons vos objectifs, et créons un site web q
 • WhatsApp intégré : Vos clients peuvent vous contacter directement via WhatsApp
 • Chatbot intelligent : Assistant 24/7 pour répondre aux questions de vos visiteurs
 
-🚀 OPTIMISATION ET PERFORMANCE
+🚀 Optimisation et Performance
 • SEO optimisé : Référencement naturel pour apparaître dans Google
 • Performance rapide : Temps de chargement optimisé pour meilleure expérience utilisateur
 • Sécurité SSL : Certificat HTTPS inclus pour la sécurité de vos visiteurs
 • Analytics intégré : Suivi des visiteurs et statistiques de performance
 
-🎯 FORMATION ET SUPPORT
+🎯 Formation et Support
 • Documentation complète : Guides détaillés pour toutes les fonctionnalités
 • Support prioritaire : Assistance par email et téléphone pendant 3 mois
 • Mises à jour incluses : Maintenance et sécurité garanties
 
-🏆 AVANTAGES EXCLUSIFS
+🏆 Avantages Exclusifs
 • Garantie satisfaction : Remboursement complet si pas satisfait sous 30 jours
 • Livraison rapide : Site web prêt en 2 jours ouvrés
 • Économie garantie : 40% moins cher que les agences traditionnelles
 • Propriété totale : Vous êtes 100% propriétaire de votre site et domaine
 
-=== MODALITÉS DE PAIEMENT ===
+💰 Modalités de paiement
 Paiement en 2 étapes - Total : 146$
 
 🚀 Étape 1 - Dépôt pour commencer : 46$
@@ -243,19 +240,13 @@ Inclus dans le pack :
 2. Nom de domaine professionnel 1 an inclus
 3. mois gratuits de suivi et maintenance
 
-=== SOUHAITEZ-VOUS DÉMARRER VOTRE PROJET ? ===
-
-Pour démarrer le projet, cliquez sur ce lien :
-mailto:{{agentEmail}}?subject=Démarrage projet {{companyName}}&body=Bonjour, je souhaite démarrer le projet pour {{companyName}}.
-
-Pour poser des questions, cliquez sur ce lien :
-mailto:{{agentEmail}}?subject=Questions projet {{companyName}}&body=Bonjour {{agentName}}, j'ai quelques questions sur le projet pour {{companyName}}.
-
----
+Souhaitez-vous démarrer votre projet ?
+• Démarrer le projet
+• Plus de questions
 
 Cordialement,
 {{agentName}}
-Solutions Web - Votre partenaire web
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -433,44 +424,49 @@ Solutions Web - Votre partenaire web
     textContent: `
 Bonjour {{firstName}},
 
-=== NOTRE DÉMARCHE PERSONNALISÉE ===
-Chez {{agentName}}, nous croyons que chaque entreprise mérite une présence en ligne qui reflète véritablement son identité et ses ambitions. Après avoir écouté attentivement vos besoins pour {{companyName}}, nous avons préparé une proposition sur mesure qui combine expertise technique et compréhension de vos objectifs business.
+Notre démarche personnalisée :
+Chez {{agentName}}, nous croyons que chaque entreprise mérite 
+une présence en ligne qui reflète véritablement son identité et ses ambitions. Après avoir écouté attentivement 
+vos besoins pour {{companyName}}, nous avons préparé une proposition sur mesure qui combine expertise technique 
+et compréhension de vos objectifs business.
 
-=== POURQUOI UN DEVIS DÉTAILLÉ ? ===
-La transparence est au cœur de notre relation client. Ce devis n'est pas seulement un document financier, c'est notre engagement clair sur ce que nous allons livrer, quand nous allons le livrer, et comment nous allons garantir votre satisfaction.
+Pourquoi un devis détaillé ?
+La transparence est au cœur de notre relation client. 
+Ce devis n'est pas seulement un document financier, c'est notre engagement clair sur ce que nous allons 
+livrer, quand nous allons le livrer, et comment nous allons garantir votre satisfaction.
 
-=== VOTRE PROJET SUR MESURE ===
-Suite à nos échanges, voici votre devis détaillé pour la création de votre site web professionnel. Nous avons analysé vos besoins spécifiques pour créer une solution parfaitement adaptée à {{companyName}}.
+Votre projet sur mesure
+Suite à nos échanges, voici votre devis détaillé pour la création de votre site web professionnel. 
+Nous avons analysé vos besoins spécifiques pour créer une solution parfaitement adaptée à {{companyName}}.
 
-VOTRE DEVIS COMPLET :
-{{devisLink}}
+Votre devis complet : {{devisLink}}
 
-=== NOTRE PROCESSUS DE RÉALISATION EN 2 JOURS OUVRABLES ===
+Notre processus de réalisation en 2 jours ouvrables :
 
-📋 JOUR 1 - PHASE 1 & 2
+📋 Jour 1 - Phase 1 & 2
 • Validation rapide : Analyse de vos besoins et validation du cahier des charges
 • Validation maquette : La maquette visuelle est déjà prête (envoyée dans l'email 1), juste besoin de votre validation
 • Demandes de modifications : Si besoin, nous ajustons la maquette selon vos retours
 
-💻 JOUR 2 - PHASE 3 & 4
+💻 Jour 2 - Phase 3 & 4
 • Développement rapide : Intégration technique et fonctionnalités principales
 • Optimisation SEO : Intégration des meilleures pratiques de référencement
 • Tests et validation : Vérification sur tous appareils
 • Mise en ligne : Déploiement immédiat du site
 
-🚀 APRÈS LIVRAISON - SUPPORT ({{deliveryDate}})
+🚀 Après Livraison - Support ({{deliveryDate}})
 • Documentation complète : Guides détaillés pour gérer votre site
 • Support prioritaire : Assistance par email et téléphone pendant 3 mois
 • Monitoring : Suivi des performances et optimisation continue
 
-=== NOS GARANTIES EXCLUSIVES ===
+Nos garanties exclusives :
 • Garantie satisfaction 30 jours : Remboursement complet si pas satisfait
 • Livraison garantie : Respect des délais ou compensation
 • Prix fixe garanti : Pas de frais cachés ni surprises
 • Propriété totale : Vous êtes 100% propriétaire du code et du domaine
 • Support prioritaire : Assistance dédiée pendant 3 mois
 
-=== MODALITÉS DE PAIEMENT ===
+💰 Modalités de paiement
 Paiement en 2 étapes - Total : 146$
 
 🚀 Étape 1 - Dépôt pour commencer : 46$
@@ -479,23 +475,10 @@ Paiement en 2 étapes - Total : 146$
 Commencez maintenant avec seulement 46$ - Le reste sera dû à la livraison de votre site
 
 Offre valide {{validityDays}} jours. Paiement 100% sécurisé via Whop.
+Commencer votre projet (dépôt 46$) : {{paymentLink}}
 
-=== COMMENCER VOTRE PROJET (DÉPÔT 46$) ===
-{{paymentLink}}
-
-=== DES QUESTIONS SUR VOTRE DEVIS ? ===
-
-Pour demander des changements, cliquez sur ce lien :
-mailto:{{agentEmail}}?subject=Questions devis {{companyName}}
-
-Pour valider la maquette, cliquez sur ce lien :
-mailto:{{agentEmail}}?subject=Validation maquette {{companyName}}
-
----
-
-Cordialement,
 {{agentName}}
-Solutions Web - Votre partenaire web
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -616,49 +599,46 @@ Solutions Web - Votre partenaire web
     textContent: `
 Bonjour {{firstName}},
 
-=== 🚀 DÉPÔT CONFIRMÉ ! VOTRE PROJET {{companyName}} DÉMARRE MAINTENANT ===
+🚀 Dépôt confirmé ! Votre projet {{companyName}} démarre maintenant
 
-✅ DÉPÔT DE 46$ REÇU
-Nous vous confirmons la bonne réception de votre dépôt de 46$ pour votre projet {{companyName}}. Votre site web est maintenant officiellement en production avec notre équipe dédiée.
+✅ Dépôt de 46$ reçu
+Nous vous confirmons la bonne réception de votre dépôt de 46$ pour votre projet {{companyName}}. 
+Votre site web est maintenant officiellement en production avec notre équipe dédiée.
 
 Reste à payer : 100$ (à la livraison)
 
-=== 📅 VOTRE CALENDRIER DE PROJET ===
+📅 Votre calendrier de projet
 Livraison prévue le {{deliveryDate}}
 
-📋 PHASE 1 - DÉVELOPPEMENT (2 JOURS)
+📋 Phase 1 - Développement (2 jours)
 • Intégration technique et fonctionnalités principales
 • Optimisation SEO et performances
 • Tests et validation sur tous appareils
 
-🚀 PHASE 2 - LIVRAISON (JOUR J)
+🚀 Phase 2 - Livraison (Jour J)
 • Mise en ligne du site sur serveur
 • Paiement final de 100$
 • Remise des accès et documentation
 • Support technique 3 mois activé
 
-=== 📄 VOTRE FACTURE DE DÉPÔT ===
-Une facture pour votre dépôt de 46$ est disponible :
-{{invoiceLink}}
+📄 Votre facture de dépôt
+Une facture pour votre dépôt de 46$ est disponible : {{invoiceLink}}
 
-=== 💬 BESOIN D'AIDE ? ===
+💬 Besoin d'aide ?
 Pendant le développement, vous pouvez nous contacter à tout moment pour :
 • Suivre l'avancement de votre projet
 • Demander des modifications
 • Poser des questions techniques
 • Planifier une visioconférence
 
-Pour nous contacter, répondez simplement à cet email ou cliquez sur :
-mailto:{{agentEmail}}?subject=Suivi projet {{companyName}}
-
----
+Répondez simplement à cet email pour nous contacter
 
 Merci de votre confiance - Votre projet est entre de bonnes mains !
 Livraison garantie le {{deliveryDate}}
 
 Cordialement,
 {{agentName}}
-Solutions Web - Votre partenaire web
+Solutions Web
 {{agentEmail}}
    `
   },
@@ -766,42 +746,31 @@ Solutions Web - Votre partenaire web
     textContent: `
 Bonjour {{firstName}},
 
-=== 🎉 VOTRE SITE EST PRÊT ! {{companyName}} - LIVRAISON PRÉVUE LE {{deliveryDate}} ===
+🎉 Votre site web professionnel pour {{companyName}} est maintenant terminé !
 
-🚀 EXCELLENTE NOUVELLE !
-Votre site web professionnel pour {{companyName}} est maintenant terminé et prêt à être mis en ligne !
+Découvrez votre site : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
-DÉCOUVREZ VOTRE SITE :
-{{websiteLink}}
+💳 Dernière étape : Paiement final de 100$
 
-=== 💳 DERNIÈRE ÉTAPE : PAIEMENT FINAL DE 100$ ===
+Pour finaliser la livraison et débloquer l'accès complet à votre site, 
+il vous reste le paiement final de 100$.
 
-Pour finaliser la livraison et débloquer l'accès complet à votre site, il vous reste le paiement final de 100$.
+Payer maintenant : {{finalPaymentLink}}
 
-Une fois le paiement effectué, votre site sera immédiatement mis en ligne et accessible à vos clients.
-
-=== PAYER MAINTENANT ===
-{{finalPaymentLink}}
-
-=== 📦 APRÈS LE PAIEMENT ===
-Dès que votre paiement sera confirmé :
+Une fois le paiement effectué :
 🚀 Votre site sera mis en ligne immédiatement
-📧 Vous recevrez les accès administrateur
+📧 Vous recevrez les accès administrateur  
 📚 Documentation complète fournie
 🛡️ Support technique 3 mois inclus
 
-=== ⏰ VOTRE SITE EST PRÊT - FINALISEZ MAINTENANT POUR LA LIVRAISON IMMÉDIATE ! ===
+⏰ Votre site est prêt - Finalisez maintenant pour la livraison immédiate !
 
-Questions sur votre site ? Répondez simplement à cet email ou cliquez sur :
-mailto:{{agentEmail}}?subject=Questions site {{companyName}}
-
+Questions sur votre site ? Répondez simplement à cet email
 Livraison garantie sous 24h après paiement final
-
----
 
 Cordialement,
 {{agentName}}
-Solutions Web - Votre partenaire web
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -895,36 +864,30 @@ Solutions Web - Votre partenaire web
     textContent: `
 Bonjour {{firstName}},
 
-=== ✅ PAIEMENT FINAL CONFIRMÉ ! VOTRE SITE {{companyName}} EST MAINTENANT EN Ligne ===
+✅ Paiement final confirmé ! Votre site {{companyName}} est maintenant en ligne
 
-🎉 PROJET COMPLÉTÉ AVEC SUCCÈS !
-Nous vous confirmons la bonne réception de votre paiement final de 100$. Votre site web {{companyName}} est maintenant officiellement en ligne et accessible à vos clients !
+🎉 Projet complété avec succès !
+Nous vous confirmons la bonne réception de votre paiement final de 100$. 
+Votre site web {{companyName}} est maintenant officiellement en ligne et accessible à vos clients !
 
-DÉCOUVREZ VOTRE SITE EN LIGNE :
-{{websiteLink}}
+Découvrez votre site en ligne : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
-=== 📄 VOTRE FACTURE FINALE ===
-Une facture pour le paiement final de 100$ est disponible :
-{{invoiceLink}}
+📄 Votre facture finale
+Une facture pour le paiement final de 100$ est disponible : {{invoiceLink}}
 
-=== 📋 PROCHAINES ÉTAPES ===
+📋 Prochaines étapes
 Vous recevrez très prochainement un email avec :
 🔐 Vos accès administrateur au site
 📚 La documentation complète
 🛠️ Les guides de gestion
 📞 Informations sur votre support technique
 
----
-
 Félicitations ! Votre présence en ligne professionnelle est maintenant active
 Support technique 3 mois inclus - Nous sommes là pour vous
 
-Pour toute question, contactez-nous :
-mailto:{{agentEmail}}?subject=Support {{companyName}}
-
 Cordialement,
 {{agentName}}
-Solutions Web - Votre partenaire web
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -1037,27 +1000,21 @@ Solutions Web - Votre partenaire web
     textContent: `
 Bonjour {{firstName}},
 
-=== 🔐 LIVRAISON COMPLÈTE - ACCÈS ET DOCUMENTATION POUR {{companyName}} ===
+🔐 Livraison complète - Accès et documentation pour {{companyName}}
 
-=== 🔑 VOS ACCÈS ADMINISTRATEUR ===
+🔑 Vos accès administrateur
 Voici vos identifiants pour gérer votre site {{companyName}} :
 
-URL d'administration :
-{{adminLink}}
-
-Nom d'utilisateur :
-{{adminUsername}}
-
-Mot de passe :
-{{adminPassword}}
+URL d'administration : {{adminLink}}
+Nom d'utilisateur : {{adminUsername}}
+Mot de passe : {{adminPassword}}
 
 🔒 Conservez ces identifiants en sécurité et changez le mot de passe lors de votre première connexion
 
-=== 📚 DOCUMENTATION COMPLÈTE ===
-Accédez à notre documentation détaillée pour gérer votre site :
-{{documentationLink}}
+📚 Documentation complète
+Accédez à notre documentation détaillée pour gérer votre site : {{documentationLink}}
 
-=== 🛡️ VOTRE SUPPORT TECHNIQUE ===
+🛡️ Votre support technique
 Votre support technique prioritaire est actif pendant 3 mois :
 📧 Assistance par email (réponse sous 24h)
 🐛 Correction des bugs et problèmes techniques
@@ -1065,21 +1022,17 @@ Votre support technique prioritaire est actif pendant 3 mois :
 🔧 Mises à jour de sécurité
 📞 Conseil et accompagnement
 
-Pour toute question, contactez-nous :
-mailto:{{agentEmail}}?subject=Support {{companyName}}
+Pour toute question, contactez-nous : {{agentEmail}}
 
-=== 🌐 VOTRE SITE EN LIGNE ===
-Votre site est accessible à l'adresse :
-{{websiteLink}}
-
----
+🌐 Votre site en ligne
+Votre site est accessible à l'adresse : <a href="{{websiteLink}}">{{websiteLink}}</a>
 
 Merci de votre confiance - Nous sommes fiers de vous accompagner
 Support prioritaire 3 mois - Disponible 7j/7
 
 Cordialement,
 {{agentName}}
-Solutions Web - Votre partenaire web
+Solutions Web
 {{agentEmail}}
     `
   }
@@ -1249,43 +1202,49 @@ export const reminderTemplates: EmailTemplate[] = [
     textContent: `
 Bonjour {{firstName}},
 
-=== NOTRE ENGAGEMENT POUR VOTRE SUCCÈS ===
-Chez {{agentName}}, nous ne considérons pas que notre travail se termine avec l'envoi d'une proposition. Votre projet {{companyName}} mérite une attention particulière, et nous voulons nous assurer que vous disposez de toutes les informations pour prendre la meilleure décision pour votre entreprise.
+Notre engagement pour votre succès :
+Chez {{agentName}}, nous ne considérons pas que notre travail 
+se termine avec l'envoi d'une proposition. Votre projet {{companyName}} mérite une attention particulière, 
+et nous voulons nous assurer que vous disposez de toutes les informations pour prendre la meilleure décision pour votre entreprise.
 
-=== POURQUOI CE SUIVI ? ===
-Nous comprenons que lancer un site web est une décision importante. C'est un investissement dans votre avenir digital, et nous voulons répondre à toutes vos questions, partager notre expérience, et vous montrer concrètement comment nous allons transformer votre présence en ligne.
+Pourquoi ce suivi ?
+Nous comprenons que lancer un site web est une décision importante. 
+C'est un investissement dans votre avenir digital, et nous voulons répondre à toutes vos questions, 
+partager notre expérience, et vous montrer concrètement comment nous allons transformer votre présence en ligne.
 
-=== VOTRE SITE WEB VOUS ATTEND ===
-Je fais suite à notre précédent email concernant votre site web professionnel pour {{companyName}}. J'espère que vous avez eu l'occasion de consulter notre proposition détaillée.
+Votre site web vous attend
+Je fais suite à notre précédent email concernant votre site web professionnel pour {{companyName}}. 
+J'espère que vous avez eu l'occasion de consulter notre proposition détaillée.
 
-DÉCOUVREZ VOTRE FUTUR SITE :
-{{websiteLink}}
+Découvrez votre futur site : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
-=== POURQUOI CHOISIR {{agentName}} ? ===
+Pourquoi choisir {{agentName}} ?
 
-💰 PAIEMENT EN 2 ÉTAPES - TOTAL : 146$
-• Dépôt pour commencer : Seulement 46$ pour lancer votre projet
-• Paiement final à la livraison : 100$ lorsque votre site est prêt
+💰 Économie de 40% garantie
+• Prix transparent : 146€ HT contre 350€ HT minimum chez les agences traditionnelles
 • Pas de frais cachés : Hébergement et domaine inclus la première année
+• Maintenance économique : 46€ HT par an uniquement pour l'hébergement
 
-⚡ LIVRAISON EXPRESS 2 JOURS
+⚡ Livraison express 2 jours
 • Rapidité exceptionnelle : Site web prêt en 2 jours ouvrés
 • Processus optimisé : Méthodologie éprouvée sans compromis sur la qualité
 • Avantage concurrentiel : Soyez en ligne avant vos concurrents
 
-🛡️ GARANTIE SATISFACTION 30 JOURS
+🛡️ Garantie satisfaction 30 jours
 • Remboursement complet : Si pas satisfait, nous vous remboursons intégralement
 • Zéro risque : Testez notre service sans engagement financier
 • Confiance mutuelle : Notre réputation repose sur votre satisfaction
 
-=== CE QUE NOS CLIENTS DISENT ===
-"Solutions Web a transformé notre présence en ligne. Site professionnel, rapide, et surtout abordable. Nous avons économisé plus de 150€ par rapport aux autres devis !"
+Ce que nos clients disent :
+"Solutions Web a transformé notre présence en ligne. Site professionnel, rapide, et surtout abordable. 
+Nous avons économisé plus de 150€ par rapport aux autres devis !"
 - Marie T., Boutique en ligne
 
-"Livraison en 6 jours exactement comme promis. Le site est magnifique et nous a déjà apporté de nouveaux clients. Service exceptionnel !"
+"Livraison en 6 jours exactement comme promis. Le site est magnifique et nous a déjà apporté 
+de nouveaux clients. Service exceptionnel !"
 - Thomas L., Artisan
 
-=== QUESTIONS FRÉQUENTES ===
+Questions fréquentes :
 "Que se passe-t-il après le paiement ?"
 Nous vous contactons sous 24h pour valider les détails, puis nous commençons immédiatement le développement selon notre processus 4 étapes.
 
@@ -1295,22 +1254,31 @@ Absolument ! Nous vous formons pendant 2 heures et vous fournissons un accès co
 "Et si je ne suis pas satisfait ?"
 Notre garantie satisfaction 30 jours vous protège : remboursement complet sans condition si vous n'êtes pas satisfait.
 
-=== PRÊT À DÉMARRER VOTRE PROJET ? ===
+💰 Paiement en 2 étapes - Total : 146$
+🚀 Étape 1 - Dépôt pour commencer : 46$
+🎯 Étape 2 - Paiement final à la livraison : 100$
+Commencez maintenant avec seulement 46$ - Le reste sera dû à la livraison de votre site
 
-Pour commencer avec 46$, cliquez sur ce lien :
-{{paymentLink}}
+Questions fréquentes :
+"Que se passe-t-il après le paiement ?"
+Nous vous contactons sous 24h pour valider les détails, puis nous commençons immédiatement le développement selon notre processus 4 étapes.
 
-Pour discuter du projet, cliquez sur ce lien :
-mailto:{{agentEmail}}?subject=Questions {{companyName}}
+"Puis-je modifier mon site après la livraison ?"
+Absolument ! Nous vous formons pendant 2 heures et vous fournissons un accès complet pour gérer votre site en autonomie.
 
----
+"Et si je ne suis pas satisfait ?"
+Notre garantie satisfaction 30 jours vous protège : remboursement complet sans condition si vous n'êtes pas satisfait.
+
+Prêt à démarrer votre projet ?
+• Commencer avec 46$
+• Discuter du projet
 
 Votre projet professionnel vous attend - Commencez avec seulement 46$
 Nous sommes là pour répondre à toutes vos questions
 
 Cordialement,
 {{agentName}}
-Solutions Web - Votre partenaire web
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -1434,39 +1402,43 @@ Solutions Web - Votre partenaire web
     textContent: `
 Bonjour {{firstName}},
 
-=== UN MESSAGE IMPORTANT POUR VOTRE ENTREPRISE ===
-Je vous écris aujourd'hui avec un certain sentiment d'urgence, parce que nous sommes à un moment décisif pour votre projet {{companyName}}. Les opportunités exceptionnelles sont rares, et celle que nous vous avons proposée est sur le point de disparaître définitivement.
+Un message important pour votre entreprise :
+Je vous écris aujourd'hui avec un certain sentiment d'urgence, 
+parce que nous sommes à un moment décisif pour votre projet {{companyName}}. Les opportunités exceptionnelles sont rares, 
+et celle que nous vous avons proposée est sur le point de disparaître définitivement.
 
-=== POURQUOI CETTE INSISTANCE ? ===
-Parce que nous avons constaté que trop d'entreprises manquent leur chance de se développer en ligne à cause d'hésitations ou de procrastination. Votre présence digitale n'est pas une option, c'est une nécessité stratégique pour votre croissance future.
+Pourquoi cette insistance ?
+Parce que nous avons constaté que trop d'entreprises manquent 
+leur chance de se développer en ligne à cause d'hésitations ou de procrastination. Votre présence digitale 
+n'est pas une option, c'est une nécessité stratégique pour votre croissance future.
 
-=== ⚠️ OFFRE EXPIRE LE {{expiryDate}} ===
-C'est votre dernière opportunité ! Notre offre spéciale pour votre site web {{companyName}} expire dans quelques jours. Ne manquez pas cette chance d'économiser 40% sur votre présence en ligne professionnelle.
+⚠️ Offre expire le {{expiryDate}}
+C'est votre dernière opportunité ! Notre offre spéciale pour votre site web {{companyName}} expire dans quelques jours. 
+Ne manquez pas cette chance d'économiser 40% sur votre présence en ligne professionnelle.
 
-=== FINALISER MAINTENANT ===
-{{paymentLink}}
+Finaliser maintenant : {{paymentLink}}
 
-=== CE QUE VOUS RISQUEZ DE PERDRE CONCRÈTEMENT ===
+Ce que vous risquez de perdre concrètement :
 
-💸 IMPACT FINANCIER IMMÉDIAT
+💸 Impact financier immédiat
 • Perte de 204€ : Le même site coûtera 350€ HT au lieu de 146€ HT après expiration
 • Hébergement payant : Plus d'hébergement gratuit la première année (+60€)
 • Domaine facturé : Le nom de domaine ne sera plus inclus (+20€)
 
-⏰ IMPACT TEMPOREL
-• Attente 3-4 semaines : Au lieu de 2 jours avec notre offre express
+⏰ Impact temporel
+• Attente 3-4 semaines : Au lieu de 7 jours avec notre offre express
 • Perte d'opportunités : Chaque semaine sans site = clients potentiels perdus
 • Concurrence avancée : Vos concurrents pourraient déjà être en ligne
 
-🛡️ IMPACT SUR LA SÉCURITÉ
+🛡️ Impact sur la sécurité
 • Garantie perdue : Plus de garantie satisfaction 30 jours
 • Risque financier : Engagement sans possibilité de remboursement
 • Support limité : Assistance standard au lieu du support prioritaire
 
-=== COMPARAISON : MAINTENANT VS PLUS TARD ===
+Comparaison : Maintenant vs Plus tard
 
 ✅ AVEC L'OFFRE ACTUELLE (expire le {{expiryDate}})
-• Investissement : 146$ (économie de 204€)
+• Investissement : 146€ HT (économie de 204€)
 • Livraison : 2 jours ouvrés
 • Hébergement : 1 an gratuit
 • Domaine : Inclus gratuitement
@@ -1474,33 +1446,25 @@ C'est votre dernière opportunité ! Notre offre spéciale pour votre site web {
 • Support : Prioritaire 3 mois
 
 ❌ APRÈS EXPIRATION (à partir du {{expiryDate}})
-• Investissement : 350$ minimum
+• Investissement : 350€ HT minimum
 • Livraison : 3-4 semaines standard
-• Hébergement : 60$ par an
-• Domaine : 20$ par an
+• Hébergement : 60€ HT par an
+• Domaine : 20€ HT par an
 • Garantie : Standard 14 jours
 • Support : Standard 30 jours
 
-=== TÉMOIGNAGE D'URGENCE ===
-"J'ai hésité et perdu l'offre spéciale. J'ai dû payer 150$ de plus pour le même site, et attendre 3 semaines au lieu de 2 jours. Ne faites pas ma même erreur !"
+Témoignage d'urgence :
+"J'ai hésité et perdu l'offre spéciale. J'ai dû payer 150€ de plus pour le même site, 
+et attendre 3 semaines au lieu de 7 jours. Ne faites pas ma même erreur !"
 - Alexandre P., Restaurant (regrette son attente)
 
-=== NE LAISSEZ PAS CETTE OPPORTUNITÉ VOUS ÉCHAPPER ! ===
-
-Pour payer maintenant, cliquez sur ce lien :
-{{paymentLink}}
-
-Pour contacter d'urgence, cliquez sur ce lien :
-mailto:{{agentEmail}}?subject=Urgence {{companyName}}
-
----
-
-Cette offre exceptionnelle expire bientôt - Agissez maintenant
-Votre projet professionnel mérite cette opportunité unique
+Ne laissez pas cette opportunité vous échapper !
+• Payer maintenant
+• Contacter d'urgence
 
 Cordialement,
 {{agentName}}
-Solutions Web - Votre partenaire web
+Solutions Web
 {{agentEmail}}
     `
   },
@@ -1608,42 +1572,36 @@ Solutions Web - Votre partenaire web
     textContent: `
 Bonjour {{firstName}},
 
-=== 🎉 VOTRE SITE EST PRÊT ! {{companyName}} - DERNIÈRE ÉTAPE AVANT LA MISE EN LIGNE ===
+🎉 Votre site est prêt ! {{companyName}} - Dernière étape avant la mise en ligne
 
-🚀 EXCELLENTE NOUVELLE !
+🚀 Excellente nouvelle !
 Votre site web professionnel pour {{companyName}} est maintenant terminé et prêt à être mis en ligne !
 
-DÉCOUVREZ VOTRE SITE :
-{{websiteLink}}
+Découvrez votre site : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
-=== 💳 DERNIÈRE ÉTAPE : PAIEMENT FINAL ===
-Pour finaliser la livraison et débloquer l'accès complet à votre site, il vous reste le paiement final de 100$.
+💳 Dernière étape : Paiement final
+Pour finaliser la livraison et débloquer l'accès complet à votre site, 
+il vous reste le paiement final de 100$.
+
+Payer maintenant : {{finalPaymentLink}}
 
 Une fois le paiement effectué, votre site sera immédiatement mis en ligne et accessible à vos clients.
 
-=== PAYER MAINTENANT ===
-{{finalPaymentLink}}
-
-=== 📦 APRÈS LE PAIEMENT ===
+📦 Après le paiement
 Dès que votre paiement sera confirmé :
 🚀 Votre site sera mis en ligne immédiatement
 📧 Vous recevrez les accès administrateur
 📚 Documentation complète fournie
 🛡️ Support technique 3 mois inclus
 
-=== ⏰ VOTRE SITE EST PRÊT - FINALISEZ MAINTENANT POUR LA LIVRAISON IMMÉDIATE ! ===
-
-Questions sur votre site ? Répondez simplement à cet email ou cliquez sur :
-mailto:{{agentEmail}}?subject=Questions site {{companyName}}
-
----
+⏰ Votre site est prêt - Finalisez maintenant pour la livraison immédiate !
 
 Votre présence en ligne professionnelle est à un clic de distance
 Finalisez maintenant et soyez en ligne dans les 24h
 
 Cordialement,
 {{agentName}}
-Solutions Web - Votre partenaire web
+Solutions Web
 {{agentEmail}}
     `
   }
