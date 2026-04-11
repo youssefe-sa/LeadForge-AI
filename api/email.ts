@@ -10,34 +10,6 @@ function getSupabase() {
   return createClient(url, key);
 }
 
-// Fonction de retry avec backoff exponentiel
-async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3,
-  baseDelayMs: number = 1000
-): Promise<T> {
-  let lastError: Error | null = null;
-  
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error as Error;
-      
-      if (attempt === maxRetries) {
-        throw lastError;
-      }
-      
-      // Backoff exponentiel: delay = baseDelay * 2^attempt
-      const delay = baseDelayMs * Math.pow(2, attempt);
-      console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms delay`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-  
-  throw lastError;
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -75,34 +47,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Invalid emails array' });
       }
 
-      // Priorité aux variables d'environnement, fallback vers Supabase
-      const smtpUser = process.env.GMAIL_SMTP_USER;
-      const smtpPassword = process.env.GMAIL_SMTP_PASSWORD;
-      const fromName = process.env.GMAIL_SMTP_FROM_NAME || 'LeadForge AI';
-      const fromEmail = process.env.GMAIL_SMTP_FROM_EMAIL;
-
-      // Si les variables d'environnement ne sont pas définies, utiliser Supabase
-      let config;
-      if (!smtpUser || !smtpPassword) {
-        const { data: supabaseConfig, error: configErr } = await supabase.from('api_config').select('*').eq('id', 1).single();
-        if (configErr || !supabaseConfig?.gmail_smtp_user || !supabaseConfig?.gmail_smtp_password) {
-          return res.status(400).json({ 
-            error: 'SMTP not configured', 
-            message: 'Please configure Gmail SMTP in Settings or Environment Variables (GMAIL_SMTP_USER, GMAIL_SMTP_PASSWORD)' 
-          });
-        }
-        config = supabaseConfig;
+      const { data: config, error: configErr } = await supabase.from('api_config').select('*').eq('id', 1).single();
+      if (configErr || !config?.gmail_smtp_user || !config?.gmail_smtp_password) {
+        return res.status(400).json({ error: 'SMTP not configured', message: 'Please configure Gmail SMTP in Settings' });
       }
 
-      const port = config?.gmail_smtp_port || 587;
+      const port = config.gmail_smtp_port || 587;
       const transporter = createTransport({
-        host: config?.gmail_smtp_host || 'smtp.gmail.com',
+        host: config.gmail_smtp_host || 'smtp.gmail.com',
         port,
         secure: port === 465,
-        auth: { 
-          user: smtpUser || config.gmail_smtp_user, 
-          pass: (smtpPassword || config.gmail_smtp_password).replace(/\s/g, '') 
-        },
+        auth: { user: config.gmail_smtp_user, pass: config.gmail_smtp_password.replace(/\s/g, '') },
         tls: { rejectUnauthorized: false }
       });
 
@@ -110,6 +65,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(500).json({ error: 'SMTP verification failed', message: (e as Error).message });
       }
 
+      const fromName = config.gmail_smtp_from_name || 'LeadForge AI';
+      const fromEmail = config.gmail_smtp_from_email || config.gmail_smtp_user;
       const results: unknown[] = [];
       const errors: unknown[] = [];
 
@@ -117,17 +74,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const emailData = emails[i] as Record<string, unknown>;
         try {
           const { to, toName, subject, html, leadId } = emailData;
-          
-          // Utiliser retryWithBackoff pour l'envoi d'email
-          const info = await retryWithBackoff(async () => {
-            return await transporter.sendMail({
-              from: `"${fromName}" <${fromEmail}>`,
-              to: `"${(toName as string) || (to as string)}" <${to as string}>`,
-              subject: subject as string,
-              html: html as string,
-              text: (html as string).replace(/<[^>]*>/g, '')
-            });
-          }, 3, 1000);
+          const info = await transporter.sendMail({
+            from: `"${fromName}" <${fromEmail}>`,
+            to: `"${(toName as string) || (to as string)}" <${to as string}>`,
+            subject: subject as string,
+            html: html as string,
+            text: (html as string).replace(/<[^>]*>/g, '')
+          });
 
           await supabase.from('email_logs').insert([{
             lead_id: leadId || null, to_email: to, subject, status: 'sent', sent_at: new Date().toISOString()
@@ -165,52 +118,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'to, subject, html are required' });
     }
 
-    // Priorité aux variables d'environnement, fallback vers Supabase
-    const smtpUser = process.env.GMAIL_SMTP_USER;
-    const smtpPassword = process.env.GMAIL_SMTP_PASSWORD;
-    const envFromName = process.env.GMAIL_SMTP_FROM_NAME;
-    const envFromEmail = process.env.GMAIL_SMTP_FROM_EMAIL;
-
-    // Si les variables d'environnement ne sont pas définies, utiliser Supabase
-    let config;
-    if (!smtpUser || !smtpPassword) {
-      const { data: supabaseConfig, error: configErr } = await supabase.from('api_config').select('*').eq('id', 1).single();
-      if (configErr || !supabaseConfig?.gmail_smtp_user || !supabaseConfig?.gmail_smtp_password) {
-        return res.status(400).json({ 
-          error: 'SMTP not configured', 
-          message: 'Please configure Gmail SMTP in Settings or Environment Variables (GMAIL_SMTP_USER, GMAIL_SMTP_PASSWORD)' 
-        });
-      }
-      config = supabaseConfig;
+    const { data: config, error: configErr } = await supabase.from('api_config').select('*').eq('id', 1).single();
+    if (configErr || !config?.gmail_smtp_user || !config?.gmail_smtp_password) {
+      return res.status(400).json({
+        error: 'SMTP not configured',
+        message: 'Please configure Gmail SMTP in Settings (gmailSmtpUser + gmailSmtpPassword required)'
+      });
     }
 
-    const port = config?.gmail_smtp_port || 587;
+    const port = config.gmail_smtp_port || 587;
     const transporter = createTransport({
-      host: config?.gmail_smtp_host || 'smtp.gmail.com',
+      host: config.gmail_smtp_host || 'smtp.gmail.com',
       port,
       secure: port === 465,
-      auth: { 
-        user: smtpUser || config.gmail_smtp_user, 
-        pass: (smtpPassword || config.gmail_smtp_password).replace(/\s/g, '') 
-      },
+      auth: { user: config.gmail_smtp_user, pass: config.gmail_smtp_password.replace(/\s/g, '') },
       tls: { rejectUnauthorized: false }
     });
 
     await transporter.verify();
 
-    const fromName = envFromName || config?.gmail_smtp_from_name || 'LeadForge AI';
-    const fromEmail = envFromEmail || config?.gmail_smtp_from_email || config?.gmail_smtp_user || smtpUser;
+    const fromName = config.gmail_smtp_from_name || 'LeadForge AI';
+    const fromEmail = config.gmail_smtp_from_email || config.gmail_smtp_user;
 
-    // Utiliser retryWithBackoff pour l'envoi d'email
-    const info = await retryWithBackoff(async () => {
-      return await transporter.sendMail({
-        from: `"${fromName}" <${fromEmail}>`,
-        to: `"${toName || to}" <${to}>`,
-        subject,
-        html,
-        text: text || html.replace(/<[^>]*>/g, '')
-      });
-    }, 3, 1000);
+    const info = await transporter.sendMail({
+      from: `"${fromName}" <${fromEmail}>`,
+      to: `"${toName || to}" <${to}>`,
+      subject,
+      html,
+      text: text || html.replace(/<[^>]*>/g, '')
+    });
 
     await supabase.from('email_logs').insert([{
       lead_id: leadId || null, to_email: to, subject, body: html,

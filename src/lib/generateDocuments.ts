@@ -68,21 +68,21 @@ tr:nth-child(even) td { background: #fafafa; }
     <tr>
       <td>Site web professionnel</td>
       <td>Design moderne responsive — Secteur ${lead.sector || 'professionnel'} — SEO local — Hébergement 1 an — Livraison en ${deliveryDate}</td>
-      <td style="text-align:right">${price}€ HT</td>
+      <td style="text-align:right">${price} $</td>
     </tr>
     <tr>
       <td>Acompte (dépôt)</td>
       <td>Paiement initial pour démarrer les travaux</td>
-      <td style="text-align:right">${deposit}€</td>
+      <td style="text-align:right">${deposit} $</td>
     </tr>
     <tr>
       <td>Solde à la livraison</td>
       <td>Paiement final à la remise du site terminé</td>
-      <td style="text-align:right">${final}€</td>
+      <td style="text-align:right">${final} $</td>
     </tr>
     <tr class="total-row">
       <td colspan="2">TOTAL</td>
-      <td style="text-align:right;color:#D4500A">${price}€ HT</td>
+      <td style="text-align:right;color:#D4500A">${price} $</td>
     </tr>
   </tbody>
 </table>
@@ -150,11 +150,11 @@ td { padding: 12px 16px; border-bottom: 1px solid #eee; font-size: 14px; }
   <tbody>
     <tr>
       <td>Site web professionnel — ${lead.sector || 'Services'} — ${lead.name}<br><small>${label}</small></td>
-      <td style="text-align:right">${amount}€</td>
+      <td style="text-align:right">${amount} $</td>
     </tr>
     <tr class="total-row">
       <td>TOTAL RECU</td>
-      <td style="text-align:right;color:#D4500A">${amount}€</td>
+      <td style="text-align:right;color:#D4500A">${amount} $</td>
     </tr>
   </tbody>
 </table>

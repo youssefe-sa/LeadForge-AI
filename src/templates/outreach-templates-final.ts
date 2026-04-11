@@ -21,24 +21,15 @@ export const salesTemplates: EmailTemplate[] = [
     subject: '🚀 {{companyName}} - Votre site web professionnel est prêt',
     variables: ['firstName', 'companyName', 'websiteLink', 'price', 'agentName', 'agentEmail'],
     htmlContent: `
-      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-      <html xmlns="http://www.w3.org/1999/xhtml">
+      <!DOCTYPE html>
+      <html>
       <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="x-apple-disable-message-reformatting" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Solutions Web - Votre site web</title>
-        <!--[if mso]>
-        <style>
-          table { border-collapse: collapse; }
-        </style>
-        <![endif]-->
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td align="center" style="padding: 40px 20px;">
-              <table width="600" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
           
           <!-- Header Simple -->
           <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
@@ -59,7 +50,7 @@ export const salesTemplates: EmailTemplate[] = [
               </p>
               <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Votre site web est prêt :</p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">VOTRE SITE WEB ICI</a>
               </p>
             </div>
             
@@ -132,19 +123,19 @@ export const salesTemplates: EmailTemplate[] = [
             <div style="background-color: #fff3cd; padding: 25px; margin: 30px 0; border: 1px solid #ffeaa7;">
               <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">💰 Modalités de paiement</h3>
               <div style="margin-bottom: 20px;">
-                <p style="font-size: 18px; font-weight: 600; margin: 10px 0; color: #2c3e50;">Paiement en 2 étapes - Total : 146€ HT</p>
+                <p style="font-size: 18px; font-weight: 600; margin: 10px 0; color: #2c3e50;">Paiement en 2 étapes - Total : 146$</p>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 15px 0;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <span style="font-weight: 600; color: #28a745;">🚀 Étape 1 - Dépôt pour commencer</span>
-                    <span style="font-weight: bold; color: #28a745; font-size: 16px;">46€</span>
+                    <span style="font-weight: bold; color: #28a745; font-size: 16px;">46$</span>
                   </div>
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-weight: 600; color: #007bff;">🎯 Étape 2 - Paiement final à la livraison</span>
-                    <span style="font-weight: bold; color: #007bff; font-size: 16px;">100€</span>
+                    <span style="font-weight: bold; color: #007bff; font-size: 16px;">100$</span>
                   </div>
                 </div>
                 <p style="margin: 15px 0 0 0; font-size: 14px; color: #856404;">
-                  <strong>Commencez maintenant avec seulement 46€</strong> - Le reste sera dû à la livraison de votre site
+                  <strong>Commencez maintenant avec seulement 46$</strong> - Le reste sera dû à la livraison de votre site
                 </p>
               </div>
               <div style="padding-top: 15px; border-top: 1px solid #ffeaa7;">
@@ -189,10 +180,7 @@ export const salesTemplates: EmailTemplate[] = [
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
-              </table>
-            </td>
-          </tr>
-        </table>
+        </div>
       </body>
       </html>
     `,
@@ -240,12 +228,12 @@ Notre proposition inclut :
 • Propriété totale : Vous êtes 100% propriétaire de votre site et domaine
 
 💰 Modalités de paiement
-Paiement en 2 étapes - Total : 146€ HT
+Paiement en 2 étapes - Total : 146$
 
-🚀 Étape 1 - Dépôt pour commencer : 46€
-🎯 Étape 2 - Paiement final à la livraison : 100€
+🚀 Étape 1 - Dépôt pour commencer : 46$
+🎯 Étape 2 - Paiement final à la livraison : 100$
 
-Commencez maintenant avec seulement 46€ - Le reste sera dû à la livraison de votre site
+Commencez maintenant avec seulement 46$ - Le reste sera dû à la livraison de votre site
 
 Inclus dans le pack :
 1. Hébergement professionnel 1 an inclus
@@ -265,29 +253,20 @@ Solutions Web
 
   {
     id: 'email2_devis',
-    name: 'Email 2 - Devis',
+    name: 'Email 2 - Devis et Paiement',
     category: 'sale',
-    subject: '📋 Devis personnalisé pour {{companyName}}',
-    variables: ['firstName', 'companyName', 'websiteLink', 'price', 'agentName', 'agentEmail', 'devisLink', 'paymentLink', 'validityDays', 'deliveryDate'],
+    subject: 'Devis détaillé pour votre site web {{companyName}}',
+    variables: ['firstName', 'companyName', 'devisLink', 'paymentLink', 'price', 'agentName', 'agentEmail', 'validityDays', 'deliveryDate'],
     htmlContent: `
-      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-      <html xmlns="http://www.w3.org/1999/xhtml">
+      <!DOCTYPE html>
+      <html>
       <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="x-apple-disable-message-reformatting" />
-        <title>Devis personnalisé</title>
-        <!--[if mso]>
-        <style>
-          table { border-collapse: collapse; }
-        </style>
-        <![endif]-->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Solutions Web - Devis Site Web</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td align="center" style="padding: 40px 20px;">
-              <table width="600" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
           
           <!-- Header -->
           <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
@@ -376,31 +355,31 @@ Solutions Web
             <div style="background-color: #fff3cd; padding: 25px; margin: 30px 0; border: 1px solid #ffeaa7;">
               <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">💰 Modalités de paiement</h3>
               <div style="margin-bottom: 20px;">
-                <p style="font-size: 18px; font-weight: 600; margin: 10px 0; color: #2c3e50;">Paiement en 2 étapes - Total : 146€ HT</p>
+                <p style="font-size: 18px; font-weight: 600; margin: 10px 0; color: #2c3e50;">Paiement en 2 étapes - Total : 146$</p>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 15px 0;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <span style="font-weight: 600; color: #28a745;">🚀 Étape 1 - Dépôt pour commencer</span>
-                    <span style="font-weight: bold; color: #28a745; font-size: 16px;">46€</span>
+                    <span style="font-weight: bold; color: #28a745; font-size: 16px;">46$</span>
                   </div>
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-weight: 600; color: #007bff;">🎯 Étape 2 - Paiement final à la livraison</span>
-                    <span style="font-weight: bold; color: #007bff; font-size: 16px;">100€</span>
+                    <span style="font-weight: bold; color: #007bff; font-size: 16px;">100$</span>
                   </div>
                 </div>
                 <p style="margin: 15px 0 0 0; font-size: 14px; color: #856404;">
-                  <strong>Commencez maintenant avec seulement 46€</strong> - Le reste sera dû à la livraison de votre site
+                  <strong>Commencez maintenant avec seulement 46$</strong> - Le reste sera dû à la livraison de votre site
                 </p>
               </div>
               <div style="padding-top: 15px; border-top: 1px solid #ffeaa7; margin-top: 15px;">
                 <p style="margin: 0 0 15px 0; font-size: 14px; color: #856404;">
                   Offre valide {{validityDays}} jours. Paiement 100% sécurisé via Whop.
                 </p>
-                <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Commencer votre projet (dépôt 46€) :</p>
+                <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Commencer votre projet (dépôt 46$) :</p>
                 <div style="text-align: center; margin: 20px 0;">
                   <a href="{{paymentLink}}" 
                      style="background: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);"
                      target="_blank">
-                    💳 Payer 46€ pour commencer →
+                    💳 Payer 46$ pour commencer →
                   </a>
                 </div>
               </div>
@@ -438,10 +417,7 @@ Solutions Web
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
-              </table>
-            </td>
-          </tr>
-        </table>
+        </div>
       </body>
       </html>
     `,
@@ -491,15 +467,15 @@ Nos garanties exclusives :
 • Support prioritaire : Assistance dédiée pendant 3 mois
 
 💰 Modalités de paiement
-Paiement en 2 étapes - Total : 146€ HT
+Paiement en 2 étapes - Total : 146$
 
-🚀 Étape 1 - Dépôt pour commencer : 46€
-🎯 Étape 2 - Paiement final à la livraison : 100€
+🚀 Étape 1 - Dépôt pour commencer : 46$
+🎯 Étape 2 - Paiement final à la livraison : 100$
 
-Commencez maintenant avec seulement 46€ - Le reste sera dû à la livraison de votre site
+Commencez maintenant avec seulement 46$ - Le reste sera dû à la livraison de votre site
 
 Offre valide {{validityDays}} jours. Paiement 100% sécurisé via Whop.
-Commencer votre projet (dépôt 46€) : {{paymentLink}}
+Commencer votre projet (dépôt 46$) : {{paymentLink}}
 
 {{agentName}}
 Solutions Web
@@ -536,13 +512,13 @@ Solutions Web
             
             <!-- Confirmation -->
             <div style="background-color: #d4edda; padding: 25px; margin: 0 0 30px 0; border: 1px solid #c3e6cb; border-radius: 8px;">
-              <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">✅ Dépôt de 46€ reçu</h3>
+              <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">✅ Dépôt de 46$ reçu</h3>
               <p style="font-size: 16px; margin-bottom: 20px; color: #155724;">
-                Nous vous confirmons la bonne réception de votre dépôt de <strong>46€</strong> pour votre projet {{companyName}}. 
+                Nous vous confirmons la bonne réception de votre dépôt de <strong>46$</strong> pour votre projet {{companyName}}. 
                 Votre site web est maintenant officiellement en production avec notre équipe dédiée.
               </p>
               <p style="margin: 0; font-size: 14px; color: #155724;">
-                <strong>Reste à payer :</strong> 100€ (à la livraison)
+                <strong>Reste à payer :</strong> 100$ (à la livraison)
               </p>
             </div>
             <!-- Calendrier -->
@@ -564,7 +540,7 @@ Solutions Web
                   <div style="font-weight: 600; color: #007bff; margin-bottom: 8px;">🚀 Phase 2 - Livraison (Jour J)</div>
                   <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #666;">
                     <li>Mise en ligne du site sur serveur</li>
-                    <li>Paiement final de 100€</li>
+                    <li>Paiement final de 100$</li>
                     <li>Remise des accès et documentation</li>
                     <li>Support technique 3 mois activé</li>
                   </ul>
@@ -576,7 +552,7 @@ Solutions Web
             <div style="background-color: #fff3cd; padding: 20px; margin: 0 0 30px 0; border: 1px solid #ffeaa7; border-radius: 8px;">
               <h3 style="color: #856404; margin-top: 0; margin-bottom: 10px; font-size: 16px;">📄 Votre facture de dépôt</h3>
               <p style="margin: 0 0 10px 0; font-size: 14px; color: #856404;">
-                Une facture pour votre dépôt de 46€ est disponible :
+                Une facture pour votre dépôt de 46$ est disponible :
               </p>
               <p style="margin: 0; font-size: 14px; color: #007bff;">
                 <a href="{{invoiceLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">Télécharger ma facture</a>
@@ -625,11 +601,11 @@ Bonjour {{firstName}},
 
 🚀 Dépôt confirmé ! Votre projet {{companyName}} démarre maintenant
 
-✅ Dépôt de 46€ reçu
-Nous vous confirmons la bonne réception de votre dépôt de 46€ pour votre projet {{companyName}}. 
+✅ Dépôt de 46$ reçu
+Nous vous confirmons la bonne réception de votre dépôt de 46$ pour votre projet {{companyName}}. 
 Votre site web est maintenant officiellement en production avec notre équipe dédiée.
 
-Reste à payer : 100€ (à la livraison)
+Reste à payer : 100$ (à la livraison)
 
 📅 Votre calendrier de projet
 Livraison prévue le {{deliveryDate}}
@@ -641,12 +617,12 @@ Livraison prévue le {{deliveryDate}}
 
 🚀 Phase 2 - Livraison (Jour J)
 • Mise en ligne du site sur serveur
-• Paiement final de 100€
+• Paiement final de 100$
 • Remise des accès et documentation
 • Support technique 3 mois activé
 
 📄 Votre facture de dépôt
-Une facture pour votre dépôt de 46€ est disponible : {{invoiceLink}}
+Une facture pour votre dépôt de 46$ est disponible : {{invoiceLink}}
 
 💬 Besoin d'aide ?
 Pendant le développement, vous pouvez nous contacter à tout moment pour :
@@ -671,7 +647,7 @@ Solutions Web
     id: 'email4_final_payment',
     name: 'Email 4 - Paiement Final',
     category: 'sale',
-    subject: '🎉 Votre site {{companyName}} est prêt - Paiement final de 100€',
+    subject: '🎉 Votre site {{companyName}} est prêt - Paiement final de 100$',
     variables: ['firstName', 'companyName', 'websiteLink', 'finalPaymentLink', 'agentName', 'agentEmail', 'deliveryDate'],
     htmlContent: `
       <!DOCTYPE html>
@@ -711,7 +687,7 @@ Solutions Web
               <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">💳 Dernière étape : Paiement final</h3>
               <p style="font-size: 16px; margin-bottom: 20px; color: #856404;">
                 Pour finaliser la livraison et débloquer l'accès complet à votre site, 
-                il vous reste le paiement final de <strong>100€</strong>.
+                il vous reste le paiement final de <strong>100$</strong>.
               </p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #856404;">
                 Une fois le paiement effectué, votre site sera immédiatement mis en ligne et accessible à vos clients.
@@ -720,7 +696,7 @@ Solutions Web
                 <a href="{{finalPaymentLink}}" 
                    style="background: #28a745; color: white; padding: 18px 35px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);"
                    target="_blank">
-                  💳 Payer 100€ - Finaliser le projet →
+                  💳 Payer 100$ - Finaliser le projet →
                 </a>
               </div>
             </div>
@@ -763,10 +739,7 @@ Solutions Web
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
-              </table>
-            </td>
-          </tr>
-        </table>
+        </div>
       </body>
       </html>
     `,
@@ -777,10 +750,10 @@ Bonjour {{firstName}},
 
 Découvrez votre site : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
-💳 Dernière étape : Paiement final de 100€
+💳 Dernière étape : Paiement final de 100$
 
 Pour finaliser la livraison et débloquer l'accès complet à votre site, 
-il vous reste le paiement final de 100€.
+il vous reste le paiement final de 100$.
 
 Payer maintenant : {{finalPaymentLink}}
 
@@ -833,7 +806,7 @@ Solutions Web
             <div style="background-color: #d4edda; padding: 25px; margin: 0 0 30px 0; border: 1px solid #c3e6cb; border-radius: 8px;">
               <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">🎉 Projet complété avec succès !</h3>
               <p style="font-size: 16px; margin-bottom: 20px; color: #155724;">
-                Nous vous confirmons la bonne réception de votre paiement final de <strong>100€</strong>. 
+                Nous vous confirmons la bonne réception de votre paiement final de <strong>100$</strong>. 
                 Votre site web {{companyName}} est maintenant officiellement en ligne et accessible à vos clients !
               </p>
               <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 500; color: #155724;">Découvrez votre site en ligne :</p>
@@ -846,7 +819,7 @@ Solutions Web
             <div style="background-color: #fff3cd; padding: 20px; margin: 0 0 30px 0; border: 1px solid #ffeaa7; border-radius: 8px;">
               <h3 style="color: #856404; margin-top: 0; margin-bottom: 10px; font-size: 16px;">📄 Votre facture finale</h3>
               <p style="margin: 0 0 10px 0; font-size: 14px; color: #856404;">
-                Une facture pour le paiement final de 100€ est disponible :
+                Une facture pour le paiement final de 100$ est disponible :
               </p>
               <p style="margin: 0; font-size: 14px; color: #007bff;">
                 <a href="{{invoiceLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">Télécharger ma facture finale</a>
@@ -884,10 +857,7 @@ Solutions Web
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
-              </table>
-            </td>
-          </tr>
-        </table>
+        </div>
       </body>
       </html>
     `,
@@ -897,13 +867,13 @@ Bonjour {{firstName}},
 ✅ Paiement final confirmé ! Votre site {{companyName}} est maintenant en ligne
 
 🎉 Projet complété avec succès !
-Nous vous confirmons la bonne réception de votre paiement final de 100€. 
+Nous vous confirmons la bonne réception de votre paiement final de 100$. 
 Votre site web {{companyName}} est maintenant officiellement en ligne et accessible à vos clients !
 
 Découvrez votre site en ligne : <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
 
 📄 Votre facture finale
-Une facture pour le paiement final de 100€ est disponible : {{invoiceLink}}
+Une facture pour le paiement final de 100$ est disponible : {{invoiceLink}}
 
 📋 Prochaines étapes
 Vous recevrez très prochainement un email avec :
@@ -1023,10 +993,7 @@ Solutions Web
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
-              </table>
-            </td>
-          </tr>
-        </table>
+        </div>
       </body>
       </html>
     `,
@@ -1080,31 +1047,20 @@ export const reminderTemplates: EmailTemplate[] = [
     subject: 'Suivi : Votre site web {{companyName}} vous attend',
     variables: ['firstName', 'companyName', 'websiteLink', 'paymentLink', 'price', 'agentName', 'agentEmail'],
     htmlContent: `
-      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-      <html xmlns="http://www.w3.org/1999/xhtml">
+      <!DOCTYPE html>
+      <html>
       <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="x-apple-disable-message-reformatting" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Solutions Web - Suivi</title>
-        <!--[if mso]>
-        <style>
-          table { border-collapse: collapse; }
-        </style>
-        <![endif]-->
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td align="center" style="padding: 40px 20px;">
-              <table width="600" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
-                <tr>
-                  <td align="center">
-                    <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-                    <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
-                    <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
-                  </td>
-                </tr>
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          
+          <!-- Header -->
+          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #2c3e50;">Suivi personnalisé</h1>
+            <p style="margin: 8px 0 0 0; font-size: 14px; color: #7f8c8d;">Votre projet {{companyName}}</p>
           </div>
           
           <!-- Content -->
@@ -1134,7 +1090,7 @@ export const reminderTemplates: EmailTemplate[] = [
               </p>
               <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Découvrez votre futur site :</p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline; font-weight: 600;">{{websiteLink}}</a>
+                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">VOTRE SITE WEB ICI</a>
               </p>
             </div>
             
@@ -1143,10 +1099,10 @@ export const reminderTemplates: EmailTemplate[] = [
               <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Pourquoi choisir {{agentName}} ?</h3>
               
               <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">💰 Paiement en 2 étapes - Total : 146€ HT</h4>
+                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">💰 Paiement en 2 étapes - Total : 146$</h4>
                 <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Dépôt pour commencer</strong> : Seulement 46€ pour lancer votre projet</li>
-                  <li style="margin-bottom: 12px;"><strong>Paiement final à la livraison</strong> : 100€ lorsque votre site est prêt</li>
+                  <li style="margin-bottom: 12px;"><strong>Dépôt pour commencer</strong> : Seulement 46$ pour lancer votre projet</li>
+                  <li style="margin-bottom: 12px;"><strong>Paiement final à la livraison</strong> : 100$ lorsque votre site est prêt</li>
                   <li style="margin-bottom: 0;"><strong>Pas de frais cachés</strong> : Hébergement et domaine inclus la première année</li>
                 </ul>
               </div>
@@ -1239,10 +1195,7 @@ export const reminderTemplates: EmailTemplate[] = [
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
-              </table>
-            </td>
-          </tr>
-        </table>
+        </div>
       </body>
       </html>
     `,
@@ -1301,10 +1254,10 @@ Absolument ! Nous vous formons pendant 2 heures et vous fournissons un accès co
 "Et si je ne suis pas satisfait ?"
 Notre garantie satisfaction 30 jours vous protège : remboursement complet sans condition si vous n'êtes pas satisfait.
 
-💰 Paiement en 2 étapes - Total : 146€ HT
-🚀 Étape 1 - Dépôt pour commencer : 46€
-🎯 Étape 2 - Paiement final à la livraison : 100€
-Commencez maintenant avec seulement 46€ - Le reste sera dû à la livraison de votre site
+💰 Paiement en 2 étapes - Total : 146$
+🚀 Étape 1 - Dépôt pour commencer : 46$
+🎯 Étape 2 - Paiement final à la livraison : 100$
+Commencez maintenant avec seulement 46$ - Le reste sera dû à la livraison de votre site
 
 Questions fréquentes :
 "Que se passe-t-il après le paiement ?"
@@ -1442,10 +1395,7 @@ Solutions Web
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
-              </table>
-            </td>
-          </tr>
-        </table>
+        </div>
       </body>
       </html>
     `,
@@ -1523,7 +1473,7 @@ Solutions Web
     id: 'reminder3_final_payment',
     name: 'Rappel 3 - Paiement Final',
     category: 'reminder',
-    subject: '🎉 Votre site {{companyName}} est prêt - Finalisez avec le paiement de 100€',
+    subject: '🎉 Votre site {{companyName}} est prêt - Finalisez avec le paiement de 100$',
     variables: ['firstName', 'companyName', 'websiteLink', 'finalPaymentLink', 'agentName', 'agentEmail'],
     htmlContent: `
       <!DOCTYPE html>
@@ -1563,7 +1513,7 @@ Solutions Web
               <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">💳 Dernière étape : Paiement final</h3>
               <p style="font-size: 16px; margin-bottom: 20px; color: #856404;">
                 Pour finaliser la livraison et débloquer l'accès complet à votre site, 
-                il vous reste le paiement final de <strong>100€</strong>.
+                il vous reste le paiement final de <strong>100$</strong>.
               </p>
               <p style="margin: 0 0 20px 0; font-size: 14px; color: #856404;">
                 Une fois le paiement effectué, votre site sera immédiatement mis en ligne et accessible à vos clients.
@@ -1572,7 +1522,7 @@ Solutions Web
                 <a href="{{finalPaymentLink}}" 
                    style="background: #28a745; color: white; padding: 18px 35px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);"
                    target="_blank">
-                  💳 Payer 100€ - Finaliser le projet →
+                  💳 Payer 100$ - Finaliser le projet →
                 </a>
               </div>
             </div>
@@ -1615,10 +1565,7 @@ Solutions Web
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
           </div>
-              </table>
-            </td>
-          </tr>
-        </table>
+        </div>
       </body>
       </html>
     `,
@@ -1634,7 +1581,7 @@ Découvrez votre site : <a href="{{websiteLink}}" style="color: #007bff; text-de
 
 💳 Dernière étape : Paiement final
 Pour finaliser la livraison et débloquer l'accès complet à votre site, 
-il vous reste le paiement final de 100€.
+il vous reste le paiement final de 100$.
 
 Payer maintenant : {{finalPaymentLink}}
 
