@@ -29,115 +29,201 @@ export const salesTemplates: EmailTemplate[] = [
         <title>Solutions Web - Votre site web</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; color: #333333; line-height: 1.6;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-          
-          <!-- Header -->
-          <div style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 40px 30px; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">{{agentName}}</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Solutions web professionnelles</p>
-          </div>
-          
-          <!-- Content -->
-          <div style="padding: 40px 30px;">
-            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 22px;">Bonjour {{firstName}},</h2>
-            
-            <!-- Site Preview -->
-            <div style="background-color: #f8f9fa; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #e9ecef;">
-              <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 18px;">🚀 Votre site web est prêt</h3>
-              <p style="font-size: 16px; margin-bottom: 20px; color: #555;">
-                Nous avons finalisé le développement de votre site web professionnel pour <strong>{{companyName}}</strong>.
-              </p>
-              <div style="text-align: center; margin: 25px 0;">
-                <a href="{{websiteLink}}" 
-                   style="display: inline-block; background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;"
-                   target="_blank">
-                  Voir mon site web →
-                </a>
-              </div>
-            </div>
-            
-            <!-- Features Grid -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Ce qui est inclus :</h3>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🌐 Design sur mesure</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Adapté à votre image</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">📱 Responsive</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Mobile & desktop</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🔍 SEO optimisé</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Référencement Google</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">⚡ Performance</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Chargement rapide</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🔒 Sécurité SSL</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Certificat HTTPS inclus</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">📊 Analytics</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Statistiques incluses</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Pricing -->
-            <div style="background-color: #fff3cd; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #ffeaa7;">
-              <h3 style="color: #856404; margin-top: 0; margin-bottom: 20px; font-size: 18px;">💰 Modalités de paiement</h3>
-              <p style="font-size: 24px; font-weight: 700; margin: 15px 0; color: #2c3e50; text-align: center;">
-                {{price}}€ HT
-              </p>
-              <div style="background: white; padding: 20px; border-radius: 6px; margin: 20px 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-                  <span style="font-weight: 600; color: #28a745;">🚀 Étape 1 - Dépôt</span>
-                  <span style="font-weight: bold; color: #28a745; font-size: 18px;">46€</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-weight: 600; color: #007bff;">🎯 Étape 2 - Livraison</span>
-                  <span style="font-weight: bold; color: #007bff; font-size: 18px;">100€</span>
-                </div>
-              </div>
-              <p style="margin: 15px 0 0 0; font-size: 14px; color: #856404; text-align: center;">
-                <strong>Commencez avec 46€</strong> - Livraison en 2 jours ouvrés
-              </p>
-              <ul style="margin: 20px 0 0 20px; font-size: 14px; color: #856404;">
-                <li>Hébergement 1 an inclus</li>
-                <li>Nom de domaine inclus</li>
-                <li>3 mois de maintenance</li>
-              </ul>
-            </div>
-            
-            <!-- CTA Buttons -->
-            <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 25px; font-size: 16px; color: #555;">Souhaitez-vous démarrer votre projet ?</p>
-              <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="mailto:{{agentEmail}}?subject=Démarrage projet {{companyName}}&body=Bonjour, je souhaite démarrer le projet pour {{companyName}}. Pouvez-vous me donner les prochaines étapes ?" 
-                   style="display: inline-block; background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                  🚀 Démarrer le projet
-                </a>
-                <a href="mailto:{{agentEmail}}?subject=Questions projet {{companyName}}&body=Bonjour {{agentName}}, j'ai quelques questions sur le projet pour {{companyName}}." 
-                   style="display: inline-block; background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                  ❓ Plus de questions
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Footer -->
-          <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
-            <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
-            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
-            </p>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-collapse: collapse;">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #2c3e50; padding: 40px 30px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 28px; font-weight: 600; color: white;">{{agentName}}</h1>
+                    <p style="margin: 10px 0 0 0; font-size: 16px; color: #cccccc;">Solutions web professionnelles</p>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 40px 30px;">
+                    <h2 style="color: #2c3e50; margin: 0 0 20px 0; font-size: 22px;">Bonjour {{firstName}},</h2>
+                    
+                    <!-- Site Preview -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px;">
+                          <h3 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 18px;">🚀 Votre site web est prêt</h3>
+                          <p style="font-size: 16px; margin: 0 0 20px 0; color: #555;">
+                            Nous avons finalisé le développement de votre site web professionnel pour <strong>{{companyName}}</strong>.
+                          </p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="{{websiteLink}}" 
+                                   style="background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;"
+                                   target="_blank">
+                                  Voir mon site web →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Features -->
+                    <h3 style="color: #2c3e50; margin: 0 0 20px 0; font-size: 18px;">Ce qui est inclus :</h3>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🌐 Design sur mesure</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Adapté à votre image</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">📱 Responsive</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Mobile & desktop</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🔍 SEO optimisé</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Référencement Google</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">⚡ Performance</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Chargement rapide</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🔒 Sécurité SSL</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Certificat HTTPS inclus</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">📊 Analytics</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Statistiques incluses</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Pricing -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px;">
+                          <h3 style="color: #856404; margin: 0 0 20px 0; font-size: 18px;">💰 Modalités de paiement</h3>
+                          <p style="font-size: 24px; font-weight: 700; margin: 15px 0; color: #2c3e50; text-align: center;">
+                            {{price}}€ HT
+                          </p>
+                          <table width="100%" cellpadding="20" cellspacing="0" style="background-color: white; border-collapse: collapse; margin: 20px 0;">
+                            <tr>
+                              <td style="border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                  <tr>
+                                    <td style="font-weight: 600; color: #28a745;">🚀 Étape 1 - Dépôt</td>
+                                    <td align="right" style="font-weight: bold; color: #28a745; font-size: 18px;">46€</td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding-top: 15px;">
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                  <tr>
+                                    <td style="font-weight: 600; color: #007bff;">🎯 Étape 2 - Livraison</td>
+                                    <td align="right" style="font-weight: bold; color: #007bff; font-size: 18px;">100€</td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                          <p style="margin: 15px 0 0 0; font-size: 14px; color: #856404; text-align: center;">
+                            <strong>Commencez avec 46€</strong> - Livraison en 2 jours ouvrés
+                          </p>
+                          <ul style="margin: 20px 0 0 20px; font-size: 14px; color: #856404;">
+                            <li>Hébergement 1 an inclus</li>
+                            <li>Nom de domaine inclus</li>
+                            <li>3 mois de maintenance</li>
+                          </ul>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- CTA Buttons -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
+                      <tr>
+                        <td align="center">
+                          <p style="margin: 0 0 25px 0; font-size: 16px; color: #555;">Souhaitez-vous démarrer votre projet ?</p>
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="padding-right: 15px;">
+                                <a href="mailto:{{agentEmail}}?subject=Démarrage projet {{companyName}}&body=Bonjour, je souhaite démarrer le projet pour {{companyName}}. Pouvez-vous me donner les prochaines étapes ?" 
+                                   style="background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;">
+                                  🚀 Démarrer le projet
+                                </a>
+                              </td>
+                              <td>
+                                <a href="mailto:{{agentEmail}}?subject=Questions projet {{companyName}}&body=Bonjour {{agentName}}, j'ai quelques questions sur le projet pour {{companyName}}." 
+                                   style="background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;">
+                                  ❓ Plus de questions
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
+                    <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+                    <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
+                    <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+                      <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `,
@@ -192,125 +278,215 @@ Solutions Web - Votre partenaire web
         <title>Solutions Web - Devis Site Web</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; color: #333333; line-height: 1.6;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-          
-          <!-- Header -->
-          <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 40px 30px; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">📋 Devis Personnalisé</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Proposition pour {{companyName}}</p>
-          </div>
-          
-          <!-- Content -->
-          <div style="padding: 40px 30px;">
-            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 22px;">Bonjour {{firstName}},</h2>
-            
-            <!-- Devis Download -->
-            <div style="background-color: #f8f9fa; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #e9ecef; text-align: center;">
-              <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 18px;">📄 Votre devis détaillé</h3>
-              <p style="font-size: 16px; margin-bottom: 20px; color: #555;">
-                Voici votre devis complet pour la création de votre site web professionnel.
-              </p>
-              <a href="{{devisLink}}" 
-                 style="display: inline-block; background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;"
-                 target="_blank">
-                📥 Télécharger le devis PDF →
-              </a>
-            </div>
-            
-            <!-- Process Timeline -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">⏱️ Notre processus en 2 jours ouvrables</h3>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #10b981;">📋 Jour 1</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Validation & Maquette</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #007bff;">💻 Jour 2</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Développement & Mise en ligne</p>
-                </div>
-              </div>
-              <p style="margin: 15px 0 0 0; font-size: 14px; color: #666;">
-                <strong>Livraison prévue :</strong> {{deliveryDate}}
-              </p>
-            </div>
-            
-            <!-- Guarantees -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">🏆 Nos garanties</h3>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">✅ Garantie 30 jours</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Remboursement complet</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🚀 Livraison garantie</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Respect des délais</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">💰 Prix fixe</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Pas de frais cachés</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🔐 Propriété totale</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">100% votre code</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Pricing -->
-            <div style="background-color: #fff3cd; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #ffeaa7;">
-              <h3 style="color: #856404; margin-top: 0; margin-bottom: 20px; font-size: 18px;">💰 Modalités de paiement</h3>
-              <p style="font-size: 24px; font-weight: 700; margin: 15px 0; color: #2c3e50; text-align: center;">
-                {{price}}€ HT
-              </p>
-              <div style="background: white; padding: 20px; border-radius: 6px; margin: 20px 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-                  <span style="font-weight: 600; color: #28a745;">🚀 Étape 1 - Dépôt</span>
-                  <span style="font-weight: bold; color: #28a745; font-size: 18px;">46€</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-weight: 600; color: #007bff;">🎯 Étape 2 - Livraison</span>
-                  <span style="font-weight: bold; color: #007bff; font-size: 18px;">100€</span>
-                </div>
-              </div>
-              <p style="margin: 15px 0 0 0; font-size: 14px; color: #856404; text-align: center;">
-                Offre valide {{validityDays}} jours • Paiement sécurisé
-              </p>
-              <div style="text-align: center; margin: 25px 0;">
-                <a href="{{paymentLink}}" 
-                   style="display: inline-block; background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;"
-                   target="_blank">
-                  💳 Payer 46€ pour commencer →
-                </a>
-              </div>
-            </div>
-            
-            <!-- CTA Buttons -->
-            <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 25px; font-size: 16px; color: #555;">Des questions sur votre devis ?</p>
-              <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="mailto:{{agentEmail}}?subject=Questions devis {{companyName}}&body=Bonjour, j'ai quelques questions sur le devis pour {{companyName}}." 
-                   style="display: inline-block; background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                  ❓ Poser une question
-                </a>
-                <a href="mailto:{{agentEmail}}?subject=Validation maquette {{companyName}}&body=Bonjour, je valide la maquette pour {{companyName}}. Continuons le projet." 
-                   style="display: inline-block; background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                  ✅ Valider la maquette
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Footer -->
-          <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
-            <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
-            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
-            </p>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-collapse: collapse;">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #10b981; padding: 40px 30px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 28px; font-weight: 600; color: white;">📋 Devis Personnalisé</h1>
+                    <p style="margin: 10px 0 0 0; font-size: 16px; color: #e6fffa;">Proposition pour {{companyName}}</p>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 40px 30px;">
+                    <h2 style="color: #2c3e50; margin: 0 0 20px 0; font-size: 22px;">Bonjour {{firstName}},</h2>
+                    
+                    <!-- Devis Download -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px; text-align: center;">
+                          <h3 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 18px;">📄 Votre devis détaillé</h3>
+                          <p style="font-size: 16px; margin: 0 0 20px 0; color: #555;">
+                            Voici votre devis complet pour la création de votre site web professionnel.
+                          </p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="{{devisLink}}" 
+                                   style="background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;"
+                                   target="_blank">
+                                  📥 Télécharger le devis PDF →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Process Timeline -->
+                    <h3 style="color: #2c3e50; margin: 0 0 20px 0; font-size: 18px;">⏱️ Notre processus en 2 jours ouvrables</h3>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #10b981; font-size: 14px;">📋 Jour 1</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Validation & Maquette</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #007bff; font-size: 14px;">💻 Jour 2</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Développement & Mise en ligne</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    <p style="margin: 15px 0 0 0; font-size: 14px; color: #666;">
+                      <strong>Livraison prévue :</strong> {{deliveryDate}}
+                    </p>
+                    
+                    <!-- Guarantees -->
+                    <h3 style="color: #2c3e50; margin: 30px 0 15px 0; font-size: 18px;">🏆 Nos garanties</h3>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">✅ Garantie 30 jours</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Remboursement complet</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🚀 Livraison garantie</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Respect des délais</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">💰 Prix fixe</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Pas de frais cachés</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🔐 Propriété totale</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">100% votre code</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Pricing -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px;">
+                          <h3 style="color: #856404; margin: 0 0 20px 0; font-size: 18px;">💰 Modalités de paiement</h3>
+                          <p style="font-size: 24px; font-weight: 700; margin: 15px 0; color: #2c3e50; text-align: center;">
+                            {{price}}€ HT
+                          </p>
+                          <table width="100%" cellpadding="20" cellspacing="0" style="background-color: white; border-collapse: collapse; margin: 20px 0;">
+                            <tr>
+                              <td style="border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                  <tr>
+                                    <td style="font-weight: 600; color: #28a745;">🚀 Étape 1 - Dépôt</td>
+                                    <td align="right" style="font-weight: bold; color: #28a745; font-size: 18px;">46€</td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding-top: 15px;">
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                  <tr>
+                                    <td style="font-weight: 600; color: #007bff;">🎯 Étape 2 - Livraison</td>
+                                    <td align="right" style="font-weight: bold; color: #007bff; font-size: 18px;">100€</td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                          <p style="margin: 15px 0 0 0; font-size: 14px; color: #856404; text-align: center;">
+                            Offre valide {{validityDays}} jours • Paiement sécurisé
+                          </p>
+                          <table cellpadding="0" cellspacing="0" align="center" style="margin: 25px 0;">
+                            <tr>
+                              <td>
+                                <a href="{{paymentLink}}" 
+                                   style="background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;"
+                                   target="_blank">
+                                  💳 Payer 46€ pour commencer →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- CTA Buttons -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
+                      <tr>
+                        <td align="center">
+                          <p style="margin: 0 0 25px 0; font-size: 16px; color: #555;">Des questions sur votre devis ?</p>
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="padding-right: 15px;">
+                                <a href="mailto:{{agentEmail}}?subject=Questions devis {{companyName}}&body=Bonjour, j'ai quelques questions sur le devis pour {{companyName}}." 
+                                   style="background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;">
+                                  ❓ Poser une question
+                                </a>
+                              </td>
+                              <td>
+                                <a href="mailto:{{agentEmail}}?subject=Validation maquette {{companyName}}&body=Bonjour, je valide la maquette pour {{companyName}}. Continuons le projet." 
+                                   style="background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;">
+                                  ✅ Valider la maquette
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
+                    <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+                    <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
+                    <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+                      <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `,
@@ -368,79 +544,127 @@ Solutions Web - Votre partenaire web
         <title>Solutions Web - Dépôt Confirmé</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; color: #333333; line-height: 1.6;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-          
-          <!-- Header -->
-          <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 40px 30px; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">🚀 Dépôt confirmé !</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Votre projet {{companyName}} démarre maintenant</p>
-          </div>
-          
-          <!-- Content -->
-          <div style="padding: 40px 30px;">
-            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 22px;">Bonjour {{firstName}},</h2>
-            
-            <!-- Confirmation -->
-            <div style="background-color: #d4edda; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #c3e6cb;">
-              <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">✅ Dépôt de 46€ reçu</h3>
-              <p style="font-size: 16px; margin-bottom: 15px; color: #155724;">
-                Nous confirmons la bonne réception de votre dépôt pour le projet {{companyName}}.
-              </p>
-              <p style="margin: 0; font-size: 16px; color: #155724;">
-                <strong>Reste à payer :</strong> 100€ (à la livraison)
-              </p>
-            </div>
-            
-            <!-- Timeline -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">📅 Calendrier de projet</h3>
-              <p style="font-size: 16px; margin-bottom: 15px; color: #2c3e50;">
-                <strong>Livraison prévue :</strong> {{deliveryDate}}
-              </p>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #28a745;">📋 Phase 1</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Développement (2 jours)</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #007bff;">🚀 Phase 2</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Livraison (Jour J)</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Invoice -->
-            <div style="background-color: #fff3cd; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #ffeaa7; text-align: center;">
-              <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">📄 Votre facture de dépôt</h3>
-              <p style="margin-bottom: 20px; font-size: 14px; color: #856404;">
-                Téléchargez votre facture pour le dépôt de 46€
-              </p>
-              <a href="{{invoiceLink}}" 
-                 style="display: inline-block; background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;"
-                 target="_blank">
-                📥 Télécharger la facture →
-              </a>
-            </div>
-            
-            <!-- Support -->
-            <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 25px; font-size: 16px; color: #555;">Besoin d'aide pendant le développement ?</p>
-              <a href="mailto:{{agentEmail}}?subject=Support projet {{companyName}}&body=Bonjour, j'ai besoin d'aide pour mon projet {{companyName}}." 
-                 style="display: inline-block; background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                💬 Contacter le support
-              </a>
-            </div>
-          </div>
-          
-          <!-- Footer -->
-          <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
-            <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
-            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
-            </p>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-collapse: collapse;">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #28a745; padding: 40px 30px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 28px; font-weight: 600; color: white;">🚀 Dépôt confirmé !</h1>
+                    <p style="margin: 10px 0 0 0; font-size: 16px; color: #e6fffa;">Votre projet {{companyName}} démarre maintenant</p>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 40px 30px;">
+                    <h2 style="color: #2c3e50; margin: 0 0 20px 0; font-size: 22px;">Bonjour {{firstName}},</h2>
+                    
+                    <!-- Confirmation -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #d4edda; border: 1px solid #c3e6cb; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px;">
+                          <h3 style="color: #155724; margin: 0 0 15px 0; font-size: 18px;">✅ Dépôt de 46€ reçu</h3>
+                          <p style="font-size: 16px; margin: 0 0 15px 0; color: #155724;">
+                            Nous confirmons la bonne réception de votre dépôt pour le projet {{companyName}}.
+                          </p>
+                          <p style="margin: 0; font-size: 16px; color: #155724;">
+                            <strong>Reste à payer :</strong> 100€ (à la livraison)
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Timeline -->
+                    <h3 style="color: #2c3e50; margin: 0 0 20px 0; font-size: 18px;">📅 Calendrier de projet</h3>
+                    <p style="font-size: 16px; margin: 0 0 15px 0; color: #2c3e50;">
+                      <strong>Livraison prévue :</strong> {{deliveryDate}}
+                    </p>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #28a745; font-size: 14px;">📋 Phase 1</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Développement (2 jours)</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #007bff; font-size: 14px;">🚀 Phase 2</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Livraison (Jour J)</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Invoice -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px; text-align: center;">
+                          <h3 style="color: #856404; margin: 0 0 15px 0; font-size: 18px;">📄 Votre facture de dépôt</h3>
+                          <p style="margin: 0 0 20px 0; font-size: 14px; color: #856404;">
+                            Téléchargez votre facture pour le dépôt de 46€
+                          </p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="{{invoiceLink}}" 
+                                   style="background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;"
+                                   target="_blank">
+                                  📥 Télécharger la facture →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Support -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
+                      <tr>
+                        <td align="center">
+                          <p style="margin: 0 0 25px 0; font-size: 16px; color: #555;">Besoin d'aide pendant le développement ?</p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="mailto:{{agentEmail}}?subject=Support projet {{companyName}}&body=Bonjour, j'ai besoin d'aide pour mon projet {{companyName}}." 
+                                   style="background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;">
+                                  💬 Contacter le support
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
+                    <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+                    <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
+                    <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+                      <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
    `,
@@ -487,91 +711,157 @@ Solutions Web - Votre partenaire web
         <title>Solutions Web - Votre site est prêt</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; color: #333333; line-height: 1.6;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-          
-          <!-- Header -->
-          <div style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: white; padding: 40px 30px; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">🎉 Votre site est prêt !</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">{{companyName}} - Livraison prévue le {{deliveryDate}}</p>
-          </div>
-          
-          <!-- Content -->
-          <div style="padding: 40px 30px;">
-            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 22px;">Bonjour {{firstName}},</h2>
-            
-            <!-- Site Ready -->
-            <div style="background-color: #d4edda; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #c3e6cb;">
-              <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">🚀 Votre site est terminé</h3>
-              <p style="font-size: 16px; margin-bottom: 20px; color: #155724;">
-                Votre site web professionnel pour <strong>{{companyName}}</strong> est prêt !
-              </p>
-              <a href="{{websiteLink}}" 
-                 style="display: inline-block; background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;"
-                 target="_blank">
-                Voir mon site →
-              </a>
-            </div>
-            
-            <!-- Final Payment -->
-            <div style="background-color: #fff3cd; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #ffeaa7;">
-              <h3 style="color: #856404; margin-top: 0; margin-bottom: 20px; font-size: 18px;">💳 Paiement final</h3>
-              <p style="font-size: 24px; font-weight: 700; margin: 15px 0; color: #2c3e50; text-align: center;">
-                100€
-              </p>
-              <p style="margin-bottom: 20px; font-size: 14px; color: #856404; text-align: center;">
-                Finalisez pour débloquer l'accès complet
-              </p>
-              <div style="text-align: center;">
-                <a href="{{finalPaymentLink}}" 
-                   style="display: inline-block; background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;"
-                   target="_blank">
-                  💳 Payer 100€ →
-                </a>
-              </div>
-            </div>
-            
-            <!-- After Payment -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">📦 Après paiement</h3>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🚀 Mise en ligne</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Immédiate</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🔐 Accès admin</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Envoyé par email</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">📚 Documentation</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Complète</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🛡️ Support</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">3 mois inclus</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Support -->
-            <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 25px; font-size: 16px; color: #555;">Questions sur votre site ?</p>
-              <a href="mailto:{{agentEmail}}?subject=Questions site {{companyName}}&body=Bonjour, j'ai des questions sur mon site {{companyName}}." 
-                 style="display: inline-block; background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                💬 Contacter le support
-              </a>
-            </div>
-          </div>
-          
-          <!-- Footer -->
-          <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
-            <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
-            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
-            </p>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-collapse: collapse;">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #ffc107; padding: 40px 30px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 28px; font-weight: 600; color: white;">🎉 Votre site est prêt !</h1>
+                    <p style="margin: 10px 0 0 0; font-size: 16px; color: #fff9e6;">{{companyName}} - Livraison prévue le {{deliveryDate}}</p>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 40px 30px;">
+                    <h2 style="color: #2c3e50; margin: 0 0 20px 0; font-size: 22px;">Bonjour {{firstName}},</h2>
+                    
+                    <!-- Site Ready -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #d4edda; border: 1px solid #c3e6cb; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px;">
+                          <h3 style="color: #155724; margin: 0 0 15px 0; font-size: 18px;">🚀 Votre site est terminé</h3>
+                          <p style="font-size: 16px; margin: 0 0 20px 0; color: #155724;">
+                            Votre site web professionnel pour <strong>{{companyName}}</strong> est prêt !
+                          </p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="{{websiteLink}}" 
+                                   style="background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;"
+                                   target="_blank">
+                                  Voir mon site →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Final Payment -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px; text-align: center;">
+                          <h3 style="color: #856404; margin: 0 0 20px 0; font-size: 18px;">💳 Paiement final</h3>
+                          <p style="font-size: 24px; font-weight: 700; margin: 15px 0; color: #2c3e50;">
+                            100€
+                          </p>
+                          <p style="margin: 0 0 20px 0; font-size: 14px; color: #856404;">
+                            Finalisez pour débloquer l'accès complet
+                          </p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="{{finalPaymentLink}}" 
+                                   style="background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;"
+                                   target="_blank">
+                                  💳 Payer 100€ →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- After Payment -->
+                    <h3 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 18px;">📦 Après paiement</h3>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🚀 Mise en ligne</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Immédiate</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🔐 Accès admin</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Envoyé par email</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">📚 Documentation</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Complète</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🛡️ Support</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">3 mois inclus</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Support -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
+                      <tr>
+                        <td align="center">
+                          <p style="margin: 0 0 25px 0; font-size: 16px; color: #555;">Questions sur votre site ?</p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="mailto:{{agentEmail}}?subject=Questions site {{companyName}}&body=Bonjour, j'ai des questions sur mon site {{companyName}}." 
+                                   style="background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;">
+                                  💬 Contacter le support
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
+                    <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+                    <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
+                    <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+                      <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `,
@@ -617,86 +907,154 @@ Solutions Web - Votre partenaire web
         <title>Solutions Web - Paiement Final Confirmé</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; color: #333333; line-height: 1.6;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-          
-          <!-- Header -->
-          <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 40px 30px; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">✅ Paiement final confirmé !</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Votre site {{companyName}} est maintenant en ligne</p>
-          </div>
-          
-          <!-- Content -->
-          <div style="padding: 40px 30px;">
-            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 22px;">Bonjour {{firstName}},</h2>
-            
-            <!-- Confirmation -->
-            <div style="background-color: #d4edda; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #c3e6cb;">
-              <h3 style="color: #155724; margin-top: 0; margin-bottom: 15px; font-size: 18px;">🎉 Projet complété avec succès !</h3>
-              <p style="font-size: 16px; margin-bottom: 20px; color: #155724;">
-                Paiement final reçu. Votre site web {{companyName}} est officiellement en ligne !
-              </p>
-              <a href="{{websiteLink}}" 
-                 style="display: inline-block; background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;"
-                 target="_blank">
-                Voir mon site →
-              </a>
-            </div>
-            
-            <!-- Invoice -->
-            <div style="background-color: #fff3cd; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #ffeaa7; text-align: center;">
-              <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">📄 Votre facture finale</h3>
-              <p style="margin-bottom: 20px; font-size: 14px; color: #856404;">
-                Téléchargez votre facture pour le paiement final
-              </p>
-              <a href="{{invoiceLink}}" 
-                 style="display: inline-block; background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;"
-                 target="_blank">
-                📥 Télécharger la facture →
-              </a>
-            </div>
-            
-            <!-- Next Steps -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">📋 Prochaines étapes</h3>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🔐 Accès admin</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Envoyé par email</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">� Documentation</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Complète</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🛠️ Guides</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">De gestion</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                  <strong style="color: #2c3e50;">🛡️ Support</strong>
-                  <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">3 mois inclus</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Support -->
-            <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 25px; font-size: 16px; color: #555;">Besoin d'aide ?</p>
-              <a href="mailto:{{agentEmail}}?subject=Support {{companyName}}&body=Bonjour, j'ai besoin d'aide pour mon site {{companyName}}." 
-                 style="display: inline-block; background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                💬 Contacter le support
-              </a>
-            </div>
-          </div>
-          
-          <!-- Footer -->
-          <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
-            <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
-            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
-            </p>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-collapse: collapse;">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #28a745; padding: 40px 30px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 28px; font-weight: 600; color: white;">✅ Paiement final confirmé !</h1>
+                    <p style="margin: 10px 0 0 0; font-size: 16px; color: #e6fffa;">Votre site {{companyName}} est maintenant en ligne</p>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 40px 30px;">
+                    <h2 style="color: #2c3e50; margin: 0 0 20px 0; font-size: 22px;">Bonjour {{firstName}},</h2>
+                    
+                    <!-- Confirmation -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #d4edda; border: 1px solid #c3e6cb; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px;">
+                          <h3 style="color: #155724; margin: 0 0 15px 0; font-size: 18px;">🎉 Projet complété avec succès !</h3>
+                          <p style="font-size: 16px; margin: 0 0 20px 0; color: #155724;">
+                            Paiement final reçu. Votre site web {{companyName}} est officiellement en ligne !
+                          </p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="{{websiteLink}}" 
+                                   style="background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;"
+                                   target="_blank">
+                                  Voir mon site →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Invoice -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px; text-align: center;">
+                          <h3 style="color: #856404; margin: 0 0 15px 0; font-size: 18px;">📄 Votre facture finale</h3>
+                          <p style="margin: 0 0 20px 0; font-size: 14px; color: #856404;">
+                            Téléchargez votre facture pour le paiement final
+                          </p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="{{invoiceLink}}" 
+                                   style="background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;"
+                                   target="_blank">
+                                  📥 Télécharger la facture →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Next Steps -->
+                    <h3 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 18px;">📋 Prochaines étapes</h3>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🔐 Accès admin</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Envoyé par email</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">📚 Documentation</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Complète</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🛠️ Guides</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">De gestion</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="50%" style="padding: 10px; vertical-align: top;">
+                          <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f8f9fa; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <strong style="color: #2c3e50; font-size: 14px;">🛡️ Support</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">3 mois inclus</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Support -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
+                      <tr>
+                        <td align="center">
+                          <p style="margin: 0 0 25px 0; font-size: 16px; color: #555;">Besoin d'aide ?</p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="mailto:{{agentEmail}}?subject=Support {{companyName}}&body=Bonjour, j'ai besoin d'aide pour mon site {{companyName}}." 
+                                   style="background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;">
+                                  💬 Contacter le support
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
+                    <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+                    <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
+                    <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+                      <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `,
@@ -746,68 +1104,108 @@ Solutions Web - Votre partenaire web
         <title>Solutions Web - Livraison et Documentation</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; color: #333333; line-height: 1.6;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-          
-          <!-- Header -->
-          <div style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white; padding: 40px 30px; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">🔐 Livraison complète</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Accès et documentation pour {{companyName}}</p>
-          </div>
-          
-          <!-- Content -->
-          <div style="padding: 40px 30px;">
-            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 22px;">Bonjour {{firstName}},</h2>
-            
-            <!-- Admin Access -->
-            <div style="background-color: #d1ecf1; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #bee5eb;">
-              <h3 style="color: #0c5460; margin-top: 0; margin-bottom: 15px; font-size: 18px;">🔑 Vos accès administrateur</h3>
-              <div style="background: white; padding: 20px; border-radius: 6px; margin-bottom: 15px;">
-                <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;"><strong>URL :</strong></p>
-                <p style="margin: 0 0 15px 0; font-size: 14px; color: #007bff;">
-                  <a href="{{adminLink}}" style="color: #007bff; text-decoration: none; font-weight: 600;">{{adminLink}}</a>
-                </p>
-                <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;"><strong>Utilisateur :</strong></p>
-                <p style="margin: 0 0 15px 0; font-size: 14px; font-weight: 600; color: #2c3e50;">{{adminUsername}}</p>
-                <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;"><strong>Mot de passe :</strong></p>
-                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #2c3e50;">{{adminPassword}}</p>
-              </div>
-              <p style="margin: 0; font-size: 12px; color: #0c5460;">
-                🔒 Changez le mot de passe lors de votre première connexion
-              </p>
-            </div>
-            
-            <!-- Documentation -->
-            <div style="background-color: #fff3cd; padding: 30px; margin: 30px 0; border-radius: 8px; border: 1px solid #ffeaa7; text-align: center;">
-              <h3 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 18px;">📚 Documentation complète</h3>
-              <p style="margin-bottom: 20px; font-size: 14px; color: #856404;">
-                Guides pour gérer votre site
-              </p>
-              <a href="{{documentationLink}}" 
-                 style="display: inline-block; background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;"
-                 target="_blank">
-                📥 Télécharger la documentation →
-              </a>
-            </div>
-            
-            <!-- Support -->
-            <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 25px; font-size: 16px; color: #555;">Besoin d'aide ?</p>
-              <a href="mailto:{{agentEmail}}?subject=Support {{companyName}}&body=Bonjour, j'ai besoin d'aide pour mon site {{companyName}}." 
-                 style="display: inline-block; background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                💬 Contacter le support
-              </a>
-            </div>
-          </div>
-          
-          <!-- Footer -->
-          <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
-            <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
-            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
-              <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
-            </p>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-collapse: collapse;">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #007bff; padding: 40px 30px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 28px; font-weight: 600; color: white;">🔐 Livraison complète</h1>
+                    <p style="margin: 10px 0 0 0; font-size: 16px; color: #e3f2fd;">Accès et documentation pour {{companyName}}</p>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 40px 30px;">
+                    <h2 style="color: #2c3e50; margin: 0 0 20px 0; font-size: 22px;">Bonjour {{firstName}},</h2>
+                    
+                    <!-- Admin Access -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #d1ecf1; border: 1px solid #bee5eb; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px;">
+                          <h3 style="color: #0c5460; margin: 0 0 15px 0; font-size: 18px;">🔑 Vos accès administrateur</h3>
+                          <table width="100%" cellpadding="20" cellspacing="0" style="background-color: white; border-collapse: collapse; margin-bottom: 15px;">
+                            <tr>
+                              <td>
+                                <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;"><strong>URL :</strong></p>
+                                <p style="margin: 0 0 15px 0; font-size: 14px; color: #007bff;">
+                                  <a href="{{adminLink}}" style="color: #007bff; text-decoration: none; font-weight: 600;">{{adminLink}}</a>
+                                </p>
+                                <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;"><strong>Utilisateur :</strong></p>
+                                <p style="margin: 0 0 15px 0; font-size: 14px; font-weight: 600; color: #2c3e50;">{{adminUsername}}</p>
+                                <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;"><strong>Mot de passe :</strong></p>
+                                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #2c3e50;">{{adminPassword}}</p>
+                              </td>
+                            </tr>
+                          </table>
+                          <p style="margin: 0; font-size: 12px; color: #0c5460;">
+                            🔒 Changez le mot de passe lors de votre première connexion
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Documentation -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 30px; text-align: center;">
+                          <h3 style="color: #856404; margin: 0 0 15px 0; font-size: 18px;">📚 Documentation complète</h3>
+                          <p style="margin: 0 0 20px 0; font-size: 14px; color: #856404;">
+                            Guides pour gérer votre site
+                          </p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="{{documentationLink}}" 
+                                   style="background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;"
+                                   target="_blank">
+                                  📥 Télécharger la documentation →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Support -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
+                      <tr>
+                        <td align="center">
+                          <p style="margin: 0 0 25px 0; font-size: 16px; color: #555;">Besoin d'aide ?</p>
+                          <table cellpadding="0" cellspacing="0" align="center">
+                            <tr>
+                              <td>
+                                <a href="mailto:{{agentEmail}}?subject=Support {{companyName}}&body=Bonjour, j'ai besoin d'aide pour mon site {{companyName}}." 
+                                   style="background-color: #6c757d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block;">
+                                  💬 Contacter le support
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
+                    <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+                    <p style="margin: 0 0 5px 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
+                    <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+                      <a href="mailto:{{agentEmail}}" style="color: #007bff; text-decoration: none;">{{agentEmail}}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `,
@@ -854,147 +1252,205 @@ export const reminderTemplates: EmailTemplate[] = [
         <title>Solutions Web - Suivi</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
-        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-          
-          <!-- Header -->
-          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
-            <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #2c3e50;">Suivi personnalisé</h1>
-            <p style="margin: 8px 0 0 0; font-size: 14px; color: #7f8c8d;">Votre projet {{companyName}}</p>
-          </div>
-          
-          <!-- Content -->
-          <div style="margin-bottom: 30px;">
-            <h2 style="color: #2c3e50; margin-bottom: 15px; font-size: 20px;">Bonjour {{firstName}},</h2>
-            
-            <!-- Introduction et contexte -->
-            <div style="margin-bottom: 30px;">
-              <p style="font-size: 16px; margin-bottom: 15px;">
-                <strong>Notre engagement pour votre succès</strong> : Chez {{agentName}}, nous ne considérons pas que notre travail 
-                se termine avec l'envoi d'une proposition. Votre projet {{companyName}} mérite une attention particulière, 
-                et nous voulons nous assurer que vous disposez de toutes les informations pour prendre la meilleure décision pour votre entreprise.
-              </p>
-              <p style="font-size: 16px; margin-bottom: 25px;">
-                <strong>Pourquoi ce suivi ?</strong> Nous comprenons que lancer un site web est une décision importante. 
-                C'est un investissement dans votre avenir digital, et nous voulons répondre à toutes vos questions, 
-                partager notre expérience, et vous montrer concrètement comment nous allons transformer votre présence en ligne.
-              </p>
-            </div>
-            
-            <!-- Proposition principale -->
-            <div style="background-color: #f8f9fa; padding: 25px; margin: 30px 0; border: 1px solid #e9ecef;">
-              <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 18px;">Votre site web vous attend</h3>
-              <p style="font-size: 16px; margin-bottom: 20px;">
-                Je fais suite à notre précédent email concernant votre site web professionnel pour {{companyName}}. 
-                J'espère que vous avez eu l'occasion de consulter notre proposition détaillée.
-              </p>
-              <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Découvrez votre futur site :</p>
-              <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
-                <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">VOTRE SITE WEB ICI</a>
-              </p>
-            </div>
-            
-            <!-- Valeurs différenciantes -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Pourquoi choisir {{agentName}} ?</h3>
-              
-              <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">💰 Paiement en 2 étapes - Total : 146$</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Dépôt pour commencer</strong> : Seulement 46$ pour lancer votre projet</li>
-                  <li style="margin-bottom: 12px;"><strong>Paiement final à la livraison</strong> : 100$ lorsque votre site est prêt</li>
-                  <li style="margin-bottom: 0;"><strong>Pas de frais cachés</strong> : Hébergement et domaine inclus la première année</li>
-                </ul>
-              </div>
-              
-              <div style="margin-bottom: 25px;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">⚡ Livraison express 2 jours</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Rapidité exceptionnelle</strong> : Site web prêt en 2 jours ouvrés</li>
-                  <li style="margin-bottom: 12px;"><strong>Processus optimisé</strong> : Méthodologie éprouvée sans compromis sur la qualité</li>
-                  <li style="margin-bottom: 0;"><strong>Avantage concurrentiel</strong> : Soyez en ligne avant vos concurrents</li>
-                </ul>
-              </div>
-              
-              <div style="margin-bottom: 0;">
-                <h4 style="color: #2c3e50; margin-bottom: 10px; font-size: 16px;">🛡️ Garantie satisfaction 30 jours</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Remboursement complet</strong> : Si pas satisfait, nous vous remboursons intégralement</li>
-                  <li style="margin-bottom: 12px;"><strong>Zéro risque</strong> : Testez notre service sans engagement financier</li>
-                  <li style="margin-bottom: 0;"><strong>Confiance mutuelle</strong> : Notre réputation repose sur votre satisfaction</li>
-                </ul>
-              </div>
-            </div>
-            
-            <!-- Témoignages et preuve sociale -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Ce que nos clients disent</h3>
-              <div style="background-color: #f8f9fa; padding: 20px; margin: 15px 0; border-left: 4px solid #007bff;">
-                <p style="margin: 0 0 10px 0; font-style: italic; font-size: 14px;">
-                  "Solutions Web a transformé notre présence en ligne. Site professionnel, rapide, et surtout abordable. 
-                  Nous avons économisé plus de 150€ par rapport aux autres devis !"
-                </p>
-                <p style="margin: 0; font-size: 12px; color: #7f8c8d;">- Marie T., Boutique en ligne</p>
-              </div>
-              <div style="background-color: #f8f9fa; padding: 20px; margin: 15px 0; border-left: 4px solid #007bff;">
-                <p style="margin: 0 0 10px 0; font-style: italic; font-size: 14px;">
-                  "Livraison en 6 jours exactement comme promis. Le site est magnifique et nous a déjà apporté 
-                  de nouveaux clients. Service exceptionnel !"
-                </p>
-                <p style="margin: 0; font-size: 12px; color: #7f8c8d;">- Thomas L., Artisan</p>
-              </div>
-            </div>
-            
-            <!-- Questions fréquentes -->
-            <div style="margin: 30px 0;">
-              <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 18px;">Questions fréquentes</h3>
-              <div style="margin-bottom: 20px;">
-                <p style="margin: 0 0 10px 0; font-weight: 500; font-size: 14px;">"Que se passe-t-il après le paiement ?"</p>
-                <p style="margin: 0; font-size: 14px; color: #666;">Nous vous contactons sous 24h pour valider les détails, puis nous commençons immédiatement le développement selon notre processus 4 étapes.</p>
-              </div>
-              <div style="margin-bottom: 20px;">
-                <p style="margin: 0 0 10px 0; font-weight: 500; font-size: 14px;">"Puis-je modifier mon site après la livraison ?"</p>
-                <p style="margin: 0; font-size: 14px; color: #666;">Absolument ! Nous vous formons pendant 2 heures et vous fournissons un accès complet pour gérer votre site en autonomie.</p>
-              </div>
-              <div style="margin-bottom: 0;">
-                <p style="margin: 0 0 10px 0; font-weight: 500; font-size: 14px;">"Et si je ne suis pas satisfait ?"</p>
-                <p style="margin: 0; font-size: 14px; color: #666;">Notre garantie satisfaction 30 jours vous protège : remboursement complet sans condition si vous n'êtes pas satisfait.</p>
-              </div>
-            </div>
-            
-            <!-- Appel à l'action -->
-            <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 20px; font-size: 16px;">Prêt à démarrer votre projet ?</p>
-              <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="{{paymentLink}}" 
-                   style="display: inline-block; background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;"
-                   target="_blank">
-                  Commencer avec 46$
-                </a>
-                <a href="mailto:{{agentEmail}}?subject=Questions {{companyName}}" 
-                   style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-                  Discuter du projet
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Footer -->
-          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
-            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
-              Votre projet professionnel vous attend - Commencez avec seulement 46$
-            </p>
-            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
-              Nous sommes là pour répondre à toutes vos questions
-            </p>
-          </div>
-          
-          <!-- Signature -->
-          <div style="margin-top: 30px; text-align: left;">
-            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding: 40px 20px;">
+              <table width="600" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
+                    <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #2c3e50;">Suivi personnalisé</h1>
+                    <p style="margin: 8px 0 0 0; font-size: 14px; color: #7f8c8d;">Votre projet {{companyName}}</p>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="margin-bottom: 30px;">
+                    <h2 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 20px;">Bonjour {{firstName}},</h2>
+                    
+                    <!-- Introduction et contexte -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                      <tr>
+                        <td>
+                          <p style="font-size: 16px; margin: 0 0 15px 0;">
+                            <strong>Notre engagement pour votre succès</strong> : Chez {{agentName}}, nous ne considérons pas que notre travail 
+                            se termine avec l'envoi d'une proposition. Votre projet {{companyName}} mérite une attention particulière, 
+                            et nous voulons nous assurer que vous disposez de toutes les informations pour prendre la meilleure décision pour votre entreprise.
+                          </p>
+                          <p style="font-size: 16px; margin: 0 0 25px 0;">
+                            <strong>Pourquoi ce suivi ?</strong> Nous comprenons que lancer un site web est une décision importante. 
+                            C'est un investissement dans votre avenir digital, et nous voulons répondre à toutes vos questions, 
+                            partager notre expérience, et vous montrer concrètement comment nous allons transformer votre présence en ligne.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Proposition principale -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 25px;">
+                          <h3 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 18px;">Votre site web vous attend</h3>
+                          <p style="font-size: 16px; margin: 0 0 20px 0;">
+                            Je fais suite à notre précédent email concernant votre site web professionnel pour {{companyName}}. 
+                            J'espère que vous avez eu l'occasion de consulter notre proposition détaillée.
+                          </p>
+                          <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">Découvrez votre futur site :</p>
+                          <p style="margin: 0 0 20px 0; font-size: 14px; color: #007bff;">
+                            <a href="{{websiteLink}}" style="color: #007bff; text-decoration: underline;">VOTRE SITE WEB ICI</a>
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Valeurs différenciantes -->
+                    <h3 style="color: #2c3e50; margin: 30px 0 20px 0; font-size: 18px;">Pourquoi choisir {{agentName}} ?</h3>
+                    
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
+                      <tr>
+                        <td>
+                          <h4 style="color: #2c3e50; margin: 0 0 10px 0; font-size: 16px;">💰 Paiement en 2 étapes - Total : 146€</h4>
+                          <ul style="padding-left: 20px; margin: 0;">
+                            <li style="margin-bottom: 12px;"><strong>Dépôt pour commencer</strong> : Seulement 46€ pour lancer votre projet</li>
+                            <li style="margin-bottom: 12px;"><strong>Paiement final à la livraison</strong> : 100€ lorsque votre site est prêt</li>
+                            <li style="margin-bottom: 0;"><strong>Pas de frais cachés</strong> : Hébergement et domaine inclus la première année</li>
+                          </ul>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
+                      <tr>
+                        <td>
+                          <h4 style="color: #2c3e50; margin: 0 0 10px 0; font-size: 16px;">⚡ Livraison express 2 jours</h4>
+                          <ul style="padding-left: 20px; margin: 0;">
+                            <li style="margin-bottom: 12px;"><strong>Rapidité exceptionnelle</strong> : Site web prêt en 2 jours ouvrés</li>
+                            <li style="margin-bottom: 12px;"><strong>Processus optimisé</strong> : Méthodologie éprouvée sans compromis sur la qualité</li>
+                            <li style="margin-bottom: 0;"><strong>Avantage concurrentiel</strong> : Soyez en ligne avant vos concurrents</li>
+                          </ul>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 0;">
+                      <tr>
+                        <td>
+                          <h4 style="color: #2c3e50; margin: 0 0 10px 0; font-size: 16px;">🛡️ Garantie satisfaction 30 jours</h4>
+                          <ul style="padding-left: 20px; margin: 0;">
+                            <li style="margin-bottom: 12px;"><strong>Remboursement complet</strong> : Si pas satisfait, nous vous remboursons intégralement</li>
+                            <li style="margin-bottom: 12px;"><strong>Zéro risque</strong> : Testez notre service sans engagement financier</li>
+                            <li style="margin-bottom: 0;"><strong>Confiance mutuelle</strong> : Notre réputation repose sur votre satisfaction</li>
+                          </ul>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Témoignages et preuve sociale -->
+                    <h3 style="color: #2c3e50; margin: 30px 0 20px 0; font-size: 18px;">Ce que nos clients disent</h3>
+                    <table width="100%" cellpadding="20" cellspacing="0" style="background-color: #f8f9fa; border-left: 4px solid #007bff; border-collapse: collapse; margin-bottom: 15px;">
+                      <tr>
+                        <td>
+                          <p style="margin: 0 0 10px 0; font-style: italic; font-size: 14px;">
+                            "Solutions Web a transformé notre présence en ligne. Site professionnel, rapide, et surtout abordable. 
+                            Nous avons économisé plus de 150€ par rapport aux autres devis !"
+                          </p>
+                          <p style="margin: 0; font-size: 12px; color: #7f8c8d;">- Marie T., Boutique en ligne</p>
+                        </td>
+                      </tr>
+                    </table>
+                    <table width="100%" cellpadding="20" cellspacing="0" style="background-color: #f8f9fa; border-left: 4px solid #007bff; border-collapse: collapse; margin-bottom: 0;">
+                      <tr>
+                        <td>
+                          <p style="margin: 0 0 10px 0; font-style: italic; font-size: 14px;">
+                            "Livraison en 6 jours exactement comme promis. Le site est magnifique et nous a déjà apporté 
+                            de nouveaux clients. Service exceptionnel !"
+                          </p>
+                          <p style="margin: 0; font-size: 12px; color: #7f8c8d;">- Thomas L., Artisan</p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Questions fréquentes -->
+                    <h3 style="color: #2c3e50; margin: 30px 0 20px 0; font-size: 18px;">Questions fréquentes</h3>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
+                      <tr>
+                        <td>
+                          <p style="margin: 0 0 10px 0; font-weight: 500; font-size: 14px;">"Que se passe-t-il après le paiement ?"</p>
+                          <p style="margin: 0; font-size: 14px; color: #666;">Nous vous contactons sous 24h pour valider les détails, puis nous commençons immédiatement le développement selon notre processus 4 étapes.</p>
+                        </td>
+                      </tr>
+                    </table>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
+                      <tr>
+                        <td>
+                          <p style="margin: 0 0 10px 0; font-weight: 500; font-size: 14px;">"Puis-je modifier mon site après la livraison ?"</p>
+                          <p style="margin: 0; font-size: 14px; color: #666;">Absolument ! Nous vous formons pendant 2 heures et vous fournissons un accès complet pour gérer votre site en autonomie.</p>
+                        </td>
+                      </tr>
+                    </table>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 0;">
+                      <tr>
+                        <td>
+                          <p style="margin: 0 0 10px 0; font-weight: 500; font-size: 14px;">"Et si je ne suis pas satisfait ?"</p>
+                          <p style="margin: 0; font-size: 14px; color: #666;">Notre garantie satisfaction 30 jours vous protège : remboursement complet sans condition si vous n'êtes pas satisfait.</p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Appel à l'action -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
+                      <tr>
+                        <td align="center">
+                          <p style="margin: 0 0 20px 0; font-size: 16px;">Prêt à démarrer votre projet ?</p>
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="padding-right: 15px;">
+                                <a href="{{paymentLink}}" 
+                                   style="display: inline-block; background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;"
+                                   target="_blank">
+                                  Commencer avec 46€
+                                </a>
+                              </td>
+                              <td>
+                                <a href="mailto:{{agentEmail}}?subject=Questions {{companyName}}" 
+                                   style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
+                                  Discuter du projet
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+                      Votre projet professionnel vous attend - Commencez avec seulement 46€
+                    </p>
+                    <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+                      Nous sommes là pour répondre à toutes vos questions
+                    </p>
+                  </td>
+                </tr>
+                
+                <!-- Signature -->
+                <tr>
+                  <td style="margin-top: 30px; text-align: left;">
+                    <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+                    <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
+                    <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `,
@@ -1097,104 +1553,155 @@ Solutions Web
         <title>Solutions Web - Dernière Chance</title>
       </head>
       <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #333333; line-height: 1.6;">
-        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-          
-          <!-- Header -->
-          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
-            <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #dc3545;">Dernière chance</h1>
-            <p style="margin: 8px 0 0 0; font-size: 14px; color: #7f8c8d;">Offre spéciale expirant le {{expiryDate}}</p>
-          </div>
-          
-          <!-- Content -->
-          <div style="margin-bottom: 30px;">
-            <h2 style="color: #2c3e50; margin-bottom: 15px; font-size: 20px;">Bonjour {{firstName}},</h2>
-            
-            <!-- Introduction urgente -->
-            <div style="margin-bottom: 30px;">
-              <p style="font-size: 16px; margin-bottom: 15px;">
-                <strong>Un message important pour votre entreprise</strong> : Je vous écris aujourd'hui avec un certain sentiment d'urgence, 
-                car nous sommes à un moment décisif pour votre projet {{companyName}}. Les opportunités exceptionnelles sont rares, 
-                et celle que nous vous avons proposée est sur le point de disparaître définitivement.
-              </p>
-              <p style="font-size: 16px; margin-bottom: 25px;">
-                <strong>Pourquoi cette insistance ?</strong> Parce que nous avons constaté que trop d'entreprises manquent 
-                leur chance de se développer en ligne à cause d'hésitations ou de procrastination. Votre présence digitale 
-                n'est pas une option, c'est une nécessité stratégique pour votre croissance future.
-              </p>
-            </div>
-            
-            <!-- Avertissement urgence -->
-            <div style="background-color: #f8d7da; padding: 25px; margin: 30px 0; text-align: center; border: 1px solid #f5c6cb;">
-              <h3 style="color: #721c24; margin-top: 0; margin-bottom: 15px; font-size: 18px;">⚠️ Offre expire le {{expiryDate}}</h3>
-              <p style="font-size: 16px; margin-bottom: 20px; color: #721c24;">
-                C'est votre dernière opportunité ! Notre offre spéciale pour votre site web {{companyName}} expire dans quelques jours. 
-                Ne manquez pas cette chance d'économiser 40% sur votre présence en ligne professionnelle.
-              </p>
-              <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500; color: #721c24;">Finaliser maintenant :</p>
-              <p style="margin: 0 0 20px 0; font-size: 14px; color: #dc3545;">
-                <a href="{{paymentLink}}" style="color: #dc3545; text-decoration: underline; font-weight: 600;">{{paymentLink}}</a>
-              </p>
-            </div>
-            
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Attente 3-4 semaines</strong> : Au lieu de 2 jours avec notre offre express</li>
-                  <li style="margin-bottom: 12px;"><strong>Perte d'opportunités</strong> : Chaque semaine sans site = clients potentiels perdus</li>
-                  <li style="margin-bottom: 0;"><strong>Concurrence avancée</strong> : Vos concurrents pourraient déjà être en ligne</li>
-                </ul>
-              </div>
-              
-              <div style="margin-bottom: 0;">
-                <h4 style="color: #dc3545; margin-bottom: 10px; font-size: 16px;">🛡️ Impact sur la sécurité</h4>
-                <ul style="padding-left: 20px; margin: 0;">
-                  <li style="margin-bottom: 12px;"><strong>Garantie perdue</strong> : Plus de garantie satisfaction 30 jours</li>
-                  <li style="margin-bottom: 12px;"><strong>Risque financier</strong> : Engagement sans possibilité de remboursement</li>
-                  <li style="margin-bottom: 0;"><strong>Support limité</strong> : Assistance standard au lieu du support prioritaire</li>
-                </ul>
-            
-            <!-- Témoignage d'urgence -->
-            <div style="margin: 30px 0;">
-              <div style="background-color: #f8f9fa; padding: 20px; border-left: 4px solid #dc3545;">
-                <p style="margin: 0 0 10px 0; font-style: italic; font-size: 14px;">
-                  "J'ai hésité et perdu l'offre spéciale. J'ai dû payer 150€ de plus pour le même site, 
-                  et attendre 3 semaines au lieu de 2 jours. Ne faites pas ma même erreur !"
-                </p>
-                <p style="margin: 0; font-size: 12px; color: #7f8c8d;">- Alexandre P., Restaurant (regrette son attente)</p>
-              </div>
-            </div>
-            
-            <!-- Appel à l'action final -->
-            <div style="text-align: center; margin: 40px 0;">
-              <p style="margin-bottom: 20px; font-size: 16px; font-weight: 500;">Ne laissez pas cette opportunité vous échapper !</p>
-              <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="{{paymentLink}}" 
-                   style="display: inline-block; background-color: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-                  Payer maintenant
-                </a>
-                <a href="mailto:{{agentEmail}}?subject=Urgence {{companyName}}" 
-                   style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-                  Contacter d'urgence
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Footer -->
-          <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
-            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
-              Cette offre exceptionnelle expire bientôt - Agissez maintenant
-            </p>
-            <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
-              Votre projet professionnel mérite cette opportunité unique
-            </p>
-          </div>
-          
-          <!-- Signature -->
-          <div style="margin-top: 30px; text-align: left;">
-            <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding: 40px 20px;">
+              <table width="600" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0;">
+                    <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #dc3545;">Dernière chance</h1>
+                    <p style="margin: 8px 0 0 0; font-size: 14px; color: #7f8c8d;">Offre spéciale expirant le {{expiryDate}}</p>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="margin-bottom: 30px;">
+                    <h2 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 20px;">Bonjour {{firstName}},</h2>
+                    
+                    <!-- Introduction urgente -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                      <tr>
+                        <td>
+                          <p style="font-size: 16px; margin: 0 0 15px 0;">
+                            <strong>Un message important pour votre entreprise</strong> : Je vous écris aujourd'hui avec un certain sentiment d'urgence, 
+                            car nous sommes à un moment décisif pour votre projet {{companyName}}. Les opportunités exceptionnelles sont rares, 
+                            et celle que nous vous avons proposée est sur le point de disparaître définitivement.
+                          </p>
+                          <p style="font-size: 16px; margin: 0 0 25px 0;">
+                            <strong>Pourquoi cette insistance ?</strong> Parce que nous avons constaté que trop d'entreprises manquent 
+                            leur chance de se développer en ligne à cause d'hésitations ou de procrastination. Votre présence digitale 
+                            n'est pas une option, c'est une nécessité stratégique pour votre croissance future.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Avertissement urgence -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8d7da; border: 1px solid #f5c6cb; border-collapse: collapse; margin-bottom: 30px;">
+                      <tr>
+                        <td style="padding: 25px; text-align: center;">
+                          <h3 style="color: #721c24; margin: 0 0 15px 0; font-size: 18px;">⚠️ Offre expire le {{expiryDate}}</h3>
+                          <p style="font-size: 16px; margin: 0 0 20px 0; color: #721c24;">
+                            C'est votre dernière opportunité ! Notre offre spéciale pour votre site web {{companyName}} expire dans quelques jours. 
+                            Ne manquez pas cette chance d'économiser 40% sur votre présence en ligne professionnelle.
+                          </p>
+                          <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 500; color: #721c24;">Finaliser maintenant :</p>
+                          <p style="margin: 0 0 20px 0; font-size: 14px; color: #dc3545;">
+                            <a href="{{paymentLink}}" style="color: #dc3545; text-decoration: underline; font-weight: 600;">{{paymentLink}}</a>
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
+                      <tr>
+                        <td>
+                          <h4 style="color: #dc3545; margin: 0 0 10px 0; font-size: 16px;">⏰ Impact temporel</h4>
+                          <ul style="padding-left: 20px; margin: 0;">
+                            <li style="margin-bottom: 12px;"><strong>Attente 3-4 semaines</strong> : Au lieu de 2 jours avec notre offre express</li>
+                            <li style="margin-bottom: 12px;"><strong>Perte d'opportunités</strong> : Chaque semaine sans site = clients potentiels perdus</li>
+                            <li style="margin-bottom: 0;"><strong>Concurrence avancée</strong> : Vos concurrents pourraient déjà être en ligne</li>
+                          </ul>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 0;">
+                      <tr>
+                        <td>
+                          <h4 style="color: #dc3545; margin: 0 0 10px 0; font-size: 16px;">🛡️ Impact sur la sécurité</h4>
+                          <ul style="padding-left: 20px; margin: 0;">
+                            <li style="margin-bottom: 12px;"><strong>Garantie perdue</strong> : Plus de garantie satisfaction 30 jours</li>
+                            <li style="margin-bottom: 12px;"><strong>Risque financier</strong> : Engagement sans possibilité de remboursement</li>
+                            <li style="margin-bottom: 0;"><strong>Support limité</strong> : Assistance standard au lieu du support prioritaire</li>
+                          </ul>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Témoignage d'urgence -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                      <tr>
+                        <td>
+                          <table width="100%" cellpadding="20" cellspacing="0" style="background-color: #f8f9fa; border-left: 4px solid #dc3545; border-collapse: collapse;">
+                            <tr>
+                              <td>
+                                <p style="margin: 0 0 10px 0; font-style: italic; font-size: 14px;">
+                                  "J'ai hésité et perdu l'offre spéciale. J'ai dû payer 150€ de plus pour le même site, 
+                                  et attendre 3 semaines au lieu de 2 jours. Ne faites pas ma même erreur !"
+                                </p>
+                                <p style="margin: 0; font-size: 12px; color: #7f8c8d;">- Alexandre P., Restaurant (regrette son attente)</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Appel à l'action final -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
+                      <tr>
+                        <td align="center">
+                          <p style="margin: 0 0 20px 0; font-size: 16px; font-weight: 500;">Ne laissez pas cette opportunité vous échapper !</p>
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="padding-right: 15px;">
+                                <a href="{{paymentLink}}" 
+                                   style="display: inline-block; background-color: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
+                                  Payer maintenant
+                                </a>
+                              </td>
+                              <td>
+                                <a href="mailto:{{agentEmail}}?subject=Urgence {{companyName}}" 
+                                   style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
+                                  Contacter d'urgence
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">
+                      Cette offre exceptionnelle expire bientôt - Agissez maintenant
+                    </p>
+                    <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+                      Votre projet professionnel mérite cette opportunité unique
+                    </p>
+                  </td>
+                </tr>
+                
+                <!-- Signature -->
+                <tr>
+                  <td style="margin-top: 30px; text-align: left;">
+                    <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2c3e50;">{{agentName}}</p>
+                    <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">Solutions Web - Votre partenaire web</p>
+                    <p style="margin: 4px 0 0 0; font-size: 14px; color: #7f8c8d;">{{agentEmail}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `,
