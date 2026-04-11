@@ -61,11 +61,12 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const ready = leads.filter(l => l.siteGenerated && !l.emailSent && l.email);
   const sent = leads.filter(l => l.emailSent);
 
-  // Fonction pour extraire les 2 premiers mots d'un nom
-  const getFirstName = (fullName: string): string => {
-    if (!fullName) return '';
-    const words = fullName.trim().split(/\s+/);
-    return words.slice(0, 2).join(' ');
+  // Fonction de salutation professionnelle B2B
+  const getSalutation = (lead: { name: string; contactName?: string }): string => {
+    if (lead.contactName && lead.contactName.trim()) {
+      return lead.contactName.trim();
+    }
+    return lead.name;
   };
 
   // Fonction de personnalisation pour nouveaux templates
@@ -74,8 +75,8 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
     if (!template) return { subject: '', htmlContent: '', textContent: '' };
 
     const variables: Record<string, string> = {
-      firstName: getFirstName(lead.name), // 2 premiers mots du nom
-      id: getFirstName(lead.name), // Toujours égal à firstName
+      firstName: getSalutation(lead), // contactName si disponible, sinon name
+      id: getSalutation(lead), // Toujours égal à firstName
       companyName: lead.name,
       websiteLink: lead.siteUrl || '#', // Toujours depuis site_url de la table leads
       price: '146', // Prix par défaut
@@ -112,8 +113,8 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const personalizeTemplate = (template: EmailTemplate, lead: Lead, apiConfig: ApiConfig) => {
     const replacements: Record<string, string> = {
       '{{name}}': lead.name,
-      '{{firstName}}': getFirstName(lead.name), // 2 premiers mots du nom
-      '{{id}}': getFirstName(lead.name), // Toujours égal à firstName
+      '{{firstName}}': getSalutation(lead), // contactName si disponible, sinon name
+      '{{id}}': getSalutation(lead), // Toujours égal à firstName
       '{{companyName}}': lead.name, // Toujours depuis la table leads
       '{{city}}': lead.city || 'votre ville',
       '{{sector}}': lead.sector || 'votre secteur',
