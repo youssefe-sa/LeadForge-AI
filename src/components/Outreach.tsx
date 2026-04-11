@@ -71,6 +71,16 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
   // Fonction de personnalisation partagée et robuste
   const personalizeTemplateContent = (template: EmailTemplate, lead: Lead, config: ApiConfig) => {
+    // Détecter le domaine actuel pour le tracking
+    const baseUrl = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}` : 'https://leadforge.ai';
+    const trackBase = `${baseUrl}/api/track?id=${lead.id}`;
+
+    // Helper pour wrapper un lien avec le tracker
+    const wrapLink = (url: string, type: string) => {
+      if (!url || url === '#' || !lead.id) return url;
+      return `${trackBase}&type=${type}&url=${encodeURIComponent(url)}`;
+    };
+
     // 1. Définir toutes les variables de remplacement
     const replacements: Record<string, string> = {
       '{{name}}': lead.name || '',
@@ -79,23 +89,20 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       '{{companyName}}': lead.name || '',
       '{{city}}': lead.city || 'votre ville',
       '{{sector}}': lead.sector || 'votre secteur',
-      '{{websiteLink}}': lead.siteUrl || '#',
-      '{{landingUrl}}': lead.landingUrl || lead.siteUrl || '#',
-      '{{email}}': lead.email || '',
       
-      // Liens de paiement dynamiques (Supabase api_config)
-      '{{paymentLink}}': config.whopDepositLink || '#',
-      '{{finalPaymentLink}}': config.whopFinalPaymentLink || '#',
+      // Liens avec tracking
+      '{{websiteLink}}': wrapLink(lead.siteUrl || '#', 'site_clicked'),
+      '{{landingUrl}}': wrapLink(lead.landingUrl || lead.siteUrl || '#', 'site_clicked'),
+      '{{paymentLink}}': wrapLink(config.whopDepositLink || '#', 'payment_clicked'),
+      '{{finalPaymentLink}}': wrapLink(config.whopFinalPaymentLink || '#', 'payment_clicked'),
+      '{{devisLink}}': wrapLink(`https://leadforge.ai/api/docs/devis?id=${lead.id}`, 'devis_clicked'),
+      '{{invoiceLink}}': wrapLink(`https://leadforge.ai/api/docs/invoice?id=${lead.id}`, 'invoice_clicked'),
       
-      // Devis et Factures (URLs propres)
-      '{{devisLink}}': lead.id ? `https://leadforge.ai/api/docs/devis?id=${lead.id}` : '#',
-      '{{invoiceLink}}': lead.id ? `https://leadforge.ai/api/docs/invoice?id=${lead.id}` : '#',
-      
-      // Infos Agent (Supabase config)
+      // Infos Agent
       '{{agentName}}': config.gmailSmtpFromName || 'Solutions Web',
       '{{agentEmail}}': config.gmailSmtpFromEmail || 'contact@leadforge.ai',
       
-      // Données dynamiques de vente
+      // Données dynamiques
       '{{price}}': '146',
       '{{amount}}': '146',
       '{{validityDays}}': '7',

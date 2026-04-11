@@ -16,52 +16,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  const { id, type } = req.query;
+    const { id, type, url, redirect } = req.query;
+    const targetUrl = (url || redirect) as string;
 
-  if (!id || !type) {
-    return res.status(400).json({ error: 'Missing ID or type' });
-  }
-
-  try {
-    const leadId = id as string;
-    const trackType = type as string;
-
-    console.log(`[Tracking] Recieved ${trackType} for lead ${leadId}`);
-
-    let updateData: any = {};
-    
-    if (trackType === 'site_clicked') {
-      updateData = { site_clicked: true };
-    } else if (trackType === 'payment_clicked') {
-      updateData = { payment_clicked: true };
-    } else if (trackType === 'devis_clicked') {
-      updateData = { devis_clicked: true };
-    } else if (trackType === 'invoice_clicked') {
-      updateData = { invoice_clicked: true };
-    } else if (trackType === 'email_opened') {
-      updateData = { email_opened: true };
-    } else {
-      return res.status(400).json({ error: 'Invalid tracking type' });
+    if (!id || !type) {
+      return res.status(400).json({ error: 'Missing ID or type' });
     }
 
-    const { error } = await supabase
-      .from('leads')
-      .update(updateData)
-      .eq('id', leadId);
+    try {
+      const leadId = id as string;
+      const trackType = type as string;
 
-    if (error) {
-      console.error('[Tracking DB Error]', error);
-      return res.status(500).json({ error: error.message });
+      let updateData: any = {};
+      
+      if (trackType === 'site_clicked') {
+        updateData = { site_clicked: true };
+      } else if (trackType === 'payment_clicked') {
+        updateData = { payment_clicked: true };
+      } else if (trackType === 'devis_clicked') {
+        updateData = { devis_clicked: true };
+      } else if (trackType === 'invoice_clicked') {
+        updateData = { invoice_clicked: true };
+      } else if (trackType === 'email_opened') {
+        updateData = { email_opened: true };
+      } else if (trackType === 'email_clicked') {
+        updateData = { email_clicked: true };
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        await supabase.from('leads').update(updateData).eq('id', leadId);
+      }
+
+      // Si c'est un clic sur un lien, on redirige
+      if (targetUrl) {
+        return res.redirect(302, targetUrl);
+      }
+
+      // Sinon (pixel d'ouverture), on renvoie le pixel transparent
+      const pixel = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
+      res.setHeader('Content-Type', 'image/gif');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      return res.send(pixel);
+
+    } catch (err) {
+      console.error('[Tracking Error]', err);
+      if (targetUrl) return res.redirect(302, targetUrl);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    // Retourner un pixel 1x1 transparent pour être discret
-    const pixel = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
-    res.setHeader('Content-Type', 'image/gif');
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    return res.send(pixel);
-
-  } catch (err) {
-    console.error('[Tracking Error]', err);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  }
 }
