@@ -83,7 +83,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
     // 1. Définir toutes les variables de remplacement
     const firstName = (lead.contactName || lead.name || '').split(' ')[0];
-    const trackBase = `/api/track?id=${lead.id}`;
+    // trackBase est déjà déclaré à la ligne 76
 
     const replacements: Record<string, string> = {
       '{{name}}': lead.name || '',
@@ -346,7 +346,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       landingUrl: 'https://example.com',
     } as Lead;
 
-    const { subject, body } = personalizeTemplate(template, testLead, apiConfig);
+    const { subject, body } = personalizeTemplateContent(template, testLead, apiConfig);
     const result = await sendEmailViaApi({
       to: testEmailAddress,
       toName: 'Test',
@@ -360,6 +360,11 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     ]);
     setTestEmailSending(false);
   };
+
+  // Wrappers pour le workflow (utilisés dans le JSX)
+  const sendEmail1Demo = (lead: Lead) => sendWorkflowEmail(lead, 'email1_presentation');
+  const sendEmail2WithPayment = (lead: Lead) => sendWorkflowEmail(lead, 'email2_devis');
+  const sendEmail3Confirmation = (lead: Lead) => sendWorkflowEmail(lead, 'email3_confirmation');
 
   return (
     <div className="animate-fade" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>

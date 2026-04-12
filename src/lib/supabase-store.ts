@@ -80,6 +80,7 @@ export interface Lead {
   admin_username?: string;
   admin_password?: string;
   documentation_url?: string;
+  contactName?: string; // Ajouté pour personnalisation Outreach
 }
 
 export type LlmProvider = 'groq' | 'gemini' | 'nvidia' | 'openrouter';
