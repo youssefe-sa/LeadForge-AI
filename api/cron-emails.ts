@@ -41,11 +41,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const transporter = nodemailer.createTransport({
       host: config.gmail_smtp_host || 'smtp.gmail.com',
-      port: parseInt(config.gmail_smtp_port || '465'),
-      secure: config.gmail_smtp_port === '465',
+      port: Number(config.gmail_smtp_port) || 587,
+      secure: Number(config.gmail_smtp_port) === 465,
       auth: {
         user: config.gmail_smtp_user,
-        pass: config.gmail_smtp_pass,
+        pass: config.gmail_smtp_password,
       },
     });
 
