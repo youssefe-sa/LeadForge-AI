@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "crons": [
-    {
-      "path": "/api/cron-emails",
-      "schedule": "*/5 * * * *"
-    }
-  ],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
