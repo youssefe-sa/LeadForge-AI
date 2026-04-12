@@ -152,7 +152,7 @@ export const salesTemplates: EmailTemplate[] = [
             <div style="text-align: center; margin: 40px 0;">
               <p style="margin-bottom: 20px; font-size: 16px;">Souhaitez-vous démarrer votre projet ?</p>
               <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="mailto:{{agentEmail}}?subject=Démarrage projet {{companyName}}&body=Bonjour, je souhaite démarrer le projet pour {{companyName}}." 
+                <a href="{{startProjectLink}}" 
                    style="display: inline-block; background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 500;">
                   Démarrer le projet
                 </a>

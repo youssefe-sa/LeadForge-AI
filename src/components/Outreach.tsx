@@ -90,13 +90,14 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       '{{city}}': lead.city || 'votre ville',
       '{{sector}}': lead.sector || 'votre secteur',
       
-      // Liens avec tracking
-      '{{websiteLink}}': wrapLink(lead.siteUrl || '#', 'site_clicked'),
-      '{{landingUrl}}': wrapLink(lead.landingUrl || lead.siteUrl || '#', 'site_clicked'),
-      '{{paymentLink}}': wrapLink(config.whopDepositLink || '#', 'payment_clicked'),
-      '{{finalPaymentLink}}': wrapLink(config.whopFinalPaymentLink || '#', 'payment_clicked'),
-      '{{devisLink}}': wrapLink(`https://leadforge.ai/api/docs/devis?id=${lead.id}`, 'devis_clicked'),
-      '{{invoiceLink}}': wrapLink(`https://leadforge.ai/api/docs/invoice?id=${lead.id}`, 'invoice_clicked'),
+      // Boutons traçables
+      '{{websiteLink}}': `${baseUrl}/api/track?id=${lead.id}&type=site_clicked`,
+      '{{startProjectLink}}': `${baseUrl}/api/track?id=${lead.id}&type=start_clicked`,
+      '{{landingUrl}}': `${baseUrl}/api/track?id=${lead.id}&type=site_clicked`,
+      '{{paymentLink}}': `${baseUrl}/api/track?id=${lead.id}&type=payment_clicked`,
+      '{{finalPaymentLink}}': `${baseUrl}/api/track?id=${lead.id}&type=payment_clicked`,
+      '{{devisLink}}': `${baseUrl}/api/track?id=${lead.id}&type=devis_clicked`,
+      '{{invoiceLink}}': `${baseUrl}/api/track?id=${lead.id}&type=invoice_clicked`,
       
       // Infos Agent
       '{{agentName}}': config.gmailSmtpFromName || 'Solutions Web',
@@ -190,7 +191,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       // Programmer l'étape suivante si nécessaire
       if (templateId === 'email1_presentation') {
         const scheduledDate = new Date();
-        scheduledDate.setDate(scheduledDate.getDate() + 3);
+        scheduledDate.setDate(scheduledDate.getDate() + 1); // <--- PASSAGE À J+1
         
         supabase.from('scheduled_emails').insert([{
           lead_id: lead.id,
@@ -198,7 +199,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
           scheduled_for: scheduledDate.toISOString(),
           status: 'pending'
         }]).then(({ error }) => {
-          if (!error) setLogs(prev => [...prev, `📅 Rappel 1 programmé pour le ${scheduledDate.toLocaleDateString()}`]);
+          if (!error) setLogs(prev => [...prev, `📅 Rappel 1 programmé pour DEMAIN`]);
         });
       }
     } else {
@@ -213,9 +214,9 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     // 2. Envoyer immédiatement l'Email 3 (Confirmation Dépôt)
     await sendWorkflowEmail(lead, 'email3_confirmation');
     
-    // 3. Programmer le solde final (Email 4) dans 3 jours (périodes de dev standard)
+    // 3. Programmer le solde final (Email 4) dans 2 jours (Production Express)
     const scheduledDate = new Date();
-    scheduledDate.setDate(scheduledDate.getDate() + 3);
+    scheduledDate.setDate(scheduledDate.getDate() + 2); // <--- PASSAGE À J+2
     
     await supabase.from('scheduled_emails').insert([{
       lead_id: lead.id,

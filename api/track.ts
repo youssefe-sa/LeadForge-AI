@@ -31,8 +31,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       if (trackType === 'site_clicked') {
         updateData = { site_clicked: true };
+        targetUrl = data.site_url || data.landing_url || '/';
+      } else if (trackType === 'start_clicked') {
+        updateData = { site_clicked: true }; // On marque aussi comme intéressé
+        // Récupérer la config pour l'email de l'agent
+        const { data: config } = await supabase.from('api_config').select('*').single();
+        const agentEmail = config?.gmail_smtp_from_email || config?.gmail_smtp_user || 'contact@leadforge.ai';
+        const companyName = data.name || 'Projet';
+        
+        // Rediriger vers un mailto personnalisé
+        targetUrl = `mailto:${agentEmail}?subject=Démarrage projet ${companyName}&body=Bonjour, je souhaite démarrer le projet pour ${companyName}.`;
       } else if (trackType === 'payment_clicked') {
         updateData = { payment_clicked: true };
+        // Rediriger vers Whop (détecté via config ou data)
+        const { data: config } = await supabase.from('api_config').select('*').single();
+        targetUrl = config?.whop_deposit_link || '/';
       } else if (trackType === 'devis_clicked') {
         updateData = { devis_clicked: true };
       } else if (trackType === 'invoice_clicked') {
@@ -47,7 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await supabase.from('leads').update(updateData).eq('id', leadId);
         
         // --- LOGIQUE DE CHAINAGE INTELLIGENT ---
-        if (trackType === 'site_clicked') {
+        if (trackType === 'site_clicked' || trackType === 'start_clicked') {
           // 1. Annuler toutes les relances (reminders) programmées
           await supabase.from('scheduled_emails')
             .delete()
@@ -63,9 +76,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .limit(1);
 
           if (!existingStep2 || existingStep2.length === 0) {
-            // 3. Programmer l'Email 2 (Devis & Paiement) pour +2 heures
+            // 3. Programmer l'Email 2 (Devis & Paiement) pour +30 minutes
             const sendDate = new Date();
-            sendDate.setHours(sendDate.getHours() + 2);
+            sendDate.setMinutes(sendDate.getMinutes() + 30); // <--- PASSAGE À 30 MIN
             
             await supabase.from('scheduled_emails').insert([{
               lead_id: leadId,
