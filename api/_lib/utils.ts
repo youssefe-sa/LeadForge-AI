@@ -17,99 +17,92 @@ export async function generateAndSaveDevis(lead: any, price: string = '146'): Pr
   const expiryDate = new Date(Date.now() + 7 * 86400000).toLocaleDateString('fr-FR');
 
   const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
-    <title>Devis ${devisNumber}</title>
-    <style>
-      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 0; margin: 0; color: #1a202c; background-color: #f7fafc; }
-      .container { max-width: 850px; margin: 40px auto; background: white; padding: 60px; border-radius: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative; }
-      .print-btn { position: absolute; top: 20px; right: 20px; background: #D4500A; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-      @media print { .print-btn { display: none; } .container { box-shadow: none; margin: 0; width: 100%; } body { background: white; } }
-      .header { display: flex; justify-content: space-between; border-bottom: 2px solid #edf2f7; padding-bottom: 30px; margin-bottom: 40px; align-items: center; }
-      .client-info { display: flex; justify-content: space-between; margin-bottom: 40px; background: #f8fafc; padding: 25px; border-radius: 8px; }
-      .section-title { background: #1a202c; color: white; padding: 10px 15px; font-size: 14px; font-weight: bold; border-radius: 4px; margin-top: 30px; }
+    <title>Devis ${devisNumber}</title>    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 0; margin: 0; color: #1a202c; background-color: #f7fafc; font-size: 13px; }
+      .container { max-width: 800px; margin: 20px auto; background: white; padding: 40px; border-radius: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative; }
+      .print-btn { position: absolute; top: 15px; right: 15px; background: #D4500A; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
+      @media print { .print-btn { display: none; } .container { box-shadow: none; margin: 0; width: 100%; padding: 20px; } body { background: white; } }
+      .header { display: flex; justify-content: space-between; border-bottom: 2px solid #edf2f7; padding-bottom: 20px; margin-bottom: 25px; align-items: center; }
+      .client-info { display: flex; justify-content: space-between; margin-bottom: 25px; background: #f8fafc; padding: 15px 20px; border-radius: 8px; border: 1px solid #edf2f7; }
+      .section-title { background: #2d3748; color: white; padding: 6px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
       table.pro-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-      table.pro-table td { padding: 8px 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; line-height: 1.5; }
-      table.pro-table td:first-child { color: #D4500A; width: 25px; font-weight: bold; }
-      .price-box { background: #1a202c; color: white; padding: 30px; border-radius: 8px; margin-top: 40px; }
-      .modalities { background: #f0fff4; border: 1px solid #c6f6d5; padding: 25px; border-radius: 8px; margin-top: 30px; color: #22543d; border-left: 5px solid #48bb78; }
+      table.pro-table td { padding: 6px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+      table.pro-table td:first-child { color: #D4500A; width: 20px; font-weight: bold; }
+      .price-box { background: #f8fafc; color: #1a202c; padding: 20px; border-radius: 8px; margin-top: 25px; border: 1px solid #e2e8f0; }
+      .modalities { background: #f0fff4; border-left: 4px solid #48bb78; padding: 15px 20px; border-radius: 4px; margin-top: 20px; color: #22543d; }
+      h4 { margin: 0 0 5px 0; font-size: 11px; color: #718096; text-transform: uppercase; }
+      p { margin: 0; line-height: 1.4; }
     </style>
   </head><body>
     <div class="container">
-      <button class="print-btn" onclick="window.print()">📥 TÉLÉCHARGER LE PDF</button>
+      <button class="print-btn" onclick="window.print()">📥 IMPRIMER LE DEVIS</button>
       <div class="header">
         ${LOGO_SVG}
         <div style="text-align:right">
-          <h2 style="margin:0; font-size:32px; font-weight:900;">DEVIS</h2>
-          <p style="margin:0; color:#718096;">N° ${devisNumber}<br>Date : ${today}</p>
+          <h2 style="margin:0; font-size:24px; font-weight:900; color:#2d3748;">DEVIS PRO</h2>
+          <p style="margin:0; color:#718096; font-size:12px;">N° ${devisNumber}<br>Date : ${today}</p>
         </div>
       </div>
       <div class="client-info">
-        <div><h4>Veuillez adresser le règlement à :</h4><p><strong>Services-Siteup</strong><br>siteup.services@gmail.com</p></div>
-        <div style="text-align:right"><h4>Client :</h4><p><strong>${lead.name}</strong><br>${lead.city || ''}</p></div>
+        <div><h4>Émetteur</h4><p><strong>Services-Siteup</strong><br>siteup.services@gmail.com</p></div>
+        <div style="text-align:right"><h4>Destinataire</h4><p><strong>${lead.name}</strong><br>${lead.city || ''}</p></div>
       </div>
 
-      <div class="section-title">🌐 SITE WEB PROFESSIONNEL COMPLET</div>
-      <table class="pro-table">
-        <tr><td>•</td><td><strong>Design sur mesure</strong> : Création unique adaptée à votre image et votre secteur d'activité</td></tr>
-        <tr><td>•</td><td><strong>Responsive design</strong> : Affichage parfait sur ordinateur, tablette et smartphone</td></tr>
-        <tr><td>•</td><td><strong>Pages essentielles</strong> : Accueil, Présentation, Services, Contact...</td></tr>
-        <tr><td>•</td><td><strong>Formulaire de contact</strong> : Vos clients peuvent vous contacter directement depuis le site</td></tr>
-        <tr><td>•</td><td><strong>WhatsApp intégré</strong> : Vos clients peuvent vous contacter directement via WhatsApp</td></tr>
-        <tr><td>•</td><td><strong>Chatbot intelligent</strong> : Assistant 24/7 pour répondre aux questions de vos visiteurs</td></tr>
-      </table>
-
-      <div class="section-title">🚀 OPTIMISATION ET PERFORMANCE</div>
-      <table class="pro-table">
-        <tr><td>•</td><td><strong>SEO optimisé</strong> : Référencement naturel pour apparaître dans Google</td></tr>
-        <tr><td>•</td><td><strong>Performance rapide</strong> : Temps de chargement optimisé pour meilleure expérience utilisateur</td></tr>
-        <tr><td>•</td><td><strong>Sécurité SSL</strong> : Certificat HTTPS inclus pour la sécurité de vos visiteurs</td></tr>
-        <tr><td>•</td><td><strong>Analytics intégré</strong> : Suivi des visiteurs et statistiques de performance</td></tr>
-      </table>
-
-      <div class="section-title">🎯 FORMATION ET SUPPORT</div>
-      <table class="pro-table">
-        <tr><td>•</td><td><strong>Support prioritaire</strong> : Assistance pendant 3 mois</td></tr>
-        <tr><td>•</td><td><strong>Mises à jour incluses</strong> : Maintenance et sécurité garanties</td></tr>
-      </table>
-
-      <div class="section-title">🏆 AVANTAGES EXCLUSIFS</div>
-      <table class="pro-table">
-        <tr><td>•</td><td><strong>Garantie satisfaction</strong> : Remboursement complet si pas satisfait sous 15 jours</td></tr>
-        <tr><td>•</td><td><strong>Livraison rapide</strong> : Site web prêt en 2 jours ouvrés</td></tr>
-        <tr><td>•</td><td><strong>Économie garantie</strong> : 75% moins cher que les agences traditionnelles</td></tr>
-        <tr><td>•</td><td><strong>Propriété totale</strong> : Vous êtes 100% propriétaire de votre site et domaine</td></tr>
-      </table>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <div class="section-title">🌐 Site Web Professionnel</div>
+          <table class="pro-table">
+            <tr><td>•</td><td>Design sur mesure & Responsive</td></tr>
+            <tr><td>•</td><td>Pages stratégiques (Accueil, Services...)</td></tr>
+            <tr><td>•</td><td>WhatsApp & Formulaire intégrés</td></tr>
+            <tr><td>•</td><td>Chatbot intelligent 24/7</td></tr>
+          </table>
+          <div class="section-title">🎯 Formation & Support</div>
+          <table class="pro-table">
+            <tr><td>•</td><td>Support prioritaire 3 mois</td></tr>
+            <tr><td>•</td><td>Maintenance & Sécurité garanties</td></tr>
+          </table>
+        </div>
+        <div>
+          <div class="section-title">🚀 Performance & SEO</div>
+          <table class="pro-table">
+            <tr><td>•</td><td>Référencement Google (SEO)</td></tr>
+            <tr><td>•</td><td>Chargement ultra-rapide</td></tr>
+            <tr><td>•</td><td>Sécurité SSL (HTTPS)</td></tr>
+            <tr><td>•</td><td>Statistiques Analytics</td></tr>
+          </table>
+          <div class="section-title">🏆 Avantages Exclusifs</div>
+          <table class="pro-table">
+            <tr><td>•</td><td>Garantie Satisfaction 15 j</td></tr>
+            <tr><td>•</td><td>Livraison express en 48h</td></tr>
+            <tr><td>•</td><td>Propriété totale à 100%</td></tr>
+          </table>
+        </div>
+      </div>
 
       <div class="price-box">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <h3 style="margin:0; font-size:26px;">INVESTISSEMENT : ${price} €</h3>
-            <p style="margin:5px 0 0 0; opacity:0.8;">La création de votre site web professionnel est payée une seule fois.</p>
+            <h3 style="margin:0; font-size:22px;">INVESTISSEMENT : ${price} €</h3>
+            <p style="margin:2px 0 0 0; color:#4a5568; font-size:12px;">Paiement unique (Hébergement & Domaine inclus 1 an)</p>
           </div>
-          <div style="text-align:right">
-            <span style="background:#D4500A; padding:8px 15px; border-radius:4px; font-weight:bold;">PACK TOUT INCLUS</span>
+          <div style="text-align:right; border-left: 1px solid #cbd5e0; padding-left: 20px;">
+            <p style="font-size:12px;"><strong>À partir de la 2ème année :</strong></p>
+            <p style="font-size:16px; font-weight:bold; color:#D4500A;">46€ / an</p>
           </div>
         </div>
-        <hr style="opacity:0.2; margin:20px 0;">
-        <p style="font-size:14px; margin-bottom:5px;"><strong>Inclut la 1ère année :</strong></p>
-        <ul style="font-size:13px; margin:0; padding-left:20px; opacity:0.9;">
-          <li>Hébergement professionnel 1 an inclus</li>
-          <li>Nom de domaine professionnel 1 an inclus</li>
-          <li>3 mois gratuits de suivi et maintenance</li>
-        </ul>
-        <p style="font-size:14px; margin-top:15px;"><strong>À partir de la 2ème année :</strong> 46€ par an (Hébergement ET nom de domaine).</p>
       </div>
 
       <div class="modalities">
-        <h4 style="margin:0 0 10px 0;">✅ MODALITÉS DE PAIEMENT</h4>
-        <p style="margin:0; font-size:15px; line-height:1.6;">
-          Le lancement de la production est conditionné par le règlement d'un <strong>acompte de démarrage de 46€</strong>.<br>
-          Le <strong>solde final de 100€</strong> sera dû uniquement à la livraison et validation de votre site web.
-        </p>
+        <p>✅ <strong>Modalités :</strong> Acompte de <strong>46€</strong> pour lancer la production. Solde de <strong>100€</strong> à la livraison.</p>
       </div>
 
-      <div style="margin-top:50px; padding-top:20px; border-top:1px solid #edf2f7;">
-        <p style="font-size:12px; color:#718096; margin-bottom:5px;">Signature Prestataire</p>
-        <div style="font-weight:bold; font-size:18px; color:#D4500A;">Services-Siteup</div>
+      <div style="margin-top:30px; padding-top:15px; border-top:1px solid #edf2f7; display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+          <p style="font-size:11px; color:#718096; margin-bottom:5px;">Signature Prestataire</p>
+          <div style="font-weight:bold; font-size:16px; color:#D4500A;">Services-Siteup</div>
+        </div>
+        <div style="font-size:10px; color:#a0aec0;">Offre valable 7 jours. Document généré numériquement.</div>
       </div>
     </div>
   </body></html>`;
