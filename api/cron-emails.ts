@@ -64,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         let subject = template.subject || 'Votre projet web';
         let body = template.body || ''; // Dans la DB, c'est la colonne 'body'
 
-        // Injection des variables standardisées
+        // Injection des variables standardisées (Tunnel complet)
         const baseUrl = 'https://www.services-siteup.online/api/track';
         const replacements: Record<string, string> = {
           '{{firstName}}': lead.name?.split(' ')[0] || lead.name || 'Client',
@@ -74,11 +74,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           '{{devisLink}}': `${baseUrl}?id=${lead.id}&type=devis_clicked&url=${encodeURIComponent(lead.devis_url || '#')}`,
           '{{paymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked`,
           '{{finalPaymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked&final=true`,
+          '{{invoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked&url=${encodeURIComponent(lead.invoice_url || '#')}`,
           '{{agentName}}': fromName,
           '{{agentEmail}}': fromEmail,
+          '{{price}}': '146', // Prix standard
+          '{{amount}}': '146',
+          '{{validityDays}}': '7',
           '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+          '{{expiryDate}}': new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
           '{{city}}': lead.city || '',
-          '{{sector}}': lead.sector || ''
+          '{{sector}}': lead.sector || '',
+          // Accès Admin (Email 6)
+          '{{adminLink}}': lead.admin_url || '#',
+          '{{adminUsername}}': lead.admin_username || lead.name?.toLowerCase().replace(/\s+/g, '') || 'admin',
+          '{{adminPassword}}': lead.admin_password || '********',
+          '{{documentationLink}}': lead.documentation_url || '#'
         };
 
         for (const [key, val] of Object.entries(replacements)) {
