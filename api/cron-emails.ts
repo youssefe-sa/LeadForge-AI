@@ -1,34 +1,28 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
-import { allTemplates } from '../src/templates/outreach-templates-final';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // 1. Initialisation sécurisée à l'intérieur du handler pour éviter le crash top-level
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    console.error('[Cron] Configuration Supabase manquante dans Vercel');
-    return res.status(500).json({ error: 'Config Supabase (URL/Key) manquante sur Vercel' });
+    return res.status(500).json({ error: 'Config Supabase manquante sur Vercel' });
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   try {
-    // 2. Vérification config SMTP
+    // 1. Récupérer la config SMTP
     const { data: config, error: configError } = await supabase
       .from('api_config')
       .select('*')
       .limit(1)
       .single();
 
-    if (configError || !config) {
-      console.error('[Cron] Configuration SMTP introuvable dans la table api_config');
-      return res.status(400).json({ error: 'Configuration SMTP manquante dans la base de données' });
-    }
+    if (configError || !config) throw new Error('Configuration SMTP manquante');
 
-    // 3. Récupérer les emails en attente
+    // 2. Récupérer les emails en attente
     const { data: scheduledEmails, error: fetchError } = await supabase
       .from('scheduled_emails')
       .select('*, leads(*)')
@@ -37,10 +31,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (fetchError) throw fetchError;
     if (!scheduledEmails || scheduledEmails.length === 0) {
-      return res.json({ success: true, message: 'Aucun email en attente' });
+      return res.json({ success: true, message: 'Aucun email à envoyer pour le moment.' });
     }
 
-    // 4. Préparer le transporteur
+    // 3. Récupérer TOUS les templates de la DB d'un coup pour plus d'efficacité
+    const { data: dbTemplates } = await supabase.from('email_templates').select('*');
+
     const transporter = nodemailer.createTransport({
       host: config.gmail_smtp_host || 'smtp.gmail.com',
       port: Number(config.gmail_smtp_port) || 587,
@@ -49,29 +45,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         user: config.gmail_smtp_user,
         pass: config.gmail_smtp_password,
       },
-      tls: { rejectUnauthorized: false } // Plus robuste pour les serveurs SMTP
+      tls: { rejectUnauthorized: false }
     });
 
     const fromName = config.gmail_smtp_from_name || 'Services Siteup';
     const fromEmail = config.gmail_smtp_from_email || config.gmail_smtp_user;
-
     const results = [];
 
     for (const job of scheduledEmails) {
       try {
         const lead = job.leads;
-        if (!lead || !lead.email) {
-          throw new Error('Lead sans email ou introuvable');
-        }
+        if (!lead || !lead.email) throw new Error('Lead invalide');
 
-        const template = allTemplates.find(t => t.id === job.template_id);
-        if (!template) throw new Error(`Template ${job.template_id} non trouvé`);
+        // CHERCHER LE TEMPLATE DANS LA BASE DE DONNÉES
+        const template = dbTemplates?.find(t => t.id === job.template_id);
+        if (!template) throw new Error(`Template ID "${job.template_id}" introuvable en base de données`);
 
         let subject = template.subject || 'Votre projet web';
-        let html = template.htmlContent || template.textContent || '';
-        let text = template.textContent || '';
+        let body = template.body || ''; // Dans la DB, c'est la colonne 'body'
 
-        // Injection des variables
+        // Injection des variables standardisées
         const baseUrl = 'https://www.services-siteup.online/api/track';
         const replacements: Record<string, string> = {
           '{{firstName}}': lead.name?.split(' ')[0] || lead.name || 'Client',
@@ -83,28 +76,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           '{{finalPaymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked&final=true`,
           '{{agentName}}': fromName,
           '{{agentEmail}}': fromEmail,
-          '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')
+          '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+          '{{city}}': lead.city || '',
+          '{{sector}}': lead.sector || ''
         };
 
         for (const [key, val] of Object.entries(replacements)) {
           subject = subject.split(key).join(val);
-          html = html.split(key).join(val);
-          text = text.split(key).join(val);
+          body = body.split(key).join(val);
         }
 
         const trackingPixel = `<img src="${baseUrl}?id=${lead.id}&type=email_opened" width="1" height="1" style="display:none;" />`;
-        if (html.includes('</body>')) {
-          html = html.replace('</body>', `${trackingPixel}</body>`);
-        } else {
-          html += trackingPixel;
-        }
+        const html = body.includes('</body>') ? body.replace('</body>', `${trackingPixel}</body>`) : body + trackingPixel;
 
         await transporter.sendMail({
           from: `"${fromName}" <${fromEmail}>`,
           to: `"${lead.name}" <${lead.email}>`,
           subject,
           html,
-          text
+          text: body.replace(/<[^>]*>/g, '') // Version texte simplifiée
         });
 
         await supabase.from('scheduled_emails').update({ 
@@ -115,7 +105,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         results.push({ job_id: job.id, status: 'success' });
 
       } catch (err: any) {
-        console.error(`[Cron] Erreur sur job ${job.id}:`, err.message);
+        console.error(`[Cron] Erreur job ${job.id}:`, err.message);
         await supabase.from('scheduled_emails').update({ 
           status: 'failed', 
           error_message: err.message,
@@ -128,8 +118,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.json({ success: true, processed: scheduledEmails.length, results });
 
   } catch (err: any) {
-    console.error('[Cron Global Error]', err);
+    console.error('[Cron Error]', err);
     return res.status(500).json({ error: 'Internal Error', message: err.message });
   }
 }
+
 
