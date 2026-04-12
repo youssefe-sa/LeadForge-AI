@@ -40,15 +40,14 @@ export async function generateAndSaveDevis(lead: any, price: string = '146'): Pr
   </body></html>`;
 
   const fileName = `devis-${lead.id}-${Date.now()}.html`;
-  // UPLOAD AVEC SERVICE_ROLE (indispensable)
   const { error: uploadError } = await supabase.storage.from('documents').upload(fileName, Buffer.from(html, 'utf-8'), { 
     contentType: 'text/html; charset=utf-8', 
     upsert: true 
   });
   if (uploadError) throw uploadError;
 
-  const { data: publicData } = supabase.storage.from('documents').getPublicUrl(fileName);
-  const publicUrl = publicData.publicUrl;
+  // Utilisation de votre domaine personnalisé
+  const publicUrl = `https://www.services-siteup.online/docs/${fileName}`;
 
   await supabase.from('leads').update({ devis_url: publicUrl }).eq('id', lead.id);
   console.log('[Utils] Devis sauvegardé:', publicUrl);
@@ -89,8 +88,8 @@ export async function generateAndSaveInvoice(lead: any, price: string = '146', t
   });
   if (uploadError) throw uploadError;
 
-  const { data: publicData } = supabase.storage.from('documents').getPublicUrl(fileName);
-  const publicUrl = publicData.publicUrl;
+  // Utilisation de votre domaine personnalisé
+  const publicUrl = `https://www.services-siteup.online/docs/${fileName}`;
 
   // IMPORTANT: Mise à jour de la colonne invoice_url
   await supabase.from('leads').update({ invoice_url: publicUrl }).eq('id', lead.id);
