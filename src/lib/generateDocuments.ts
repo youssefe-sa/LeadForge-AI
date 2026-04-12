@@ -172,11 +172,12 @@ export async function uploadDocumentToStorage(
   fileName: string,
   bucket: string = 'documents'
 ): Promise<string> {
-  const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
+  // Remplacement de Blob par Buffer pour compatibilité Node.js/Vercel
+  const dataToUpload = Buffer.from(html, 'utf-8');
 
   const { error } = await supabase.storage
     .from(bucket)
-    .upload(fileName, blob, {
+    .upload(fileName, dataToUpload, {
       contentType: 'text/html; charset=utf-8',
       upsert: true,
     });

@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import { generateAndSaveDevis, generateAndSaveInvoice } from '../src/lib/generateDocuments';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
@@ -26,16 +27,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const leadId = id as string;
     const trackType = type as string;
 
-    // --- RÉCUPÉRATION DES DONNÉES DU LEAD (VITAL) ---
-    const { data: lead, error: leadError } = await supabase
-      .from('leads')
-      .select('*')
-      .eq('id', leadId)
-      .single();
-
+    const { data: lead, error: leadError } = await supabase.from('leads').select('*').eq('id', leadId).single();
     if (leadError || !lead) {
       console.error('[Tracking] Lead not found:', leadId);
-      // On continue quand même si targetUrl existe pour ne pas bloquer le client
     }
 
     let updateData: any = {};
@@ -44,71 +38,83 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (trackType === 'site_clicked') {
       updateData = { site_clicked: true };
       if (!targetUrl) targetUrl = lead?.site_url || lead?.landing_url || '/';
-    } else if (trackType === 'start_clicked') {
-      updateData = { site_clicked: true }; 
+    } 
+    else if (trackType === 'start_clicked') {
+      updateData = { site_clicked: true, status: 'interested' }; 
       const agentEmail = config?.gmail_smtp_from_email || config?.gmail_smtp_user || 'contact@leadforge.ai';
       const companyName = lead?.name || 'votre projet';
       
-      // Encodage sécurisé pour la redirection (évite l'erreur 500 sur Vercel)
+      // GÉNÉRATION AUTO DU DEVIS
+      try {
+        await generateAndSaveDevis(lead);
+      } catch (err) {
+        console.error('Erreur génération Devis:', err);
+      }
+
       const subject = encodeURIComponent(`Démarrage projet ${companyName}`);
       const body = encodeURIComponent(`Bonjour, je souhaite démarrer le projet pour ${companyName}.`);
       targetUrl = `mailto:${agentEmail}?subject=${subject}&body=${body}`;
-    } else if (trackType === 'payment_clicked') {
+    } 
+    else if (trackType === 'payment_clicked') {
       updateData = { payment_clicked: true };
-      if (!targetUrl) targetUrl = config?.whop_deposit_link || '/';
-    } else if (trackType === 'devis_clicked') {
+      const isFinal = req.query.final === 'true';
+      
+      // GÉNÉRATION AUTO DE LA FACTURE
+      try {
+        await generateAndSaveInvoice(lead, '146', isFinal ? 'final' : 'deposit');
+      } catch (err) {
+        console.error('Erreur génération Facture:', err);
+      }
+
+      if (!targetUrl) {
+         targetUrl = isFinal ? config?.whop_final_payment_link : config?.whop_deposit_link;
+         if (!targetUrl) targetUrl = config?.whop_deposit_link || '/';
+      }
+    } 
+    else if (trackType === 'devis_clicked') {
       updateData = { devis_clicked: true };
-    } else if (trackType === 'invoice_clicked') {
+      if (!targetUrl || targetUrl === '#') targetUrl = lead?.devis_url || '#';
+    } 
+    else if (trackType === 'invoice_clicked') {
       updateData = { invoice_clicked: true };
-    } else if (trackType === 'email_opened') {
+      if (!targetUrl || targetUrl === '#') targetUrl = lead?.invoice_url || '#';
+    } 
+    else if (trackType === 'email_opened') {
       updateData = { email_opened: true };
-    } else if (trackType === 'email_clicked') {
+    } 
+    else if (trackType === 'email_clicked') {
       updateData = { email_clicked: true };
     }
 
-    // Mise à jour du statut du lead
     if (Object.keys(updateData).length > 0) {
       await supabase.from('leads').update(updateData).eq('id', leadId);
       
-      // Logique de chainage automatique (30 minutes)
+      // Logique de chainage (Automation)
       if (trackType === 'site_clicked' || trackType === 'start_clicked') {
-        // Annuler les relances
         await supabase.from('scheduled_emails').delete().eq('lead_id', leadId).eq('status', 'pending');
-          
-        // Programmer l'Email 2 (Devis) si pas déjà fait
-        const { data: existingStep2 } = await supabase
-          .from('scheduled_emails')
-          .select('id')
-          .eq('lead_id', leadId)
-          .eq('template_id', 'step-2-devis')
-          .limit(1);
-
-        if (!existingStep2 || existingStep2.length === 0) {
-          const sendDate = new Date();
-          sendDate.setMinutes(sendDate.getMinutes() + 30);
-          
-          await supabase.from('scheduled_emails').insert([{
-            lead_id: leadId,
-            template_id: 'step-2-devis',
-            scheduled_for: sendDate.toISOString(),
-            status: 'pending'
-          }]);
-        }
+        
+        const sendDate = new Date();
+        sendDate.setMinutes(sendDate.getMinutes() + 30);
+        
+        await supabase.from('scheduled_emails').insert([{
+          lead_id: leadId,
+          template_id: 'step-2-devis',
+          scheduled_for: sendDate.toISOString(),
+          status: 'pending'
+        }]);
       }
     }
 
-    if (targetUrl) {
+    if (targetUrl && targetUrl !== '#') {
       return res.redirect(302, targetUrl);
     }
 
     const pixel = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
     res.setHeader('Content-Type', 'image/gif');
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     return res.send(pixel);
 
   } catch (err) {
     console.error('[Tracking Error]', err);
-    if (targetUrl) return res.redirect(302, targetUrl);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Error' });
   }
 }
