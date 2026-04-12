@@ -82,23 +82,31 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
     };
 
     // 1. Définir toutes les variables de remplacement
+    const firstName = (lead.contactName || lead.name || '').split(' ')[0];
+    const trackBase = `/api/track?id=${lead.id}`;
+
     const replacements: Record<string, string> = {
       '{{name}}': lead.name || '',
-      '{{firstName}}': (lead.contactName || lead.name || '').trim(),
-      '{{id}}': (lead.contactName || lead.name || '').trim(),
+      '{{firstName}}': firstName,
       '{{companyName}}': lead.name || '',
       '{{city}}': lead.city || 'votre ville',
       '{{sector}}': lead.sector || 'votre secteur',
       
       // Boutons traçables
-      '{{websiteLink}}': `${baseUrl}/api/track?id=${lead.id}&type=site_clicked`,
-      '{{startProjectLink}}': `${baseUrl}/api/track?id=${lead.id}&type=start_clicked`,
-      '{{landingUrl}}': `${baseUrl}/api/track?id=${lead.id}&type=site_clicked`,
-      '{{paymentLink}}': `${baseUrl}/api/track?id=${lead.id}&type=payment_clicked`,
-      '{{finalPaymentLink}}': `${baseUrl}/api/track?id=${lead.id}&type=payment_clicked`,
-      '{{devisLink}}': `${baseUrl}/api/track?id=${lead.id}&type=devis_clicked`,
-      '{{invoiceLink}}': `${baseUrl}/api/track?id=${lead.id}&type=invoice_clicked`,
+      '{{websiteLink}}': `${trackBase}&type=site_clicked`,
+      '{{startProjectLink}}': `${trackBase}&type=start_clicked`,
+      '{{landingUrl}}': `${trackBase}&type=site_clicked`,
+      '{{paymentLink}}': `${trackBase}&type=payment_clicked`,
+      '{{finalPaymentLink}}': `${trackBase}&type=payment_clicked&final=true`,
+      '{{devisLink}}': `${trackBase}&type=devis_clicked&url=${encodeURIComponent(lead.devis_url || '#')}`,
+      '{{invoiceLink}}': `${trackBase}&type=invoice_clicked`,
       
+      // Infos de Livraison (Email 6)
+      '{{adminLink}}': lead.admin_url || `${lead.siteUrl || lead.website || ''}/admin`,
+      '{{adminUsername}}': lead.admin_username || lead.name?.toLowerCase().replace(/\s+/g, '') || 'admin',
+      '{{adminPassword}}': lead.admin_password || '********',
+      '{{documentationLink}}': lead.documentation_url || '#',
+
       // Infos Agent
       '{{agentName}}': config.gmailSmtpFromName || 'Solutions Web',
       '{{agentEmail}}': config.gmailSmtpFromEmail || 'contact@leadforge.ai',
