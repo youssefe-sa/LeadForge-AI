@@ -49,8 +49,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const agentEmail = config?.gmail_smtp_from_email || config?.gmail_smtp_user || 'contact@leadforge.ai';
       const companyName = lead?.name || 'votre projet';
       
-      // Mailto personnalisé pour engagement immédiat
-      targetUrl = `mailto:${agentEmail}?subject=Démarrage projet ${companyName}&body=Bonjour, je souhaite démarrer le projet pour ${companyName}.`;
+      // Encodage sécurisé pour la redirection (évite l'erreur 500 sur Vercel)
+      const subject = encodeURIComponent(`Démarrage projet ${companyName}`);
+      const body = encodeURIComponent(`Bonjour, je souhaite démarrer le projet pour ${companyName}.`);
+      targetUrl = `mailto:${agentEmail}?subject=${subject}&body=${body}`;
     } else if (trackType === 'payment_clicked') {
       updateData = { payment_clicked: true };
       if (!targetUrl) targetUrl = config?.whop_deposit_link || '/';
@@ -78,7 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .from('scheduled_emails')
           .select('id')
           .eq('lead_id', leadId)
-          .eq('template_id', 'email2_devis')
+          .eq('template_id', 'step-2-devis')
           .limit(1);
 
         if (!existingStep2 || existingStep2.length === 0) {
@@ -87,7 +89,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           
           await supabase.from('scheduled_emails').insert([{
             lead_id: leadId,
-            template_id: 'email2_devis',
+            template_id: 'step-2-devis',
             scheduled_for: sendDate.toISOString(),
             status: 'pending'
           }]);
