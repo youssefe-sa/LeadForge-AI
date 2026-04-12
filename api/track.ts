@@ -59,7 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .from('scheduled_emails')
             .select('id')
             .eq('lead_id', leadId)
-            .eq('template_id', 'email2_devis_paiement')
+            .eq('template_id', 'email2_devis')
             .limit(1);
 
           if (!existingStep2 || existingStep2.length === 0) {
@@ -69,7 +69,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             
             await supabase.from('scheduled_emails').insert([{
               lead_id: leadId,
-              template_id: 'email2_devis_paiement',
+              template_id: 'email2_devis',
               scheduled_for: sendDate.toISOString(),
               status: 'pending'
             }]);

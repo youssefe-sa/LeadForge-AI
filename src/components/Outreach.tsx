@@ -211,7 +211,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     await supabase.from('scheduled_emails').delete().eq('lead_id', lead.id).eq('status', 'pending');
     
     // 2. Envoyer immédiatement l'Email 3 (Confirmation Dépôt)
-    await sendWorkflowEmail(lead, 'email3_confirmation_depot');
+    await sendWorkflowEmail(lead, 'email3_confirmation');
     
     // 3. Programmer le solde final (Email 4) dans 3 jours (périodes de dev standard)
     const scheduledDate = new Date();
@@ -219,7 +219,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     
     await supabase.from('scheduled_emails').insert([{
       lead_id: lead.id,
-      template_id: 'email4_paiement_final',
+      template_id: 'email4_final_payment',
       scheduled_for: scheduledDate.toISOString(),
       status: 'pending'
     }]);
@@ -232,7 +232,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     await supabase.from('scheduled_emails').delete().eq('lead_id', lead.id).eq('status', 'pending');
     
     // 2. Envoyer immédiatement l'Email 5 (Confirmation Solde Final)
-    await sendWorkflowEmail(lead, 'email5_confirmation_paiement_final');
+    await sendWorkflowEmail(lead, 'email5_final_payment_confirmation');
     
     // 3. Programmer l'Email 6 (Livraison) pour dans 1 heure (le temps du déploiement final)
     const deliveryDate = new Date();
@@ -240,7 +240,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     
     await supabase.from('scheduled_emails').insert([{
       lead_id: lead.id,
-      template_id: 'email6_livraison_documentation',
+      template_id: 'email6_delivery_documentation',
       scheduled_for: deliveryDate.toISOString(),
       status: 'pending'
     }]);
