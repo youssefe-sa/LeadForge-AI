@@ -39,8 +39,9 @@ export default function Pipeline({ leads, updateLead }: Props) {
   const handleDragStart = (id: string) => setDragId(id);
   const handleDrop = (stage: Lead['stage']) => {
     if (dragId) {
+      const lead = leads.find(l => l.id === dragId);
       const updates: Partial<Lead> = { stage };
-      if (stage === 'converted') updates.revenue = updates.revenue || 0;
+      if (stage === 'converted') updates.revenue = lead?.revenue || 146;
       updateLead(dragId, updates);
       setDragId(null);
     }
