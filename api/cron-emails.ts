@@ -3,23 +3,32 @@ import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 import { allTemplates } from '../src/templates/outreach-templates-final';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Sécurisation par clé API simple ou Cron-Secret
-  const cronSecret = process.env.CRON_SECRET;
-  const authHeader = req.headers['authorization'];
-  
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    // return res.status(401).json({ error: 'Unauthorized' });
-    // Désactivé temporairement pour vos tests si nécessaire
+  // 1. Initialisation sécurisée à l'intérieur du handler pour éviter le crash top-level
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('[Cron] Configuration Supabase manquante dans Vercel');
+    return res.status(500).json({ error: 'Config Supabase (URL/Key) manquante sur Vercel' });
   }
 
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   try {
-    // 1. Récupérer les emails en attente
+    // 2. Vérification config SMTP
+    const { data: config, error: configError } = await supabase
+      .from('api_config')
+      .select('*')
+      .limit(1)
+      .single();
+
+    if (configError || !config) {
+      console.error('[Cron] Configuration SMTP introuvable dans la table api_config');
+      return res.status(400).json({ error: 'Configuration SMTP manquante dans la base de données' });
+    }
+
+    // 3. Récupérer les emails en attente
     const { data: scheduledEmails, error: fetchError } = await supabase
       .from('scheduled_emails')
       .select('*, leads(*)')
@@ -28,17 +37,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (fetchError) throw fetchError;
     if (!scheduledEmails || scheduledEmails.length === 0) {
-      return res.json({ success: true, message: 'No pending emails to send' });
+      return res.json({ success: true, message: 'Aucun email en attente' });
     }
 
-    // 2. Récupérer la config SMTP
-    const { data: config, error: configError } = await supabase
-      .from('api_config')
-      .select('*')
-      .single();
-
-    if (configError || !config) throw new Error('SMTP Config missing');
-
+    // 4. Préparer le transporteur
     const transporter = nodemailer.createTransport({
       host: config.gmail_smtp_host || 'smtp.gmail.com',
       port: Number(config.gmail_smtp_port) || 587,
@@ -47,6 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         user: config.gmail_smtp_user,
         pass: config.gmail_smtp_password,
       },
+      tls: { rejectUnauthorized: false } // Plus robuste pour les serveurs SMTP
     });
 
     const fromName = config.gmail_smtp_from_name || 'Services Siteup';
@@ -57,41 +60,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     for (const job of scheduledEmails) {
       try {
         const lead = job.leads;
-        if (!lead) continue;
+        if (!lead || !lead.email) {
+          throw new Error('Lead sans email ou introuvable');
+        }
 
-        // Trouver le template Services Siteup correspondant
         const template = allTemplates.find(t => t.id === job.template_id);
-        if (!template) throw new Error(`Template ${job.template_id} not found`);
+        if (!template) throw new Error(`Template ${job.template_id} non trouvé`);
 
-        let subject = template.subject;
-        let html = template.htmlContent;
-        let text = template.textContent;
+        let subject = template.subject || 'Votre projet web';
+        let html = template.htmlContent || template.textContent || '';
+        let text = template.textContent || '';
 
-        // --- GÉNÉRATION DES LIENS DE TRACKING (VITAL) ---
-        const baseUrl = 'https://leadforge.ai/api/track'; // À adapter selon votre domaine
-        const websiteLink = `${baseUrl}?id=${lead.id}&type=site_clicked`;
-        const startProjectLink = `${baseUrl}?id=${lead.id}&type=start_clicked`;
-        const devisLink = `${baseUrl}?id=${lead.id}&type=devis_clicked&url=${encodeURIComponent(lead.devis_url || '#')}`;
-        const paymentLink = `${baseUrl}?id=${lead.id}&type=payment_clicked`;
-        const finalPaymentLink = `${baseUrl}?id=${lead.id}&type=payment_clicked&final=true`;
-
-        // --- MOTEUR D'INJECTION DE VARIABLES SERVICES SITEUP ---
+        // Injection des variables
+        const baseUrl = 'https://www.services-siteup.online/api/track';
         const replacements: Record<string, string> = {
           '{{firstName}}': lead.name?.split(' ')[0] || lead.name || 'Client',
           '{{companyName}}': lead.name || 'votre entreprise',
-          '{{websiteLink}}': websiteLink,
-          '{{startProjectLink}}': startProjectLink,
-          '{{devisLink}}': devisLink,
-          '{{paymentLink}}': paymentLink,
-          '{{finalPaymentLink}}': finalPaymentLink,
-          '{{invoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked`,
+          '{{websiteLink}}': `${baseUrl}?id=${lead.id}&type=site_clicked`,
+          '{{startProjectLink}}': `${baseUrl}?id=${lead.id}&type=start_clicked`,
+          '{{devisLink}}': `${baseUrl}?id=${lead.id}&type=devis_clicked&url=${encodeURIComponent(lead.devis_url || '#')}`,
+          '{{paymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked`,
+          '{{finalPaymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked&final=true`,
           '{{agentName}}': fromName,
           '{{agentEmail}}': fromEmail,
-          '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
-          '{{adminLink}}': lead.admin_url || '#',
-          '{{adminUsername}}': lead.admin_username || 'admin',
-          '{{adminPassword}}': lead.admin_password || '********',
-          '{{documentationLink}}': lead.documentation_url || '#'
+          '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')
         };
 
         for (const [key, val] of Object.entries(replacements)) {
@@ -100,9 +92,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           text = text.split(key).join(val);
         }
 
-        // Injection du pixel d'ouverture
         const trackingPixel = `<img src="${baseUrl}?id=${lead.id}&type=email_opened" width="1" height="1" style="display:none;" />`;
-        html = html.replace('</body>', `${trackingPixel}</body>`);
+        if (html.includes('</body>')) {
+          html = html.replace('</body>', `${trackingPixel}</body>`);
+        } else {
+          html += trackingPixel;
+        }
 
         await transporter.sendMail({
           from: `"${fromName}" <${fromEmail}>`,
@@ -112,7 +107,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           text
         });
 
-        // Marquer comme envoyé
         await supabase.from('scheduled_emails').update({ 
           status: 'sent', 
           updated_at: new Date().toISOString() 
@@ -121,6 +115,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         results.push({ job_id: job.id, status: 'success' });
 
       } catch (err: any) {
+        console.error(`[Cron] Erreur sur job ${job.id}:`, err.message);
         await supabase.from('scheduled_emails').update({ 
           status: 'failed', 
           error_message: err.message,
@@ -133,7 +128,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.json({ success: true, processed: scheduledEmails.length, results });
 
   } catch (err: any) {
-    console.error('[Cron Error]', err);
-    return res.status(500).json({ error: err.message });
+    console.error('[Cron Global Error]', err);
+    return res.status(500).json({ error: 'Internal Error', message: err.message });
   }
 }
+
