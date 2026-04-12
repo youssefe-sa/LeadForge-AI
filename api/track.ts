@@ -89,19 +89,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (Object.keys(updateData).length > 0) {
       await supabase.from('leads').update(updateData).eq('id', leadId);
       
-      // Logique de chainage (Automation)
+      // --- LOGIQUE D'AUTOMATISATION DU TUNNEL ---
+      let nextTemplateId = '';
+      
       if (trackType === 'site_clicked' || trackType === 'start_clicked') {
+        nextTemplateId = 'step-2-devis';
+      } 
+      else if (trackType === 'payment_clicked') {
+        const isFinal = req.query.final === 'true';
+        nextTemplateId = isFinal ? 'step-5-confirmation' : 'step-3-depot';
+      }
+
+      if (nextTemplateId) {
+        // 1. Annuler les emails en attente pour éviter les doublons
         await supabase.from('scheduled_emails').delete().eq('lead_id', leadId).eq('status', 'pending');
         
+        // 2. Planifier l'étape suivante (dans 1 minute pour le test, puis 30 min en prod)
         const sendDate = new Date();
-        sendDate.setMinutes(sendDate.getMinutes() + 30);
+        sendDate.setMinutes(sendDate.getMinutes() + 2); // Délai de 2 minutes pour laisser le temps au client de voir la page
         
         await supabase.from('scheduled_emails').insert([{
           lead_id: leadId,
-          template_id: 'step-2-devis',
+          template_id: nextTemplateId,
           scheduled_for: sendDate.toISOString(),
           status: 'pending'
         }]);
+        console.log(`[Automation] Prochain email planifié : ${nextTemplateId} pour le lead ${leadId}`);
       }
     }
 
@@ -113,8 +126,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Content-Type', 'image/gif');
     return res.send(pixel);
 
-  } catch (err) {
+  } catch (err: any) {
     console.error('[Tracking Error]', err);
-    return res.status(500).json({ error: 'Internal Error' });
+    return res.status(500).json({ error: 'Internal Error', message: err.message });
   }
 }
+
