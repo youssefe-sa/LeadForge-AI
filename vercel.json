@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/cron-emails",
-      "schedule": "*/30 * * * *"
+      "schedule": "*/5 * * * *"
     }
   ],
   "buildCommand": "npm run build",
