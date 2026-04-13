@@ -12,19 +12,22 @@ export interface EmailTemplate {
   category: 'sale' | 'reminder';
 }
 
-const LOGO_SVG = `
-  <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0" y="0" width="50" height="50" rx="14" fill="#D4500A" />
-    <text x="25" y="33" font-family="Arial" font-weight="900" font-size="24" fill="white" text-anchor="middle">ST</text>
-  </svg>
+const LOGO_BOX = `
+  <div style="background-color: #D4500A; width: 48px; height: 48px; border-radius: 12px; display: inline-block; vertical-align: middle; text-align: center; line-height: 48px; color: white; font-family: Arial, sans-serif; font-weight: 900; font-size: 22px;">
+    ST
+  </div>
 `;
 
 const HEADER_HTML = `
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 25px;">
-    ${LOGO_SVG}
-    <div>
-      <div style="font-family: Arial; font-weight: bold; font-size: 20px; color: #1a202c;">Services-Siteup</div>
-      <div style="font-size: 11px; color: #718096; font-style: italic;">Propulsez votre présence en ligne avec excellence</div>
+  <div style="margin-bottom: 25px;">
+    <div style="display: table;">
+      <div style="display: table-cell; vertical-align: middle;">
+        ${LOGO_BOX}
+      </div>
+      <div style="display: table-cell; vertical-align: middle; padding-left: 12px;">
+        <div style="font-family: Arial; font-weight: bold; font-size: 20px; color: #1a202c; line-height: 1.2;">Services-Siteup</div>
+        <div style="font-size: 11px; color: #718096; font-style: italic;">Propulsez votre présence en ligne avec excellence</div>
+      </div>
     </div>
   </div>
 `;
