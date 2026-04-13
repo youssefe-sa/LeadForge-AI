@@ -14,106 +14,88 @@ const LOGO_SVG = `<svg width="280" height="60" viewBox="0 0 280 60" xmlns="http:
 export async function generateAndSaveDevis(lead: any, price: string = '146'): Promise<string> {
   const devisNumber = `DEV-${lead.id.slice(0, 8).toUpperCase()}-${Date.now()}`;
   const today = new Date().toLocaleDateString('fr-FR');
-  const expiryDate = new Date(Date.now() + 7 * 86400000).toLocaleDateString('fr-FR');
 
   const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
     <title>Devis ${devisNumber}</title>
     <style>
-      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 0; margin: 0; color: #1a202c; background-color: #f7fafc; }
-      .container { max-width: 850px; margin: 40px auto; background: white; padding: 60px; border-radius: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative; }
-      .print-btn { position: absolute; top: 20px; right: 20px; background: #D4500A; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-      @media print { .print-btn { display: none; } .container { box-shadow: none; margin: 0; width: 100%; } body { background: white; } }
-      .header { display: flex; justify-content: space-between; border-bottom: 2px solid #edf2f7; padding-bottom: 30px; margin-bottom: 40px; align-items: center; }
-      .client-info { display: flex; justify-content: space-between; margin-bottom: 40px; background: #f8fafc; padding: 25px; border-radius: 8px; }
-      .section-title { background: #1a202c; color: white; padding: 10px 15px; font-size: 14px; font-weight: bold; border-radius: 4px; margin-top: 30px; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 0; margin: 0; color: #1a202c; background-color: white; }
+      .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px 45px; position: relative; }
+      .print-btn { position: absolute; top: 10px; right: 45px; background: #D4500A; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; }
+      @media print { .print-btn { display: none; } .container { padding: 15px; width: 100%; } }
+      .header { display: flex; justify-content: space-between; border-bottom: 2px solid #edf2f7; padding-bottom: 12px; margin-bottom: 15px; align-items: center; }
+      .client-info { display: flex; justify-content: space-between; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #edf2f7; font-size: 13px; }
+      .section-title { background: #f1f5f9; color: #D4500A; padding: 5px 10px; font-size: 13px; font-weight: bold; border-radius: 4px; margin-top: 15px; border-left: 4px solid #D4500A; }
       table.pro-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-      table.pro-table td { padding: 8px 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; line-height: 1.5; }
-      table.pro-table td:first-child { color: #D4500A; width: 25px; font-weight: bold; }
-      .price-box { background: #1a202c; color: white; padding: 30px; border-radius: 8px; margin-top: 40px; }
-      .modalities { background: #f0fff4; border: 1px solid #c6f6d5; padding: 25px; border-radius: 8px; margin-top: 30px; color: #22543d; border-left: 5px solid #48bb78; }
+      table.pro-table td { padding: 4px 12px; border-bottom: 1px solid #f7fafc; font-size: 13px; line-height: 1.4; }
+      table.pro-table td:first-child { color: #D4500A; width: 20px; font-weight: bold; }
+      .price-box { background: #f8fafc; color: #1a202c; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #edf2f7; border-left: 5px solid #1a202c; }
+      .modalities { background: #f0fff4; border: 1px solid #c6f6d5; padding: 15px; border-radius: 8px; margin-top: 20px; color: #22543d; border-left: 5px solid #48bb78; }
     </style>
   </head><body>
     <div class="container">
-      <button class="print-btn" onclick="window.print()">📥 TÉLÉCHARGER LE PDF</button>
+      <button class="print-btn" onclick="window.print()">📥 IMPRIMER / PDF</button>
       <div class="header">
         ${LOGO_SVG}
         <div style="text-align:right">
-          <h2 style="margin:0; font-size:32px; font-weight:900;">DEVIS</h2>
-          <p style="margin:0; color:#718096;">N° ${devisNumber}<br>Date : ${today}</p>
+          <h2 style="margin:0; font-size:24px; font-weight:900;">DEVIS</h2>
+          <p style="margin:0; color:#718096; font-size:12px;">N° ${devisNumber}<br>Date : ${today}</p>
         </div>
       </div>
       <div class="client-info">
-        <div><h4>Veuillez adresser le règlement à :</h4><p><strong>Services-Siteup</strong><br>siteup.services@gmail.com</p></div>
-        <div style="text-align:right"><h4>Client :</h4><p><strong>${lead.name}</strong><br>${lead.city || ''}</p></div>
+        <div><strong>Services-Siteup</strong><br>siteup.services@gmail.com</div>
+        <div style="text-align:right"><strong>${lead.name}</strong><br>${lead.city || ''}</div>
       </div>
 
       <div class="section-title">🌐 SITE WEB PROFESSIONNEL COMPLET</div>
       <table class="pro-table">
-        <tr><td>•</td><td><strong>Design sur mesure</strong> : Création unique adaptée à votre image et votre secteur d'activité</td></tr>
-        <tr><td>•</td><td><strong>Responsive design</strong> : Affichage parfait sur ordinateur, tablette et smartphone</td></tr>
-        <tr><td>•</td><td><strong>Pages essentielles</strong> : Accueil, Présentation, Services, Contact...</td></tr>
-        <tr><td>•</td><td><strong>Formulaire de contact</strong> : Vos clients peuvent vous contacter directement depuis le site</td></tr>
-        <tr><td>•</td><td><strong>WhatsApp intégré</strong> : Vos clients peuvent vous contacter directement via WhatsApp</td></tr>
-        <tr><td>•</td><td><strong>Chatbot intelligent</strong> : Assistant 24/7 pour répondre aux questions de vos visiteurs</td></tr>
+        <tr><td>•</td><td><strong>Design sur mesure</strong> : Création unique adaptée à votre image et secteur</td></tr>
+        <tr><td>•</td><td><strong>Responsive & Support</strong> : Affichage parfait et assistance 24/7 (Chatbot)</td></tr>
+        <tr><td>•</td><td><strong>Contact direct</strong> : Formulaire et bouton WhatsApp intégré</td></tr>
       </table>
 
       <div class="section-title">🚀 OPTIMISATION ET PERFORMANCE</div>
       <table class="pro-table">
-        <tr><td>•</td><td><strong>SEO optimisé</strong> : Référencement naturel pour apparaître dans Google</td></tr>
-        <tr><td>•</td><td><strong>Performance rapide</strong> : Temps de chargement optimisé pour meilleure expérience utilisateur</td></tr>
-        <tr><td>•</td><td><strong>Sécurité SSL</strong> : Certificat HTTPS inclus pour la sécurité de vos visiteurs</td></tr>
-        <tr><td>•</td><td><strong>Analytics intégré</strong> : Suivi des visiteurs et statistiques de performance</td></tr>
+        <tr><td>•</td><td><strong>SEO & Google</strong> : Référencement naturel optimisé</td></tr>
+        <tr><td>•</td><td><strong>Sécurité SSL</strong> : Certificat HTTPS et protection des données</td></tr>
+        <tr><td>•</td><td><strong>Vitesse</strong> : Temps de chargement optimisé pour l'expérience utilisateur</td></tr>
       </table>
 
-      <div class="section-title">🎯 FORMATION ET SUPPORT</div>
+      <div class="section-title">🏆 AVANTAGES & GARANTIES</div>
       <table class="pro-table">
-        <tr><td>•</td><td><strong>Support prioritaire</strong> : Assistance pendant 3 mois</td></tr>
-        <tr><td>•</td><td><strong>Mises à jour incluses</strong> : Maintenance et sécurité garanties</td></tr>
-      </table>
-
-      <div class="section-title">🏆 AVANTAGES EXCLUSIFS</div>
-      <table class="pro-table">
-        <tr><td>•</td><td><strong>Garantie satisfaction</strong> : Remboursement complet si pas satisfait sous 15 jours</td></tr>
-        <tr><td>•</td><td><strong>Livraison rapide</strong> : Site web prêt en 2 jours ouvrés</td></tr>
-        <tr><td>•</td><td><strong>Économie garantie</strong> : 75% moins cher que les agences traditionnelles</td></tr>
-        <tr><td>•</td><td><strong>Propriété totale</strong> : Vous êtes 100% propriétaire de votre site et domaine</td></tr>
+        <tr><td>•</td><td><strong>Satisfaction 15j</strong> : Remboursement intégral si non satisfait</td></tr>
+        <tr><td>•</td><td><strong>Livraison 48h</strong> : Site web opérationnel en 2 jours ouvrés</td></tr>
+        <tr><td>•</td><td><strong>Propriété 100%</strong> : Vous restez seul maître de votre site et domaine</td></tr>
       </table>
 
       <div class="price-box">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <h3 style="margin:0; font-size:26px;">INVESTISSEMENT : ${price} €</h3>
-            <p style="margin:5px 0 0 0; opacity:0.8;">La création de votre site web professionnel est payée une seule fois.</p>
+            <h3 style="margin:0; font-size:22px;">INVESTISSEMENT : ${price} €</h3>
+            <p style="margin:3px 0 0 0; opacity:0.8; font-size:12px;">Création complète, paiement unique sans abonnement caché.</p>
           </div>
           <div style="text-align:right">
-            <span style="background:#D4500A; padding:8px 15px; border-radius:4px; font-weight:bold;">PACK TOUT INCLUS</span>
+            <span style="border:1px solid #D4500A; color:#D4500A; padding:4px 10px; border-radius:4px; font-weight:bold; font-size:12px;">PACK TOUT INCLUS</span>
           </div>
         </div>
-        <hr style="opacity:0.2; margin:20px 0;">
-        <p style="font-size:14px; margin-bottom:5px;"><strong>Inclut la 1ère année :</strong></p>
-        <ul style="font-size:13px; margin:0; padding-left:20px; opacity:0.9;">
-          <li>Hébergement professionnel 1 an inclus</li>
-          <li>Nom de domaine professionnel 1 an inclus</li>
-          <li>3 mois gratuits de suivi et maintenance</li>
-        </ul>
-        <p style="font-size:14px; margin-top:15px;"><strong>À partir de la 2ème année :</strong> 46€ par an (Hébergement ET nom de domaine).</p>
+        <p style="font-size:12px; margin-top:10px;">• <strong>An 1 :</strong> Hébergement, Domaine et Maintenance inclus.</p>
+        <p style="font-size:12px; margin-top:2px;">• <strong>Dès An 2 :</strong> 46€/an seulement pour l'hébergement et le domaine.</p>
       </div>
 
       <div class="modalities">
-        <h4 style="margin:0 0 10px 0;">✅ MODALITÉS DE PAIEMENT</h4>
-        <p style="margin:0; font-size:15px; line-height:1.6;">
-          Le lancement de la production est conditionné par le règlement d'un <strong>acompte de démarrage de 46€</strong>.<br>
-          Le <strong>solde final de 100€</strong> sera dû uniquement à la livraison et validation de votre site web.
+        <p style="margin:0; font-size:14px; line-height:1.5;">
+          <strong>✅ Modalités :</strong> Acompte de <strong>46€</strong> pour lancer la production. Solde final de <strong>100€</strong> à la livraison.
         </p>
       </div>
 
-      <div style="margin-top:50px; padding-top:20px; border-top:1px solid #edf2f7;">
-        <p style="font-size:12px; color:#718096; margin-bottom:5px;">Signature Prestataire</p>
-        <div style="font-weight:bold; font-size:18px; color:#D4500A;">Services-Siteup</div>
+      <div style="margin-top:25px; padding-top:15px; border-top:1px solid #edf2f7; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <p style="font-size:11px; color:#718096; margin:0;">Signature Prestataire</p>
+          <div style="font-weight:bold; font-size:15px; color:#D4500A;">Services-Siteup</div>
+        </div>
+        <div style="font-size:10px; color:#cbd5e0;">Document généré numériquement</div>
       </div>
     </div>
   </body></html>`;
-
 
   const fileName = `devis-${lead.id}-${Date.now()}.html`;
   const { error: uploadError } = await supabase.storage.from('documents').upload(fileName, Buffer.from(html, 'utf-8'), { 
@@ -168,12 +150,7 @@ export async function generateAndSaveInvoice(lead: any, price: string = '146', t
   });
   if (uploadError) throw uploadError;
 
-  // Utilisation de votre domaine personnalisé
   const publicUrl = `https://www.services-siteup.online/docs/${fileName}`;
-
-  // IMPORTANT: Mise à jour de la colonne invoice_url
   await supabase.from('leads').update({ invoice_url: publicUrl }).eq('id', lead.id);
-  console.log('[Utils] Facture sauvegardée:', publicUrl);
   return publicUrl;
 }
-
