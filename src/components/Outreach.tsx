@@ -220,7 +220,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     await supabase.from('scheduled_emails').delete().eq('lead_id', lead.id).eq('status', 'pending');
     
     // 2. Envoyer immédiatement l'Email 3 (Confirmation Dépôt)
-    await sendWorkflowEmail(lead, 'email3_confirmation');
+    await sendWorkflowEmail(lead, 'step-3-depot');
     
     // 3. Programmer le solde final (Email 4) dans 2 jours (Production Express)
     const scheduledDate = new Date();
@@ -241,7 +241,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     await supabase.from('scheduled_emails').delete().eq('lead_id', lead.id).eq('status', 'pending');
     
     // 2. Envoyer immédiatement l'Email 5 (Confirmation Solde Final)
-    await sendWorkflowEmail(lead, 'email5_final_payment_confirmation');
+    await sendWorkflowEmail(lead, 'step-5-confirmation');
     
     // 3. Programmer l'Email 6 (Livraison) pour dans 1 heure (le temps du déploiement final)
     const deliveryDate = new Date();
@@ -364,7 +364,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
   // Wrappers pour le workflow (utilisés dans le JSX)
   const sendEmail1Demo = (lead: Lead) => sendWorkflowEmail(lead, 'email1_presentation');
   const sendEmail2WithPayment = (lead: Lead) => sendWorkflowEmail(lead, 'email2_devis');
-  const sendEmail3Confirmation = (lead: Lead) => sendWorkflowEmail(lead, 'email3_confirmation');
+  const sendEmail3Confirmation = (lead: Lead) => sendWorkflowEmail(lead, 'step-3-depot');
 
   return (
     <div className="animate-fade" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
