@@ -133,10 +133,10 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   };
 
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
-    const allTemplates = [...salesTemplates, ...reminderTemplates, ...templates];
+    // UNIFICATION : On donne la priorité aux templates de la BASE DE DONNÉES
+    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
     const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
     
-    // Utiliser la nouvelle fonction de personnalisation robuste
     const base = personalizeTemplateContent(template, lead, apiConfig);
 
     if (hasLLM) {
@@ -174,7 +174,9 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
     if (!lead.email) { alert("Ce lead n'a pas d'email"); return; }
 
-    const template = [...salesTemplates, ...reminderTemplates].find(t => t.id === templateId);
+    // UNIFICATION : On cherche d'abord dans les templates de la DB (prop templates)
+    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+    const template = allTemplates.find(t => t.id === templateId);
     if (!template) return;
 
     const { subject, body } = personalizeTemplateContent(template, lead, apiConfig);
