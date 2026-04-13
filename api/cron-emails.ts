@@ -61,6 +61,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const template = dbTemplates?.find(t => t.id === job.template_id);
         if (!template) throw new Error(`Template ID "${job.template_id}" introuvable en base de données`);
 
+        console.log(`[Cron] Préparation email ${job.template_id} pour ${lead.name}. InvoiceURL: ${lead.invoice_url || 'VIDE'}`);
+
         let subject = template.subject || 'Votre projet web';
         let body = template.body || ''; // Dans la DB, c'est la colonne 'body'
 
