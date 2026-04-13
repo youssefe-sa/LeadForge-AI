@@ -96,10 +96,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (trackType === 'site_clicked' || trackType === 'start_clicked') {
         nextTemplateId = 'step-2-devis';
       } 
-      else if (trackType === 'payment_clicked') {
-        const isFinal = req.query.final === 'true';
-        nextTemplateId = isFinal ? 'step-5-confirmation' : 'step-3-depot';
-      }
+      // Planification automatique retirée pour le paiement (Validation manuelle requise désormais)
 
       if (nextTemplateId) {
         // 1. Annuler les emails en attente pour éviter les doublons
