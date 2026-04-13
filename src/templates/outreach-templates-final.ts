@@ -17,7 +17,7 @@ export interface EmailTemplate {
 // ============================================================
 export const salesTemplates: EmailTemplate[] = [
   {
-    id: 'email1_presentation',
+    id: 'step-1-start',
     name: 'Email 1 - Démo & Premier Contact',
     category: 'sale',
     subject: '🎁 Une surprise pour {{companyName}} : Votre nouveau site est prêt',
@@ -51,7 +51,7 @@ export const salesTemplates: EmailTemplate[] = [
     textContent: "Bonjour {{firstName}}, j'ai conçu un nouveau site pour {{companyName}}. Voir la démo : {{websiteLink}}. Démarrer ici : {{startProjectLink}}"
   },
   {
-    id: 'email2_devis',
+    id: 'step-2-devis',
     name: 'Email 2 - Devis & Paiement',
     category: 'sale',
     subject: '📄 Votre Devis & Lien de Paiement - {{companyName}}',
@@ -80,7 +80,7 @@ export const salesTemplates: EmailTemplate[] = [
     textContent: "Voici votre devis pour {{companyName}} : {{devisLink}}. Payer l'acompte : {{paymentLink}}"
   },
   {
-    id: 'email3_confirmation',
+    id: 'step-3-depot',
     name: 'Email 3 - Confirmation Dépôt',
     category: 'sale',
     subject: '✅ Confirmation de votre acompte - {{companyName}}',
@@ -103,7 +103,7 @@ export const salesTemplates: EmailTemplate[] = [
     textContent: "Dépôt confirmé pour {{companyName}}. Livraison finale le {{deliveryDate}}."
   },
   {
-    id: 'email4_final_payment',
+    id: 'step-4-paiement',
     name: 'Email 4 - Paiement Final',
     category: 'sale',
     subject: '🎉 Votre site {{companyName}} est prêt !',
@@ -131,7 +131,7 @@ export const salesTemplates: EmailTemplate[] = [
     textContent: "Votre site {{companyName}} est prêt ! Solde de 100$ : {{finalPaymentLink}}"
   },
   {
-    id: 'email5_final_payment_confirmation',
+    id: 'step-5-confirmation',
     name: 'Email 5 - Confirmation Paiement Final',
     category: 'sale',
     subject: '✅ Paiement reçu ! {{companyName}} est en ligne',
@@ -151,7 +151,7 @@ export const salesTemplates: EmailTemplate[] = [
     textContent: "Félicitations ! Votre site {{companyName}} est en ligne : {{websiteLink}}"
   },
   {
-    id: 'email6_delivery_documentation',
+    id: 'step-6-livraison',
     name: 'Email 6 - Livraison & Accès',
     category: 'sale',
     subject: '🔐 Vos Accès - {{companyName}}',

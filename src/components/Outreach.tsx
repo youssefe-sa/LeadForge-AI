@@ -49,7 +49,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
   // Nouveaux états pour workflow et paiement
   const [workflowMode, setWorkflowMode] = useState<'manual' | 'automated'>('manual');
-  const [selectedWorkflowTemplate, setSelectedWorkflowTemplate] = useState('email1_presentation');
+  const [selectedWorkflowTemplate, setSelectedWorkflowTemplate] = useState('step-1-start');
   const [paymentLinks, setPaymentLinks] = useState<Record<string, { link: string; amount: number; created: string }>>({});
   const [devisLinks, setDevisLinks] = useState<Record<string, string>>({});
   const [invoiceLinks, setInvoiceLinks] = useState<Record<string, string>>({});
@@ -228,7 +228,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     
     await supabase.from('scheduled_emails').insert([{
       lead_id: lead.id,
-      template_id: 'email4_final_payment',
+      template_id: 'step-4-paiement',
       scheduled_for: scheduledDate.toISOString(),
       status: 'pending'
     }]);
@@ -249,7 +249,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     
     await supabase.from('scheduled_emails').insert([{
       lead_id: lead.id,
-      template_id: 'email6_delivery_documentation',
+      template_id: 'step-6-livraison',
       scheduled_for: deliveryDate.toISOString(),
       status: 'pending'
     }]);
@@ -362,8 +362,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
   };
 
   // Wrappers pour le workflow (utilisés dans le JSX)
-  const sendEmail1Demo = (lead: Lead) => sendWorkflowEmail(lead, 'email1_presentation');
-  const sendEmail2WithPayment = (lead: Lead) => sendWorkflowEmail(lead, 'email2_devis');
+  const sendEmail1Demo = (lead: Lead) => sendWorkflowEmail(lead, 'step-1-start');
+  const sendEmail2WithPayment = (lead: Lead) => sendWorkflowEmail(lead, 'step-2-devis');
   const sendEmail3Confirmation = (lead: Lead) => sendWorkflowEmail(lead, 'step-3-depot');
 
   return (
