@@ -1,5 +1,5 @@
 // ============================================================
-// Solutions Web - Templates Email Outreach Agent (Services Siteup Premium - Version Institutionnelle)
+// Solutions Web - Templates Email Outreach Agent (Services Siteup Premium - Version Utilisateur)
 // ============================================================
 
 export interface EmailTemplate {
@@ -12,200 +12,179 @@ export interface EmailTemplate {
   category: 'sale' | 'reminder';
 }
 
-const PREMIUM_STYLE = `
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #f7f9fc; color: #1a202c; }
-    .wrapper { background-color: #f7f9fc; padding: 40px 20px; }
-    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e1e8ed; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .header { padding: 30px; text-align: left; border-bottom: 1px solid #edf2f7; }
-    .content { padding: 40px 35px; line-height: 1.6; font-size: 15px; }
-    .footer { padding: 25px; text-align: center; color: #718096; font-size: 12px; border-top: 1px solid #edf2f7; background: #f8fafc; }
-    .btn { display: inline-block; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; transition: opacity 0.2s; }
-    .btn-green { background-color: #28a745; color: #ffffff !important; }
-    .btn-orange { background-color: #D4500A; color: #ffffff !important; }
-    .btn-dark { background-color: #2d3748; color: #ffffff !important; }
-    .table-price { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
-    .table-price td { padding: 12px; border: 1px solid #edf2f7; }
-    .step-box { display: inline-block; width: 45%; padding: 15px; border-radius: 8px; text-align: center; vertical-align: top; }
-    .admin-block { background-color: #1a202c; color: #ffffff; padding: 25px; border-radius: 8px; margin: 20px 0; }
-    .signature { margin-top: 30px; padding-top: 20px; border-top: 1px solid #edf2f7; font-size: 13px; color: #4a5568; }
-  </style>
+const LOGO_SVG = `
+  <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="50" height="50" rx="14" fill="#D4500A" />
+    <text x="25" y="33" font-family="Arial" font-weight="900" font-size="24" fill="white" text-anchor="middle">ST</text>
+  </svg>
 `;
 
-const LOGO_BAR = `
-  <div class="header">
-    <table width="100%">
-      <tr>
-        <td>
-          <svg width="220" height="40" viewBox="0 0 280 60" xmlns="http://www.w3.org/2000/svg">
-            <rect x="0" y="5" width="50" height="50" rx="14" fill="#D4500A" />
-            <text x="25" y="41" font-family="Arial" font-weight="900" font-size="28" fill="white" text-anchor="middle">ST</text>
-            <text x="62" y="32" font-family="Arial" font-weight="bold" font-size="24" fill="#1a202c">Services-Siteup</text>
-          </svg>
-          <div style="font-size: 10px; color: #718096; margin-left: 62px; margin-top: -12px; font-style: italic;">Propulsez votre présence en ligne avec excellence</div>
-        </td>
-      </tr>
-    </table>
-  </div>
-`;
-
-const SIGNATURE = `
-  <div class="signature">
-    <strong>L'équipe Services-Siteup</strong><br>
-    <a href="mailto:siteup.services@gmail.com" style="color: #D4500A; text-decoration: none;">siteup.services@gmail.com</a><br>
-    <span style="font-size: 11px; color: #a0aec0;">Expertise digitale | Présence en ligne | Performance</span>
+const HEADER_HTML = `
+  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 25px;">
+    ${LOGO_SVG}
+    <div>
+      <div style="font-family: Arial; font-weight: bold; font-size: 20px; color: #1a202c;">Services-Siteup</div>
+      <div style="font-size: 11px; color: #718096; font-style: italic;">Propulsez votre présence en ligne avec excellence</div>
+    </div>
   </div>
 `;
 
 export const salesTemplates: EmailTemplate[] = [
   {
-    id: 'step-1-start',
-    name: 'Email 1 - Présentation',
+    id: 'step-1-presentation',
+    name: '1. Présentation Site Web',
     category: 'sale',
     subject: '🎁 Une surprise pour {{companyName}} : Votre nouveau site est prêt',
     variables: ['firstName', 'companyName', 'websiteLink', 'startProjectLink'],
-    htmlContent: `<!DOCTYPE html><html><head>${PREMIUM_STYLE}</head><body><div class="wrapper"><div class="container">${LOGO_BAR}
-      <div class="content">
-        <p>Bonjour {{firstName}},</p>
-        <p>J'ai le plaisir de vous informer que j'ai conçu une première version modernisée pour <strong>{{companyName}}</strong>.</p>
-        <div style="text-align: center; margin: 30px 0;"><a href="{{websiteLink}}" class="btn btn-orange">👀 VOIR VOTRE SITE</a></div>
-        <p><strong>Nos 5 avantages exclusifs :</strong></p>
-        <ul style="padding-left: 20px;">
-          <li>Propriété totale de votre site et domaine</li>
-          <li>Design unique et responsive (mobile, tablette, PC)</li>
-          <li>Optimisation SEO pour apparaître sur Google</li>
-          <li>WhatsApp et Chatbot intelligent intégrés</li>
-          <li>Livraison ultra-rapide sous 48h</li>
-        </ul>
-        <p><strong>Investissement direct : 146€</strong> tout inclus.<br>Le règlement s'effectue en 2 étapes simples (Acompte 46€ / Solde 100€).</p>
-        ${SIGNATURE}
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 10px; background: #ffffff;">
+      ${HEADER_HTML}
+      <p>Bonjour <strong>{{firstName}}</strong>,</p>
+      <p style="font-size: 15px;">J’ai pris l’initiative de créer une <strong>version professionnelle complète de site web</strong> pour <strong>{{companyName}}</strong>.</p>
+      <p style="font-size: 14px;">L’objectif est simple : vous aider à <strong>générer plus de clients locaux grâce à une présence en ligne optimisée et professionnelle</strong>.</p>
+      <div style="text-align: center; margin: 25px 0;">
+        <a href="{{websiteLink}}" style="background: #D4500A; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block;">VOIR VOTRE SITE →</a>
       </div>
-      <div class="footer">Services-Siteup &copy; 2026</div>
-    </div></div></body></html>`,
-    textContent: "Bonjour {{firstName}}, votre site {{companyName}} est prêt. Voir ici : {{websiteLink}}"
+      <p style="text-align: center; font-size: 13px; color: #718096; margin-top: -10px;">⏱️ 30 secondes suffisent pour comprendre son potentiel commercial</p>
+      <p style="margin-top: 25px;">Ce site est conçu pour :</p>
+      <ul style="padding-left: 18px; font-size: 14px; line-height: 1.6;">
+        <li>📞 Générer plus d’appels clients automatiquement</li>
+        <li>📱 Être parfaitement optimisé pour mobile (priorité clients locaux)</li>
+        <li>💬 Intégrer WhatsApp, formulaire de contact et chatbot intelligent</li>
+        <li>🚀 Être visible sur Google grâce à un SEO local optimisé</li>
+      </ul>
+      <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 14px;">
+        <strong>💰 Activation du projet :</strong><br><br>
+        • 46$ pour démarrer<br>
+        • 100$ à la livraison finale<br><br>
+        ✔ Hébergement + domaine inclus (1 an)<br>
+        ✔ Support et maintenance inclus<br>
+      </div>
+      <p style="margin-top: 25px; font-size: 15px;">Si vous souhaitez activer ce site pour votre entreprise, il suffit de confirmer.</p>
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="{{startProjectLink}}" style="background: #1a202c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;">CONFIRMER ET ACTIVER →</a>
+      </div>
+      <p style="text-align:center; font-size:13px; color:#718096; margin-top:10px;">👉 En cliquant, vous recevrez immédiatement un devis détaillé.</p>
+      <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 20px; font-size: 13px; color: #4a5568;">Cordialement,<br>Consultant Digital | Services-Siteup</p>
+    </div>`,
+    textContent: "Bonjour {{firstName}}, votre site {{companyName}} est prêt. Voir : {{websiteLink}}"
   },
   {
     id: 'step-2-devis',
-    name: 'Email 2 - Devis & Paiement',
+    name: '2. Devis & Paiement',
     category: 'sale',
-    subject: '📄 Votre Devis & Lancement du projet - {{companyName}}',
-    variables: ['firstName', 'companyName', 'devisLink', 'paymentLink', 'expiryDate'],
-    htmlContent: `<!DOCTYPE html><html><head>${PREMIUM_STYLE}</head><body><div class="wrapper"><div class="container">${LOGO_BAR}
-      <div class="content">
-        <h2>Ravi de vous accompagner, {{firstName}} !</h2>
-        <p>Pour lancer officiellement le projet pour <strong>{{companyName}}</strong>, veuillez trouver ci-dessous votre devis et le lien de démarrage :</p>
-        <div style="text-align: center; margin: 25px 0;"><a href="{{devisLink}}" class="btn btn-green">📄 CONSULTER LE DEVIS</a></div>
-        <table class="table-price">
-          <tr style="background: #f8fafc; font-weight: bold;"><td>Prestation</td><td align="right">Montant</td></tr>
-          <tr><td>Création & Installation Site Web Pro</td><td align="right">146€</td></tr>
-        </table>
-        <div style="margin: 20px 0; text-align: center;">
-          <div class="step-box" style="background: #f0fdf4; border: 1px solid #dcfce7; color: #166534;"><strong>ÉTAPE 1</strong><br>Acompte : 46€</div>
-          <div class="step-box" style="background: #f7fafc; border: 1px solid #edf2f7; color: #718096; margin-left: 5%;"><strong>ÉTAPE 2</strong><br>Solde : 100€</div>
-        </div>
-        <div style="text-align: center; margin-top: 30px;"><a href="{{paymentLink}}" class="btn btn-orange">💳 RÉGLER L'ACOMPTE (46€)</a></div>
-        <p style="font-size: 11px; color: #a0aec0; margin-top: 30px; text-align: center;">Ce devis est valable jusqu'au {{expiryDate}}.</p>
-        ${SIGNATURE}
+    subject: '📄 Confirmation & Devis Officiel - {{companyName}}',
+    variables: ['firstName', 'companyName', 'devisLink', 'paymentLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+      ${HEADER_HTML}
+      <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">CONFIRMATION & DEVIS OFFICIEL</h2>
+      <p>Bonjour <strong>{{firstName}}</strong>,</p>
+      <p style="font-size: 14px;">Suite à votre intérêt, nous avons préparé une solution complète pour <strong>{{companyName}}</strong>.</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px;">
+        <tr style="background: #f8fafc;"><td style="padding: 10px; border: 1px solid #edf2f7;">🌐 <b>Site Pro Complet</b></td><td style="padding: 10px; border: 1px solid #edf2f7;">Design sur mesure, responsive mobile, chatbot</td></tr>
+        <tr><td style="padding: 10px; border: 1px solid #edf2f7;">🚀 <b>Performance</b></td><td style="padding: 10px; border: 1px solid #edf2f7;">SEO Google local, vitesse SSL</td></tr>
+        <tr style="background: #f8fafc;"><td style="padding: 10px; border: 1px solid #edf2f7;">📞 <b>Conversion clients</b></td><td style="padding: 10px; border: 1px solid #edf2f7;">WhatsApp + formulaire + appels</td></tr>
+        <tr><td style="padding: 10px; border: 1px solid #edf2f7;">🏆 <b>Garanties</b></td><td style="padding: 10px; border: 1px solid #edf2f7;">Satisfait ou remboursé sous 15 jours</td></tr>
+      </table>
+      <div style="background: #fffaf0; padding: 20px; border: 1px solid #fbd38d; border-radius: 8px;">
+        <p style="margin: 0; font-weight: bold;">💰 Investissement total : 146$</p>
+        <p style="margin-top: 10px; font-size: 13px;">✔ 46$ pour démarrrer<br>✔ 100$ à la livraison</p>
       </div>
-      <div class="footer">Services-Siteup | Excellence Digitale</div>
-    </div></div></body></html>`,
-    textContent: "Consultez votre devis pour {{companyName}} : {{devisLink}}. Régler l'acompte : {{paymentLink}}"
+      <div style="text-align: center; margin: 25px 0;">
+        <a href="{{devisLink}}" style="color: #D4500A; text-decoration: underline; font-weight: bold; margin-right: 20px;">📄 Voir le devis</a>
+        <a href="{{paymentLink}}" style="background: #28a745; color: white; padding: 14px 22px; text-decoration: none; border-radius: 6px; font-weight: bold;">💳 PAYER 46$ ET DÉMARRER</a>
+      </div>
+      <p style="margin-top: 25px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Cordialement,<br>Consultant Digital | Services-Siteup</p>
+    </div>`,
+    textContent: "Voici votre devis : {{devisLink}}"
   },
   {
     id: 'step-3-depot',
-    name: 'Email 3 - Confirmation Dépôt',
+    name: '3. Confirmation Acompte',
     category: 'sale',
-    subject: '✅ Confirmation de votre acompte - Projet Lancé !',
+    subject: '✅ Confirmation de votre acompte - {{companyName}}',
     variables: ['firstName', 'companyName', 'invoiceLink', 'deliveryDate'],
-    htmlContent: `<!DOCTYPE html><html><head>${PREMIUM_STYLE}</head><body><div class="wrapper"><div class="container">${LOGO_BAR}
-      <div class="content">
-        <h2 style="color: #28a745;"><span style="font-size: 24px;">✓</span> Paiement Confirmé</h2>
-        <p>Bonjour {{firstName}}, nous avons bien reçu votre acompte pour <strong>{{companyName}}</strong>.</p>
-        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #edf2f7; margin: 20px 0;">
-          <p style="margin: 0; font-size: 13px;"><strong>Récapitulatif de paiement :</strong></p>
-          <p style="margin: 5px 0; font-size: 14px;">Montant perçu : 46€<br>État : Validé<br>Livraison prévue : {{deliveryDate}}</p>
-          <div style="margin-top: 15px;"><a href="{{invoiceLink}}" class="btn btn-dark" style="padding: 10px 20px; font-size: 12px;">📄 TÉLÉCHARGER LE REÇU</a></div>
-        </div>
-        <p><strong>Nos prochaines étapes :</strong></p>
-        <ol style="padding-left: 20px; font-size: 14px;">
-          <li>Mise en conformité technique</li>
-          <li>Optimisation SEO et Performance</li>
-          <li>Installation du Chatbot & WhatsApp</li>
-          <li>Livraison de vos accès (E6)</li>
-        </ol>
-        ${SIGNATURE}
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+      ${HEADER_HTML}
+      <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">CONFIRMATION D’ACOMPTE</h2>
+      <p>Bonjour <strong>{{firstName}}</strong>,</p>
+      <p style="font-size: 14px;">Nous vous confirmons que votre acompte de <strong>46$</strong> a bien été reçu.</p>
+      <p style="font-size: 14px;">Votre projet pour <strong>{{companyName}}</strong> est désormais en cours de production.</p>
+      <div style="background: #f0fff4; padding: 15px; border: 1px solid #c6f6d5; border-radius: 6px; color: #22543d; margin-top: 15px;">
+        <strong>📦 Statut :</strong> Analyse terminée, création en cours.
       </div>
-    </div></div></body></html>`,
-    textContent: "Paiement de 46€ confirmé pour {{companyName}}. Livraison prévue le {{deliveryDate}}."
+      <div style="background: #f7fafc; padding: 15px; border-radius: 6px; margin-top: 15px;">
+        <strong>📅 Livraison prévue :</strong> <b>{{deliveryDate}}</b>
+      </div>
+      <div style="margin-top: 25px; text-align: center;">
+        <a href="{{invoiceLink}}" style="background: #f8fafc; color: #1a202c; padding: 10px 20px; border: 1px solid #edf2f7; text-decoration: none; border-radius: 6px; font-size: 13px;">📄 Facture d'acompte (PDF)</a>
+      </div>
+      <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Cordialement,<br>Consultant Digital | Services-Siteup</p>
+    </div>`,
+    textContent: "Acompte reçu pour {{companyName}}. Livraison : {{deliveryDate}}"
   },
   {
     id: 'step-4-paiement',
-    name: 'Email 4 - Paiement Final',
+    name: '4. Paiement Final',
     category: 'sale',
-    subject: '✨ Votre site est prêt ! (Action requise)',
+    subject: '🎉 Votre site {{companyName}} est prêt !',
     variables: ['firstName', 'companyName', 'websiteLink', 'finalPaymentLink'],
-    htmlContent: `<!DOCTYPE html><html><head>${PREMIUM_STYLE}</head><body><div class="wrapper"><div class="container">${LOGO_BAR}
-      <div class="content">
-        <h2>Félicitations {{firstName}}, votre site est prêt !</h2>
-        <p>Nous avons terminé la configuration pour <strong>{{companyName}}</strong>. Vous pouvez visualiser le résultat final ici :</p>
-        <div style="text-align: center; margin: 25px 0;"><a href="{{websiteLink}}" class="btn btn-dark">🔍 VOIR LA VERSION FINALE</a></div>
-        <div style="border: 1px solid #feb2b2; background: #fff5f5; padding: 25px; border-radius: 8px; text-align: center; border-left: 5px solid #f56565;">
-          <p style="margin: 0; color: #c53030; font-weight: bold; font-size: 18px;">Reste à régler : 100€</p>
-          <p style="margin: 5px 0; font-size: 12px; color: #742a2a;">Montant total projet : 146€</p>
-          <a href="{{finalPaymentLink}}" class="btn btn-orange" style="margin-bottom: 0;">🚀 PAYER LE SOLDE & PUBLIER</a>
-        </div>
-        ${SIGNATURE}
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+      ${HEADER_HTML}
+      <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">FINALISATION DE VOTRE SITE WEB</h2>
+      <p>Bonjour <strong>{{firstName}}</strong>,</p>
+      <p style="font-size: 14px;">Votre site pour <strong>{{companyName}}</strong> est maintenant entièrement prêt.</p>
+      <p style="font-size: 14px;">👉 Consulter ici : <a href="{{websiteLink}}" style="color: #D4500A; font-weight: bold;">Voir le rendu final</a></p>
+      <div style="background: #fffaf0; padding: 18px; border: 1px solid #fbd38d; border-radius: 8px; margin-top: 15px;">
+        <strong>💰 Solde restant :</strong> 100$
       </div>
-    </div></div></body></html>`,
-    textContent: "Votre site {{companyName}} est prêt. Solde restant : 100€. Régler ici : {{finalPaymentLink}}"
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{{finalPaymentLink}}" style="background: #28a745; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">💰 RÉGLER LE SOLDE & ACTIVER</a>
+      </div>
+      <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Cordialement,<br>Consultant Digital | Services-Siteup</p>
+    </div>`,
+    textContent: "Votre site {{companyName}} est prêt : {{websiteLink}}"
   },
   {
     id: 'step-5-confirmation',
-    name: 'Email 5 - Confirmation Finale',
+    name: '5. Confirmation Finale',
     category: 'sale',
-    subject: '🎉 Bienvenue en ligne ! Confirmation de paiement final',
-    variables: ['firstName', 'companyName', 'websiteLink', 'invoiceLink'],
-    htmlContent: `<!DOCTYPE html><html><head>${PREMIUM_STYLE}</head><body><div class="wrapper"><div class="container">${LOGO_BAR}
-      <div class="content">
-        <h2 style="text-align: center;">Célébration 🎉</h2>
-        <p>Bonjour {{firstName}}, nous avons bien reçu votre paiement final. Vous êtes désormais 100% propriétaire de votre présence digitale.</p>
-        <div style="text-align: center; margin: 30px 0;"><a href="{{websiteLink}}" class="btn btn-green">🌐 VOIR MON SITE EN LIGNE</a></div>
-        <table class="table-price">
-          <tr style="background: #f8fafc; font-weight: bold;"><td>Document</td><td align="right">Status</td></tr>
-          <tr><td>Facture Finale Services-Siteup</td><td align="right" style="color: #28a745;">ACQUITTÉE ✅</td></tr>
-        </table>
-        <div style="text-align: center;"><a href="{{invoiceLink}}" class="btn btn-dark" style="padding: 10px 20px; font-size: 12px;">📄 TÉLÉCHARGER LA FACTURE</a></div>
-        ${SIGNATURE}
+    subject: '✅ Paiement reçu ! {{companyName}} est activé',
+    variables: ['firstName', 'companyName', 'invoiceLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+      ${HEADER_HTML}
+      <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">CONFIRMATION FINALE</h2>
+      <p>Bonjour <strong>{{firstName}}</strong>,</p>
+      <p style="font-size: 14px;">Note vous confirmons que le solde de <strong>100$</strong> a bien été reçu.</p>
+      <p style="font-size: 14px;">Votre projet pour <strong>{{companyName}}</strong> est maintenant <strong>100% finalisé et activé</strong>.</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{{invoiceLink}}" style="background: #f8fafc; color: #1a202c; padding: 10px 20px; border: 1px solid #edf2f7; text-decoration: none; border-radius: 6px; font-size: 13px;">📄 Facture finale (PDF)</a>
       </div>
-    </div></div></body></html>`,
-    textContent: "Paiement final reçu pour {{companyName}}. Votre site est en ligne : {{websiteLink}}"
+      <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Cordialement,<br>Consultant Digital | Services-Siteup</p>
+    </div>`,
+    textContent: "Paiement final reçu pour {{companyName}}."
   },
   {
     id: 'step-6-livraison',
-    name: 'Email 6 - Livraison & Accès',
+    name: '6. Accès Admin',
     category: 'sale',
     subject: '🔐 Vos Accès Administrateur - {{companyName}}',
-    variables: ['firstName', 'companyName', 'adminLink', 'adminUsername', 'adminPassword', 'documentationLink', 'websiteLink'],
-    htmlContent: `<!DOCTYPE html><html><head>${PREMIUM_STYLE}</head><body><div class="wrapper"><div class="container">${LOGO_BAR}
-      <div class="content">
-        <h2>Vos accès officiels</h2>
-        <p>Bonjour {{firstName}}, voici vos informations pour gérer <strong>{{companyName}}</strong> en toute autonomie :</p>
-        <div class="admin-block">
-          <p style="margin-top: 0; border-bottom: 1px solid #4a5568; padding-bottom: 10px;">🛡️ ESPACE ADMINISTRATION</p>
-          <p><strong>Lien :</strong> <a href="{{adminLink}}" style="color: #48bb78;">{{adminLink}}</a></p>
-          <p><strong>Identifiant :</strong> <span style="color: #48bb78;">{{adminUsername}}</span></p>
-          <p><strong>Mot de passe :</strong> <span style="color: #48bb78;">{{adminPassword}}</span></p>
-        </div>
-        <p style="font-size: 12px; color: #c53030;">🚨 <strong>Alerte Confidentialité :</strong> Ne partagez jamais ces accès avec des tiers non autorisés.</p>
-        <div style="display: flex; gap: 10px; margin-top: 25px;">
-          <a href="{{websiteLink}}" class="btn btn-orange" style="flex: 1; text-align: center; margin: 0;">VISITER LE SITE</a>
-          <a href="{{documentationLink}}" class="btn btn-dark" style="flex: 1; text-align: center; margin: 0;">DOCUMENTATION</a>
-        </div>
-        <p style="margin-top: 30px; font-size: 13px;">📞 <strong>Support :</strong> Besoin d'aide ? Répondez simplement à cet email.</p>
-        ${SIGNATURE}
+    variables: ['firstName', 'companyName', 'adminLink', 'adminUsername', 'adminPassword', 'documentationLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+      ${HEADER_HTML}
+      <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">ACCÈS À VOTRE SITE WEB</h2>
+      <p>Bonjour <strong>{{firstName}}</strong>,</p>
+      <div style="background: #f8fafc; padding: 20px; border-radius: 8px; font-family: monospace; font-size: 13px;">
+        <strong>🔐 Connexion :</strong><br><br>
+        <strong>URL Admin :</strong> <a href="{{adminLink}}" style="color: #D4500A;">{{adminLink}}</a><br>
+        <strong>User :</strong> {{adminUsername}}<br>
+        <strong>Pass :</strong> {{adminPassword}}
       </div>
-    </div></div></body></html>`,
-    textContent: "Voici vos accès pour {{companyName}}. User: {{adminUsername}}, Pass: {{adminPassword}}"
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="{{documentationLink}}" style="color: #1a202c; font-weight: bold; text-decoration: underline;">📚 Documentation complète</a>
+      </div>
+      <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Cordialement,<br>Consultant Digital | Services-Siteup</p>
+    </div>`,
+    textContent: "Vos accès pour {{companyName}} : {{adminLink}}"
   }
 ];
 
@@ -216,21 +195,15 @@ export const reminderTemplates: EmailTemplate[] = [
     category: 'reminder',
     subject: 'Suivi : Votre démo pour {{companyName}}',
     variables: ['firstName', 'companyName', 'websiteLink', 'startProjectLink'],
-    htmlContent: `<!DOCTYPE html><html><head>${PREMIUM_STYLE}</head><body><div class="wrapper"><div class="container">${LOGO_BAR}
-      <div class="content">
-        <h2>Bonjour {{firstName}},</h2>
-        <p>Je reviens vers vous concernant la démo du nouveau site pour <strong>{{companyName}}</strong>. L'avez-vous consultée ?</p>
-        <div style="text-align: center; margin: 30px 0;"><a href="{{websiteLink}}" class="btn btn-dark">🔍 REVOIR LA DÉMO</a></div>
-        <p>Nous pouvons lancer les travaux d'installation dès aujourd'hui.</p>
-        <div style="text-align: center; margin-top: 25px;"><a href="{{startProjectLink}}" class="btn btn-orange">DÉMARRER LE PROJET MAINTENANT →</a></div>
-        ${SIGNATURE}
-      </div>
-    </div></div></body></html>`,
-    textContent: "Avez-vous vu la démo pour {{companyName}} ? {{websiteLink}}"
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+      ${HEADER_HTML}
+      <p>Bonjour {{firstName}}, avez-vous pu consulter la démo pour {{companyName}} ?</p>
+      <div style="text-align: center;"><a href="{{websiteLink}}" style="background: #1a202c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">🔍 VOIR LA DÉMO</a></div>
+      <div style="text-align: center; margin-top: 20px;"><a href="{{startProjectLink}}" style="background: #D4500A; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">LANCER LE PROJET →</a></div>
+    </div>`,
+    textContent: "Relance démo pour {{companyName}}"
   }
 ];
-
-export const PREMIUM_OUTREACH_TEMPLATES = salesTemplates;
 
 export function getTemplateById(id: string): EmailTemplate | undefined {
   const all = [...salesTemplates, ...reminderTemplates];
