@@ -61,7 +61,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       // GÉNÉRATION AUTO DE LA FACTURE
       try {
-        await generateAndSaveInvoice(lead, '146', isFinal ? 'final' : 'deposit');
+        const invUrl = await generateAndSaveInvoice(lead, '146', isFinal ? 'final' : 'deposit');
+        if (lead) lead.invoice_url = invUrl; // Mettre à jour l'objet local pour la suite du script
       } catch (err) {
         console.error('Erreur génération Facture:', err);
       }
