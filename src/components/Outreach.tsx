@@ -198,18 +198,25 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       });
       setLogs(prev => [...prev, `✅ ${template.name} envoyé à ${lead.name}`]);
       
-      // Programmer l'étape suivante si nécessaire
-      if (templateId === 'email1_presentation') {
+      // --- LOGIQUE DE RAPPEL AUTOMATIQUE J+1 ---
+      let nextReminderId = '';
+      if (templateId === 'step-1-presentation') nextReminderId = 'reminder1_after_email1';
+      if (templateId === 'step-2-devis') nextReminderId = 'reminder2_after_devis';
+      if (templateId === 'step-4-paiement') nextReminderId = 'reminder3_final_payment';
+
+      if (nextReminderId) {
         const scheduledDate = new Date();
         scheduledDate.setDate(scheduledDate.getDate() + 1); // <--- PASSAGE À J+1
         
         supabase.from('scheduled_emails').insert([{
           lead_id: lead.id,
-          template_id: 'reminder1_after_email1',
+          template_id: nextReminderId,
           scheduled_for: scheduledDate.toISOString(),
           status: 'pending'
         }]).then(({ error }) => {
-          if (!error) setLogs(prev => [...prev, `📅 Rappel 1 programmé pour DEMAIN`]);
+          const reminderNum = nextReminderId.includes('reminder1') ? '1' : 
+                             nextReminderId.includes('reminder2') ? '2' : '3';
+          if (!error) setLogs(prev => [...prev, `📅 Rappel ${reminderNum} programmé pour DEMAIN`]);
         });
       }
     } else {
