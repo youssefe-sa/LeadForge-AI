@@ -595,7 +595,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
             ))}
           </div>
           <div style={{ fontSize: 11, color: C.tx3, fontStyle: 'italic' }}>
-            Rappel 1: 3 jours après Email 1 → Rappel 2: 2 jours avant expiration → Rappel 3: 3 jours après Email 4 (paiement final)
+            Rappel 1: 1 jour après Email 1 → Rappel 2: 1 jour après Email 2 (paiement Dépôt) → Rappel 3: 1 jour après Email 4 (paiement final)
           </div>
         </div>
 
