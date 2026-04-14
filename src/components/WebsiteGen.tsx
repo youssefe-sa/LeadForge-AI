@@ -20,7 +20,11 @@ const contrastColor = (bg: string, fg: string) => {
   const bgLum = luminance(bg);
   const fgLum = luminance(fg);
   const contrast = (Math.max(bgLum, fgLum) + 0.05) / (Math.min(bgLum, fgLum) + 0.05);
-  return contrast >= 4.5 ? fg : (bgLum > fgLum ? '#EEEEEE' : '#333333');
+  // FIX: Si contraste insuffisant, renvoyer du noir sur fond clair et du blanc sur fond sombre
+  if (contrast < 4.5) {
+    return bgLum > 0.5 ? '#1C1B18' : '#FFFFFF';
+  }
+  return fg;
 };
 
 const C = {
@@ -29,8 +33,8 @@ const C = {
   surface2: getCssVar('surface2', '#F2F1EC'),
   border: getCssVar('border', '#E4E2DA'),
   tx: getCssVar('text', '#1C1B18'),
-  tx2: getCssVar('muted', '#5C5A53'),
-  tx3: contrastColor(getCssVar('surface2', '#F2F1EC'), getCssVar('subtle', '#9B9890')),
+  tx2:  '#4A4943', // Gris plus sombre pour lisibilité
+  tx3: '#6B6960', // Gris moyen (accessibilité AA)
   accent: getCssVar('primary', '#D4500A'),
   accent2: getCssVar('secondary', '#F0E8DF'),
   green: getCssVar('success', '#1A7A4A'),

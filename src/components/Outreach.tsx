@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Lead, ApiConfig, EmailTemplate, callLLM, useScheduledEmails } from '../lib/supabase-store';
+import { Lead, ApiConfig, EmailTemplate, callLLM } from '../lib/supabase-store';
 import { supabase } from '../lib/supabase';
 import { salesTemplates, reminderTemplates, getTemplateById } from '../templates/outreach-templates-final';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
-  border: '#E4E2DA', tx: '#1C1B18', tx2: '#5C5A53', tx3: '#9B9890',
+  border: '#E4E2DA', tx: '#1C1B18', tx2: '#4A4943', tx3: '#6B6960',
   accent: '#D4500A', accent2: '#F0E8DF',
   green: '#1A7A4A', blue: '#1A4FA0', amber: '#B45309', red: '#C0392B',
 };
@@ -53,7 +53,6 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const [paymentLinks, setPaymentLinks] = useState<Record<string, { link: string; amount: number; created: string }>>({});
   const [devisLinks, setDevisLinks] = useState<Record<string, string>>({});
   const [invoiceLinks, setInvoiceLinks] = useState<Record<string, string>>({});
-  const { scheduled, cancelEmail } = useScheduledEmails();
   const [showEmailPreview, setShowEmailPreview] = useState(false);
 
   const hasGmailSmtp = !!(apiConfig.gmailSmtpUser && apiConfig.gmailSmtpPassword);
@@ -193,25 +192,12 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     });
 
     if (result.success) {
-      // Marquer l'email spécifique comme envoyé
-      const emailTracking: any = {
+      updateLead(lead.id, {
         emailSent: true,
         emailSentDate: new Date().toISOString(),
         stage: 'email_sent',
         lastContact: new Date().toISOString(),
-      };
-      
-      if (templateId === 'step-1-presentation') emailTracking.email1_sent = true;
-      if (templateId === 'step-2-devis') emailTracking.email2_sent = true;
-      if (templateId === 'step-3-depot') emailTracking.email3_sent = true;
-      if (templateId === 'step-4-paiement') emailTracking.email4_sent = true;
-      if (templateId === 'step-5-confirmation') emailTracking.email5_sent = true;
-      if (templateId === 'step-6-livraison') emailTracking.email6_sent = true;
-      if (templateId === 'reminder1_after_email1') emailTracking.reminder1_sent = true;
-      if (templateId === 'reminder2_after_devis') emailTracking.reminder2_sent = true;
-      if (templateId === 'reminder3_final_payment') emailTracking.reminder3_sent = true;
-      
-      updateLead(lead.id, emailTracking);
+      });
       setLogs(prev => [...prev, `✅ ${template.name} envoyé à ${lead.name}`]);
       
       // --- LOGIQUE DE RAPPEL AUTOMATIQUE J+1 ---
@@ -392,7 +378,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
   const sendEmail3Confirmation = (lead: Lead) => sendWorkflowEmail(lead, 'step-3-depot');
 
   return (
-    <div className="animate-fade" style={{ fontFamily: '"Bricolage Grotesque", sans-serif' }}>
+    <div className="animate-fade" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
       {/* Header */}
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
@@ -400,7 +386,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
         background: C.bg, padding: '20px 0', borderBottom: `1px solid ${C.border}`
       }}>
         <div>
-          <h1 style={{ fontFamily: '"Fraunces", serif', fontSize: 28, fontWeight: 700, color: C.tx, marginBottom: 4 }}>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 700, color: C.tx, marginBottom: 4 }}>
             Outreach Agent
           </h1>
           <p style={{ color: C.tx3, fontSize: 14 }}>
@@ -448,7 +434,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
             borderLeft: `3px solid ${s.color}`, boxShadow: '0 1px 3px rgba(28,27,24,0.06)',
           }}>
             <div style={{ fontSize: 10, color: C.tx3, fontWeight: 500, marginBottom: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 700, fontFamily: '"Fraunces", serif', color: C.tx }}>{s.value}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "'Fraunces', serif", color: C.tx }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -458,7 +444,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
         <div style={{ background: C.surface, borderRadius: 8, padding: '16px 20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
             <span style={{ fontSize: 13, fontWeight: 500 }}>📧 Envoi: {progress.name}</span>
-            <span style={{ fontSize: 12, color: C.tx3, fontFamily: '"DM Mono", monospace' }}>{progress.current}/{progress.total}</span>
+            <span style={{ fontSize: 12, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>{progress.current}/{progress.total}</span>
           </div>
           <div style={{ height: 6, borderRadius: 3, background: C.surface2, overflow: 'hidden' }}>
             <div style={{
@@ -466,51 +452,6 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
               width: `${(progress.current / progress.total) * 100}%`,
               transition: 'width 300ms',
             }} />
-          </div>
-        </div>
-      )}
-
-      {/* --- VUE FILE D'ATTENTE (NOUVEAU) --- */}
-      {scheduled.length > 0 && (
-        <div className="animate-fade" style={{ marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>⏳ File d'attente des envois</h2>
-            <span style={{ background: C.accent, color: '#fff', padding: '2px 8px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
-              {scheduled.length} emails planifiés
-            </span>
-          </div>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-            {scheduled.map(job => {
-              const lead = leads.find(l => l.id === job.lead_id);
-              const template = [...salesTemplates, ...reminderTemplates].find(t => t.id === job.template_id);
-              return (
-                <div key={job.id} style={{ 
-                  background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16,
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.02)', position: 'relative'
-                }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: C.tx, marginBottom: 4 }}>
-                    {lead?.name || 'Lead inconnu'}
-                  </div>
-                  <div style={{ fontSize: 12, color: C.tx3, marginBottom: 12 }}>
-                    {template?.name || job.template_id}
-                  </div>
-                  
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: C.accent, fontWeight: 600 }}>
-                    <span>🗓️ Prévu : {new Date(job.scheduled_for).toLocaleString()}</span>
-                  </div>
-
-                  <button 
-                    onClick={() => { if(confirm('Annuler cet envoi ?')) cancelEmail(job.id); }}
-                    style={{
-                      position: 'absolute', top: 12, right: 12, background: 'transparent',
-                      border: 'none', color: C.tx3, cursor: 'pointer', fontSize: 16
-                    }}
-                    title="Annuler l'envoi"
-                  >✕</button>
-                </div>
-              );
-            })}
           </div>
         </div>
       )}
@@ -647,7 +588,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                     overflowY: 'auto'
                   }}>
                     <pre style={{ 
-                      fontFamily: '"DM Mono", monospace',
+                      fontFamily: "'DM Mono', monospace", 
                       fontSize: 11, 
                       color: C.tx2, 
                       whiteSpace: 'pre-wrap', 
@@ -664,7 +605,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
               ) : (
                 /* Template texte classique */
                 <pre style={{ 
-                  fontFamily: '"DM Mono", monospace',
+                  fontFamily: "'DM Mono', monospace", 
                   fontSize: 12, 
                   color: C.tx2, 
                   whiteSpace: 'pre-wrap', 
@@ -684,7 +625,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                   <div style={{ fontSize: 11, fontWeight: 600, color: C.tx3, marginBottom: 4 }}>
                     🔄 Variables utilisées:
                   </div>
-                  <div style={{ fontSize: 10, color: C.tx2, fontFamily: '"DM Mono", monospace' }}>
+                  <div style={{ fontSize: 10, color: C.tx2, fontFamily: "'DM Mono', monospace" }}>
                     {selected.variables.map((v: string) => `{{${v}}}`).join(', ')}
                   </div>
                 </div>
@@ -742,7 +683,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
               }}>
                 <div>
                   <div style={{ fontWeight: 500, fontSize: 13 }}>{lead.name}</div>
-                  <div style={{ fontSize: 11, color: C.tx3, fontFamily: '"DM Mono", monospace' }}>{lead.email}</div>
+                  <div style={{ fontSize: 11, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>{lead.email}</div>
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button onClick={() => previewForLead(lead)} style={{
@@ -786,125 +727,25 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
           <div style={{ maxHeight: 400, overflowY: 'auto' }}>
             {sent.map(lead => (
               <div key={lead.id} style={{
-                padding: '12px', borderBottom: `1px solid ${C.border}`,
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '10px 12px', borderBottom: `1px solid ${C.border}`,
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <div>
-                    <div style={{ fontWeight: 500, fontSize: 13 }}>{lead.name}</div>
-                    <div style={{ fontSize: 11, color: C.tx3, fontFamily: '"DM Mono", monospace' }}>
-                      {lead.emailSentDate ? new Date(lead.emailSentDate).toLocaleDateString('fr-FR') : ''} — {lead.email}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                    {lead.emailOpened && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 3, background: '#dbeafe', color: C.blue, fontWeight: 600 }}>Ouvert</span>}
-                    <button onClick={() => confirmDeposit(lead)} style={{
-                      padding: '4px 8px', borderRadius: 4, border: 'none',
-                      background: C.green, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
-                    }}>💰 Valider Acompte</button>
-                    <button onClick={() => confirmFinalPayment(lead)} style={{
-                      padding: '4px 8px', borderRadius: 4, border: 'none',
-                      background: C.amber, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
-                    }}>🏆 Valider Solde</button>
+                <div>
+                  <div style={{ fontWeight: 500, fontSize: 13 }}>{lead.name}</div>
+                  <div style={{ fontSize: 11, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>
+                    {lead.emailSentDate ? new Date(lead.emailSentDate).toLocaleDateString('fr-FR') : ''} — {lead.email}
                   </div>
                 </div>
-                {/* Email tracking - Design professionnel */}
-                <div style={{ marginTop: 12 }}>
-                  <div style={{ fontSize: 10, fontWeight: 600, color: C.tx3, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Workflow Emails
-                  </div>
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(3, 1fr)', 
-                    gap: 6,
-                    marginBottom: 12
-                  }}>
-                    {[
-                      { key: 'email1_sent', label: 'Présentation', icon: '📧' },
-                      { key: 'email2_sent', label: 'Devis', icon: '📄' },
-                      { key: 'email3_sent', label: 'Dépôt', icon: '💰' },
-                      { key: 'email4_sent', label: 'Paiement', icon: '💳' },
-                      { key: 'email5_sent', label: 'Confirmation', icon: '✅' },
-                      { key: 'email6_sent', label: 'Livraison', icon: '🚀' },
-                    ].map((email) => (
-                      <div key={email.key} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        padding: '6px 8px',
-                        borderRadius: 4,
-                        background: lead[email.key as keyof Lead] ? '#e3f2fd' : '#f8f9fa',
-                        border: `1px solid ${lead[email.key as keyof Lead] ? '#2196f3' : '#e0e0e0'}`,
-                        transition: 'all 0.2s'
-                      }}>
-                        <span style={{ fontSize: 12 }}>{email.icon}</span>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 10, fontWeight: 500, color: lead[email.key as keyof Lead] ? '#1976d2' : '#757575' }}>
-                            {email.label}
-                          </div>
-                          <div style={{ fontSize: 8, color: lead[email.key as keyof Lead] ? '#1976d2' : '#9e9e9e' }}>
-                            {lead[email.key as keyof Lead] ? 'Envoyé' : 'En attente'}
-                          </div>
-                        </div>
-                        {lead[email.key as keyof Lead] && (
-                          <div style={{ 
-                            width: 16, 
-                            height: 16, 
-                            borderRadius: '50%', 
-                            background: '#2196f3',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}>
-                            <span style={{ fontSize: 10, color: '#fff' }}>✓</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ fontSize: 10, fontWeight: 600, color: C.tx3, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Rappels Automatiques
-                  </div>
-                  <div style={{ 
-                    display: 'flex', 
-                    gap: 8
-                  }}>
-                    {[
-                      { key: 'reminder1_sent', label: 'Rappel J+1' },
-                      { key: 'reminder2_sent', label: 'Rappel J+2' },
-                      { key: 'reminder3_sent', label: 'Rappel Final' },
-                    ].map((reminder) => (
-                      <div key={reminder.key} style={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        padding: '6px 10px',
-                        borderRadius: 4,
-                        background: lead[reminder.key as keyof Lead] ? '#fff3e0' : '#f8f9fa',
-                        border: `1px solid ${lead[reminder.key as keyof Lead] ? '#ff9800' : '#e0e0e0'}`,
-                      }}>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 10, fontWeight: 500, color: lead[reminder.key as keyof Lead] ? '#e65100' : '#757575' }}>
-                            {reminder.label}
-                          </div>
-                        </div>
-                        {lead[reminder.key as keyof Lead] && (
-                          <div style={{ 
-                            width: 14, 
-                            height: 14, 
-                            borderRadius: '50%', 
-                            background: '#ff9800',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}>
-                            <span style={{ fontSize: 9, color: '#fff' }}>✓</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  {lead.emailOpened && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 3, background: '#dbeafe', color: C.blue, fontWeight: 600 }}>Ouvert</span>}
+                  <button onClick={() => confirmDeposit(lead)} style={{
+                    padding: '4px 8px', borderRadius: 4, border: 'none',
+                    background: C.green, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                  }}>💰 Valider Acompte</button>
+                  <button onClick={() => confirmFinalPayment(lead)} style={{
+                    padding: '4px 8px', borderRadius: 4, border: 'none',
+                    background: C.amber, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                  }}>🏆 Valider Solde</button>
                 </div>
               </div>
             ))}
@@ -923,7 +764,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
               background: C.surface, fontSize: 11, cursor: 'pointer', color: C.tx3,
             }}>Effacer</button>
           </div>
-          <div style={{ maxHeight: 200, overflowY: 'auto', fontFamily: '"DM Mono", monospace', fontSize: 12 }}>
+          <div style={{ maxHeight: 200, overflowY: 'auto', fontFamily: "'DM Mono', monospace", fontSize: 12 }}>
             {logs.map((log, i) => (
               <div key={i} style={{ padding: '3px 0', color: log.startsWith('✅') ? C.green : log.startsWith('❌') ? C.red : C.tx2 }}>{log}</div>
             ))}
@@ -935,7 +776,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       {Object.keys(paymentLinks).length > 0 && (
         <div style={{ background: C.surface, borderRadius: 8, padding: '16px 20px', border: `1px solid ${C.border}`, marginTop: 20 }}>
           <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>💳 Liens de paiement actifs</h3>
-          <div style={{ fontSize: 12, fontFamily: '"DM Mono", monospace' }}>
+          <div style={{ fontSize: 12, fontFamily: "'DM Mono', monospace" }}>
             {Object.entries(paymentLinks).map(([leadId, data]) => {
               const lead = leads.find(l => l.id === leadId);
               return (
@@ -968,7 +809,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
             boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontFamily: '"Fraunces", serif', fontSize: 20 }}>Aperçu de l'email</h2>
+              <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 20 }}>Aperçu de l'email</h2>
               <button onClick={() => setPreviewEmail(null)} style={{
                 width: 28, height: 28, borderRadius: 4, border: `1px solid ${C.border}`,
                 background: C.surface, fontSize: 14, cursor: 'pointer',
@@ -976,7 +817,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
             </div>
             <div style={{ marginBottom: 12 }}>
               <span style={{ fontSize: 12, color: C.tx3 }}>À :</span>
-              <span style={{ fontSize: 13, marginLeft: 8, fontFamily: '"DM Mono", monospace' }}>{previewEmail.lead.email}</span>
+              <span style={{ fontSize: 13, marginLeft: 8, fontFamily: "'DM Mono', monospace" }}>{previewEmail.lead.email}</span>
             </div>
             <div style={{ marginBottom: 16 }}>
               <span style={{ fontSize: 12, color: C.tx3 }}>Sujet :</span>
@@ -985,7 +826,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
             <div 
               style={{ 
                 padding: 20, background: '#F7F6F2', borderRadius: 8, 
-                fontSize: 14, lineHeight: 1.7, fontFamily: '"Bricolage Grotesque", sans-serif',
+                fontSize: 14, lineHeight: 1.7, fontFamily: "'Bricolage Grotesque', sans-serif",
                 maxHeight: 400, overflow: 'auto'
               }}
               dangerouslySetInnerHTML={{ __html: previewEmail.body }}

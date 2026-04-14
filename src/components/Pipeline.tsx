@@ -3,7 +3,7 @@ import { Lead, exportLeadsCSV } from '../lib/supabase-store';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
-  border: '#E4E2DA', tx: '#1C1B18', tx2: '#5C5A53', tx3: '#9B9890',
+  border: '#E4E2DA', tx: '#1C1B18', tx2: '#4A4943', tx3: '#6B6960',
   accent: '#D4500A', accent2: '#F0E8DF',
   green: '#1A7A4A', blue: '#1A4FA0', amber: '#B45309', red: '#C0392B',
 };
