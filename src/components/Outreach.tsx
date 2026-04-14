@@ -179,7 +179,9 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     const template = allTemplates.find(t => t.id === templateId);
     if (!template) return;
 
-    const { subject, body } = personalizeTemplateContent(template, lead, apiConfig);
+    // SÉCURITÉ : Extraire le contenu (body si DB, htmlContent si Local)
+    const rawContent = (template as any).body || template.htmlContent;
+    const { subject, body } = personalizeTemplateContent({ ...template, htmlContent: rawContent }, lead, apiConfig);
     
     const result = await sendEmailViaApi({
       to: lead.email,
