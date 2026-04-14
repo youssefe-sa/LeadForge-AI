@@ -205,6 +205,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
         emailSentDate: new Date().toISOString(),
         stage: 'email_sent',
         lastContact: new Date().toISOString(),
+        sentSteps: Array.from(new Set([...(lead.sentSteps || []), templateId]))
       });
       setLogs(prev => [...prev, `✅ ${template.name} envoyé à ${lead.name}`]);
       
@@ -300,6 +301,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
         emailSentDate: new Date().toISOString(),
         stage: 'email_sent',
         lastContact: new Date().toISOString(),
+        sentSteps: Array.from(new Set([...(lead.sentSteps || []), selectedTemplate]))
       });
       setLogs(prev => [...prev, `✅ Email envoyé à ${lead.name}`]);
     } else {
@@ -334,6 +336,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
           emailSentDate: new Date().toISOString(),
           stage: 'email_sent',
           lastContact: new Date().toISOString(),
+          sentSteps: Array.from(new Set([...(lead.sentSteps || []), selectedTemplate]))
         });
         setLogs(prev => [...prev, `✅ ${lead.name} — envoyé`]);
       } else {
@@ -426,37 +429,43 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 12, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 10, marginBottom: 24 }}>
         {[
           { label: 'Prêts à Envoyer', value: ready.length, color: C.amber },
           { label: 'Emails Envoyés', value: sent.length, color: C.green },
           { label: 'Ouverts', value: leads.filter(l => l.emailOpened).length, color: C.blue },
-          { label: 'Non Ouverts', value: leads.filter(l => l.emailSent && !l.emailOpened).length, color: '#6c757d' },
           { label: 'Lien Site Cliqués', value: leads.filter(l => l.siteClicked).length, color: '#17a2b8' },
-          { label: 'Lien Paiement Cliqués', value: leads.filter(l => l.paymentClicked).length, color: '#28a745' },
+          { label: 'Acompte $46 Cliqué', value: leads.filter(l => l.paymentDepositClicked).length, color: '#28a745' },
+          { label: 'Solde $100 Cliqué', value: leads.filter(l => l.paymentFinalClicked).length, color: '#2ecc71' },
           { label: 'Devis Cliqués', value: leads.filter(l => l.devisClicked).length, color: '#ffc107' },
-          { label: 'Facture Cliqués', value: leads.filter(l => l.invoiceClicked).length, color: '#dc3545' },
+          { label: 'Facture Acompte', value: leads.filter(l => l.invoiceDepositClicked).length, color: '#dc3545' },
+          { label: 'Facture Solde', value: leads.filter(l => l.invoiceFinalClicked).length, color: '#e74c3c' },
         ].map((s, i) => (
           <div key={i} style={{
-            background: C.surface, borderRadius: 8, padding: '16px 12px',
+            background: C.surface, borderRadius: 8, padding: '12px 10px',
             borderLeft: `3px solid ${s.color}`, boxShadow: '0 1px 3px rgba(28,27,24,0.06)',
           }}>
-            <div style={{ fontSize: 10, color: C.tx3, fontWeight: 500, marginBottom: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "'Fraunces', serif", color: C.tx }}>{s.value}</div>
+            <div style={{ fontSize: 9, color: C.tx3, fontWeight: 700, marginBottom: 4, textTransform: 'uppercase' }}>{s.label}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'Fraunces', serif", color: C.tx }}>{s.value}</div>
           </div>
         ))}
       </div>
 
-      {/* Vue "File d'attente" (NOUVEAU) */}
+      {/* Vue "File d'attente" (AMÉLIORÉE AVEC SCROLL) */}
       {scheduled.length > 0 && (
         <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
              <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
                ⏳ File d'attente ({scheduled.length})
              </h3>
-             <span style={{ fontSize: 12, color: C.tx3 }}>Auto-refresh Realtime ✅</span>
+             <span style={{ fontSize: 11, color: C.tx3, background: C.bg, padding: '2px 8px', borderRadius: 4 }}>
+               Mise à jour en direct ⚡
+             </span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ 
+            display: 'flex', flexDirection: 'column', gap: 8, 
+            maxHeight: '320px', overflowY: 'auto', paddingRight: '8px'
+          }}>
             {scheduled.map((job: ScheduledEmail) => {
               const lead = leads.find(l => l.id === job.lead_id);
               return (
@@ -499,43 +508,6 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
         </div>
       )}
 
-      {/* Workflow Mode */}
-      <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>🚀 Mode Workflow</h3>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          <button onClick={() => setWorkflowMode('manual')} style={{
-            padding: '8px 16px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
-            border: `1px solid ${workflowMode === 'manual' ? C.accent : C.border}`,
-            background: workflowMode === 'manual' ? C.accent2 : C.surface,
-            color: workflowMode === 'manual' ? C.accent : C.tx2, fontWeight: 500,
-          }}>📧 Manuel</button>
-          <button onClick={() => setWorkflowMode('automated')} style={{
-            padding: '8px 16px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
-            border: `1px solid ${workflowMode === 'automated' ? C.accent : C.border}`,
-            background: workflowMode === 'automated' ? C.accent2 : C.surface,
-            color: workflowMode === 'automated' ? C.accent : C.tx2, fontWeight: 500,
-          }}>🤖 Automatisé</button>
-        </div>
-        
-        {workflowMode === 'automated' && (
-          <div style={{ background: C.bg, padding: '14px', borderRadius: 6, fontSize: 13 }}>
-            <h4 style={{ fontWeight: 600, marginBottom: 8 }}>📋 Templates Workflow</h4>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-              {salesTemplates.map(t => (
-                <button key={t.id} onClick={() => setSelectedWorkflowTemplate(t.id)} style={{
-                  padding: '6px 12px', borderRadius: 4, fontSize: 12, cursor: 'pointer',
-                  border: `1px solid ${selectedWorkflowTemplate === t.id ? C.accent : C.border}`,
-                  background: selectedWorkflowTemplate === t.id ? C.accent2 : C.surface,
-                  color: selectedWorkflowTemplate === t.id ? C.accent : C.tx2,
-                }}>{t.name.split(' - ')[1]}</button>
-              ))}
-            </div>
-            <div style={{ fontSize: 12, color: C.tx2, lineHeight: 1.4 }}>
-              <strong>Workflow:</strong> Email 1 → (3j) Rappel 1 → Email 2 → (5j) Rappel 2 → Email 3 → Email 4 → (après Email 4) Rappel 3 → Email 5 → Email 6
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Templates */}
       <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
@@ -773,10 +745,39 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 padding: '10px 12px', borderBottom: `1px solid ${C.border}`,
               }}>
-                <div>
-                  <div style={{ fontWeight: 500, fontSize: 13 }}>{lead.name}</div>
-                  <div style={{ fontSize: 11, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: C.tx }}>{lead.name}</div>
+                  <div style={{ fontSize: 11, color: C.tx3, marginBottom: 8 }}>
                     {lead.emailSentDate ? new Date(lead.emailSentDate).toLocaleDateString('fr-FR') : ''} — {lead.email}
+                  </div>
+                  
+                  {/* Step Checklist (NOUVEAU) */}
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {[
+                      { id: 'step-1-presentation', label: 'Présentation' },
+                      { id: 'step-2-devis', label: 'Devis' },
+                      { id: 'reminder1_after_email1', label: 'R1' },
+                      { id: 'reminder2_after_devis', label: 'R2' },
+                      { id: 'step-3-depot', label: 'Acompte' },
+                      { id: 'reminder3_final_payment', label: 'R3' },
+                      { id: 'step-5-confirmation', label: 'Solde' },
+                      { id: 'step-6-livraison', label: 'Livré' }
+                    ].map(step => {
+                      const isSent = (lead.sentSteps || []).includes(step.id);
+                      const isPending = scheduled.some(s => s.lead_id === lead.id && s.template_id === step.id);
+                      
+                      return (
+                        <div key={step.id} style={{ 
+                          fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                          background: isSent ? C.green + '15' : isPending ? C.amber + '15' : C.bg,
+                          color: isSent ? C.green : isPending ? C.amber : C.tx3,
+                          border: `1px solid ${isSent ? C.green + '40' : C.border}`,
+                          display: 'flex', alignItems: 'center', gap: 3
+                        }}>
+                          {isSent ? '✅' : isPending ? '⏳' : '⚪'} {step.label}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>

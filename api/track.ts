@@ -56,13 +56,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       targetUrl = `mailto:${agentEmail}?subject=${subject}&body=${body}`;
     } 
     else if (trackType === 'payment_clicked') {
-      updateData = { payment_clicked: true };
       const isFinal = req.query.final === 'true';
+      updateData = isFinal ? { payment_final_clicked: true } : { payment_deposit_clicked: true };
       
       // GÉNÉRATION AUTO DE LA FACTURE
       try {
-        const invUrl = await generateAndSaveInvoice(lead, '146', isFinal ? 'final' : 'deposit');
-        if (lead) lead.invoice_url = invUrl; // Mettre à jour l'objet local pour la suite du script
+        const invUrl = await generateAndSaveInvoice(lead, isFinal ? '100' : '46', isFinal ? 'final' : 'deposit');
+        if (lead) lead.invoice_url = invUrl;
       } catch (err) {
         console.error('Erreur génération Facture:', err);
       }
@@ -77,7 +77,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!targetUrl || targetUrl === '#') targetUrl = lead?.devis_url || '#';
     } 
     else if (trackType === 'invoice_clicked') {
-      updateData = { invoice_clicked: true };
+      const isFinal = req.query.final === 'true';
+      updateData = isFinal ? { invoice_final_clicked: true } : { invoice_deposit_clicked: true };
       if (!targetUrl || targetUrl === '#') targetUrl = lead?.invoice_url || '#';
     } 
     else if (trackType === 'email_opened') {

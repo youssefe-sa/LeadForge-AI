@@ -55,9 +55,11 @@ export interface Lead {
   emailOpened: boolean;
   emailClicked: boolean;
   siteClicked: boolean;
-  paymentClicked: boolean;
+  paymentDepositClicked: boolean;
+  paymentFinalClicked: boolean;
   devisClicked: boolean;
-  invoiceClicked: boolean;
+  invoiceDepositClicked: boolean;
+  invoiceFinalClicked: boolean;
   lastContact: string;
   followUps: number;
   revenue: number;
@@ -81,6 +83,7 @@ export interface Lead {
   admin_password?: string;
   documentation_url?: string;
   contactName?: string; // Ajouté pour personnalisation Outreach
+  sentSteps: string[];
 }
 
 export type LlmProvider = 'groq' | 'gemini' | 'nvidia' | 'openrouter';
@@ -228,6 +231,10 @@ function mapSupabaseLeadToLead(supabaseLead: Database['public']['Tables']['leads
     emailSentDate: supabaseLead.email_sent_date || '',
     emailOpened: supabaseLead.email_opened || false,
     emailClicked: supabaseLead.email_clicked || false,
+    paymentDepositClicked: supabaseLead.payment_deposit_clicked || false,
+    paymentFinalClicked: supabaseLead.payment_final_clicked || false,
+    invoiceDepositClicked: supabaseLead.invoice_deposit_clicked || false,
+    invoiceFinalClicked: supabaseLead.invoice_final_clicked || false,
     lastContact: supabaseLead.last_contact || '',
     followUps: supabaseLead.follow_ups || 0,
     revenue: supabaseLead.revenue || 0,
@@ -244,6 +251,7 @@ function mapSupabaseLeadToLead(supabaseLead: Database['public']['Tables']['leads
     campaign: supabaseLead.campaign || '',
     campaignDate: supabaseLead.campaign_date || '',
     source: supabaseLead.source || '',
+    sentSteps: supabaseLead.sent_steps || [],
   };
 }
 
@@ -264,6 +272,10 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
     email_sent: lead.emailSent,
     email_opened: lead.emailOpened,
     email_clicked: lead.emailClicked,
+    payment_deposit_clicked: lead.paymentDepositClicked,
+    payment_final_clicked: lead.paymentFinalClicked,
+    invoice_deposit_clicked: lead.invoiceDepositClicked,
+    invoice_final_clicked: lead.invoiceFinalClicked,
     revenue: lead.revenue || 0,
   };
 
@@ -291,6 +303,7 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
   if (lead.serperType) data.serper_type = lead.serperType;
   if (lead.serperHours) data.serper_hours = lead.serperHours;
   if (lead.serperSnippets && lead.serperSnippets.length > 0) data.serper_snippets = lead.serperSnippets;
+  if (lead.sentSteps && lead.sentSteps.length > 0) data.sent_steps = lead.sentSteps;
   if (lead.description) data.description = lead.description;
   if (lead.logo) data.logo = lead.logo;
   if (lead.images && lead.images.length > 0) data.images = lead.images;

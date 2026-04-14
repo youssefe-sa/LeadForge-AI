@@ -109,6 +109,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           text: body.replace(/<[^>]*>/g, '') // Version texte simplifiée
         });
 
+        // MISE À JOUR DE L'HISTORIQUE DES ÉTAPES (sent_steps)
+        const currentSteps = lead.sent_steps || [];
+        if (!currentSteps.includes(job.template_id)) {
+          await supabase.from('leads').update({
+            sent_steps: [...currentSteps, job.template_id],
+            email_sent: true,
+            email_sent_date: new Date().toISOString(),
+            last_contact: new Date().toISOString()
+          }).eq('id', lead.id);
+        }
+
         await supabase.from('scheduled_emails').update({ 
           status: 'sent', 
           updated_at: new Date().toISOString() 
