@@ -125,7 +125,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       '{{finalPaymentLink}}': `${trackBase}&type=payment_clicked&final=true`,
       '{{devisLink}}': `${trackBase}&type=devis_clicked&url=${encodeURIComponent(lead.devis_url || '#')}`,
       '{{invoiceLink}}': `${trackBase}&type=invoice_clicked`,
-      '{{finalInvoiceLink}}': `${trackBase}&type=invoice_clicked&final=true`,
+      '{{finalInvoiceLink}}': `${trackBase}&type=invoice_clicked&final=true&url=${encodeURIComponent(lead.invoice_url || '#')}`,
       
       // Infos de Livraison (Email 6)
       '{{adminLink}}': lead.admin_url || `${lead.siteUrl || lead.website || ''}/admin`,
