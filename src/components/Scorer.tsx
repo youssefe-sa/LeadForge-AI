@@ -660,8 +660,8 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     items.push({ label: 'Complétude des données', points: completeness, max: 30, detail: fields.length > 0 ? fields.join(', ') : 'Aucune donnée' });
 
     let websiteScore = 0;
-    if (!lead.website || lead.tags.includes('Sans site')) websiteScore = 25;
-    else if (lead.tags.includes('Site obsolète')) websiteScore = 15;
+    if (!lead.website || (lead.tags || []).includes('Sans site')) websiteScore = 25;
+    else if ((lead.tags || []).includes('Site obsolète')) websiteScore = 15;
     items.push({ label: 'Potentiel web', points: websiteScore, max: 25, detail: !lead.website ? 'Pas de site → fort potentiel' : 'A déjà un site' });
 
     let google = 0;
@@ -677,7 +677,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     else if (medVal.some(s => sl.includes(s))) sectorScore = 10;
     items.push({ label: 'Valeur secteur', points: sectorScore, max: 15, detail: lead.sector || 'Non détecté' });
     items.push({ label: 'Visuels disponibles', points: lead.images.length > 0 ? 5 : 0, max: 5, detail: lead.images.length > 0 ? `${lead.images.length} image(s)` : 'Aucune' });
-    items.push({ label: 'Tag prioritaire', points: lead.tags.includes('Prioritaire') ? 5 : 0, max: 5, detail: lead.tags.includes('Prioritaire') ? 'Marqué prioritaire' : 'Non prioritaire' });
+    items.push({ label: 'Tag prioritaire', points: (lead.tags || []).includes('Prioritaire') ? 5 : 0, max: 5, detail: (lead.tags || []).includes('Prioritaire') ? 'Marqué prioritaire' : 'Non prioritaire' });
     return items;
   };
 

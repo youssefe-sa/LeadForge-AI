@@ -97,8 +97,8 @@ export default function Campaigns() {
   };
   
   const websiteStats = {
-    with: leads.filter(l => l.website && !l.tags.includes('Sans site')).length,
-    without: leads.filter(l => !l.website || l.tags.includes('Sans site')).length,
+    with: leads.filter(l => l.website && !(l.tags || []).includes('Sans site')).length,
+    without: leads.filter(l => !l.website || (l.tags || []).includes('Sans site')).length,
   };
 
   // Fonction pour calculer les statistiques d'une campagne spécifique (avec clé de rafraîchissement)
@@ -111,15 +111,17 @@ export default function Campaigns() {
     };
     
     const websiteStats = {
-      with: campaignLeads.filter(l => l.website && !l.tags.includes('Sans site')).length,
-      without: campaignLeads.filter(l => !l.website || l.tags.includes('Sans site')).length,
+      with: campaignLeads.filter(l => l.website && !(l.tags || []).includes('Sans site')).length,
+      without: campaignLeads.filter(l => !l.website || (l.tags || []).includes('Sans site')).length,
     };
     
     // Extraire les mots-clés uniques des tags et secteurs
     const keywords = new Set<string>();
     campaignLeads.forEach(lead => {
       if (lead.sector) keywords.add(lead.sector);
-      lead.tags.forEach(tag => keywords.add(tag));
+      if (Array.isArray(lead.tags)) {
+        lead.tags.forEach(tag => keywords.add(tag));
+      }
     });
     
     return {
