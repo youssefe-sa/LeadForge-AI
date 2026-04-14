@@ -19,6 +19,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { id, type, url, redirect } = req.query;
   let targetUrl = (url || redirect) as string;
 
+  // FILTRE ANTI-ROBOTS : On ignore les pré-chargements de Google, Outlook, etc.
+  const userAgent = req.headers['user-agent'] || '';
+  const isBot = /bot|google|proxy|scanner|prewarm|monitor|preview/i.test(userAgent) || userAgent.includes('GoogleImageProxy');
+
   if (!id || !type) {
     return res.status(400).json({ error: 'Missing ID or type' });
   }
@@ -26,6 +30,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const leadId = id as string;
     const trackType = type as string;
+
+    // Protection : Si c'est un robot qui ouvre le mail, on renvoie l'image sans tracker
+    if (trackType === 'email_opened' && isBot) {
+      const pixel = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
+      res.setHeader('Content-Type', 'image/gif');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      return res.send(pixel);
+    }
 
     const { data: lead, error: leadError } = await supabase.from('leads').select('*').eq('id', leadId).single();
     if (leadError || !lead) {
