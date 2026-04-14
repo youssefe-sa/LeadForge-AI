@@ -99,20 +99,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Planification automatique retirée pour le paiement (Validation manuelle requise désormais)
 
       if (nextTemplateId) {
-        // 1. Annuler les emails en attente pour éviter les doublons
-        await supabase.from('scheduled_emails').delete().eq('lead_id', leadId).eq('status', 'pending');
-        
-        // 2. Planifier l'étape suivante (dans 1 minute pour le test, puis 30 min en prod)
-        const sendDate = new Date();
-        sendDate.setMinutes(sendDate.getMinutes() + 2); // Délai de 2 minutes pour laisser le temps au client de voir la page
-        
-        await supabase.from('scheduled_emails').insert([{
-          lead_id: leadId,
-          template_id: nextTemplateId,
-          scheduled_for: sendDate.toISOString(),
-          status: 'pending'
-        }]);
-        console.log(`[Automation] Prochain email planifié : ${nextTemplateId} pour le lead ${leadId}`);
+        // SÉCURITÉ : On vérifie si cet email n'a pas déjà été traité pour ce lead
+        const { data: existing } = await supabase
+          .from('scheduled_emails')
+          .select('id')
+          .eq('lead_id', leadId)
+          .eq('template_id', nextTemplateId)
+          .in('status', ['pending', 'sent', 'sending'])
+          .maybeSingle();
+
+        if (!existing) {
+          // Planifier l'étape suivante (dans 2 minutes)
+          const sendDate = new Date();
+          sendDate.setMinutes(sendDate.getMinutes() + 2);
+          
+          await supabase.from('scheduled_emails').insert([{
+            lead_id: leadId,
+            template_id: nextTemplateId,
+            scheduled_for: sendDate.toISOString(),
+            status: 'pending'
+          }]);
+          console.log(`[Automation] Premier envoi planifié : ${nextTemplateId} pour le lead ${leadId}`);
+        } else {
+          console.log(`[Automation] Email ${nextTemplateId} déjà envoyé ou en cours pour ${leadId}. Ignoré.`);
+        }
       }
     }
 
