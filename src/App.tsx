@@ -13,6 +13,7 @@ import { NotificationContainer, ApiStatusIndicator } from './components/Notifica
 import Login from './components/Login';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
+import { LogProvider } from './lib/LogContext';
 
 type View = 'dashboard' | 'scorer' | 'website' | 'outreach' | 'pipeline' | 'campaigns' | 'settings';
 
@@ -61,13 +62,14 @@ export default function App() {
   ].filter(Boolean).length;
 
   return (
-    <ErrorBoundary>
-      <div style={{ display: 'flex', minHeight: '100vh', background: '#F7F6F2' }}>
-        {/* Système de notifications API */}
-        <NotificationContainer />
-        <ApiStatusIndicator />
-        
-        <Sidebar active={view} onNavigate={(id) => setView(id as View)} leadCount={leads.length} apiCount={activeApis} />
+    <LogProvider>
+      <ErrorBoundary>
+        <div style={{ display: 'flex', minHeight: '100vh', background: '#F7F6F2' }}>
+          {/* Système de notifications API */}
+          <NotificationContainer />
+          <ApiStatusIndicator />
+          
+          <Sidebar active={view} onNavigate={(id) => setView(id as View)} leadCount={leads.length} apiCount={activeApis} />
 
         <main style={{
           marginLeft: 240, flex: 1, padding: '28px 32px',
@@ -104,5 +106,6 @@ export default function App() {
         </main>
       </div>
     </ErrorBoundary>
+    </LogProvider>
   );
 }

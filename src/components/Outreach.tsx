@@ -1,7 +1,23 @@
-import { useState } from 'react';
-import { Lead, ApiConfig, EmailTemplate, callLLM, useScheduledEmails, ScheduledEmail } from '../lib/supabase-store';
+import { useState, useMemo, useEffect } from 'react';
+import {
+  Lead, ApiConfig, callLLM, useScheduledEmails, ScheduledEmail,
+} from '../lib/supabase-store';
+import { testAllApis, formatTestResults } from '../lib/api-test';
+import { apiErrorState } from '../lib/api-error-state';
+import { useProcessingState, processingState } from '../lib/processing-state';
+import { useLogger } from '../lib/LogContext';
+import { salesTemplates, reminderTemplates } from '../templates/outreach-templates-final';
 import { supabase } from '../lib/supabase';
-import { salesTemplates, reminderTemplates, getTemplateById } from '../templates/outreach-templates-final';
+
+interface EmailTemplate {
+  id: string;
+  name: string;
+  category: 'sale' | 'reminder';
+  subject: string;
+  htmlContent: string;
+  textContent?: string;
+  variables?: string[];
+}
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -37,6 +53,7 @@ async function sendEmailViaApi(payload: {
 }
 
 export default function Outreach({ leads, updateLead, apiConfig, templates }: Props) {
+  const { addLog } = useLogger();
   const [sending, setSending] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0, name: '' });
   const [emailDelay, setEmailDelay] = useState(8000);
@@ -108,6 +125,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       '{{finalPaymentLink}}': `${trackBase}&type=payment_clicked&final=true`,
       '{{devisLink}}': `${trackBase}&type=devis_clicked&url=${encodeURIComponent(lead.devis_url || '#')}`,
       '{{invoiceLink}}': `${trackBase}&type=invoice_clicked`,
+      '{{finalInvoiceLink}}': `${trackBase}&type=invoice_clicked&final=true`,
       
       // Infos de Livraison (Email 6)
       '{{adminLink}}': lead.admin_url || `${lead.siteUrl || lead.website || ''}/admin`,
@@ -312,6 +330,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
   const sendBatch = async () => {
     if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
     if (ready.length === 0) return;
+    
+    addLog(`Démarrage de l'envoi batch de ${ready.length} emails`, '#B45309', 'Outreach');
 
     setSending(true);
     setProgress({ current: 0, total: ready.length, name: '' });
@@ -347,6 +367,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     }
 
     setLogs(prev => [...prev, `🏁 Envoi terminé.`]);
+    addLog(`Envoi batch terminé: ${ready.length} emails envoyés`, '#B45309', 'Outreach');
     setSending(false);
   };
 
@@ -766,7 +787,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                       { id: 'step-6-livraison', label: 'Livré' }
                     ].map(step => {
                       const isSent = (lead.sentSteps || []).includes(step.id);
-                      const isPending = scheduled.some(s => s.lead_id === lead.id && s.template_id === step.id);
+                      const isPending = scheduled.some((s: ScheduledEmail) => s.lead_id === lead.id && s.template_id === step.id);
                       
                       return (
                         <div key={step.id} style={{ 

@@ -4,6 +4,7 @@ import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { fetchSectorImages } from '../lib/imageAgent';
 import { supabase } from '../lib/supabase';
+import { useLogger } from '../lib/LogContext';
 
 const getCssVar = (name: string, fallback: string) => {
   const val = getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim();
@@ -166,6 +167,7 @@ function getCuratedFallback(sector: string, index: number): string {
 }
 
 export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: Props) {
+  const { addLog } = useLogger();
   // Utiliser l'état local de processing pour WebsiteGen
   const { isProcessing, isPaused, progress, startProcessing, updateProgress, stopProcessing, pauseProcessing, resumeProcessing } = useWebsiteGenState();
   
@@ -758,6 +760,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     }
     
     console.log('✅ Starting batch generation...');
+    addLog(`Démarrage de la génération batch de sites pour ${enriched.length} leads`, '#1A4FA0', 'WebsiteGen');
     startProcessing('website-generation', 'websitegen-batch');
     
     let processedCount = 0;
@@ -857,6 +860,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       console.error('💥 Error in generateBatch loop:', error);
     } finally {
       console.log(`🏁 Batch generation completed. Total processed: ${processedCount}`);
+      addLog(`Génération batch terminée: ${processedCount} sites générés`, '#1A4FA0', 'WebsiteGen');
       stopProcessing();
     }
   };
@@ -909,6 +913,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
   // ── CHANGER PALETTE DE COULEURS ──
   const changePalette = async () => {
     if (!previewLead) return;
+    addLog(`Changement de palette pour: ${previewLead.name}`, '#1A4FA0', 'WebsiteGen');
     startProcessing('palette-change', 'websitegen-palette');
     updateProgress({ current: 1, total: 1, name: previewLead.name, step: '🎨 Changement de palette...' });
     
@@ -1119,9 +1124,11 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
                     background: C.surface, fontSize: 12, cursor: 'pointer', color: C.blue, fontWeight: 500,
                   }}>👁️ Voir</button>
                   <button onClick={() => {
+                    addLog(`Régénération individuelle du site pour: ${l.name}`, '#1A4FA0', 'WebsiteGen');
                     startProcessing('single-regeneration', 'websitegen-single');
                     updateProgress({ current: 1, total: 1, name: l.name, step: '🔄 Régénération...' });
                     generateSite(l).then(() => {
+                      addLog(`Régénération terminée pour: ${l.name}`, '#1A4FA0', 'WebsiteGen');
                       stopProcessing();
                       // Forcer le rafraîchissement si c'est le lead en preview
                       if (previewId === l.id) {

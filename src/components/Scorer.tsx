@@ -10,6 +10,7 @@ import { testAllApis, formatTestResults } from '../lib/api-test';
 import { eventBus, LeadForgeEvents } from '../lib/events';
 import { apiErrorState } from '../lib/api-error-state';
 import { useProcessingState, processingState } from '../lib/processing-state';
+import { useLogger } from '../lib/LogContext';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -38,13 +39,14 @@ interface Props {
 }
 
 export default function Scorer({ leads, updateLead, apiConfig }: Props) {
+  const { addLog } = useLogger();
   // Utiliser l'état global de processing
   const { isProcessing, isPaused, progress, startProcessing, updateProgress, stopProcessing, pauseProcessing, resumeProcessing } = useProcessingState();
   
   // État local pour les logs et filtres
   const [enrichmentDelay, setEnrichmentDelay] = useState(2000);
   const [logs, setLogs] = useState<string[]>([]);
-  const addLog = (msg: string) => setLogs(prev => [`[${new Date().toLocaleTimeString('fr-FR')}] ${msg}`, ...prev.slice(0, 199)]);
+  const addLocalLog = (msg: string) => setLogs(prev => [`[${new Date().toLocaleTimeString('fr-FR')}] ${msg}`, ...prev.slice(0, 199)]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchFilter, setSearchFilter] = useState('');
   const [filterView, setFilterView] = useState<'all' | 'unscored' | 'very_hot' | 'hot' | 'warm' | 'cold'>('all');
@@ -118,10 +120,10 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
           serperUpdates.website && `🌐 ${serperUpdates.website}`,
           serperUpdates.googleRating && `⭐ ${serperUpdates.googleRating}`,
         ].filter(Boolean);
-        if (found.length) addLog(`✅ Places: ${found.join(' | ')}`);
-        else addLog('ℹ️ Places: aucune donnée supplémentaire');
+        if (found.length) addLocalLog(`✅ Places: ${found.join(' | ')}`);
+        else addLocalLog('ℹ️ Places: aucune donnée supplémentaire');
       } catch (error) {
-        addLog(`⚠️ Places: échec (${error instanceof Error ? error.message : 'erreur'})`);
+        addLocalLog(`⚠️ Places: échec (${error instanceof Error ? error.message : 'erreur'})`);
       }
     }
 
@@ -133,24 +135,24 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
         const siteContact = await scrapeWebsiteForContact(apiConfig.serperKey, currentWebsite, lead.name);
         if (siteContact.email && !updates.email && !lead.email) {
           updates.email = siteContact.email;
-          addLog(`✅ Email trouvé via site web : ${siteContact.email}`);
+          addLocalLog(`✅ Email trouvé via site web : ${siteContact.email}`);
         }
         if (siteContact.phone && !updates.phone && !lead.phone) {
           updates.phone = siteContact.phone;
-          addLog(`✅ Téléphone trouvé via site web : ${siteContact.phone}`);
+          addLocalLog(`✅ Téléphone trouvé via site web : ${siteContact.phone}`);
         }
         if (siteContact.services.length > 0) {
           const existingTags = updates.tags || lead.tags || [];
           updates.tags = [...new Set([...existingTags, ...siteContact.services])].slice(0, 10);
           llmContext.websiteContent = siteContact.services.join(' | ');
-          addLog(`✅ Services extraits : ${siteContact.services.slice(0, 3).join(', ')}`);
+          addLocalLog(`✅ Services extraits : ${siteContact.services.slice(0, 3).join(', ')}`);
         }
-        if (!siteContact.email && !siteContact.phone) addLog('ℹ️ Site web : pas de contact trouvé dans les pages indexées');
+        if (!siteContact.email && !siteContact.phone) addLocalLog('ℹ️ Site web : pas de contact trouvé dans les pages indexées');
       } catch (error) {
-        addLog(`⚠️ Site web : échec scraping (${error instanceof Error ? error.message : 'erreur'})`);
+        addLocalLog(`⚠️ Site web : échec scraping (${error instanceof Error ? error.message : 'erreur'})`);
       }
     } else if (!currentWebsite) {
-      addLog('ℹ️ Pas de site web — scraping ignoré');
+      addLocalLog('ℹ️ Pas de site web — scraping ignoré');
     }
 
     // ── STEP 3 — Deep search contact (email + téléphone) si encore manquants ──
@@ -163,21 +165,21 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
         const contact = await deepSearchContact(apiConfig.serperKey, merged, apiConfig);
         if (contact.email && !updates.email) {
           updates.email = contact.email;
-          addLog(`✅ Email trouvé via deep search : ${contact.email}`);
+          addLocalLog(`✅ Email trouvé via deep search : ${contact.email}`);
         } else if (!contact.email && needEmail) {
-          addLog('⚠️ Email : non trouvé via deep search');
+          addLocalLog('⚠️ Email : non trouvé via deep search');
         }
         if (contact.phone && !updates.phone) {
           updates.phone = contact.phone;
-          addLog(`✅ Téléphone trouvé via deep search : ${contact.phone}`);
+          addLocalLog(`✅ Téléphone trouvé via deep search : ${contact.phone}`);
         } else if (!contact.phone && needPhone) {
-          addLog('⚠️ Téléphone : non trouvé via deep search');
+          addLocalLog('⚠️ Téléphone : non trouvé via deep search');
         }
       } catch (error) {
-        addLog(`⚠️ Deep search : échec (${error instanceof Error ? error.message : 'erreur'})`);
+        addLocalLog(`⚠️ Deep search : échec (${error instanceof Error ? error.message : 'erreur'})`);
       }
     } else if (!needEmail && !needPhone) {
-      addLog('✅ Email & téléphone déjà renseignés — deep search ignoré');
+      addLocalLog('✅ Email & téléphone déjà renseignés — deep search ignoré');
     }
 
     // ── STEP 4 — Avis Google ──
@@ -202,9 +204,9 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       if (reviews.length > 0) {
         updates.googleReviewsData = reviews.slice(0, 6);
         llmContext.reviews = reviews.map(r => `"${r.text}" — ${r.author}`);
-        addLog(`✅ Avis : ${reviews.length} avis clients extraits`);
+        addLocalLog(`✅ Avis : ${reviews.length} avis clients extraits`);
       } else {
-        addLog('ℹ️ Avis : aucun avis trouvé');
+        addLocalLog('ℹ️ Avis : aucun avis trouvé');
       }
     }
 
@@ -213,8 +215,8 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       setStep('🖼️ Recherche logo & images...');
       const merged = { ...lead, ...updates };
       const imgResults = await searchLeadImages(apiConfig.serperKey, merged);
-      if (imgResults.logo) { updates.logo = imgResults.logo; addLog('✅ Logo trouvé'); }
-      if (imgResults.websiteImages.length > 0) { updates.websiteImages = imgResults.websiteImages; addLog(`✅ ${imgResults.websiteImages.length} image(s) trouvée(s)`); }
+      if (imgResults.logo) { updates.logo = imgResults.logo; addLocalLog('✅ Logo trouvé'); }
+      if (imgResults.websiteImages.length > 0) { updates.websiteImages = imgResults.websiteImages; addLocalLog(`✅ ${imgResults.websiteImages.length} image(s) trouvée(s)`); }
     }
 
     // ── STEP 6 — Stock images fallback ──
@@ -252,10 +254,10 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
         if (llmUpdates.hours && !updates.hours && !lead.hours) { updates.hours = llmUpdates.hours; enriched.push('horaires'); }
         if (llmUpdates.city && !updates.city && !lead.city) { updates.city = llmUpdates.city; enriched.push('ville'); }
 
-        if (enriched.length) addLog(`🧠 LLM : ${enriched.join(', ')} enrichi(s)`);
-        else addLog('ℹ️ LLM : tous les champs étaient déjà renseignés');
+        if (enriched.length) addLocalLog(`🧠 LLM : ${enriched.join(', ')} enrichi(s)`);
+        else addLocalLog('ℹ️ LLM : tous les champs étaient déjà renseignés');
       } catch (error) {
-        addLog(`⚠️ LLM : échec (${error instanceof Error ? error.message : 'erreur'})`);
+        addLocalLog(`⚠️ LLM : échec (${error instanceof Error ? error.message : 'erreur'})`);
       }
     }
 
@@ -316,6 +318,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     }
 
     console.log('✅ Tests API réussis - Lancement des agents...');
+    addLog(`Démarrage de l'enrichissement batch de ${toScore.length} leads`, '#1A7A4A', 'Scorer');
     startProcessing('batch-enrichment', 'scorer-batch');
     updateProgress({ current: 0, total: toScore.length, name: '', step: '' });
     setLogs([`🚀 Début de l'enrichissement de ${toScore.length} leads...`]);
@@ -379,6 +382,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     
     // Arrêter l'agent
     apiErrorState.stopAgent('scorer-batch');
+    addLog(`Enrichissement batch terminé: ${toScore.length} leads traités`, '#1A7A4A', 'Scorer');
     setLogs(prev => [...prev, `🏁 Enrichissement terminé ! ${toScore.length} leads traités.`]);
     stopProcessing();
   };
@@ -420,6 +424,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     }
 
     console.log('✅ Tests API réussis - Lancement des agents filtrés...');
+    addLog(`Démarrage de l'enrichissement filtré de ${toScore.length} leads`, '#1A7A4A', 'Scorer');
     startProcessing('filtered-enrichment', 'scorer-filtered');
     updateProgress({ current: 0, total: toScore.length, name: '', step: '' });
     setLogs([`🚀 Début de l'enrichissement de ${toScore.length} leads filtrés...`]);
@@ -483,6 +488,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     
     // Arrêter l'agent
     apiErrorState.stopAgent('scorer-filtered');
+    addLog(`Enrichissement filtré terminé: ${toScore.length} leads traités`, '#1A7A4A', 'Scorer');
     setLogs(prev => [...prev, `🏁 Enrichissement terminé ! ${toScore.length} leads filtrés traités.`]);
     stopProcessing();
   };
@@ -514,6 +520,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     }
 
     console.log('✅ Tests API réussis - Lancement de l\'agent individuel...');
+    addLog(`Enrichissement individuel démarré pour: ${lead.name || lead.email}`, '#1A7A4A', 'Scorer');
     startProcessing('single-enrichment', 'scorer-single');
     const setStep = (step: string) => updateProgress({ current: 1, total: 1, name: lead.name, step });
     setStep('Démarrage...');
@@ -527,6 +534,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     
     const t = tempMap[updates.temperature || ''];
     const reviewsCount = (updates.googleReviewsData || []).length;
+    addLog(`Enrichissement individuel terminé: ${lead.name} - Score ${updates.score}/100 - ${t?.label}`, '#1A7A4A', 'Scorer');
     setLogs(prev => [...prev, `✅ ${lead.name}: Score ${updates.score}/100 — ${t?.label} · ${reviewsCount} avis${updates.logo ? ' · logo' : ''}${updates.email && !lead.email ? ' · email trouvé' : ''}`]);
     stopProcessing();
   };

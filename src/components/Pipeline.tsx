@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Lead, exportLeadsCSV } from '../lib/supabase-store';
+import { useLogger } from '../lib/LogContext';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export default function Pipeline({ leads, updateLead }: Props) {
+  const { addLog } = useLogger();
   const [view, setView] = useState<'kanban' | 'analytics'>('analytics');
   const [dragId, setDragId] = useState<string | null>(null);
 
@@ -38,13 +40,13 @@ export default function Pipeline({ leads, updateLead }: Props) {
 
   const handleDragStart = (id: string) => setDragId(id);
   const handleDrop = (stage: Lead['stage']) => {
-    if (dragId) {
-      const lead = leads.find(l => l.id === dragId);
-      const updates: Partial<Lead> = { stage };
-      if (stage === 'converted') updates.revenue = lead?.revenue || 146;
-      updateLead(dragId, updates);
-      setDragId(null);
-    }
+    if (!dragId) return;
+    const lead = leads.find(l => l.id === dragId);
+    const updates: Partial<Lead> = { stage };
+    if (stage === 'converted') updates.revenue = lead?.revenue || 146;
+    addLog(`Changement de stage: ${lead?.name} → ${stage}`, '#C0392B', 'Pipeline');
+    updateLead(dragId, updates);
+    setDragId(null);
   };
 
   // Funnel data
@@ -78,7 +80,7 @@ export default function Pipeline({ leads, updateLead }: Props) {
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <button onClick={() => setView('kanban')} style={{
+          <button onClick={() => { setView('kanban'); addLog('Vue Kanban activée', '#C0392B', 'Pipeline'); }} style={{
             padding: '8px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
             border: `2px solid ${view === 'kanban' ? C.accent : C.border}`,
             background: view === 'kanban' ? C.accent : C.surface,
@@ -87,7 +89,7 @@ export default function Pipeline({ leads, updateLead }: Props) {
             display: 'flex', alignItems: 'center', gap: 4,
             whiteSpace: 'nowrap'
           }}>🗂️ Kanban</button>
-          <button onClick={() => setView('analytics')} style={{
+          <button onClick={() => { setView('analytics'); addLog('Vue Analytics activée', '#C0392B', 'Pipeline'); }} style={{
             padding: '8px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
             border: `2px solid ${view === 'analytics' ? C.accent : C.border}`,
             background: view === 'analytics' ? C.accent : C.surface,
