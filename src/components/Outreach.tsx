@@ -438,15 +438,17 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
           { label: 'Acompte $46 Cliqué', value: leads.filter(l => l.paymentDepositClicked).length, color: '#28a745' },
           { label: 'Solde $100 Cliqué', value: leads.filter(l => l.paymentFinalClicked).length, color: '#2ecc71' },
           { label: 'Devis Cliqués', value: leads.filter(l => l.devisClicked).length, color: '#ffc107' },
-          { label: 'Facture Acompte', value: leads.filter(l => l.invoiceDepositClicked).length, color: '#dc3545' },
+          { label: 'Facture Acomp', value: leads.filter(l => l.invoiceDepositClicked).length, color: '#dc3545' },
           { label: 'Facture Solde', value: leads.filter(l => l.invoiceFinalClicked).length, color: '#e74c3c' },
+          { label: 'Total CA ($)', value: `${leads.filter(l => l.stage === 'converted').reduce((s, l) => s + (l.revenue || 0), 0)}$`, color: C.tx },
         ].map((s, i) => (
           <div key={i} style={{
-            background: C.surface, borderRadius: 8, padding: '12px 10px',
+            background: C.surface, borderRadius: 8, padding: '12px 8px',
             borderLeft: `3px solid ${s.color}`, boxShadow: '0 1px 3px rgba(28,27,24,0.06)',
+            display: 'flex', flexDirection: 'column', justifyContent: 'center'
           }}>
-            <div style={{ fontSize: 9, color: C.tx3, fontWeight: 700, marginBottom: 4, textTransform: 'uppercase' }}>{s.label}</div>
-            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'Fraunces', serif", color: C.tx }}>{s.value}</div>
+            <div style={{ fontSize: 8.5, color: C.tx3, fontWeight: 800, marginBottom: 4, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{s.label}</div>
+            <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'Fraunces', serif", color: C.tx }}>{s.value}</div>
           </div>
         ))}
       </div>
