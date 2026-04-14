@@ -94,7 +94,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // --- LOGIQUE D'AUTOMATISATION DU TUNNEL ---
       let nextTemplateId = '';
       
-      if (trackType === 'site_clicked' || trackType === 'start_clicked') {
+      // Seul le bouton "CONFIRMER ET ACTIVER" (start_clicked) déclenche désormais l'Email 2 automatiquement
+      if (trackType === 'start_clicked') {
         nextTemplateId = 'step-2-devis';
       } 
       // Planification automatique retirée pour le paiement (Validation manuelle requise désormais)
