@@ -53,10 +53,18 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const [paymentLinks, setPaymentLinks] = useState<Record<string, { link: string; amount: number; created: string }>>({});
   const [devisLinks, setDevisLinks] = useState<Record<string, string>>({});
   const [invoiceLinks, setInvoiceLinks] = useState<Record<string, string>>({});
+  const { scheduled, cancelEmail } = useScheduledEmails();
   const [showEmailPreview, setShowEmailPreview] = useState(false);
 
   const hasGmailSmtp = !!(apiConfig.gmailSmtpUser && apiConfig.gmailSmtpPassword);
   const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.nvidiaKey || apiConfig.openrouterKey);
+
+  // LOG DIAGNOSTIC
+  console.log('🔍 Outreach Dashboard:', {
+    leadsCount: leads.length,
+    scheduledCount: scheduled.length,
+    hasSmtp: hasGmailSmtp
+  });
 
   const ready = leads.filter(l => l.siteGenerated && !l.emailSent && l.email);
   const sent = leads.filter(l => l.emailSent);
@@ -438,6 +446,41 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
           </div>
         ))}
       </div>
+
+      {/* Vue "File d'attente" (NOUVEAU) */}
+      {scheduled.length > 0 && (
+        <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+             <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+               ⏳ File d'attente ({scheduled.length})
+             </h3>
+             <span style={{ fontSize: 12, color: C.tx3 }}>Auto-refresh Realtime ✅</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {scheduled.map(job => {
+              const lead = leads.find(l => l.id === job.lead_id);
+              return (
+                <div key={job.id} style={{ 
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '12px 16px', background: C.bg, borderRadius: 8, border: `1px solid ${C.border}`
+                }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: C.tx }}>{lead?.name || 'Lead inconnu'}</div>
+                    <div style={{ fontSize: 11, color: C.tx3 }}>{job.template_id} • Prévu le {new Date(job.scheduled_for).toLocaleString()}</div>
+                  </div>
+                  <button 
+                    onClick={() => cancelEmail(job.id)}
+                    style={{ 
+                      padding: '6px 12px', borderRadius: 4, background: '#fee2e2', color: '#dc2626', 
+                      fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer' 
+                    }}
+                  >Annuler</button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Progress */}
       {sending && (

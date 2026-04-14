@@ -121,6 +121,24 @@ export interface EmailTemplate {
   category: 'sale' | 'reminder';
 }
 
+export interface ScheduledEmail {
+  id: string;
+  lead_id: string;
+  template_id: string;
+  scheduled_for: string;
+  status: 'pending' | 'sent' | 'sending' | 'error';
+  error_message?: string;
+}
+
+export interface ScheduledEmail {
+  id: string;
+  lead_id: string;
+  template_id: string;
+  scheduled_for: string;
+  status: 'pending' | 'sent' | 'sending' | 'error';
+  error_message?: string;
+}
+
 // --- DEFAULTS ---
 export const defaultApiConfig: ApiConfig = {
   groqKey: '', 
@@ -246,6 +264,7 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
     email_sent: lead.emailSent,
     email_opened: lead.emailOpened,
     email_clicked: lead.emailClicked,
+    revenue: lead.revenue || 0,
   };
 
   // Ajouter les champs uniquement s'ils ont une valeur non-undefined et non-null
@@ -325,7 +344,22 @@ export function useLeads() {
     loadLeads();
   }, [loadLeads]);
 
-  // Écouter les événements de synchronisation
+  // Souscription Realtime (Pour les clics et ouvertures qui viennent du serveur)
+  useEffect(() => {
+    const channel = supabase
+      .channel('leads-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload) => {
+        console.log('⚡ Changement Realtime détecté:', payload);
+        loadLeads();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadLeads]);
+
+  // Écouter les événements de synchronisation locaux (EventBus)
   useEffect(() => {
     // Importer eventBus localement pour éviter les dépendances circulaires
     import('./events').then(({ eventBus, LeadForgeEvents }) => {
@@ -747,6 +781,70 @@ export function useEmailTemplates() {
   }, [loadTemplates]);
 
   return { templates, loading, error, addTemplate, updateTemplate, deleteTemplate };
+}
+
+export function useScheduledEmails() {
+  const [scheduled, setScheduled] = useState<ScheduledEmail[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadScheduled = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('scheduled_emails')
+      .select('*')
+      .eq('status', 'pending')
+      .order('scheduled_for', { ascending: true });
+    
+    if (!error && data) setScheduled(data as ScheduledEmail[]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadScheduled();
+    const sub = supabase.channel('scheduled-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'scheduled_emails' }, loadScheduled)
+      .subscribe();
+    return () => { supabase.removeChannel(sub); };
+  }, [loadScheduled]);
+
+  const cancelEmail = async (id: string) => {
+    await supabase.from('scheduled_emails').delete().eq('id', id);
+    loadScheduled();
+  };
+
+  return { scheduled, loading, cancelEmail, refresh: loadScheduled };
+}
+
+export function useScheduledEmails() {
+  const [scheduled, setScheduled] = useState<ScheduledEmail[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadScheduled = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('scheduled_emails')
+      .select('*')
+      .eq('status', 'pending')
+      .order('scheduled_for', { ascending: true });
+    
+    if (!error && data) setScheduled(data as ScheduledEmail[]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadScheduled();
+    const sub = supabase.channel('scheduled-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'scheduled_emails' }, loadScheduled)
+      .subscribe();
+    return () => { supabase.removeChannel(sub); };
+  }, [loadScheduled]);
+
+  const cancelEmail = async (id: string) => {
+    await supabase.from('scheduled_emails').delete().eq('id', id);
+    loadScheduled();
+  };
+
+  return { scheduled, loading, cancelEmail, refresh: loadScheduled };
 }
 
 // --- RETRY UTILS ---
