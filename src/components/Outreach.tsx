@@ -107,7 +107,8 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       '{{paymentLink}}': `${trackBase}&type=payment_clicked`,
       '{{finalPaymentLink}}': `${trackBase}&type=payment_clicked&final=true`,
       '{{devisLink}}': `${trackBase}&type=devis_clicked&url=${encodeURIComponent(lead.devis_url || '#')}`,
-      '{{invoiceLink}}': `${trackBase}&type=invoice_clicked`,
+      '{{invoiceLink}}': `${trackBase}&type=invoice_clicked&url=${encodeURIComponent(lead.invoice_url || '#')}`,
+      '{{finalInvoiceLink}}': `${trackBase}&type=invoice_clicked&final=true&url=${encodeURIComponent(lead.invoice_url || '#')}`,
       
       // Infos de Livraison (Email 6)
       '{{adminLink}}': lead.admin_url || `${lead.siteUrl || lead.website || ''}/admin`,
@@ -260,10 +261,10 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     // 1. Annuler toutes les relances programmées
     await supabase.from('scheduled_emails').delete().eq('lead_id', lead.id).eq('status', 'pending');
     
-    // 2. Envoyer immédiatement l'Email 5 (Confirmation Solde Final)
+    // 2. Envoyer l'Email 5 (Confirmation Solde Final)
     await sendWorkflowEmail(lead, 'step-5-confirmation');
     
-    // 3. Programmer l'Email 6 (Livraison) pour dans 1 heure (le temps du déploiement final)
+    // 3. Programmer l'Email 6 (Livraison) pour dans 1 heure
     const deliveryDate = new Date();
     deliveryDate.setHours(deliveryDate.getHours() + 1);
     
@@ -274,12 +275,15 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       status: 'pending'
     }]);
 
-    setLogs(prev => [...prev, `🏆 Solde final validé pour ${lead.name}. Email 5 envoyé et Livraison (E6) programmée.`]);
-    
+    // 4. Update groupé pour éviter la race condition entre sendWorkflowEmail et l'update du stage
+    // On force l'ajout de step-5-confirmation dans sentSteps au cas où l'update interne de sendWorkflowEmail soit écrasé
     updateLead(lead.id, {
       stage: 'converted',
-      revenue: 146
+      revenue: 146,
+      sentSteps: Array.from(new Set([...(lead.sentSteps || []), 'step-5-confirmation']))
     });
+
+    setLogs(prev => [...prev, `🏆 Solde final validé pour ${lead.name}. Email 5 envoyé et Livraison (E6) programmée.`]);
   };
 
   const sendOne = async (lead: Lead) => {

@@ -67,7 +67,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         let body = template.body || ''; // Dans la DB, c'est la colonne 'body'
 
         // Injection des variables standardisées (Tunnel complet)
-        const baseUrl = 'https://www.services-siteup.online/api/track';
+        const protocol = req.headers['x-forwarded-proto'] || 'https';
+        const host = req.headers.host || 'www.services-siteup.online';
+        const baseUrl = `${protocol}://${host}/api/track`;
+
         const replacements: Record<string, string> = {
           '{{firstName}}': lead.name?.split(' ')[0] || lead.name || 'Client',
           '{{companyName}}': lead.name || 'votre entreprise',
@@ -77,6 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           '{{paymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked`,
           '{{finalPaymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked&final=true`,
           '{{invoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked&url=${encodeURIComponent(lead.invoice_url || '#')}`,
+          '{{finalInvoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked&final=true&url=${encodeURIComponent(lead.invoice_url || '#')}`,
           '{{agentName}}': fromName,
           '{{agentEmail}}': fromEmail,
           '{{price}}': '146', // Prix standard
