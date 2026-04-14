@@ -355,15 +355,22 @@ export function useLeads() {
 
   // Souscription Realtime (Pour les clics et ouvertures qui viennent du serveur)
   useEffect(() => {
+    // Utiliser un nom de canal unique pour éviter les collisions
+    const channelId = `leads-realtime-${Math.random().toString(36).substring(2, 9)}`;
     const channel = supabase
-      .channel('leads-realtime')
+      .channel(channelId)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload) => {
         console.log('⚡ Changement Realtime détecté:', payload);
         loadLeads();
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log(`📡 Realtime subscribe: ${channelId}`);
+        }
+      });
 
     return () => {
+      console.log(`🔌 Realtime unsubscribe: ${channelId}`);
       supabase.removeChannel(channel);
     };
   }, [loadLeads]);
