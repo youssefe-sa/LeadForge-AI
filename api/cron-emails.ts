@@ -77,7 +77,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           '{{paymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked`,
           '{{finalPaymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked&final=true`,
           '{{invoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked&url=${encodeURIComponent(lead.invoice_url || '#')}`,
-          '{{finalInvoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked&final=true&url=${encodeURIComponent(lead.invoice_url || '#')}`,
           '{{agentName}}': fromName,
           '{{agentEmail}}': fromEmail,
           '{{price}}': '146', // Prix standard

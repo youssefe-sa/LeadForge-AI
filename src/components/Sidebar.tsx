@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useLogger } from '../lib/LogContext';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -16,6 +15,12 @@ const agents = [
   { id: 'pipeline', label: 'Pipeline & Analytics', icon: '📈', color: C.red },
 ];
 
+interface LogEntry {
+  timestamp: string;
+  message: string;
+  color: string;
+}
+
 interface Props {
   active: string;
   onNavigate: (id: string) => void;
@@ -24,16 +29,15 @@ interface Props {
 }
 
 export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Props) {
-  const { logs, addLog } = useLogger();
+  const [logs, setLogs] = useState<LogEntry[]>([
+    { timestamp: new Date().toLocaleTimeString(), message: 'Système démarré', color: '#1A7A4A' },
+    { timestamp: new Date().toLocaleTimeString(), message: 'Surveillance active...', color: '#9B9890' },
+    { timestamp: new Date().toLocaleTimeString(), message: `${leadCount} leads chargés`, color: '#D4500A' },
+    { timestamp: new Date().toLocaleTimeString(), message: `${apiCount} APIs connectées`, color: '#1A4FA0' },
+    { timestamp: new Date().toLocaleTimeString(), message: 'Pipeline en cours...', color: '#B45309' },
+  ]);
+  
   const logContainerRef = React.useRef<HTMLDivElement>(null);
-
-  // Initialisation des logs système
-  useEffect(() => {
-    addLog('Système démarré', '#1A7A4A', 'System');
-    addLog('Surveillance active...', '#9B9890', 'System');
-    addLog(`${leadCount} leads chargés`, '#D4500A', 'System');
-    addLog(`${apiCount} APIs connectées`, '#1A4FA0', 'System');
-  }, []);
 
   // Fonction pour scroller automatiquement en bas
   const scrollToBottom = () => {
@@ -47,29 +51,53 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
     scrollToBottom();
   }, [logs]);
 
-  // Vérification automatique toutes les 5 secondes
   useEffect(() => {
     const interval = setInterval(() => {
-      addLog(`Vérification automatique - Leads: ${leadCount}, APIs: ${apiCount}`, '#9B9890', 'System');
-    }, 5000);
+      const newLog: LogEntry = {
+        timestamp: new Date().toLocaleTimeString(),
+        message: `Vérification automatique - Leads: ${leadCount}, APIs: ${apiCount}`,
+        color: '#9B9890'
+      };
+      
+      setLogs(prevLogs => {
+        const updatedLogs = [...prevLogs, newLog];
+        // Garder seulement les 20 derniers logs
+        return updatedLogs.slice(-20);
+      });
+    }, 5000); // Toutes les 5 secondes
 
     return () => clearInterval(interval);
-  }, [leadCount, apiCount, addLog]);
+  }, [leadCount, apiCount]);
 
-  // Log quand le nombre de leads change
   useEffect(() => {
-    addLog(`Changement détecté: ${leadCount} leads dans le système`, '#D4500A', 'System');
-  }, [leadCount, addLog]);
+    // Ajouter un log quand le nombre de leads change
+    const newLog: LogEntry = {
+      timestamp: new Date().toLocaleTimeString(),
+      message: `Changement détecté: ${leadCount} leads dans le système`,
+      color: '#D4500A'
+    };
+    setLogs(prevLogs => [...prevLogs.slice(-19), newLog]);
+  }, [leadCount]);
 
-  // Log quand le nombre d'APIs change
   useEffect(() => {
-    addLog(`Mise à jour APIs: ${apiCount} services actifs`, '#1A4FA0', 'System');
-  }, [apiCount, addLog]);
+    // Ajouter un log quand le nombre d'APIs change
+    const newLog: LogEntry = {
+      timestamp: new Date().toLocaleTimeString(),
+      message: `Mise à jour APIs: ${apiCount} services actifs`,
+      color: '#1A4FA0'
+    };
+    setLogs(prevLogs => [...prevLogs.slice(-19), newLog]);
+  }, [apiCount]);
 
-  // Log quand la page active change
   useEffect(() => {
-    addLog(`Navigation: ${active} activé`, '#B45309', 'System');
-  }, [active, addLog]);
+    // Ajouter un log quand la page active change
+    const newLog: LogEntry = {
+      timestamp: new Date().toLocaleTimeString(),
+      message: `Navigation: ${active} activé`,
+      color: '#B45309'
+    };
+    setLogs(prevLogs => [...prevLogs.slice(-19), newLog]);
+  }, [active]);
   return (
     <div style={{
       width: 240, minHeight: '100vh', background: C.surface, borderRight: `1px solid ${C.border}`,
@@ -199,7 +227,7 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
         >
           {logs.map((log, index) => (
             <div key={index} style={{ color: log.color, marginBottom: 2 }}>
-              [{log.timestamp}] {log.source ? `[${log.source}] ` : ''}{log.message}
+              [{log.timestamp}] {log.message}
             </div>
           ))}
         </div>

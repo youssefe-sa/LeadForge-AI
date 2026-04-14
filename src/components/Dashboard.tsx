@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { configService } from '../lib/supabase';
 import { Lead, mapColumns, exportLeadsCSV, useCampaigns } from '../lib/supabase-store';
 import { eventBus, LeadForgeEvents } from '../lib/events';
-import { useLogger } from '../lib/LogContext';
 
 // CSS pour l'animation shimmer
 const shimmerStyle = `
@@ -55,7 +54,6 @@ interface Props {
 }
 
 export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, loadLeads }: Props) {
-  const { addLog } = useLogger();
   const { campaigns, forceReloadCampaigns } = useCampaigns();
   const [campaignsCount, setCampaignsCount] = useState(campaigns.length); // État local pour les campagnes
   const [filterCampaign, setFilterCampaign] = useState('');
@@ -503,9 +501,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
       console.log('Importation des données de scraping:', jsonData);
       
       // Ajouter les leads
-      addLog(`Importation de ${jsonData.length} leads depuis le scraping`, '#1A7A4A', 'Dashboard');
       addLeads(jsonData);
-      addLog(`Importation scraping terminée: ${jsonData.length} leads ajoutés`, '#1A7A4A', 'Dashboard');
       
       // Émettre des événements de synchronisation
       eventBus.emit(LeadForgeEvents.LEADS_CHANGED);
@@ -577,9 +573,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
             
             setTimeout(() => {
               console.log('Mapped leads from JSON:', mappedLeads);
-              addLog(`Importation CSV de ${mappedLeads.length} leads`, '#1A7A4A', 'Dashboard');
               addLeads(mappedLeads);
-              addLog(`Importation CSV terminée: ${mappedLeads.length} leads ajoutés`, '#1A7A4A', 'Dashboard');
               setImportProgress(100);
               setImportStatus('Importation terminée!');
               
@@ -653,9 +647,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
             
             setTimeout(() => {
               console.log('Mapped leads:', leadsWithCampaign);
-              addLog(`Importation Excel de ${leadsWithCampaign.length} leads`, '#1A7A4A', 'Dashboard');
               addLeads(leadsWithCampaign);
-              addLog(`Importation Excel terminée: ${leadsWithCampaign.length} leads ajoutés`, '#1A7A4A', 'Dashboard');
               setImportProgress(100);
               setImportStatus('Importation terminée!');
               
@@ -726,9 +718,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
             setImportStatus(`Importation de ${leadsWithCampaign.length} leads...`);
 
             setTimeout(() => {
-              addLog(`Importation fichier de ${leadsWithCampaign.length} leads`, '#1A7A4A', 'Dashboard');
               addLeads(leadsWithCampaign);
-              addLog(`Importation fichier terminée: ${leadsWithCampaign.length} leads ajoutés`, '#1A7A4A', 'Dashboard');
               setImportProgress(100);
               setImportStatus('Importation terminée!');
 
@@ -905,9 +895,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
           {selected.size > 0 && (
             <button onClick={() => { 
               const selectedIds = [...selected];
-              addLog(`Suppression de ${selectedIds.length} leads`, '#C0392B', 'Dashboard');
               deleteLeads(selectedIds); 
-              addLog(`Suppression terminée: ${selectedIds.length} leads supprimés`, '#C0392B', 'Dashboard');
               setSelected(new Set());
               
               // Émettre des événements de synchronisation
