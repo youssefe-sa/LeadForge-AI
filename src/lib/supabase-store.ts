@@ -815,38 +815,6 @@ export function useScheduledEmails() {
   return { scheduled, loading, cancelEmail, refresh: loadScheduled };
 }
 
-export function useScheduledEmails() {
-  const [scheduled, setScheduled] = useState<ScheduledEmail[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const loadScheduled = useCallback(async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('scheduled_emails')
-      .select('*')
-      .eq('status', 'pending')
-      .order('scheduled_for', { ascending: true });
-    
-    if (!error && data) setScheduled(data as ScheduledEmail[]);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    loadScheduled();
-    const sub = supabase.channel('scheduled-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'scheduled_emails' }, loadScheduled)
-      .subscribe();
-    return () => { supabase.removeChannel(sub); };
-  }, [loadScheduled]);
-
-  const cancelEmail = async (id: string) => {
-    await supabase.from('scheduled_emails').delete().eq('id', id);
-    loadScheduled();
-  };
-
-  return { scheduled, loading, cancelEmail, refresh: loadScheduled };
-}
-
 // --- RETRY UTILS ---
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000; // 1 seconde

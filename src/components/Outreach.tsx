@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lead, ApiConfig, EmailTemplate, callLLM } from '../lib/supabase-store';
+import { Lead, ApiConfig, EmailTemplate, callLLM, useScheduledEmails, ScheduledEmail } from '../lib/supabase-store';
 import { supabase } from '../lib/supabase';
 import { salesTemplates, reminderTemplates, getTemplateById } from '../templates/outreach-templates-final';
 
@@ -457,7 +457,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
              <span style={{ fontSize: 12, color: C.tx3 }}>Auto-refresh Realtime ✅</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {scheduled.map(job => {
+            {scheduled.map((job: ScheduledEmail) => {
               const lead = leads.find(l => l.id === job.lead_id);
               return (
                 <div key={job.id} style={{ 
