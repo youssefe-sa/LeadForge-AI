@@ -640,6 +640,14 @@ export default function Pipeline({ leads, updateLead }: Props) {
             </div>
 
             {/* Performance Commerciale */}
+            <div style={{ 
+              background: C.surface, 
+              borderRadius: 12, 
+              padding: '24px', 
+              border: `1px solid ${C.border}`,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+            }}>
+              <h3 style={{ fontSize: 18, fontWeight: 600, color: C.tx, marginBottom: 20 }}>💰 Performance Commerciale</h3>
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 20 }}>
                 <div style={{ 
