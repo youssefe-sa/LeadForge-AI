@@ -592,15 +592,54 @@ export default function Pipeline({ leads, updateLead }: Props) {
               )}
             </div>
 
-            {/* Conversions et Revenus */}
+            {/* Rapport de Performance par Secteur (NOUVEAU) */}
             <div style={{ 
               background: C.surface, 
               borderRadius: 12, 
               padding: '24px', 
               border: `1px solid ${C.border}`,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              marginBottom: 24
             }}>
-              <h3 style={{ fontSize: 18, fontWeight: 600, color: C.tx, marginBottom: 20 }}>💰 Performance Commerciale</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 600, color: C.tx, marginBottom: 20 }}>📊 Performance par Secteur</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {Array.from(new Set(leads.map(l => l.sector).filter(Boolean))).map(sect => {
+                  const sectorLeads = leads.filter(l => l.sector === sect);
+                  const sectorConversions = sectorLeads.filter(l => l.stage === 'converted');
+                  const sectorRevenue = sectorConversions.reduce((sum, l) => sum + (l.revenue || 0), 0);
+                  const sectorRate = (sectorConversions.length / sectorLeads.length) * 100;
+                  
+                  if (sectorLeads.length < 2) return null; // Ignorer les secteurs trop petits
+
+                  return (
+                    <div key={sect} style={{ 
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      padding: '12px 16px', background: C.bg, borderRadius: 8, border: `1px solid ${C.border}`
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: C.tx }}>{sect}</div>
+                        <div style={{ fontSize: 11, color: C.tx3 }}>{sectorLeads.length} leads • {sectorConversions.length} clients</div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                         <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: C.green }}>{sectorRevenue.toLocaleString()}$</div>
+                            <div style={{ fontSize: 10, color: C.tx3 }}>CA Total</div>
+                         </div>
+                         <div style={{ 
+                           background: sectorRate > 10 ? C.green + '20' : C.tx3 + '20', 
+                           color: sectorRate > 10 ? C.green : C.tx3,
+                           padding: '4px 8px', borderRadius: 4, fontSize: 12, fontWeight: 700 
+                         }}>
+                           {sectorRate.toFixed(1)}%
+                         </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Performance Commerciale */}
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 20 }}>
                 <div style={{ 

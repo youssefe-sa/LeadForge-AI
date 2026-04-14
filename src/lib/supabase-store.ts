@@ -131,6 +131,15 @@ export interface EmailTemplate {
   category: 'sale' | 'reminder';
 }
 
+export interface ScheduledEmail {
+  id: string;
+  lead_id: string;
+  template_id: string;
+  scheduled_for: string;
+  status: 'pending' | 'sent' | 'sending' | 'error';
+  error_message?: string;
+}
+
 // --- DEFAULTS ---
 export const defaultApiConfig: ApiConfig = {
   groqKey: '', 
@@ -773,6 +782,38 @@ export function useEmailTemplates() {
   }, [loadTemplates]);
 
   return { templates, loading, error, addTemplate, updateTemplate, deleteTemplate };
+}
+
+export function useScheduledEmails() {
+  const [scheduled, setScheduled] = useState<ScheduledEmail[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadScheduled = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('scheduled_emails')
+      .select('*')
+      .eq('status', 'pending')
+      .order('scheduled_for', { ascending: true });
+    
+    if (!error && data) setScheduled(data as ScheduledEmail[]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadScheduled();
+    const sub = supabase.channel('scheduled-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'scheduled_emails' }, loadScheduled)
+      .subscribe();
+    return () => { supabase.removeChannel(sub); };
+  }, [loadScheduled]);
+
+  const cancelEmail = async (id: string) => {
+    await supabase.from('scheduled_emails').delete().eq('id', id);
+    loadScheduled();
+  };
+
+  return { scheduled, loading, cancelEmail, refresh: loadScheduled };
 }
 
 // --- RETRY UTILS ---
