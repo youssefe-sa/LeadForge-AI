@@ -336,7 +336,22 @@ export function useLeads() {
     loadLeads();
   }, [loadLeads]);
 
-  // Écouter les événements de synchronisation
+  // Souscription Realtime (Pour les clics et ouvertures qui viennent du serveur)
+  useEffect(() => {
+    const channel = supabase
+      .channel('leads-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload) => {
+        console.log('⚡ Changement Realtime détecté:', payload);
+        loadLeads();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadLeads]);
+
+  // Écouter les événements de synchronisation locaux (EventBus)
   useEffect(() => {
     // Importer eventBus localement pour éviter les dépendances circulaires
     import('./events').then(({ eventBus, LeadForgeEvents }) => {
