@@ -29,7 +29,7 @@ export default function Pipeline({ leads, updateLead }: Props) {
 
   // Calculs avancés
   const stageCounts = stages.map(s => ({ ...s, count: leads.filter(l => l.stage === s.key).length }));
-  const totalRevenue = leads.filter(l => l.stage === 'converted').reduce((s, l) => s + l.revenue, 0);
+  const totalRevenue = leads.filter(l => l.stage === 'converted').reduce((s, l) => s + (l.revenue || 0), 0);
   const conversionRate = leads.length > 0 ? (leads.filter(l => l.stage === 'converted').length / leads.length) * 100 : 0;
   const avgScore = leads.length > 0 ? Math.round(leads.reduce((s, l) => s + (l.score || 0), 0) / leads.length) : 0;
   const highScoreLeads = leads.filter(l => (l.score || 0) >= 60);
@@ -125,7 +125,7 @@ export default function Pipeline({ leads, updateLead }: Props) {
           },
           { 
             label: '💰 Chiffre d\'Affaires', 
-            value: `${totalRevenue.toLocaleString()}€`, 
+            value: `${totalRevenue.toLocaleString()}$`, 
             change: '+15%', 
             color: C.blue,
             description: 'Revenu total généré'
@@ -623,7 +623,7 @@ export default function Pipeline({ leads, updateLead }: Props) {
                   border: `2px solid ${C.blue}20`
                 }}>
                   <div style={{ fontSize: 28, fontWeight: 700, fontFamily: "'Fraunces', serif", color: C.blue }}>
-                    {totalRevenue.toLocaleString()}€
+                    {totalRevenue.toLocaleString()}$
                   </div>
                   <div style={{ fontSize: 13, color: C.tx3, marginTop: 4 }}>Chiffre d\'Affaires</div>
                 </div>
@@ -648,7 +648,7 @@ export default function Pipeline({ leads, updateLead }: Props) {
                   textAlign: 'center'
                 }}>
                   <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'Fraunces', serif", color: C.accent }}>
-                    {Math.round(avgRevenuePerConversion)}€
+                    {Math.round(avgRevenuePerConversion)}$
                   </div>
                   <div style={{ fontSize: 12, color: C.tx3, marginTop: 4 }}>Panier Moyen</div>
                 </div>
@@ -681,7 +681,7 @@ export default function Pipeline({ leads, updateLead }: Props) {
                           background: C.green + '15',
                           padding: '4px 8px',
                           borderRadius: 4
-                        }}>{l.revenue.toLocaleString()}€</div>
+                        }}>{l.revenue.toLocaleString()}$</div>
                       </div>
                     ))}
                   </div>

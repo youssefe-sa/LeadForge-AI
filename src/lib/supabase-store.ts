@@ -81,6 +81,16 @@ export interface Lead {
   admin_password?: string;
   documentation_url?: string;
   contactName?: string; // Ajouté pour personnalisation Outreach
+  // Email tracking - Suivi des emails envoyés
+  email1_sent?: boolean;
+  email2_sent?: boolean;
+  email3_sent?: boolean;
+  email4_sent?: boolean;
+  email5_sent?: boolean;
+  email6_sent?: boolean;
+  reminder1_sent?: boolean;
+  reminder2_sent?: boolean;
+  reminder3_sent?: boolean;
 }
 
 export type LlmProvider = 'groq' | 'gemini' | 'nvidia' | 'openrouter';
@@ -246,6 +256,7 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
     email_sent: lead.emailSent,
     email_opened: lead.emailOpened,
     email_clicked: lead.emailClicked,
+    revenue: lead.revenue,
   };
 
   // Ajouter les champs uniquement s'ils ont une valeur non-undefined et non-null
