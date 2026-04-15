@@ -719,14 +719,20 @@ export function useEmailTemplates() {
     try {
       const supabaseTemplates = await templatesService.getAll();
       if (supabaseTemplates.length > 0) {
+        // Helper pour extraire les variables {{variableName}} du template
+        const extractVariables = (text: string): string[] => {
+          const matches = text.match(/\{\{([a-zA-Z]+)\}\}/g) || [];
+          return [...new Set(matches.map(m => m.replace(/[{}]/g, '')))];
+        };
+
         setTemplates(supabaseTemplates.map(t => ({
           id: t.id,
           name: t.name,
           category: (t.sector === 'sale' || t.sector === 'reminder') ? t.sector as 'sale' | 'reminder' : 'sale', // sector -> category
           subject: t.subject,
-          htmlContent: '', // La base de données n'a pas htmlContent
-          textContent: t.body || '', // body -> textContent
-          variables: [], // La base de données n'a pas variables
+          htmlContent: t.body || '', // ✅ CORRECTION: body contient le HTML
+          textContent: t.body?.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() || '', // ✅ CORRECTION: version texte propre
+          variables: extractVariables(t.body || ''), // ✅ CORRECTION: extraire automatiquement les variables
         })));
       }
     } catch (err) {
