@@ -176,7 +176,9 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
 
   const previewForLead = async (lead: Lead) => {
     const { subject, body } = await generateEmailContent(lead);
-    setPreviewEmail({ lead, subject, body });
+    // Supprimer le pixel de tracking pour éviter le chargement automatique lors de la prévisualisation
+    const cleanBody = body.replace(/<img[^>]*\/api\/track[^>]*>/gi, '');
+    setPreviewEmail({ lead, subject, body: cleanBody });
   };
 
   const sendWorkflowEmail = async (lead: Lead, templateId: string) => {
