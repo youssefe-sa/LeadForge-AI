@@ -26,6 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const leadId = id as string;
     const trackType = type as string;
+    console.log('[TRACKING] Request received:', { leadId, trackType, userAgent: req.headers['user-agent'] });
 
     const { data: lead, error: leadError } = await supabase.from('leads').select('*').eq('id', leadId).single();
     if (leadError || !lead) {

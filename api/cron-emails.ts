@@ -69,7 +69,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Injection des variables standardisées (Tunnel complet)
         const protocol = req.headers['x-forwarded-proto'] || 'https';
         const host = req.headers.host || 'www.services-siteup.online';
-        const baseUrl = `${protocol}://${host}/api/track`;
+        // IMPORTANT: Utiliser le domaine de production pour le tracking, pas localhost
+        const baseUrl = host.includes('localhost') || host.includes('127.0.0.1')
+          ? 'https://leadforge.ai/api/track'  // Domaine de production en développement
+          : `${protocol}://${host}/api/track`;
 
         const replacements: Record<string, string> = {
           '{{firstName}}': lead.name?.split(' ')[0] || lead.name || 'Client',
@@ -102,8 +105,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           body = body.split(key).join(val);
         }
 
-        const trackingPixel = `<img src="${baseUrl}?id=${lead.id}&type=email_opened" width="1" height="1" style="display:none;" />`;
-        const html = body.includes('</body>') ? body.replace('</body>', `${trackingPixel}</body>`) : body + trackingPixel;
+        // Pixel de tracking d'ouverture DÉSACTIVÉ
+        // Les clients email préchargent automatiquement les images, ce qui cause des faux positifs
+        const html = body;
 
         await transporter.sendMail({
           from: `"${fromName}" <${fromEmail}>`,

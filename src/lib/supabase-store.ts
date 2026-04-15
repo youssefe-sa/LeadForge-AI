@@ -340,7 +340,9 @@ export function useLeads() {
     setError(null);
     try {
       const { leads: supabaseLeads } = await leadsService.getAll();
-      setLeads(supabaseLeads.map(mapSupabaseLeadToLead));
+      const mappedLeads = supabaseLeads.map(mapSupabaseLeadToLead);
+      console.log('📊 Leads loaded:', mappedLeads.map(l => ({ id: l.id, name: l.name, emailOpened: l.emailOpened })));
+      setLeads(mappedLeads);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load leads');
     } finally {
