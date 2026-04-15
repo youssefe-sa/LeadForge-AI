@@ -598,6 +598,21 @@ export function useCampaigns() {
     }
   }, [loadCampaigns, initialized, refreshTrigger]);
 
+  // Souscription Realtime (les campagnes dépendent des leads)
+  useEffect(() => {
+    const channel = supabase
+      .channel('campaigns-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload) => {
+        console.log('⚡ [Campaigns] Realtime change detected in leads:', payload);
+        loadCampaigns();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadCampaigns]);
+
   // Écouter les événements de synchronisation
   useEffect(() => {
     // Importer eventBus localement pour éviter les dépendances circulaires
@@ -689,6 +704,21 @@ export function useApiConfig() {
     loadConfig();
   }, [loadConfig]);
 
+  // Souscription Realtime
+  useEffect(() => {
+    const channel = supabase
+      .channel('api-config-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'api_config' }, (payload) => {
+        console.log('⚡ API Config Realtime Change:', payload);
+        loadConfig();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadConfig]);
+
   const updateConfig = useCallback(async (updates: Partial<ApiConfig>) => {
     setLoading(true);
     setError(null);
@@ -747,6 +777,21 @@ export function useEmailTemplates() {
     loadTemplates();
   }, [loadTemplates]);
 
+  // Souscription Realtime
+  useEffect(() => {
+    const channel = supabase
+      .channel('templates-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'email_templates' }, (payload) => {
+        console.log('⚡ Templates Realtime Change:', payload);
+        loadTemplates();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadTemplates]);
+
   const addTemplate = useCallback(async (template: Omit<EmailTemplate, 'id'>) => {
     setLoading(true);
     setError(null);
@@ -773,7 +818,16 @@ export function useEmailTemplates() {
     setError(null);
     
     try {
-      await templatesService.update(id, updates);
+      // Mapper les champs vers le format de la base de données
+      const dbUpdates: any = {};
+      if (updates.name) dbUpdates.name = updates.name;
+      if (updates.category) dbUpdates.sector = updates.category;
+      if (updates.subject) dbUpdates.subject = updates.subject;
+      if (updates.textContent || updates.htmlContent) {
+        dbUpdates.body = updates.textContent || updates.htmlContent;
+      }
+
+      await templatesService.update(id, dbUpdates);
       await loadTemplates();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update template');
