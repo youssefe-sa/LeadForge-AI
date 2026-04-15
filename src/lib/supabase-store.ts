@@ -758,7 +758,7 @@ export function useEmailTemplates() {
         const mappedTemplates = supabaseTemplates.map(t => ({
           id: t.id,
           name: t.name,
-          category: (t.sector === 'reminder') ? 'reminder' : 'sale', // Plus robuste
+          category: (t.sector === 'reminder' ? 'reminder' : 'sale') as 'sale' | 'reminder',
           subject: t.subject,
           htmlContent: t.body || '',
           textContent: t.body?.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() || '',
