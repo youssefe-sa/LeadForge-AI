@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Lead, ApiConfig, EmailTemplate, callLLM, useScheduledEmails, ScheduledEmail } from '../lib/supabase-store';
 import { supabase } from '../lib/supabase';
+import { salesTemplates, reminderTemplates, getTemplateById } from '../templates/outreach-templates-final';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -41,7 +42,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const [emailDelay, setEmailDelay] = useState(8000);
   const [logs, setLogs] = useState<string[]>([]);
   const [previewEmail, setPreviewEmail] = useState<{ lead: Lead; subject: string; body: string } | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState(templates[0]?.id || '');
+  const [selectedTemplate, setSelectedTemplate] = useState(salesTemplates[0]?.id || '');
 
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [testEmailSending, setTestEmailSending] = useState(false);
@@ -141,11 +142,9 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   };
 
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
-    // UTILISATION UNIQUEMENT DES TEMPLATES SUPABASE
-    const template = templates.find((t: EmailTemplate) => t.id === selectedTemplate) || templates[0];
-    if (!template) {
-      throw new Error('Aucun template disponible');
-    }
+    // UNIFICATION : On donne la priorité aux templates de la BASE DE DONNÉES
+    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+    const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
     
     const base = personalizeTemplateContent(template, lead, apiConfig);
 
@@ -186,15 +185,14 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
     if (!lead.email) { alert("Ce lead n'a pas d'email"); return; }
 
-    // UTILISATION UNIQUEMENT DES TEMPLATES SUPABASE
-    const template = templates.find(t => t.id === templateId);
-    if (!template) {
-      alert(`Template ${templateId} introuvable dans Supabase`);
-      return;
-    }
+    // UNIFICATION : On cherche d'abord dans les templates de la DB (prop templates)
+    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+    const template = allTemplates.find(t => t.id === templateId);
+    if (!template) return;
 
-    // Les templates Supabase ont htmlContent qui contient le HTML
-    const { subject, body } = personalizeTemplateContent(template, lead, apiConfig);
+    // SÉCURITÉ : Extraire le contenu (body si DB, htmlContent si Local)
+    const rawContent = (template as any).body || template.htmlContent;
+    const { subject, body } = personalizeTemplateContent({ ...template, htmlContent: rawContent }, lead, apiConfig);
     
     const result = await sendEmailViaApi({
       to: lead.email,
@@ -368,13 +366,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     setTestEmailSending(true);
     setLogs(prev => [...prev, `🧪 Envoi d'email test à ${testEmailAddress}...`]);
 
-    // UTILISATION UNIQUEMENT DES TEMPLATES SUPABASE
-    const template = templates.find((t: EmailTemplate) => t.id === selectedTemplate) || templates[0];
-    if (!template) {
-      alert('Aucun template disponible pour le test');
-      setTestEmailSending(false);
-      return;
-    }
+    const allTemplates = [...salesTemplates, ...reminderTemplates];
+    const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
     const testLead: Lead = {
       id: 'test', name: 'Test Prospect', email: testEmailAddress,
       sector: 'Commerce', city: 'Ville Test',
@@ -549,11 +542,11 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
         </div>
         
         
-        {/* Templates depuis Supabase */}
+        {/* Templates de VENTE */}
         <div style={{ marginBottom: 20 }}>
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: C.green, marginBottom: 10 }}>📋 Templates depuis Supabase</h4>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: C.green, marginBottom: 10 }}>� Templates de VENTE</h4>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-            {templates.map(t => (
+            {salesTemplates.map(t => (
               <button key={t.id} onClick={() => setSelectedTemplate(t.id)} style={{
                 padding: '8px 14px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
                 border: `1px solid ${selectedTemplate === t.id ? C.green : C.border}`,
@@ -561,20 +554,40 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                 color: selectedTemplate === t.id ? C.green : C.tx2, fontWeight: 500,
               }}>
                 <span style={{ marginRight: 4 }}>{t.category === 'sale' ? '💰' : '⏰'}</span>
-                {t.name}
+                {t.name.split(' - ')[1]}
               </button>
             ))}
           </div>
-          {templates.length === 0 && (
-            <div style={{ fontSize: 12, color: C.amber, padding: '8px', background: C.amber + '20', borderRadius: 4 }}>
-              ⚠️ Aucun template dans Supabase. Ajoutez des templates dans la base de données.
-            </div>
-          )}
+          <div style={{ fontSize: 11, color: C.tx3, fontStyle: 'italic' }}>
+            Email 1: Présentation → Email 2: Devis/Paiement → Email 3: Confirmation Dépôt → Email 4: Paiement Final → Email 5: Confirmation Final → Email 6: Livraison
+          </div>
+        </div>
+
+        {/* Templates de RAPPEL */}
+        <div>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: C.blue, marginBottom: 10 }}>⏰ Templates de RAPPEL</h4>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+            {reminderTemplates.map(t => (
+              <button key={t.id} onClick={() => setSelectedTemplate(t.id)} style={{
+                padding: '8px 14px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
+                border: `1px solid ${selectedTemplate === t.id ? C.blue : C.border}`,
+                background: selectedTemplate === t.id ? '#e3f2fd' : C.surface,
+                color: selectedTemplate === t.id ? C.blue : C.tx2, fontWeight: 500,
+              }}>
+                <span style={{ marginRight: 4 }}>⏰</span>
+                {t.name.split(' - ')[1]}
+              </button>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: C.tx3, fontStyle: 'italic' }}>
+            Rappel 1: 3 jours après Email 1 → Rappel 2: 2 jours avant expiration → Rappel 3: 3 jours après Email 4 (paiement final)
+          </div>
         </div>
 
         {/* Preview du template sélectionné */}
         {(() => {
-          const selected = templates.find(t => t.id === selectedTemplate);
+          const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+          const selected = allTemplates.find(t => t.id === selectedTemplate);
           if (!selected) return null;
           
           return (
@@ -887,7 +900,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
 
       {/* HTML Email Preview Modal */}
       {showEmailPreview && (() => {
-        const selected = templates.find(t => t.id === selectedTemplate);
+        const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+        const selected = allTemplates.find(t => t.id === selectedTemplate);
         if (!selected || !selected.htmlContent) return null;
 
         return (
@@ -928,7 +942,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                 height: 'calc(100% - 60px)', overflow: 'auto',
                 background: '#f4f4f4'
               }}>
-                <div dangerouslySetInnerHTML={{ __html: selected.htmlContent.replace(/<img[^>]*\/api\/track[^>]*>/gi, '') }} />
+                <div dangerouslySetInnerHTML={{ __html: selected.htmlContent }} />
               </div>
             </div>
           </>

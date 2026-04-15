@@ -78,7 +78,6 @@ export interface Lead {
   source: string;
   // Champs ajoutés pour le workflow Outreach 2026
   devis_url?: string;
-  invoice_url?: string;
   admin_url?: string;
   admin_username?: string;
   admin_password?: string;
@@ -731,8 +730,8 @@ export function useEmailTemplates() {
           name: t.name,
           category: (t.sector === 'sale' || t.sector === 'reminder') ? t.sector as 'sale' | 'reminder' : 'sale', // sector -> category
           subject: t.subject,
-          htmlContent: t.body || '', // CORRECTION: body de Supabase contient le HTML
-          textContent: t.body?.replace(/<[^>]*>/g, '') || '', // Version texte sans HTML
+          htmlContent: '', // La base de données n'a pas htmlContent
+          textContent: t.body || '', // body -> textContent
           variables: [], // La base de données n'a pas variables
         })));
       }
