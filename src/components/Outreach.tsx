@@ -184,11 +184,13 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
       '{{agentEmail}}': config.gmailSmtpFromEmail || 'contact@leadforge.ai',
       
       // Données dynamiques
-      '{{price}}': '146',
-      '{{amount}}': '146',
+      '{{price}}': config.region === 'US' ? '146$' : '146€',
+      '{{deposit}}': config.region === 'US' ? '46$' : '46€',
+      '{{balance}}': config.region === 'US' ? '100$' : '100€',
+      '{{amount}}': config.region === 'US' ? '146$' : '146€',
       '{{validityDays}}': '7',
-      '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
-      '{{expiryDate}}': new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+      '{{deliveryDate}}': new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString(config.region === 'US' ? 'en-US' : 'fr-FR'),
+      '{{expiryDate}}': new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(config.region === 'US' ? 'en-US' : 'fr-FR'),
     };
 
     let subject = template.subject || '';

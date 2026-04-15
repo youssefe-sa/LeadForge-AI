@@ -67,7 +67,14 @@ export default function App() {
         <NotificationContainer />
         <ApiStatusIndicator />
         
-        <Sidebar active={view} onNavigate={(id) => setView(id as View)} leadCount={leads.length} apiCount={activeApis} />
+        <Sidebar 
+          active={view} 
+          onNavigate={(id) => setView(id as View)} 
+          leadCount={leads.length} 
+          apiCount={activeApis} 
+          config={config}
+          updateConfig={updateConfig}
+        />
 
         <main style={{
           marginLeft: 240, flex: 1, padding: '28px 32px',

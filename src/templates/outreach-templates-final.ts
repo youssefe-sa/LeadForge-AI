@@ -55,8 +55,8 @@ export const salesTemplates: EmailTemplate[] = [
   <p style="margin-top: 20px; font-size: 14px;">Aujourd’hui, la présence en ligne d’une entreprise est devenue un facteur décisif dans la confiance et la prise de décision des clients.</p>
   <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 14px;">
     <strong>💰 Activation du projet :</strong><br><br>
-    • 46$ pour démarrer<br>
-    • 100$ à la livraison finale<br><br>
+    • {{deposit}} pour démarrer<br>
+    • {{balance}} à la livraison finale<br><br>
     ✔ Hébergement + domaine inclus (1 an)<br>
     ✔ Support et maintenance inclus<br>
   </div>
@@ -88,8 +88,8 @@ export const salesTemplates: EmailTemplate[] = [
     <tr><td style="padding: 10px; border: 1px solid #edf2f7;">🏆 <b>Garanties</b></td><td style="padding: 10px; border: 1px solid #edf2f7;">Satisfait ou remboursé sous 15 jours</td></tr>
   </table>
   <div style="background: #fffaf0; padding: 20px; border: 1px solid #fbd38d; border-radius: 8px;">
-    <p style="margin: 0; font-weight: bold;">💰 Investissement total : 146$</p>
-    <p style="margin-top: 10px; font-size: 13px;">✔ 46$ aujourd’hui pour démarrer la création<br>✔ 100$ à la livraison finale</p>
+    <p style="margin: 0; font-weight: bold;">💰 Investissement total : {{price}}</p>
+    <p style="margin-top: 10px; font-size: 13px;">✔ {{deposit}} aujourd’hui pour démarrer la création<br>✔ {{balance}} à la livraison finale</p>
   </div>
   <div style="text-align: center; margin: 25px 0;">
     <a href="{{devisLink}}" style="color: #D4500A; text-decoration: underline; font-weight: bold; margin-right: 20px;">📄 Voir le devis</a>
@@ -109,7 +109,7 @@ export const salesTemplates: EmailTemplate[] = [
   ${HEADER_HTML}
   <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">CONFIRMATION D’ACOMPTE</h2>
   <p>Bonjour <strong>{{firstName}}</strong>,</p>
-  <p style="font-size: 14px;">Nous vous confirmons que votre acompte de <strong>46$</strong> a bien été reçu.</p>
+  <p style="font-size: 14px;">Nous vous confirmons que votre acompte de <strong>{{deposit}}</strong> a bien été reçu.</p>
   <p style="font-size: 14px;">Votre projet pour <strong>{{companyName}}</strong> est désormais officiellement <strong>en cours de production</strong>.</p>
   <div style="background: #f0fff4; padding: 15px; border: 1px solid #c6f6d5; border-radius: 6px; color: #22543d; margin-top: 15px;">
     <strong>📦 Statut du projet :</strong><br><br>✔ Analyse terminée<br>✔ Création en cours<br>✔ Optimisation du site en préparation
@@ -143,7 +143,7 @@ export const salesTemplates: EmailTemplate[] = [
     <li>💬 Recevoir des demandes via WhatsApp et formulaire</li>
   </ul>
   <div style="background: #fffaf0; padding: 18px; border: 1px solid #fbd38d; border-radius: 8px; margin-top: 15px;">
-    <strong>💰 Solde restant :</strong> 100$
+    <strong>💰 Solde restant :</strong> {{balance}}
   </div>
   <div style="text-align: center; margin: 30px 0;">
     <a href="{{finalPaymentLink}}" style="background: #28a745; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">💰 RÉGLER LE SOLDE & ACTIVER</a>
@@ -162,7 +162,7 @@ export const salesTemplates: EmailTemplate[] = [
   ${HEADER_HTML}
   <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">CONFIRMATION FINALE DE VOTRE PROJET</h2>
   <p>Bonjour <strong>{{firstName}}</strong>,</p>
-  <p style="font-size: 14px;">Nous vous confirmons que le paiement du solde de <strong>100$</strong> a bien été reçu.</p>
+  <p style="font-size: 14px;">Nous vous confirmons que le paiement du solde de <strong>{{balance}}</strong> a bien été reçu.</p>
   <p style="font-size: 14px;">Votre projet pour <strong>{{companyName}}</strong> est maintenant <strong>100% finalisé et activé</strong>.</p>
   <div style="text-align: center; margin: 30px 0;">
     <a href="{{finalInvoiceLink}}" style="background: #f8fafc; color: #1a202c; padding: 10px 20px; border: 1px solid #edf2f7; text-decoration: none; border-radius: 6px; font-size: 13px;">📄 Facture finale (PDF)</a>
@@ -227,7 +227,7 @@ export const reminderTemplates: EmailTemplate[] = [
   <p>Bonjour <strong>{{firstName}}</strong>,</p>
   <p style="font-size: 14px;">Le devis ainsi que la version de votre site pour <strong>{{companyName}}</strong> sont toujours disponibles.</p>
   <div style="text-align: center; margin: 25px 0;"><a href="{{devisLink}}" style="color: #D4500A; text-decoration: underline; font-weight: bold;">📄 Consulter le devis</a></div>
-  <div style="text-align: center; margin: 30px 0;"><a href="{{paymentLink}}" style="background: #28a745; color: white; padding: 16px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">💳 PAYER 46$ ET DÉMARRER</a></div>
+  <div style="text-align: center; margin: 30px 0;"><a href="{{paymentLink}}" style="background: #28a745; color: white; padding: 16px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">💳 PAYER {{deposit}} ET DÉMARRER</a></div>
   <p style="margin-top: 40px; border-top: 1px solid #edf2f7; padding-top: 20px; font-size: 13px; color: #4a5568;">Cordialement,<br>Consultant Digital | Services-Siteup</p>
 </div>`,
     textContent: "Rappel 2"

@@ -109,6 +109,7 @@ export interface ApiConfig {
   // Payment Configuration
   whopDepositLink: string; // Lien pour paiement 46$ (dépôt)
   whopFinalPaymentLink: string; // Lien pour paiement 100$ (paiement final)
+  region: 'FR' | 'US';
 }
 
 export interface ApiStatus {
@@ -164,6 +165,7 @@ export const defaultApiConfig: ApiConfig = {
   // Payment defaults
   whopDepositLink: '',
   whopFinalPaymentLink: '',
+  region: 'FR',
 };
 
 export const defaultEmailTemplates: EmailTemplate[] = [

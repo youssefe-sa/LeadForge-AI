@@ -237,12 +237,13 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
     const styles = ['elegant classic with full-screen hero overlay', 'split-screen modern with side-by-side hero', 'dark bold premium with dark background and neon accents', 'minimal zen with maximum whitespace and centered text', 'colorful modern with rounded corners and floating cards', 'magazine editorial with asymmetric grid layout'];
 
     const system = `Tu es un expert en développement web et design UI/UX. Crée des sites web MODERNES, PROFESSIONNELS et UNIQUES.
-
+    Langue de rédaction obligatoire : ${apiConfig.region === 'US' ? 'ANGLAIS (English)' : 'FRANÇAIS (Français)'}.
+    
 PRINCIPES:
 - Design épuré et moderne
 - Structure HTML5 sémantique
 - CSS responsive et animations fluides
-- Contenu personnalisé selon le secteur
+- Contenu personnalisé selon le secteur (${apiConfig.region === 'US' ? 'culture US/UK' : 'culture française'})
 - Performance optimisée
 
 RÈGLES STRICTES:

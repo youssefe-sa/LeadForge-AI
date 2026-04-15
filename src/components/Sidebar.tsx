@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ApiConfig } from '../lib/supabase-store';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -7,12 +8,12 @@ const C = {
   green: '#1A7A4A', blue: '#1A4FA0', amber: '#B45309', red: '#C0392B',
 };
 
-const agents = [
-  { id: 'dashboard', label: 'Lead Dashboard', icon: '📊', color: C.accent },
-  { id: 'scorer', label: 'Scorer & Enrichissement', icon: '🧠', color: C.green },
-  { id: 'website', label: 'Website Generator', icon: '🌐', color: C.blue },
-  { id: 'outreach', label: 'Outreach Agent', icon: '📧', color: C.amber },
-  { id: 'pipeline', label: 'Pipeline & Analytics', icon: '📈', color: C.red },
+const getAgents = (region: string) => [
+  { id: 'dashboard', label: region === 'US' ? 'Lead Dashboard' : 'Lead Dashboard', icon: '📊', color: C.accent },
+  { id: 'scorer', label: region === 'US' ? 'Scorer & Enrichment' : 'Scorer & Enrichissement', icon: '🧠', color: C.green },
+  { id: 'website', label: region === 'US' ? 'Website Generator' : 'Website Generator', icon: '🌐', color: C.blue },
+  { id: 'outreach', label: region === 'US' ? 'Outreach Agent' : 'Outreach Agent', icon: '📧', color: C.amber },
+  { id: 'pipeline', label: region === 'US' ? 'Pipeline & Analytics' : 'Pipeline & Analytics', icon: '📈', color: C.red },
 ];
 
 interface LogEntry {
@@ -29,9 +30,11 @@ interface Props {
   onNavigate: (id: string) => void;
   leadCount: number;
   apiCount: number;
+  config: ApiConfig;
+  updateConfig: (updates: Partial<ApiConfig>) => Promise<void>;
 }
 
-export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Props) {
+export default function Sidebar({ active, onNavigate, leadCount, apiCount, config, updateConfig }: Props) {
   const [logs, setLogs] = useState<LogEntry[]>([
     { 
       timestamp: new Date().toLocaleTimeString(), 
@@ -130,7 +133,8 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
 
   useEffect(() => {
     // Ajouter un log quand la page active change
-    const agentName = agents.find(a => a.id === active)?.label || 'Page';
+    const currentAgents = getAgents(config.region);
+    const agentName = currentAgents.find(a => a.id === active)?.label || 'Page';
     const newLog: LogEntry = {
       timestamp: new Date().toLocaleTimeString(),
       message: `🧭 Navigation: ${agentName} activée`,
@@ -140,7 +144,7 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
       agent: agentName
     };
     setLogs(prevLogs => [...prevLogs.slice(-49), newLog]);
-  }, [active]);
+  }, [active, config.region]);
   return (
     <div style={{
       width: 240, minHeight: '100vh', background: C.surface, borderRight: `1px solid ${C.border}`,
@@ -149,7 +153,7 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
     }}>
       {/* Logo */}
       <div style={{ padding: '24px 20px 20px', borderBottom: `1px solid ${C.border}` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <div style={{
             width: 36, height: 36, borderRadius: 8, background: C.accent,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -158,17 +162,68 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
           }}>LF</div>
           <div>
             <div style={{ fontWeight: 700, fontSize: 15, color: C.tx, letterSpacing: '-0.3px' }}>LeadForge AI</div>
-            <div style={{ fontSize: 11, color: C.tx3 }}>Prospection B2B</div>
+            <div style={{ fontSize: 11, color: C.tx3 }}>{config.region === 'US' ? 'B2B Outreach' : 'Prospection B2B'}</div>
           </div>
+        </div>
+
+        {/* Region Switcher Compact */}
+        <div style={{ 
+          display: 'inline-flex', 
+          background: C.surface2, 
+          borderRadius: 20, 
+          padding: 3,
+          border: `1px solid ${C.border}`,
+          marginBottom: 8
+        }}>
+          <button
+            onClick={() => updateConfig({ region: 'FR' })}
+            style={{
+              padding: '4px 12px',
+              fontSize: 10,
+              fontWeight: config.region === 'FR' ? 700 : 500,
+              border: 'none',
+              borderRadius: 18,
+              background: config.region === 'FR' ? C.accent : 'transparent',
+              color: config.region === 'FR' ? '#fff' : C.tx3,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: config.region === 'FR' ? '0 2px 4px rgba(212, 80, 10, 0.3)' : 'none'
+            }}
+          >
+            <span>🇫🇷</span> FR
+          </button>
+          <button
+            onClick={() => updateConfig({ region: 'US' })}
+            style={{
+              padding: '4px 12px',
+              fontSize: 10,
+              fontWeight: config.region === 'US' ? 700 : 500,
+              border: 'none',
+              borderRadius: 18,
+              background: config.region === 'US' ? C.accent : 'transparent',
+              color: config.region === 'US' ? '#fff' : C.tx3,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: config.region === 'US' ? '0 2px 4px rgba(212, 80, 10, 0.3)' : 'none'
+            }}
+          >
+            <span>🇺🇸</span> US
+          </button>
         </div>
       </div>
 
       {/* Navigation */}
       <nav style={{ flex: 1, padding: '12px 10px' }}>
         <div style={{ fontSize: 10, fontWeight: 600, color: C.tx3, textTransform: 'uppercase', letterSpacing: '1px', padding: '8px 10px 6px', marginBottom: 2 }}>
-          Agents
+          {config.region === 'US' ? 'Agents' : 'Agents'}
         </div>
-        {agents.map(a => {
+        {getAgents(config.region).map(a => {
           const isActive = active === a.id;
           return (
             <button key={a.id} onClick={() => onNavigate(a.id)} style={{
@@ -191,7 +246,7 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
 
         <div style={{ height: 1, background: C.border, margin: '12px 10px' }} />
         <div style={{ fontSize: 10, fontWeight: 600, color: C.tx3, textTransform: 'uppercase', letterSpacing: '1px', padding: '8px 10px 6px' }}>
-          Système
+          {config.region === 'US' ? 'System' : 'Système'}
         </div>
         <button 
           style={{
@@ -212,7 +267,7 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
           onMouseLeave={e => { if (active !== 'campaigns') (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
         >
           <span style={{ fontSize: 14 }}>📋</span>
-          <span style={{ fontSize: 13, fontWeight: active === 'campaigns' ? 600 : 400, color: active === 'campaigns' ? C.tx : C.tx2 }}>Campagnes d'importation</span>
+          <span style={{ fontSize: 13, fontWeight: active === 'campaigns' ? 600 : 400, color: active === 'campaigns' ? C.tx : C.tx2 }}>{config.region === 'US' ? 'Import Campaigns' : 'Campagnes d\'importation'}</span>
         </button>
         <button 
           style={{
@@ -233,7 +288,7 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
           onMouseLeave={e => { if (active !== 'settings') (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
         >
           <span style={{ fontSize: 14 }}>⚙️</span>
-          <span style={{ fontSize: 13, fontWeight: active === 'settings' ? 600 : 400, color: active === 'settings' ? C.tx : C.tx2 }}>Paramètres</span>
+          <span style={{ fontSize: 13, fontWeight: active === 'settings' ? 600 : 400, color: active === 'settings' ? C.tx : C.tx2 }}>{config.region === 'US' ? 'Settings' : 'Paramètres'}</span>
         </button>
       </nav>
 
