@@ -19,6 +19,9 @@ interface LogEntry {
   timestamp: string;
   message: string;
   color: string;
+  type: 'system' | 'agent' | 'navigation' | 'verification' | 'lead' | 'api';
+  agent?: string;
+  action?: string;
 }
 
 interface Props {
@@ -30,11 +33,41 @@ interface Props {
 
 export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Props) {
   const [logs, setLogs] = useState<LogEntry[]>([
-    { timestamp: new Date().toLocaleTimeString(), message: 'Système démarré', color: '#1A7A4A' },
-    { timestamp: new Date().toLocaleTimeString(), message: 'Surveillance active...', color: '#9B9890' },
-    { timestamp: new Date().toLocaleTimeString(), message: `${leadCount} leads chargés`, color: '#D4500A' },
-    { timestamp: new Date().toLocaleTimeString(), message: `${apiCount} APIs connectées`, color: '#1A4FA0' },
-    { timestamp: new Date().toLocaleTimeString(), message: 'Pipeline en cours...', color: '#B45309' },
+    { 
+      timestamp: new Date().toLocaleTimeString(), 
+      message: '🚀 Système LeadForge AI démarré', 
+      color: '#1A7A4A',
+      type: 'system',
+      action: 'démarrage'
+    },
+    { 
+      timestamp: new Date().toLocaleTimeString(), 
+      message: '👁️ Surveillance active...', 
+      color: '#9B9890',
+      type: 'system',
+      action: 'surveillance'
+    },
+    { 
+      timestamp: new Date().toLocaleTimeString(), 
+      message: `📊 ${leadCount} leads chargés dans le système`, 
+      color: '#D4500A',
+      type: 'lead',
+      action: 'chargement'
+    },
+    { 
+      timestamp: new Date().toLocaleTimeString(), 
+      message: `🔑 ${apiCount} APIs connectées et actives`, 
+      color: '#1A4FA0',
+      type: 'api',
+      action: 'connexion'
+    },
+    { 
+      timestamp: new Date().toLocaleTimeString(), 
+      message: '📈 Pipeline d\'analyse prêt', 
+      color: '#B45309',
+      type: 'system',
+      action: 'initialisation'
+    },
   ]);
   
   const logContainerRef = React.useRef<HTMLDivElement>(null);
@@ -55,14 +88,16 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
     const interval = setInterval(() => {
       const newLog: LogEntry = {
         timestamp: new Date().toLocaleTimeString(),
-        message: `Vérification automatique - Leads: ${leadCount}, APIs: ${apiCount}`,
-        color: '#9B9890'
+        message: `🔄 Vérification automatique - Leads: ${leadCount}, APIs: ${apiCount}`,
+        color: '#9B9890',
+        type: 'verification',
+        action: 'surveillance'
       };
       
       setLogs(prevLogs => {
         const updatedLogs = [...prevLogs, newLog];
-        // Garder seulement les 20 derniers logs
-        return updatedLogs.slice(-20);
+        // Garder seulement les 50 derniers logs
+        return updatedLogs.slice(-50);
       });
     }, 5000); // Toutes les 5 secondes
 
@@ -73,30 +108,38 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
     // Ajouter un log quand le nombre de leads change
     const newLog: LogEntry = {
       timestamp: new Date().toLocaleTimeString(),
-      message: `Changement détecté: ${leadCount} leads dans le système`,
-      color: '#D4500A'
+      message: `📊 Mise à jour: ${leadCount} leads détectés`,
+      color: '#D4500A',
+      type: 'lead',
+      action: 'changement'
     };
-    setLogs(prevLogs => [...prevLogs.slice(-19), newLog]);
+    setLogs(prevLogs => [...prevLogs.slice(-49), newLog]);
   }, [leadCount]);
 
   useEffect(() => {
     // Ajouter un log quand le nombre d'APIs change
     const newLog: LogEntry = {
       timestamp: new Date().toLocaleTimeString(),
-      message: `Mise à jour APIs: ${apiCount} services actifs`,
-      color: '#1A4FA0'
+      message: `🔑 Mise à jour: ${apiCount} APIs connectées`,
+      color: '#1A4FA0',
+      type: 'api',
+      action: 'mise à jour'
     };
-    setLogs(prevLogs => [...prevLogs.slice(-19), newLog]);
+    setLogs(prevLogs => [...prevLogs.slice(-49), newLog]);
   }, [apiCount]);
 
   useEffect(() => {
     // Ajouter un log quand la page active change
+    const agentName = agents.find(a => a.id === active)?.label || 'Page';
     const newLog: LogEntry = {
       timestamp: new Date().toLocaleTimeString(),
-      message: `Navigation: ${active} activé`,
-      color: '#B45309'
+      message: `🧭 Navigation: ${agentName} activée`,
+      color: '#B45309',
+      type: 'navigation',
+      action: 'activation',
+      agent: agentName
     };
-    setLogs(prevLogs => [...prevLogs.slice(-19), newLog]);
+    setLogs(prevLogs => [...prevLogs.slice(-49), newLog]);
   }, [active]);
   return (
     <div style={{
@@ -208,28 +251,92 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
           textTransform: 'uppercase', 
           letterSpacing: '1px', 
           marginBottom: 8,
-          textAlign: 'center'
+          textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          justifyContent: 'center'
         }}>
-          Journal Temps Réel
+          <span>📊</span>
+          <span>Journal Temps Réel</span>
         </div>
         <div 
           ref={logContainerRef}
           style={{ 
-            background: '#0A0A09', 
-            borderRadius: 6, 
-            padding: 8, 
-            height: 120, 
+            background: 'linear-gradient(135deg, #0A0A09 0%, #1A1A1A 100%)', 
+            borderRadius: 8, 
+            padding: 10, 
+            height: 140, 
             overflow: 'auto',
-            fontSize: 10,
+            fontSize: 9,
             fontFamily: "'DM Mono', monospace",
-            border: '1px solid #333'
+            border: '1px solid #333',
+            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
-          {logs.map((log, index) => (
-            <div key={index} style={{ color: log.color, marginBottom: 2 }}>
-              [{log.timestamp}] {log.message}
-            </div>
-          ))}
+          {logs.map((log, index) => {
+            // Déterminer l'icône selon le type
+            const getIcon = () => {
+              switch(log.type) {
+                case 'system': return '🚀';
+                case 'agent': return '🤖';
+                case 'navigation': return '🧭';
+                case 'verification': return '🔄';
+                case 'lead': return '📊';
+                case 'api': return '🔑';
+                default: return '📝';
+              }
+            };
+
+            return (
+              <div 
+                key={index} 
+                style={{ 
+                  color: log.color, 
+                  marginBottom: 3,
+                  padding: '4px 6px',
+                  borderRadius: 4,
+                  background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
+                  borderLeft: `2px solid ${log.color}`,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 6,
+                  marginBottom: 1
+                }}>
+                  <span style={{ fontSize: 10 }}>{getIcon()}</span>
+                  <span style={{ 
+                    fontSize: 8, 
+                    color: '#9B9890',
+                    background: '#1C1B18',
+                    padding: '1px 4px',
+                    borderRadius: 3,
+                    fontWeight: 600
+                  }}>
+                    {log.type?.toUpperCase()}
+                  </span>
+                  {log.agent && (
+                    <span style={{ 
+                      fontSize: 7, 
+                      color: '#9B9890',
+                      background: '#1C1B18',
+                      padding: '1px 3px',
+                      borderRadius: 3,
+                      fontStyle: 'italic'
+                    }}>
+                      {log.agent}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: 9, opacity: 0.8 }}>
+                  [{log.timestamp}] {log.message}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

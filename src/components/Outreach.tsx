@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Lead, ApiConfig, EmailTemplate, callLLM, useScheduledEmails, ScheduledEmail } from '../lib/supabase-store';
 import { supabase } from '../lib/supabase';
 import { salesTemplates, reminderTemplates, getTemplateById } from '../templates/outreach-templates-final';
@@ -60,6 +60,38 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const [currentPage, setCurrentPage] = useState(1);
   const [leadsPerPage, setLeadsPerPage] = useState(3);
   const [filterStatus, setFilterStatus] = useState<'all' | 'opened' | 'converted' | 'not-converted'>('all');
+
+  // États pour l'email test
+  const [testEmail, setTestEmail] = useState('');
+  const [testEmailLoading, setTestEmailLoading] = useState(false);
+  const [testEmailError, setTestEmailError] = useState('');
+  const [testEmailSuccess, setTestEmailSuccess] = useState('');
+
+  // États pour l'édition de template
+  const [isEditingTemplate, setIsEditingTemplate] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<any>(null);
+  const [editedSubject, setEditedSubject] = useState('');
+  const [editedContent, setEditedContent] = useState('');
+  const [editedVariables, setEditedVariables] = useState<string[]>([]);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState('');
+
+  // États pour l'éditeur avancé
+  const [editorMode, setEditorMode] = useState<'wysiwyg' | 'html'>('wysiwyg');
+  const [showPreview, setShowPreview] = useState(false);
+  const [selectedText, setSelectedText] = useState('');
+  const [cursorPosition, setCursorPosition] = useState(0);
+
+  // États pour le moteur de recherche de variables
+  const [variableSearch, setVariableSearch] = useState('');
+  const [allVariables, setAllVariables] = useState<string[]>([]);
+  const [filteredVariables, setFilteredVariables] = useState<string[]>([]);
+  const [showVariableSuggestions, setShowVariableSuggestions] = useState(false);
+
+  // États pour le preview mobile
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [mobileEditMode, setMobileEditMode] = useState(false);
 
   const hasGmailSmtp = !!(apiConfig.gmailSmtpUser && apiConfig.gmailSmtpPassword);
   const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.nvidiaKey || apiConfig.openrouterKey);
@@ -386,36 +418,260 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
   };
 
   const sendTestEmail = async () => {
-    if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
-    if (!testEmailAddress || !testEmailAddress.includes('@')) {
-      alert('Veuillez entrer une adresse email valide');
+    if (!hasGmailSmtp) { 
+      setTestEmailError('Configurez Gmail SMTP dans les Paramètres');
+      return; 
+    }
+    if (!testEmail || !testEmail.includes('@')) {
+      setTestEmailError('Veuillez entrer une adresse email valide');
       return;
     }
 
-    setTestEmailSending(true);
-    setLogs(prev => [...prev, `🧪 Envoi d'email test à ${testEmailAddress}...`]);
+    setTestEmailLoading(true);
+    setTestEmailError('');
+    setTestEmailSuccess('');
+    setLogs(prev => [...prev, `Envoi d'email test à ${testEmail}...`]);
 
-    const allTemplates = [...salesTemplates, ...reminderTemplates];
-    const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
-    const testLead: Lead = {
-      id: 'test', name: 'Test Prospect', email: testEmailAddress,
-      sector: 'Commerce', city: 'Ville Test',
-      landingUrl: 'https://example.com',
-    } as Lead;
+    try {
+      const allTemplates = [...salesTemplates, ...reminderTemplates];
+      const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
+      const testLead: Lead = {
+        id: 'test', name: 'Test Prospect', email: testEmail,
+        sector: 'Commerce', city: 'Ville Test',
+        landingUrl: 'https://example.com',
+      } as Lead;
 
-    const { subject, body } = personalizeTemplateContent(template, testLead, apiConfig);
-    const result = await sendEmailViaApi({
-      to: testEmailAddress,
-      toName: 'Test',
-      subject,
-      html: body.replace(/\n/g, '<br/>'),
+      const { subject, body } = personalizeTemplateContent(template, testLead, apiConfig);
+      const result = await sendEmailViaApi({
+        to: testEmail,
+        toName: 'Test',
+        subject,
+        html: body.replace(/\n/g, '<br/>'),
+      });
+
+      if (result.success) {
+        setTestEmailSuccess(`Email test envoyé avec succès à ${testEmail}`);
+        setLogs(prev => [...prev, `Email test envoyé à ${testEmail}`]);
+      } else {
+        setTestEmailError(`Échec de l'envoi: ${result.message}`);
+        setLogs(prev => [...prev, `Échec envoi test: ${result.message}`]);
+      }
+    } catch (error) {
+      setTestEmailError('Erreur lors de l\'envoi de l\'email test');
+      setLogs(prev => [...prev, `Erreur envoi test: ${error}`]);
+    } finally {
+      setTestEmailLoading(false);
+    }
+  };
+
+  // Fonctions pour la barre d'outils d'édition
+  const insertText = (text: string, before: string = '', after: string = '') => {
+    const textarea = document.getElementById('template-editor') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    const newText = before + selectedText + after;
+    const newContent = editedContent.substring(0, start) + newText + editedContent.substring(end);
+    
+    setEditedContent(newContent);
+    
+    // Restaurer le curseur
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + before.length + selectedText.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
+  const insertVariable = (variable: string) => {
+    insertText(`{{${variable}}}`);
+  };
+
+  const formatText = (tag: string) => {
+    insertText('', `<${tag}>`, `</${tag}>`);
+  };
+
+  const insertLink = () => {
+    const url = prompt('Entrez l\'URL du lien:');
+    if (url) {
+      insertText(url, '<a href="', '"></a>');
+    }
+  };
+
+  const insertImage = () => {
+    const url = prompt('Entrez l\'URL de l\'image:');
+    if (url) {
+      insertText(url, '<img src="', '" alt="" style="max-width: 100%; height: auto;">');
+    }
+  };
+
+  const insertButton = () => {
+    const text = prompt('Entrez le texte du bouton:');
+    const url = prompt('Entrez l\'URL du bouton:');
+    if (text && url) {
+      insertText(text, `<a href="${url}" style="display: inline-block; padding: 12px 24px; background: #D4500A; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">`, `</a>`);
+    }
+  };
+
+  const insertLineBreak = () => {
+    insertText('<br>');
+  };
+
+  const insertHorizontalRule = () => {
+    insertText('<hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">');
+  };
+
+  // Fonctions pour le moteur de recherche de variables
+  const scanAllVariables = () => {
+    // Scanner tous les templates pour extraire toutes les variables
+    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+    const allVars = new Set<string>();
+    
+    allTemplates.forEach(template => {
+      const content = template.htmlContent || template.body || template.textContent || '';
+      const variableRegex = /\{\{(\w+)\}\}/g;
+      const matches = content.match(variableRegex) || [];
+      matches.forEach(match => {
+        const varName = match.replace(/[{}]/g, '');
+        allVars.add(varName);
+      });
     });
 
-    setLogs(prev => [...prev, result.success
-      ? `✅ Email test envoyé à ${testEmailAddress}`
-      : `❌ Échec envoi test: ${result.message}`
-    ]);
-    setTestEmailSending(false);
+    // Ajouter les variables communes prédéfinies
+    const commonVariables = [
+      'firstName', 'lastName', 'companyName', 'websiteLink', 'price', 
+      'agentName', 'agentEmail', 'agentPhone', 'sector', 'city', 
+      'country', 'address', 'phone', 'email', 'date', 'time'
+    ];
+    
+    commonVariables.forEach(v => allVars.add(v));
+    
+    const variables = Array.from(allVars).sort();
+    setAllVariables(variables);
+    setFilteredVariables(variables);
+  };
+
+  const handleVariableSearch = (searchTerm: string) => {
+    setVariableSearch(searchTerm);
+    
+    if (searchTerm.trim() === '') {
+      setFilteredVariables(allVariables);
+    } else {
+      const filtered = allVariables.filter(variable => 
+        variable.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredVariables(filtered);
+    }
+  };
+
+  const insertVariableFromSearch = (variable: string) => {
+    insertVariable(variable);
+    setVariableSearch('');
+    setShowVariableSuggestions(false);
+  };
+
+  // Scanner les variables au montage du composant
+  useEffect(() => {
+    scanAllVariables();
+  }, [templates, salesTemplates, reminderTemplates]);
+
+  // Fonctions pour l'édition de template
+  const startEditingTemplate = (template: any) => {
+    setIsEditingTemplate(true);
+    setEditingTemplate(template);
+    setEditedSubject(template.subject || '');
+    setEditedContent(template.htmlContent || template.textContent || '');
+    setEditedVariables(template.variables || []);
+    setSaveError('');
+    setSaveSuccess('');
+    setEditorMode('wysiwyg');
+    setShowPreview(false);
+  };
+
+  const cancelEditing = () => {
+    setIsEditingTemplate(false);
+    setEditingTemplate(null);
+    setEditedSubject('');
+    setEditedContent('');
+    setEditedVariables([]);
+    setSaveError('');
+    setSaveSuccess('');
+  };
+
+  const saveTemplate = async () => {
+    if (!editingTemplate) return;
+
+    setSavingTemplate(true);
+    setSaveError('');
+    setSaveSuccess('');
+
+    try {
+      // Extraire les variables du contenu édité
+      const variableRegex = /\{\{(\w+)\}\}/g;
+      const matches = editedContent.match(variableRegex) || [];
+      const extractedVariables = [...new Set(matches.map(match => match.replace(/[{}]/g, '')))];
+
+      // Mettre à jour le template dans Supabase avec gestion d'erreur pour la colonne variables
+      let updateData: any = {
+        subject: editedSubject,
+        body: editedContent, // Utiliser 'body' au lieu de 'htmlContent'
+        updated_at: new Date().toISOString()
+      };
+
+      // Essayer d'inclure les variables seulement si la colonne existe
+      try {
+        updateData.variables = extractedVariables;
+      } catch (e) {
+        console.log('Colonne variables non disponible, sauvegarde sans variables');
+      }
+
+      const { error } = await supabase
+        .from('email_templates')
+        .update(updateData)
+        .eq('id', editingTemplate.id);
+
+      if (error) {
+        // Si l'erreur concerne la colonne variables, réessayer sans
+        if (error.message?.includes('variables') || error.code === 'PGRST204') {
+          console.log('Erreur colonne variables, sauvegarde sans cette colonne');
+          const { error: retryError } = await supabase
+            .from('email_templates')
+            .update({
+              subject: editedSubject,
+              body: editedContent,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', editingTemplate.id);
+          
+          if (retryError) {
+            throw retryError;
+          }
+        } else {
+          throw error;
+        }
+      }
+
+      // Note: Les templates sont importés statiquement, pas besoin de mise à jour locale
+      // La mise à jour dans Supabase suffit pour la persistance
+
+      setSaveSuccess(`Template "${editingTemplate.name}" sauvegardé avec succès !`);
+      setLogs(prev => [...prev, `Template "${editingTemplate.name}" mis à jour dans Supabase`]);
+      
+      // Fermer le mode édition après 2 secondes
+      setTimeout(() => {
+        cancelEditing();
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('Erreur sauvegarde template:', error);
+      setSaveError(`Erreur lors de la sauvegarde: ${error.message || 'Erreur inconnue'}`);
+      setLogs(prev => [...prev, `Erreur sauvegarde template: ${error.message}`]);
+    } finally {
+      setSavingTemplate(false);
+    }
   };
 
   // Wrappers pour le workflow (utilisés dans le JSX)
@@ -544,92 +800,1073 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
           </div>
         </div>
       )}
+      {/* Templates d'email - Section professionnelle réorganisée */}
+      <div style={{ 
+        background: C.surface, 
+        borderRadius: 12, 
+        padding: '24px', 
+        border: `1px solid ${C.border}`, 
+        marginBottom: 20,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.04)'
+      }}>
+        
+        {/* Header principal avec actions globales */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start', 
+          marginBottom: 24,
+          paddingBottom: 16,
+          borderBottom: `2px solid ${C.bg}`
+        }}>
+          <div>
+            <h3 style={{ 
+              fontSize: 18, 
+              fontWeight: 700, 
+              margin: '0 0 4px 0', 
+              color: C.tx,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}>
+              <span>📧</span>
+              Templates d'email
+            </h3>
+            <p style={{ 
+              fontSize: 12, 
+              color: C.tx3, 
+              margin: 0,
+              fontStyle: 'italic'
+            }}>
+              Gérez vos templates de vente et rappels
+            </p>
+          </div>
+          
+          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+            <button 
+              onClick={() => setShowEmailPreview(true)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 6,
+                border: '1px solid #D4500A',
+                background: '#D4500A',
+                color: '#fff',
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+            >
+              <span>👁️</span>
+              Visualiser HTML
+            </button>
+          </div>
+        </div>
 
-
-      {/* Templates */}
-      <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 600, margin: 0 }}>📋 Templates d'email</h3>
-          <button 
-            onClick={() => setShowEmailPreview(true)}
-            style={{
-              padding: '8px 16px',
-              borderRadius: 6,
-              border: '1px solid #D4500A',
-              background: '#D4500A',
-              color: '#fff',
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: 'pointer',
+        {/* Section Test Email */}
+        <div style={{ 
+          background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+          borderRadius: 8, 
+          padding: '16px', 
+          marginBottom: 24,
+          border: `1px solid ${C.border}`
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: 8 
+          }}>
+            <h4 style={{ 
+              fontSize: 14, 
+              fontWeight: 600, 
+              margin: 0, 
+              color: C.accent,
               display: 'flex',
               alignItems: 'center',
               gap: 6
-            }}
-          >
-            👁️ Visualiser l'email HTML
-          </button>
+            }}>
+              <span>🧪</span>
+              Test Email
+            </h4>
+            <span style={{ 
+              fontSize: 10, 
+              color: C.tx3, 
+              background: C.surface, 
+              padding: '2px 8px', 
+              borderRadius: 12 
+            }}>
+              {selectedTemplate ? 'Template sélectionné' : 'Aucun template'}
+            </span>
+          </div>
+          
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <input
+              placeholder="Entrez l'email de test..."
+              type="email"
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                border: `1px solid ${C.border}`,
+                borderRadius: 6,
+                fontSize: 11,
+                background: C.surface,
+                color: C.tx,
+                fontFamily: "'DM Mono', monospace"
+              }}
+            />
+            <button
+              onClick={sendTestEmail}
+              disabled={!testEmail || !selectedTemplate}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 6,
+                border: 'none',
+                background: (testEmail && selectedTemplate) ? C.accent : C.surface2,
+                color: (testEmail && selectedTemplate) ? '#fff' : C.tx3,
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: (testEmail && selectedTemplate) ? 'pointer' : 'default',
+                minWidth: '80px'
+              }}
+            >
+              {testEmailLoading ? 'Envoi...' : 'Envoyer Test'}
+            </button>
+          </div>
+          
+          {/* Messages de feedback */}
+          {testEmailError && (
+            <div style={{ 
+              marginTop: 8, 
+              padding: '6px 10px', 
+              background: C.red + '15', 
+              border: `1px solid ${C.red}40`, 
+              borderRadius: 4, 
+              fontSize: 10, 
+              color: C.red
+            }}>
+              {testEmailError}
+            </div>
+          )}
+          
+          {testEmailSuccess && (
+            <div style={{ 
+              marginTop: 8, 
+              padding: '6px 10px', 
+              background: C.green + '15', 
+              border: `1px solid ${C.green}40`, 
+              borderRadius: 4, 
+              fontSize: 10, 
+              color: C.green
+            }}>
+              {testEmailSuccess}
+            </div>
+          )}
         </div>
-        
-        
-        {/* Templates de VENTE */}
-        <div style={{ marginBottom: 20 }}>
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: C.green, marginBottom: 10 }}>� Templates de VENTE</h4>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+
+        {/* Section Templates de VENTE */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: 16 
+          }}>
+            <h4 style={{ 
+              fontSize: 16, 
+              fontWeight: 600, 
+              margin: 0, 
+              color: C.green,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}>
+              <span>💰</span>
+              Templates de VENTE
+              <span style={{ 
+                fontSize: 11, 
+                color: C.tx3, 
+                background: C.bg, 
+                padding: '2px 8px', 
+                borderRadius: 12,
+                fontWeight: 400
+              }}>
+                {salesTemplates.length} templates
+              </span>
+            </h4>
+            <div style={{ 
+              fontSize: 10, 
+              color: C.tx3, 
+              fontStyle: 'italic',
+              textAlign: 'right'
+            }}>
+              Workflow: 6 étapes de vente
+            </div>
+          </div>
+          
+          <div style={{ 
+            display: 'flex', 
+            gap: 8, 
+            marginBottom: 12,
+            overflowX: 'auto',
+            padding: '4px 0'
+          }}>
             {salesTemplates.map(t => (
               <button key={t.id} onClick={() => setSelectedTemplate(t.id)} style={{
-                padding: '8px 14px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
-                border: `1px solid ${selectedTemplate === t.id ? C.green : C.border}`,
-                background: selectedTemplate === t.id ? '#e8f5e9' : C.surface,
-                color: selectedTemplate === t.id ? C.green : C.tx2, fontWeight: 500,
+                padding: '10px 14px',
+                borderRadius: 8,
+                fontSize: 11,
+                cursor: 'pointer',
+                border: `2px solid ${selectedTemplate === t.id ? C.green : C.border}`,
+                background: selectedTemplate === t.id ? C.green + '15' : C.surface,
+                color: selectedTemplate === t.id ? C.green : C.tx2,
+                fontWeight: 500,
+                textAlign: 'left',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                minWidth: '140px',
+                flexShrink: 0
               }}>
-                <span style={{ marginRight: 4 }}>{t.category === 'sale' ? '💰' : '⏰'}</span>
-                {t.name.split(' - ')[1]}
+                <span style={{ fontSize: 14 }}>{t.category === 'sale' ? '💰' : '📧'}</span>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 600, marginBottom: 1, fontSize: 11 }}>
+                    {t.name.split(' - ')[1]}
+                  </div>
+                  <div style={{ fontSize: 9, color: C.tx3 }}>
+                    Étape {t.name.split(' - ')[0]}
+                  </div>
+                </div>
               </button>
             ))}
           </div>
-          <div style={{ fontSize: 11, color: C.tx3, fontStyle: 'italic' }}>
-            Email 1: Présentation → Email 2: Devis/Paiement → Email 3: Confirmation Dépôt → Email 4: Paiement Final → Email 5: Confirmation Final → Email 6: Livraison
+          
+          <div style={{ 
+            fontSize: 11, 
+            color: C.tx3, 
+            background: C.bg, 
+            padding: '8px 12px', 
+            borderRadius: 6,
+            border: `1px solid ${C.border}`
+          }}>
+            <strong>🔄 Workflow de vente:</strong> Présentation → Devis/Paiement → Confirmation Dépôt → Paiement Final → Confirmation Final → Livraison
           </div>
         </div>
 
-        {/* Templates de RAPPEL */}
+        {/* Section Templates de RAPPEL */}
         <div>
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: C.blue, marginBottom: 10 }}>⏰ Templates de RAPPEL</h4>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: 16 
+          }}>
+            <h4 style={{ 
+              fontSize: 16, 
+              fontWeight: 600, 
+              margin: 0, 
+              color: C.blue,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}>
+              <span>⏰</span>
+              Templates de RAPPEL
+              <span style={{ 
+                fontSize: 11, 
+                color: C.tx3, 
+                background: C.bg, 
+                padding: '2px 8px', 
+                borderRadius: 12,
+                fontWeight: 400
+              }}>
+                {reminderTemplates.length} templates
+              </span>
+            </h4>
+            <div style={{ 
+              fontSize: 10, 
+              color: C.tx3, 
+              fontStyle: 'italic',
+              textAlign: 'right'
+            }}>
+              Automatisation: 3 rappels
+            </div>
+          </div>
+          
+          <div style={{ 
+            display: 'flex', 
+            gap: 8, 
+            marginBottom: 12,
+            overflowX: 'auto',
+            padding: '4px 0'
+          }}>
             {reminderTemplates.map(t => (
               <button key={t.id} onClick={() => setSelectedTemplate(t.id)} style={{
-                padding: '8px 14px', borderRadius: 6, fontSize: 13, cursor: 'pointer',
-                border: `1px solid ${selectedTemplate === t.id ? C.blue : C.border}`,
-                background: selectedTemplate === t.id ? '#e3f2fd' : C.surface,
-                color: selectedTemplate === t.id ? C.blue : C.tx2, fontWeight: 500,
+                padding: '10px 14px',
+                borderRadius: 8,
+                fontSize: 11,
+                cursor: 'pointer',
+                border: `2px solid ${selectedTemplate === t.id ? C.blue : C.border}`,
+                background: selectedTemplate === t.id ? C.blue + '15' : C.surface,
+                color: selectedTemplate === t.id ? C.blue : C.tx2,
+                fontWeight: 500,
+                textAlign: 'left',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                minWidth: '140px',
+                flexShrink: 0
               }}>
-                <span style={{ marginRight: 4 }}>⏰</span>
-                {t.name.split(' - ')[1]}
+                <span style={{ fontSize: 14 }}>⏰</span>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 600, marginBottom: 1, fontSize: 11 }}>
+                    {t.name.split(' - ')[1]}
+                  </div>
+                  <div style={{ fontSize: 9, color: C.tx3 }}>
+                    {t.name.split(' - ')[0]}
+                  </div>
+                </div>
               </button>
             ))}
           </div>
-          <div style={{ fontSize: 11, color: C.tx3, fontStyle: 'italic' }}>
-            Rappel 1: 3 jours après Email 1 → Rappel 2: 2 jours avant expiration → Rappel 3: 3 jours après Email 4 (paiement final)
+          
+          <div style={{ 
+            fontSize: 11, 
+            color: C.tx3, 
+            background: C.bg, 
+            padding: '8px 12px', 
+            borderRadius: 6,
+            border: `1px solid ${C.border}`
+          }}>
+            <strong>⏰ Automatisation des rappels:</strong> Rappel 1 (1j après Email 1) → Rappel 2 (1j après Email 2) → Rappel 3 (1j après Email 4)
           </div>
         </div>
 
-        {/* Preview du template sélectionné */}
+        {/* Éditeur de template professionnel */}
         {(() => {
           const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
           const selected = allTemplates.find(t => t.id === selectedTemplate);
           if (!selected) return null;
           
+          // Si on est en mode édition pour ce template
+          if (isEditingTemplate && editingTemplate?.id === selected.id) {
+            return (
+              <div style={{ 
+                marginTop: 14, 
+                background: C.bg, 
+                borderRadius: 12, 
+                border: `2px solid ${C.accent}`,
+                fontSize: 13,
+                overflow: 'hidden'
+              }}>
+                {/* Header de l'éditeur professionnel */}
+                <div style={{ 
+                  background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                  padding: '16px 20px',
+                  borderBottom: `1px solid ${C.border}`
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center' 
+                  }}>
+                    <div>
+                      <h4 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: C.accent, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span>Editor</span>
+                        <span style={{ fontSize: 12, color: C.tx3, background: C.bg, padding: '2px 8px', borderRadius: 12 }}>
+                          {selected.name}
+                        </span>
+                      </h4>
+                      <p style={{ fontSize: 11, color: C.tx3, margin: '4px 0 0 0' }}>
+                        Éditeur professionnel d'email template
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button
+                        onClick={() => setShowPreview(!showPreview)}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: showPreview ? C.accent + '15' : C.surface,
+                          color: showPreview ? C.accent : C.tx3,
+                          fontSize: 11,
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {showPreview ? 'Masquer' : 'Aperçu'}
+                      </button>
+                      <button
+                        onClick={cancelEditing}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: C.surface,
+                          color: C.tx3,
+                          fontSize: 11,
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Annuler
+                      </button>
+                      <button
+                        onClick={saveTemplate}
+                        disabled={savingTemplate}
+                        style={{
+                          padding: '6px 16px',
+                          borderRadius: 4,
+                          border: 'none',
+                          background: savingTemplate ? C.surface2 : C.accent,
+                          color: savingTemplate ? C.tx3 : '#fff',
+                          fontSize: 11,
+                          fontWeight: 600,
+                          cursor: savingTemplate ? 'default' : 'pointer'
+                        }}
+                      >
+                        {savingTemplate ? 'Sauvegarde...' : 'Sauvegarder'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Messages de feedback */}
+                {saveError && (
+                  <div style={{ 
+                    margin: '12px 20px', 
+                    padding: '8px 12px', 
+                    background: C.red + '15', 
+                    border: `1px solid ${C.red}40`, 
+                    borderRadius: 4, 
+                    fontSize: 11, 
+                    color: C.red
+                  }}>
+                    {saveError}
+                  </div>
+                )}
+                
+                {saveSuccess && (
+                  <div style={{ 
+                    margin: '12px 20px', 
+                    padding: '8px 12px', 
+                    background: C.green + '15', 
+                    border: `1px solid ${C.green}40`, 
+                    borderRadius: 4, 
+                    fontSize: 11, 
+                    color: C.green
+                  }}>
+                    {saveSuccess}
+                  </div>
+                )}
+
+                {/* Champ d'édition du sujet */}
+                <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
+                  <label style={{ 
+                    display: 'block', 
+                    fontSize: 11, 
+                    fontWeight: 600, 
+                    color: C.tx2, 
+                    marginBottom: 8 
+                  }}>
+                    Sujet de l'email:
+                  </label>
+                  <input
+                    type="text"
+                    value={editedSubject}
+                    onChange={(e) => setEditedSubject(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      border: `1px solid ${C.border}`,
+                      borderRadius: 6,
+                      fontSize: 13,
+                      background: C.surface,
+                      color: C.tx,
+                      fontFamily: "'DM Mono', monospace",
+                      minHeight: '48px'
+                    }}
+                    placeholder="Entrez le sujet de l'email..."
+                  />
+                </div>
+
+                {/* Barre d'outils d'édition professionnelle */}
+                <div style={{ 
+                  background: '#f8f9fa',
+                  padding: '12px 20px',
+                  borderBottom: `1px solid ${C.border}`
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    marginBottom: 12
+                  }}>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <span style={{ fontSize: 10, fontWeight: 600, color: C.tx3 }}>MODE:</span>
+                      <button
+                        onClick={() => setEditorMode('wysiwyg')}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${editorMode === 'wysiwyg' ? C.accent : C.border}`,
+                          background: editorMode === 'wysiwyg' ? C.accent + '15' : C.surface,
+                          color: editorMode === 'wysiwyg' ? C.accent : C.tx3,
+                          fontSize: 10,
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        WYSIWYG
+                      </button>
+                      <button
+                        onClick={() => setEditorMode('html')}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${editorMode === 'html' ? C.accent : C.border}`,
+                          background: editorMode === 'html' ? C.accent + '15' : C.surface,
+                          color: editorMode === 'html' ? C.accent : C.tx3,
+                          fontSize: 10,
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        HTML
+                      </button>
+                    </div>
+                    
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      {/* Formatage texte */}
+                      <button
+                        onClick={() => formatText('strong')}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: C.surface,
+                          color: C.tx2,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                        title="Gras"
+                      >
+                        B
+                      </button>
+                      <button
+                        onClick={() => formatText('em')}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: C.surface,
+                          color: C.tx2,
+                          fontSize: 11,
+                          fontStyle: 'italic',
+                          cursor: 'pointer'
+                        }}
+                        title="Italique"
+                      >
+                        I
+                      </button>
+                      <button
+                        onClick={() => formatText('u')}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: C.surface,
+                          color: C.tx2,
+                          fontSize: 11,
+                          textDecoration: 'underline',
+                          cursor: 'pointer'
+                        }}
+                        title="Souligné"
+                      >
+                        U
+                      </button>
+                      
+                      <div style={{ width: 1, height: 20, background: C.border, margin: '0 4px' }} />
+                      
+                      {/* Éléments */}
+                      <button
+                        onClick={insertLink}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: C.surface,
+                          color: C.blue,
+                          fontSize: 10,
+                          cursor: 'pointer'
+                        }}
+                        title="Lien"
+                      >
+                        Lien
+                      </button>
+                      <button
+                        onClick={insertImage}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: C.surface,
+                          color: C.green,
+                          fontSize: 10,
+                          cursor: 'pointer'
+                        }}
+                        title="Image"
+                      >
+                        Image
+                      </button>
+                      <button
+                        onClick={insertButton}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: C.surface,
+                          color: C.accent,
+                          fontSize: 10,
+                          cursor: 'pointer'
+                        }}
+                        title="Bouton"
+                      >
+                        Bouton
+                      </button>
+                      
+                      <div style={{ width: 1, height: 20, background: C.border, margin: '0 4px' }} />
+                      
+                      {/* Autres */}
+                      <button
+                        onClick={insertLineBreak}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: C.surface,
+                          color: C.tx2,
+                          fontSize: 10,
+                          cursor: 'pointer'
+                        }}
+                        title="Saut de ligne"
+                      >
+                        BR
+                      </button>
+                      <button
+                        onClick={insertHorizontalRule}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${C.border}`,
+                          background: C.surface,
+                          color: C.tx2,
+                          fontSize: 10,
+                          cursor: 'pointer'
+                        }}
+                        title="Ligne horizontale"
+                      >
+                        HR
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Moteur de recherche de variables */}
+                  <div style={{ position: 'relative' }}>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 600, color: C.tx3 }}>RECHERCHE VARIABLES:</span>
+                      <div style={{ position: 'relative', flex: 1 }}>
+                        <input
+                          type="text"
+                          value={variableSearch}
+                          onChange={(e) => {
+                            handleVariableSearch(e.target.value);
+                            setShowVariableSuggestions(true);
+                          }}
+                          onFocus={() => setShowVariableSuggestions(true)}
+                          placeholder="Rechercher une variable..."
+                          style={{
+                            width: '100%',
+                            padding: '4px 8px',
+                            border: `1px solid ${C.border}`,
+                            borderRadius: 4,
+                            fontSize: 9,
+                            background: C.surface,
+                            color: C.tx,
+                            fontFamily: "'DM Mono', monospace"
+                          }}
+                        />
+                        
+                        {/* Suggestions de variables */}
+                        {showVariableSuggestions && filteredVariables.length > 0 && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            background: C.surface,
+                            border: `1px solid ${C.border}`,
+                            borderRadius: 4,
+                            marginTop: 2,
+                            maxHeight: '120px',
+                            overflowY: 'auto',
+                            zIndex: 1000,
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                          }}>
+                            {filteredVariables.slice(0, 8).map(variable => (
+                              <button
+                                key={variable}
+                                onClick={() => insertVariableFromSearch(variable)}
+                                style={{
+                                  width: '100%',
+                                  padding: '4px 8px',
+                                  border: 'none',
+                                  background: 'transparent',
+                                  color: C.tx2,
+                                  fontSize: 9,
+                                  fontFamily: "'DM Mono', monospace",
+                                  textAlign: 'left',
+                                  cursor: 'pointer',
+                                  borderBottom: `1px solid ${C.border}`,
+                                  transition: 'background 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = C.bg;
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'transparent';
+                                }}
+                              >
+                                {`{{${variable}}}`}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Variables récemment utilisées */}
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 9, fontWeight: 600, color: C.tx3 }}>RAPIDES:</span>
+                      {['firstName', 'companyName', 'websiteLink', 'price'].slice(0, 4).map(variable => (
+                        <button
+                          key={variable}
+                          onClick={() => insertVariable(variable)}
+                          style={{
+                            padding: '2px 6px',
+                            borderRadius: 3,
+                            border: `1px solid ${C.border}`,
+                            background: C.bg,
+                            color: C.tx2,
+                            fontSize: 9,
+                            fontFamily: "'DM Mono', monospace",
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {`{{${variable}}}`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Zone d'édition et preview */}
+                <div style={{ display: showPreview ? 'grid' : 'block', gridTemplateColumns: showPreview ? '1fr 1fr' : '1fr', gap: 0 }}>
+                  {/* Éditeur */}
+                  <div style={{ padding: '20px', borderRight: showPreview ? `1px solid ${C.border}` : 'none' }}>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: 11, 
+                      fontWeight: 600, 
+                      color: C.tx2, 
+                      marginBottom: 8 
+                    }}>
+                      {editorMode === 'wysiwyg' ? 'Contenu (WYSIWYG)' : 'Contenu (HTML)'}:
+                    </label>
+                    <textarea
+                      id="template-editor"
+                      value={editedContent}
+                      onChange={(e) => setEditedContent(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: '400px',
+                        padding: '12px 14px',
+                        border: `1px solid ${C.border}`,
+                        borderRadius: 6,
+                        fontSize: 11,
+                        background: C.surface,
+                        color: C.tx,
+                        fontFamily: editorMode === 'html' ? "'DM Mono', monospace" : "'Inter', sans-serif",
+                        lineHeight: 1.5,
+                        resize: 'vertical'
+                      }}
+                      placeholder={editorMode === 'wysiwyg' ? "Entrez le contenu de l'email..." : "Entrez le code HTML..."}
+                    />
+                    <div style={{ marginTop: 8, fontSize: 10, color: C.tx3 }}>
+                      {editorMode === 'wysiwyg' 
+                        ? 'Utilisez la barre d\'outils pour formater le texte' 
+                        : 'Mode HTML - insérez directement les balises HTML'
+                      }
+                    </div>
+                  </div>
+                  
+                  {/* Preview */}
+                  {showPreview && (
+                    <div style={{ padding: '20px', background: '#fff' }}>
+                      {/* Header du preview avec switch desktop/mobile et mode édition */}
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        marginBottom: 12
+                      }}>
+                        <label style={{ 
+                          fontSize: 11, 
+                          fontWeight: 600, 
+                          color: C.tx2,
+                          margin: 0
+                        }}>
+                          {previewMode === 'mobile' && mobileEditMode ? 'Édition Mobile:' : 'Aperçu en temps réel:'}
+                        </label>
+                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          <span style={{ fontSize: 9, fontWeight: 600, color: C.tx3 }}>MODE:</span>
+                          <button
+                            onClick={() => setPreviewMode('desktop')}
+                            style={{
+                              padding: '3px 6px',
+                              borderRadius: 3,
+                              border: `1px solid ${previewMode === 'desktop' ? C.accent : C.border}`,
+                              background: previewMode === 'desktop' ? C.accent + '15' : C.surface,
+                              color: previewMode === 'desktop' ? C.accent : C.tx3,
+                              fontSize: 9,
+                              fontWeight: 500,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            🖥️ Desktop
+                          </button>
+                          <button
+                            onClick={() => setPreviewMode('mobile')}
+                            style={{
+                              padding: '3px 6px',
+                              borderRadius: 3,
+                              border: `1px solid ${previewMode === 'mobile' ? C.accent : C.border}`,
+                              background: previewMode === 'mobile' ? C.accent + '15' : C.surface,
+                              color: previewMode === 'mobile' ? C.accent : C.tx3,
+                              fontSize: 9,
+                              fontWeight: 500,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            📱 Mobile
+                          </button>
+                          {previewMode === 'mobile' && (
+                            <>
+                              <div style={{ width: 1, height: 16, background: C.border, margin: '0 8px' }} />
+                              <button
+                                onClick={() => setMobileEditMode(!mobileEditMode)}
+                                style={{
+                                  padding: '3px 8px',
+                                  borderRadius: 3,
+                                  border: `1px solid ${mobileEditMode ? C.green : C.border}`,
+                                  background: mobileEditMode ? C.green + '15' : C.surface,
+                                  color: mobileEditMode ? C.green : C.tx3,
+                                  fontSize: 9,
+                                  fontWeight: 600,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                {mobileEditMode ? '✏️ Édition' : '👁️ Aperçu'}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Contenu du preview */}
+                      <div style={{
+                        height: '400px',
+                        border: `1px solid ${C.border}`,
+                        borderRadius: 6,
+                        background: '#fff',
+                        overflow: 'auto',
+                        fontSize: 12,
+                        lineHeight: 1.5
+                      }}>
+                        {previewMode === 'desktop' ? (
+                          // Mode Desktop
+                          <div style={{
+                            padding: '16px',
+                            width: '100%',
+                            height: '100%'
+                          }}
+                            dangerouslySetInnerHTML={{ __html: editedContent }}
+                          />
+                        ) : (
+                          // Mode Mobile - simulation d'écran mobile
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'flex-start',
+                            padding: '20px 10px',
+                            height: '100%',
+                            background: '#f5f5f5'
+                          }}>
+                            <div style={{
+                              width: '375px', // Largeur iPhone
+                              height: '667px', // Hauteur iPhone
+                              background: '#fff',
+                              border: `2px solid ${C.border}`,
+                              borderRadius: 20,
+                              overflow: 'auto',
+                              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                              position: 'relative'
+                            }}>
+                              {/* Barre de statut mobile */}
+                              <div style={{
+                                position: 'sticky',
+                                top: 0,
+                                background: '#000',
+                                color: '#fff',
+                                padding: '4px 12px',
+                                fontSize: 8,
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                zIndex: 10
+                              }}>
+                                <span>9:41</span>
+                                <div style={{ display: 'flex', gap: 2 }}>
+                                  <span>📶</span>
+                                  <span>📶</span>
+                                  <span>🔋</span>
+                                </div>
+                              </div>
+                              
+                              {/* Contenu de l'email en mode mobile */}
+                              {mobileEditMode ? (
+                                <textarea
+                                  value={editedContent}
+                                  onChange={(e) => setEditedContent(e.target.value)}
+                                  style={{
+                                    width: '100%',
+                                    height: '580px',
+                                    padding: '12px',
+                                    border: `1px solid ${C.border}`,
+                                    borderRadius: 6,
+                                    fontSize: 11,
+                                    background: C.surface,
+                                    color: C.tx,
+                                    fontFamily: "'DM Mono', monospace",
+                                    lineHeight: 1.4,
+                                    resize: 'none',
+                                    outline: 'none'
+                                  }}
+                                  placeholder="Éditez le contenu de l'email pour mobile..."
+                                />
+                              ) : (
+                                <div style={{
+                                  padding: '12px',
+                                  fontSize: 11,
+                                  lineHeight: 1.4
+                                }}
+                                dangerouslySetInnerHTML={{ __html: editedContent }}
+                                />
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Info de responsive */}
+                      <div style={{ 
+                        marginTop: 8, 
+                        fontSize: 9, 
+                        color: C.tx3, 
+                        textAlign: 'center',
+                        fontStyle: 'italic'
+                      }}>
+                        {previewMode === 'mobile' 
+                          ? '📱 Mode Mobile - Test de la responsivité sur écran 375x667px (iPhone)'
+                          : '🖥️ Mode Desktop - Affichage standard'
+                        }
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Variables détectées */}
+                <div style={{ 
+                  padding: '16px 20px', 
+                  background: '#f8f9fa',
+                  borderTop: `1px solid ${C.border}`
+                }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: C.tx3, marginBottom: 8 }}>
+                    Variables détectées dans le contenu:
+                  </div>
+                  <div style={{ fontSize: 10, color: C.tx2, fontFamily: "'DM Mono', monospace" }}>
+                    {(() => {
+                      const variableRegex = /\{\{(\w+)\}\}/g;
+                      const matches = editedContent.match(variableRegex) || [];
+                      const extractedVariables = [...new Set(matches.map(match => match.replace(/[{}]/g, '')))];
+                      
+                      if (extractedVariables.length === 0) {
+                        return 'Aucune variable détectée';
+                      }
+                      
+                      return extractedVariables.map(v => `{{${v}}}`).join(', ');
+                    })()}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+          
+          // Mode affichage normal
           return (
             <div style={{ marginTop: 14, padding: '14px', background: C.bg, borderRadius: 6, fontSize: 13 }}>
-              <div style={{ fontWeight: 600, marginBottom: 6 }}>
-                Sujet: {selected.subject}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                marginBottom: 10 
+              }}>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>
+                  Sujet: {selected.subject}
+                </div>
+                <button
+                  onClick={() => startEditingTemplate(selected)}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: 4,
+                    border: `1px solid ${C.accent}`,
+                    background: C.accent + '15',
+                    color: C.accent,
+                    fontSize: 10,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4
+                  }}
+                >
+                  <span>Éditer</span>
+                </button>
               </div>
               
               {/* Template HTML - Affichage complet du contenu texte */}
               {selected.htmlContent ? (
                 <div>
                   <div style={{ marginBottom: 8, fontSize: 11, color: C.tx3 }}>
-                    💡 Template HTML moderne avec design professionnel
+                    Template HTML moderne avec design professionnel
                   </div>
                   <div style={{ 
                     background: '#fff', 
@@ -651,7 +1888,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                     </pre>
                   </div>
                   <div style={{ marginTop: 8, fontSize: 10, color: C.tx3 }}>
-                    📧 Contenu HTML complet (balises retirées pour la lisibilité)
+                    Contenu HTML complet (balises retirées pour la lisibilité)
                   </div>
                 </div>
               ) : (
@@ -675,52 +1912,16 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
               {selected.variables && selected.variables.length > 0 && (
                 <div style={{ marginTop: 12, padding: '8px', background: '#f8f9fa', borderRadius: 4 }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: C.tx3, marginBottom: 4 }}>
-                    🔄 Variables utilisées:
+                    Variables utilisées:
                   </div>
                   <div style={{ fontSize: 10, color: C.tx2, fontFamily: "'DM Mono', monospace" }}>
                     {selected.variables.map((v: string) => `{{${v}}}`).join(', ')}
                   </div>
                 </div>
               )}
-
-                          </div>
+            </div>
           );
         })()}
-      </div>
-
-      {/* Test Email */}
-      <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}`, marginBottom: 20 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>🧪 Envoyer un email test</h3>
-        <p style={{ fontSize: 13, color: C.tx2, marginBottom: 12 }}>
-          Envoyez un email test pour vérifier l'apparence et la livraison avant d'envoyer à vos leads.
-        </p>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <input
-            type="email"
-            value={testEmailAddress}
-            onChange={e => setTestEmailAddress(e.target.value)}
-            placeholder="votre.email@test.com"
-            style={{
-              flex: 1, padding: '10px 14px', borderRadius: 6,
-              border: `1px solid ${C.border}`, fontSize: 13,
-              background: C.surface, color: C.tx,
-            }}
-          />
-          <button onClick={sendTestEmail} disabled={testEmailSending || !hasGmailSmtp} style={{
-            padding: '10px 20px', borderRadius: 6, border: 'none',
-            background: testEmailSending || !hasGmailSmtp ? C.tx3 : C.blue,
-            color: '#fff', fontWeight: 600, fontSize: 14,
-            cursor: testEmailSending || !hasGmailSmtp ? 'default' : 'pointer',
-            whiteSpace: 'nowrap',
-          }}>
-            {testEmailSending ? '⏳ Envoi...' : '🧪 Envoyer test'}
-          </button>
-        </div>
-        {!hasGmailSmtp && (
-          <div style={{ marginTop: 10, fontSize: 12, color: C.amber }}>
-            ⚠️ Configurez Gmail SMTP dans les Paramètres pour envoyer des emails
-          </div>
-        )}
       </div>
 
       {/* Ready / Sent */}
