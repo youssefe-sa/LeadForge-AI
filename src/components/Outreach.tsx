@@ -531,10 +531,10 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     const allVars = new Set<string>();
     
     allTemplates.forEach(template => {
-      const content = template.htmlContent || template.body || template.textContent || '';
+      const content = template.htmlContent || (template as any).body || template.textContent || '';
       const variableRegex = /\{\{(\w+)\}\}/g;
       const matches = content.match(variableRegex) || [];
-      matches.forEach(match => {
+      matches.forEach((match: any) => {
         const varName = match.replace(/[{}]/g, '');
         allVars.add(varName);
       });
