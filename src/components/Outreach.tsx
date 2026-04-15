@@ -79,9 +79,8 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
   // Fonction de personnalisation partagée et robuste
   const personalizeTemplateContent = (template: EmailTemplate, lead: Lead, config: ApiConfig) => {
-    // IMPORTANT: Utiliser toujours le domaine de production pour le tracking, pas localhost
-    // pour éviter que le navigateur ne charge les liens de tracking lors de la prévisualisation
-    const baseUrl = 'https://leadforge.ai';
+    // Détecter le domaine actuel pour le tracking
+    const baseUrl = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}` : 'https://leadforge.ai';
     const trackBase = `${baseUrl}/api/track?id=${lead.id}`;
 
     // Helper pour wrapper un lien avec le tracker
@@ -177,9 +176,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
 
   const previewForLead = async (lead: Lead) => {
     const { subject, body } = await generateEmailContent(lead);
-    // Supprimer le pixel de tracking pour éviter le chargement automatique lors de la prévisualisation
-    const cleanBody = body.replace(/<img[^>]*\/api\/track[^>]*>/gi, '');
-    setPreviewEmail({ lead, subject, body: cleanBody });
+    setPreviewEmail({ lead, subject, body });
   };
 
   const sendWorkflowEmail = async (lead: Lead, templateId: string) => {

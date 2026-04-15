@@ -141,18 +141,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const fromEmail = config.gmail_smtp_from_email || config.gmail_smtp_user;
 
     // Déterminer l'URL de base pour le tracking
-    // IMPORTANT: Utiliser toujours le domaine de production pour le tracking, pas localhost
-    // pour éviter que le navigateur ne charge le pixel lors de l'envoi en développement
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers.host || 'leadforge.ai';
-    const baseUrl = host.includes('localhost') || host.includes('127.0.0.1')
-      ? 'https://leadforge.ai'  // Domaine de production en développement
-      : `${protocol}://${host}`;  // Domaine réel en production
+    const baseUrl = `${protocol}://${host}`;
 
-    // Injection du pixel de tracking d'ouverture DÉSACTIVÉ
-    // Les clients email préchargent automatiquement les images, ce qui cause des faux positifs
-    // Le tracking des clics reste actif via les liens traçables
+    // Injection du pixel de tracking d'ouverture
     let trackedHtml = html;
+    if (leadId) {
+      const trackingPixel = `<img src="${baseUrl}/api/track?id=${leadId}&type=email_opened" width="1" height="1" style="display:none !important;" />`;
+      if (trackedHtml.includes('</body>')) {
+        trackedHtml = trackedHtml.replace('</body>', `${trackingPixel}</body>`);
+      } else {
+        trackedHtml += trackingPixel;
+      }
+    }
 
     const info = await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
