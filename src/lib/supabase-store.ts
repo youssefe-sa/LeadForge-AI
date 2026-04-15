@@ -58,8 +58,10 @@ export interface Lead {
   paymentDepositClicked: boolean;
   paymentFinalClicked: boolean;
   devisClicked: boolean;
+  devis_url: string;
   invoiceDepositClicked: boolean;
   invoiceFinalClicked: boolean;
+  invoice_url: string;
   lastContact: string;
   followUps: number;
   revenue: number;
@@ -77,7 +79,6 @@ export interface Lead {
   campaignDate: string;
   source: string;
   // Champs ajoutés pour le workflow Outreach 2026
-  devis_url?: string;
   admin_url?: string;
   admin_username?: string;
   admin_password?: string;
@@ -231,8 +232,10 @@ function mapSupabaseLeadToLead(supabaseLead: Database['public']['Tables']['leads
     emailClicked: supabaseLead.email_clicked || false,
     paymentDepositClicked: supabaseLead.payment_deposit_clicked || false,
     paymentFinalClicked: supabaseLead.payment_final_clicked || false,
+    devis_url: supabaseLead.devis_url || '',
     invoiceDepositClicked: supabaseLead.invoice_deposit_clicked || false,
     invoiceFinalClicked: supabaseLead.invoice_final_clicked || false,
+    invoice_url: supabaseLead.invoice_url || '',
     lastContact: supabaseLead.last_contact || '',
     followUps: supabaseLead.follow_ups || 0,
     revenue: supabaseLead.revenue || 0,
