@@ -78,6 +78,7 @@ export interface Lead {
   source: string;
   // Champs ajoutés pour le workflow Outreach 2026
   devis_url?: string;
+  invoice_url?: string;
   admin_url?: string;
   admin_username?: string;
   admin_password?: string;
