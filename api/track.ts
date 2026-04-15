@@ -82,14 +82,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!targetUrl || targetUrl === '#') targetUrl = lead?.invoice_url || '#';
     } 
     else if (trackType === 'email_opened') {
-      updateData = { email_opened: true };
+      const ua = req.headers['user-agent'] || '';
+      console.log(`[Tracking] Email opened for lead ${leadId}. User-Agent: ${ua}`);
+      
+      // Protection simple contre les robots de pré-chargement (Gmail, ProtonMail, etc.)
+      const isBot = /bot|google|proxy|crawler|spider|facebook|bing|preview|whatsapp|outlook|office|skype|microsoft/i.test(ua);
+      
+      if (!isBot) {
+        updateData = { email_opened: true };
+      } else {
+        console.log(`[Tracking] Bot detected (${ua}), open event ignored for lead ${leadId}`);
+      }
     } 
     else if (trackType === 'email_clicked') {
       updateData = { email_clicked: true };
     }
 
     if (Object.keys(updateData).length > 0) {
-      await supabase.from('leads').update(updateData).eq('id', leadId);
+      const { error: updateError } = await supabase.from('leads').update(updateData).eq('id', leadId);
+      if (updateError) {
+        console.error('[Tracking] Update failed:', updateError);
+      }
       
       // --- LOGIQUE D'AUTOMATISATION DU TUNNEL ---
       let nextTemplateId = '';
@@ -98,10 +111,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (trackType === 'start_clicked') {
         nextTemplateId = 'step-2-devis';
       } 
-      // Planification automatique retirée pour le paiement (Validation manuelle requise désormais)
 
       if (nextTemplateId) {
-        // SÉCURITÉ : On vérifie si cet email n'a pas déjà été traité pour ce lead
+        // ... (rest of the scheduling logic remains same)
         const { data: existing } = await supabase
           .from('scheduled_emails')
           .select('id')
@@ -111,7 +123,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .maybeSingle();
 
         if (!existing) {
-          // Planifier l'étape suivante (dans 2 minutes)
           const sendDate = new Date();
           sendDate.setMinutes(sendDate.getMinutes() + 2);
           
@@ -121,9 +132,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             scheduled_for: sendDate.toISOString(),
             status: 'pending'
           }]);
-          console.log(`[Automation] Premier envoi planifié : ${nextTemplateId} pour le lead ${leadId}`);
-        } else {
-          console.log(`[Automation] Email ${nextTemplateId} déjà envoyé ou en cours pour ${leadId}. Ignoré.`);
         }
       }
     }
@@ -132,8 +140,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.redirect(302, targetUrl);
     }
 
+    // Return 1x1 transparent pixel
     const pixel = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
     res.setHeader('Content-Type', 'image/gif');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // Empêcher la mise en cache
     return res.send(pixel);
 
   } catch (err: any) {

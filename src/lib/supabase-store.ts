@@ -78,6 +78,7 @@ export interface Lead {
   source: string;
   // Champs ajoutés pour le workflow Outreach 2026
   devis_url?: string;
+  invoice_url?: string;
   admin_url?: string;
   admin_username?: string;
   admin_password?: string;
@@ -817,10 +818,13 @@ export function useScheduledEmails() {
 
   useEffect(() => {
     loadScheduled();
-    const sub = supabase.channel('scheduled-realtime')
+    const channelId = `scheduled-realtime-${Math.random().toString(36).substring(2, 9)}`;
+    const sub = supabase.channel(channelId)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'scheduled_emails' }, loadScheduled)
       .subscribe();
-    return () => { supabase.removeChannel(sub); };
+    return () => {
+      supabase.removeChannel(sub);
+    };
   }, [loadScheduled]);
 
   const cancelEmail = async (id: string) => {
