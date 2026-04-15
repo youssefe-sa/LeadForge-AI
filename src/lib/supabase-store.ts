@@ -692,7 +692,12 @@ export function useApiConfig() {
       console.log('Loading config from Supabase...');
       const supabaseConfig = await configService.get();
       console.log('Config loaded:', supabaseConfig);
-      setConfig(supabaseConfig);
+      if (supabaseConfig) {
+        setConfig({
+          ...supabaseConfig,
+          region: (supabaseConfig as any).region || 'FR'
+        } as ApiConfig);
+      }
     } catch (err) {
       console.error('Failed to load config:', err);
       setError(err instanceof Error ? err.message : 'Failed to load config');
