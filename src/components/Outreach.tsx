@@ -56,6 +56,11 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const { scheduled, cancelEmail } = useScheduledEmails();
   const [showEmailPreview, setShowEmailPreview] = useState(false);
 
+  // États pour la pagination et le filtrage
+  const [currentPage, setCurrentPage] = useState(1);
+  const [leadsPerPage, setLeadsPerPage] = useState(3);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'opened' | 'converted' | 'not-converted'>('all');
+
   const hasGmailSmtp = !!(apiConfig.gmailSmtpUser && apiConfig.gmailSmtpPassword);
   const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.nvidiaKey || apiConfig.openrouterKey);
 
@@ -68,6 +73,32 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
   const ready = leads.filter(l => l.siteGenerated && !l.emailSent && l.email);
   const sent = leads.filter(l => l.emailSent);
+
+  // Logique de filtrage
+  const filteredSent = sent.filter(lead => {
+    switch (filterStatus) {
+      case 'opened':
+        return lead.emailOpened;
+      case 'converted':
+        return lead.stage === 'converted';
+      case 'not-converted':
+        return lead.stage !== 'converted';
+      default:
+        return true;
+    }
+  });
+
+  // Logique de pagination
+  const totalPages = Math.ceil(filteredSent.length / leadsPerPage);
+  const startIndex = (currentPage - 1) * leadsPerPage;
+  const endIndex = startIndex + leadsPerPage;
+  const paginatedSent = filteredSent.slice(startIndex, endIndex);
+
+  // Réinitialiser la page si le filtre change
+  const handleFilterChange = (newFilter: typeof filterStatus) => {
+    setFilterStatus(newFilter);
+    setCurrentPage(1);
+  };
 
   // Fonction de salutation professionnelle B2B
   const getSalutation = (lead: { name: string; contactName?: string }): string => {
@@ -743,63 +774,389 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
           </div>
         </div>
 
-        <div style={{ background: C.surface, borderRadius: 8, padding: '20px', border: `1px solid ${C.border}` }}>
-          <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16, color: C.green }}>✅ Emails envoyés ({sent.length})</h3>
-          <div style={{ maxHeight: 400, overflowY: 'auto' }}>
-            {sent.map(lead => (
-              <div key={lead.id} style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '10px 12px', borderBottom: `1px solid ${C.border}`,
-              }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: C.tx }}>{lead.name}</div>
-                  <div style={{ fontSize: 11, color: C.tx3, marginBottom: 8 }}>
-                    {lead.emailSentDate ? new Date(lead.emailSentDate).toLocaleDateString('fr-FR') : ''} — {lead.email}
-                  </div>
-                  
-                  {/* Step Checklist (NOUVEAU) */}
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {[
-                      { id: 'step-1-start', label: 'Présentation' },
-                      { id: 'step-2-devis', label: 'Devis' },
-                      { id: 'reminder1_after_email1', label: 'R1' },
-                      { id: 'reminder2_after_devis', label: 'R2' },
-                      { id: 'step-3-depot', label: 'Acompte' },
-                      { id: 'reminder3_final_payment', label: 'R3' },
-                      { id: 'step-5-confirmation', label: 'Solde' },
-                      { id: 'step-6-livraison', label: 'Livré' }
-                    ].map(step => {
-                      const isSent = (lead.sentSteps || []).includes(step.id);
-                      const isPending = scheduled.some(s => s.lead_id === lead.id && s.template_id === step.id);
-                      
-                      return (
-                        <div key={step.id} style={{ 
-                          fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
-                          background: isSent ? C.green + '15' : isPending ? C.amber + '15' : C.bg,
-                          color: isSent ? C.green : isPending ? C.amber : C.tx3,
-                          border: `1px solid ${isSent ? C.green + '40' : C.border}`,
-                          display: 'flex', alignItems: 'center', gap: 3
-                        }}>
-                          {isSent ? '✅' : isPending ? '⏳' : '⚪'} {step.label}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  {lead.emailOpened && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 3, background: '#dbeafe', color: C.blue, fontWeight: 600 }}>Ouvert</span>}
-                  <button onClick={() => confirmDeposit(lead)} style={{
-                    padding: '4px 8px', borderRadius: 4, border: 'none',
-                    background: C.green, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
-                  }}>💰 Valider Acompte</button>
-                  <button onClick={() => confirmFinalPayment(lead)} style={{
-                    padding: '4px 8px', borderRadius: 4, border: 'none',
-                    background: C.amber, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
-                  }}>🏆 Valider Solde</button>
-                </div>
+        <div style={{ background: C.surface, borderRadius: 12, padding: '18px', border: `1px solid ${C.border}`, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          {/* Header avec filtre */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, paddingBottom: 10, borderBottom: `2px solid ${C.bg}` }}>
+            <div>
+              <h3 style={{ fontSize: 17, fontWeight: 700, margin: 0, color: C.green, display: 'flex', alignItems: 'center', gap: 8 }}>
+                ✅ Emails Envoyés
+                <span style={{ fontSize: 12, fontWeight: 500, color: C.tx3, background: C.bg, padding: '3px 8px', borderRadius: 12 }}>
+                  {filteredSent.length}
+                </span>
+              </h3>
+              <p style={{ fontSize: 11, color: C.tx3, margin: '4px 0 0 0' }}>Détails complets des campagnes d'emailing</p>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+              {/* Filtres */}
+              <div style={{ display: 'flex', gap: 4, fontSize: 9 }}>
+                <button
+                  onClick={() => handleFilterChange('all')}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: 4,
+                    border: `1px solid ${filterStatus === 'all' ? C.green : C.border}`,
+                    background: filterStatus === 'all' ? C.green + '15' : C.bg,
+                    color: filterStatus === 'all' ? C.green : C.tx3,
+                    fontSize: 9,
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  📧 Tous ({sent.length})
+                </button>
+                <button
+                  onClick={() => handleFilterChange('opened')}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: 4,
+                    border: `1px solid ${filterStatus === 'opened' ? C.blue : C.border}`,
+                    background: filterStatus === 'opened' ? C.blue + '15' : C.bg,
+                    color: filterStatus === 'opened' ? C.blue : C.tx3,
+                    fontSize: 9,
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  📧 Ouverts ({sent.filter(l => l.emailOpened).length})
+                </button>
+                <button
+                  onClick={() => handleFilterChange('converted')}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: 4,
+                    border: `1px solid ${filterStatus === 'converted' ? C.green : C.border}`,
+                    background: filterStatus === 'converted' ? C.green + '15' : C.bg,
+                    color: filterStatus === 'converted' ? C.green : C.tx3,
+                    fontSize: 9,
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  🏆 Convertis ({leads.filter(l => l.stage === 'converted').length})
+                </button>
+                <button
+                  onClick={() => handleFilterChange('not-converted')}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: 4,
+                    border: `1px solid ${filterStatus === 'not-converted' ? C.amber : C.border}`,
+                    background: filterStatus === 'not-converted' ? C.amber + '15' : C.bg,
+                    color: filterStatus === 'not-converted' ? C.amber : C.tx3,
+                    fontSize: 9,
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  ⏳ En cours ({sent.filter(l => l.stage !== 'converted').length})
+                </button>
               </div>
-            ))}
-            {sent.length === 0 && <p style={{ color: C.tx3, fontSize: 13, textAlign: 'center', padding: 20 }}>Aucun email envoyé</p>}
+              
+                          </div>
+          </div>
+
+          {/* Vue détaillée mais compacte avec pagination */}
+          <div style={{ maxHeight: 650, overflowY: 'auto', paddingRight: 4 }}>
+            {paginatedSent.map(lead => {
+              const isConverted = lead.stage === 'converted';
+              const progressPercent = ((lead.sentSteps || []).length / 8) * 100;
+              
+              return (
+                <div key={lead.id} style={{
+                  background: C.bg,
+                  borderRadius: 8,
+                  padding: '14px 16px',
+                  marginBottom: 8,
+                  border: `1px solid ${C.border}`,
+                  transition: 'all 0.2s ease',
+                  position: 'relative'
+                }}>
+                  {/* En-tête avec infos principales */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                        <div style={{ 
+                          width: 8, height: 8, borderRadius: '50%', 
+                          background: isConverted ? C.green : lead.emailOpened ? C.blue : C.tx3,
+                          boxShadow: isConverted ? `0 0 0 3px ${C.green}20` : lead.emailOpened ? `0 0 0 3px ${C.blue}20` : 'none'
+                        }} />
+                        <h4 style={{ fontSize: 14, fontWeight: 700, margin: 0, color: C.tx }}>
+                          {lead.name}
+                        </h4>
+                        {isConverted && (
+                          <span style={{ 
+                            fontSize: 9, padding: '2px 6px', borderRadius: 8, 
+                            background: C.green + '15', color: C.green, fontWeight: 600,
+                            border: `1px solid ${C.green}40`
+                          }}>
+                            ✅ Converti ({lead.revenue || 0}€)
+                          </span>
+                        )}
+                        {lead.emailOpened && !isConverted && (
+                          <span style={{ 
+                            fontSize: 9, padding: '2px 6px', borderRadius: 8, 
+                            background: C.blue + '15', color: C.blue, fontWeight: 600,
+                            border: `1px solid ${C.blue}40`
+                          }}>
+                            📧 Ouvert
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: 16, fontSize: 10, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>
+                        <span>📧 {lead.email}</span>
+                        <span>📅 {lead.emailSentDate ? new Date(lead.emailSentDate).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}</span>
+                        <span>🏢 {lead.sector || 'N/A'}</span>
+                        <span>🌍 {lead.city || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Informations détaillées sur les emails */}
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: C.tx2, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      📧 Détails des emails envoyés
+                      <span style={{ fontSize: 9, color: C.tx3, fontWeight: 400 }}>
+                        ({(lead.sentSteps || []).length}/8 étapes)
+                      </span>
+                    </div>
+                    
+                    {/* Grille d'étapes détaillées sur une ligne */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 2 }}>
+                      {[
+                        { id: 'step-1-start', label: 'Présentation', icon: '📧', desc: 'Email initial de présentation' },
+                        { id: 'step-2-devis', label: 'Devis', icon: '📄', desc: 'Devis et lien de paiement' },
+                        { id: 'reminder1_after_email1', label: 'Rappel 1', icon: '⏰', desc: 'Rappel 3j après présentation' },
+                        { id: 'reminder2_after_devis', label: 'Rappel 2', icon: '⏰', desc: 'Rappel 2j avant expiration' },
+                        { id: 'step-3-depot', label: 'Acompte', icon: '💰', desc: 'Confirmation acompte 46€' },
+                        { id: 'reminder3_final_payment', label: 'Rappel 3', icon: '⏰', desc: 'Rappel 3j après paiement final' },
+                        { id: 'step-5-confirmation', label: 'Solde', icon: '🏆', desc: 'Confirmation solde 100€' },
+                        { id: 'step-6-livraison', label: 'Livraison', icon: '📦', desc: 'Livraison du site web' }
+                      ].map(step => {
+                        const isSent = (lead.sentSteps || []).includes(step.id);
+                        const isPending = scheduled.some(s => s.lead_id === lead.id && s.template_id === step.id);
+                        
+                        return (
+                          <div key={step.id} style={{ 
+                            fontSize: 8, fontWeight: 600, padding: '6px 4px', borderRadius: 4,
+                            background: isSent ? C.green + '15' : isPending ? C.amber + '15' : '#ffffff',
+                            color: isSent ? C.green : isPending ? C.amber : C.tx3,
+                            border: `1px solid ${isSent ? C.green + '40' : isPending ? C.amber + '40' : C.border}`,
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+                            textAlign: 'center',
+                            transition: 'all 0.2s ease',
+                            cursor: 'pointer'
+                          }}
+                          title={step.desc}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <span style={{ fontSize: 10 }}>{isSent ? '✅' : isPending ? '⏳' : '⚪'}</span>
+                              <span>{step.icon}</span>
+                            </div>
+                            <span>{step.label}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Statistiques sur une seule ligne forcée */}
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: 6, 
+                    marginBottom: 10, 
+                    fontSize: 9, 
+                    color: C.tx3, 
+                    alignItems: 'center', 
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    flexWrap: 'nowrap'
+                  }}>
+                    <span style={{ flexShrink: 0, display: 'inline-block' }}>📈 Progression: {(() => {
+                      const salesSteps = ['step-1-start', 'step-2-devis', 'step-3-depot', 'step-5-confirmation', 'step-6-livraison'];
+                      const sentSalesSteps = (lead.sentSteps || []).filter(step => salesSteps.includes(step));
+                      return Math.round((sentSalesSteps.length / salesSteps.length) * 100);
+                    })()}%</span>
+                    {lead.siteClicked && <span style={{ flexShrink: 0, display: 'inline-block' }}>🔗 Site cliqué</span>}
+                    {lead.paymentDepositClicked && <span style={{ flexShrink: 0, display: 'inline-block' }}>💳 Acompte cliqué</span>}
+                    {lead.paymentFinalClicked && <span style={{ flexShrink: 0, display: 'inline-block' }}>💳 Solde cliqué</span>}
+                    {lead.devisClicked && <span style={{ flexShrink: 0, display: 'inline-block' }}>📄 Devis cliqué</span>}
+                    {lead.invoiceDepositClicked && <span style={{ flexShrink: 0, display: 'inline-block' }}>🧾 Facture acompte cliquée</span>}
+                    {lead.invoiceFinalClicked && <span style={{ flexShrink: 0, display: 'inline-block' }}>🧾 Facture solde cliquée</span>}
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
+                    <button 
+                      onClick={() => previewForLead(lead)} 
+                      style={{
+                        padding: '6px 12px', borderRadius: 6, border: `1px solid ${C.border}`,
+                        background: C.surface, fontSize: 10, cursor: 'pointer', color: C.blue,
+                        fontWeight: 500, transition: 'all 0.2s ease'
+                      }}
+                    >
+                      👁️ Aperçu
+                    </button>
+                    
+                    {!isConverted && (
+                      <>
+                        <button 
+                          onClick={() => confirmDeposit(lead)} 
+                          style={{
+                            padding: '6px 12px', borderRadius: 6, border: 'none',
+                            background: C.green, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                            transition: 'all 0.2s ease', boxShadow: '0 2px 4px rgba(26, 122, 74, 0.2)'
+                          }}
+                        >
+                          💰 Valider Acompte
+                        </button>
+                        <button 
+                          onClick={() => confirmFinalPayment(lead)} 
+                          style={{
+                            padding: '6px 12px', borderRadius: 6, border: 'none',
+                            background: C.amber, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                            transition: 'all 0.2s ease', boxShadow: '0 2px 4px rgba(212, 80, 10, 0.2)'
+                          }}
+                        >
+                          🏆 Valider Solde
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            
+            {paginatedSent.length === 0 && filteredSent.length > 0 && (
+              <div style={{ 
+                textAlign: 'center', padding: '30px 20px', 
+                background: C.bg, borderRadius: 10, border: `2px dashed ${C.border}`
+              }}>
+                <div style={{ fontSize: 20, marginBottom: 6 }}>🔍</div>
+                <h4 style={{ fontSize: 14, fontWeight: 600, color: C.tx2, margin: '0 0 6px 0' }}>
+                  Aucun lead trouvé pour ce filtre
+                </h4>
+                <p style={{ fontSize: 11, color: C.tx3, margin: 0 }}>
+                  Essayez un autre filtre pour voir les leads correspondants
+                </p>
+              </div>
+            )}
+
+            {sent.length === 0 && (
+              <div style={{ 
+                textAlign: 'center', padding: '40px 20px', 
+                background: C.bg, borderRadius: 10, border: `2px dashed ${C.border}`
+              }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>📭</div>
+                <h4 style={{ fontSize: 16, fontWeight: 600, color: C.tx2, margin: '0 0 8px 0' }}>
+                  Aucun email envoyé
+                </h4>
+                <p style={{ fontSize: 12, color: C.tx3, margin: 0 }}>
+                  Commencez par envoyer des emails aux leads prêts dans la section "Prêts à envoyer"
+                </p>
+              </div>
+            )}
+
+            {/* Contrôles de pagination */}
+            {totalPages > 1 && (
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                gap: 8, 
+                marginTop: 16,
+                paddingTop: 12,
+                borderTop: `1px solid ${C.border}`
+              }}>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    border: `1px solid ${C.border}`,
+                    background: currentPage === 1 ? C.bg : C.surface,
+                    color: currentPage === 1 ? C.tx3 : C.tx,
+                    fontSize: 10,
+                    fontWeight: 500,
+                    cursor: currentPage === 1 ? 'default' : 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  ← Précédent
+                </button>
+
+                {/* Numéros de page */}
+                <div style={{ display: 'flex', gap: 4 }}>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: 4,
+                          border: `1px solid ${pageNum === currentPage ? C.green : C.border}`,
+                          background: pageNum === currentPage ? C.green + '15' : C.bg,
+                          color: pageNum === currentPage ? C.green : C.tx3,
+                          fontSize: 9,
+                          fontWeight: pageNum === currentPage ? 600 : 400,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          minWidth: '24px'
+                        }}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    border: `1px solid ${C.border}`,
+                    background: currentPage === totalPages ? C.bg : C.surface,
+                    color: currentPage === totalPages ? C.tx3 : C.tx,
+                    fontSize: 10,
+                    fontWeight: 500,
+                    cursor: currentPage === totalPages ? 'default' : 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  Suivant →
+                </button>
+              </div>
+            )}
+
+            {/* Info de pagination */}
+            {totalPages > 1 && (
+              <div style={{ 
+                textAlign: 'center', 
+                fontSize: 9, 
+                color: C.tx3, 
+                marginTop: 8 
+              }}>
+                Page {currentPage} sur {totalPages} • {filteredSent.length} leads au total
+              </div>
+            )}
           </div>
         </div>
       </div>
