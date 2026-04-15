@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useCampaigns, useLeads } from '../lib/supabase-store';
+import { useCampaigns, useLeads, Lead } from '../lib/supabase-store';
 import { eventBus, LeadForgeEvents } from '../lib/events';
 
 const C = {
@@ -15,9 +15,12 @@ interface Campaign {
   count: number;
 }
 
-export default function Campaigns() {
+interface Props {
+  leads: Lead[];
+}
+
+export default function Campaigns({ leads }: Props) {
   const { campaigns, loading, error, deleteCampaign } = useCampaigns();
-  const { leads } = useLeads();
   const [campaignToDelete, setCampaignToDelete] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0); // Forcer le rafraîchissement
@@ -88,39 +91,44 @@ export default function Campaigns() {
     }
   };
 
-  const totalLeads = campaigns.reduce((sum, campaign) => sum + campaign.count, 0);
+  const totalLeads = Array.isArray(campaigns) ? campaigns.reduce((sum, c) => sum + (Number(c?.count) || 0), 0) : 0;
+  const safeLeads = Array.isArray(leads) ? leads : [];
   
   // Calculer les statistiques d'email et site web (avec clé de rafraîchissement)
   const emailStats = {
-    with: leads.filter(l => l.email).length,
-    without: leads.filter(l => !l.email).length,
+    with: safeLeads.filter(l => l && l.email).length,
+    without: safeLeads.filter(l => l && !l.email).length,
   };
   
   const websiteStats = {
-    with: leads.filter(l => l.website && !(l.tags || []).includes('Sans site')).length,
-    without: leads.filter(l => !l.website || (l.tags || []).includes('Sans site')).length,
+    with: safeLeads.filter(l => l && l.website && !(l.tags || []).includes('Sans site')).length,
+    without: safeLeads.filter(l => l && (!l.website || (l.tags || []).includes('Sans site'))).length,
   };
 
   // Fonction pour calculer les statistiques d'une campagne spécifique (avec clé de rafraîchissement)
   const getCampaignStats = (campaignName: string) => {
-    const campaignLeads = leads.filter(l => l.campaign === campaignName);
+    const safeLeads = Array.isArray(leads) ? leads : [];
+    const campaignLeads = safeLeads.filter(l => l && l.campaign === campaignName);
     
     const emailStats = {
-      with: campaignLeads.filter(l => l.email).length,
-      without: campaignLeads.filter(l => !l.email).length,
+      with: campaignLeads.filter(l => l && l.email).length,
+      without: campaignLeads.filter(l => l && !l.email).length,
     };
     
     const websiteStats = {
-      with: campaignLeads.filter(l => l.website && !(l.tags || []).includes('Sans site')).length,
-      without: campaignLeads.filter(l => !l.website || (l.tags || []).includes('Sans site')).length,
+      with: campaignLeads.filter(l => l && l.website && !(l.tags || []).includes('Sans site')).length,
+      without: campaignLeads.filter(l => l && (!l.website || (l.tags || []).includes('Sans site'))).length,
     };
     
     // Extraire les mots-clés uniques des tags et secteurs
     const keywords = new Set<string>();
     campaignLeads.forEach(lead => {
+      if (!lead) return;
       if (lead.sector) keywords.add(lead.sector);
       if (Array.isArray(lead.tags)) {
-        lead.tags.forEach(tag => keywords.add(tag));
+        lead.tags.forEach((tag: string) => {
+          if (tag) keywords.add(tag);
+        });
       }
     });
     
@@ -238,7 +246,7 @@ export default function Campaigns() {
           </h2>
         </div>
 
-        {campaigns.length === 0 ? (
+        {(!Array.isArray(campaigns) || campaigns.length === 0) ? (
           <div style={{ padding: '60px 20px', textAlign: 'center' }}>
             <div style={{ fontSize: 48, marginBottom: 16, opacity: 0.5 }}>📋</div>
             <h3 style={{ fontSize: 18, fontWeight: 600, color: C.tx, marginBottom: 8 }}>
@@ -260,7 +268,8 @@ export default function Campaigns() {
           </div>
         ) : (
           <div>
-            {campaigns.map((campaign, index) => {
+            {Array.isArray(campaigns) && campaigns.map((campaign, index) => {
+              if (!campaign) return null;
               const stats = getCampaignStats(campaign.name);
               return (
                 <div key={campaign.name} style={{

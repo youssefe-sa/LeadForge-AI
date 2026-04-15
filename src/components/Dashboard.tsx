@@ -762,8 +762,8 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
     if (filterCampaign && l.campaign !== filterCampaign) return false;
     if (filterEmail === 'with' && !l.email) return false;
     if (filterEmail === 'without' && l.email) return false;
-    if (filterWebsite === 'with' && (!l.website || l.tags.includes('Sans site'))) return false;
-    if (filterWebsite === 'without' && l.website && !l.tags.includes('Sans site')) return false;
+    if (filterWebsite === 'with' && (!l.website || (l.tags || []).includes('Sans site'))) return false;
+    if (filterWebsite === 'without' && l.website && !(l.tags || []).includes('Sans site')) return false;
     return true;
   });
 
@@ -787,8 +787,8 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
 
   const stats = {
     total: leads.length,
-    noSite: leads.filter(l => !l.website || l.tags.includes('Sans site')).length,
-    withSite: leads.filter(l => l.website && !l.tags.includes('Sans site')).length,
+    noSite: leads.filter(l => !l.website || (l.tags || []).includes('Sans site')).length,
+    withSite: leads.filter(l => l.website && !(l.tags || []).includes('Sans site')).length,
     noEmail: leads.filter(l => !l.email).length,
     withEmail: leads.filter(l => l.email).length,
     emailPercentage: leads.length > 0 ? Math.round((leads.filter(l => l.email).length / leads.length) * 100) : 0,

@@ -95,7 +95,7 @@ export default function App() {
               <Pipeline leads={leads} updateLead={updateLead} />
             )}
             {view === 'campaigns' && (
-              <Campaigns />
+              <Campaigns leads={leads} />
             )}
             {view === 'settings' && (
               <Settings config={config} updateConfig={updateConfig} statuses={{}} setStatus={() => {}} onClearData={() => {}} />
