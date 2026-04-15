@@ -730,8 +730,8 @@ export function useEmailTemplates() {
           name: t.name,
           category: (t.sector === 'sale' || t.sector === 'reminder') ? t.sector as 'sale' | 'reminder' : 'sale', // sector -> category
           subject: t.subject,
-          htmlContent: '', // La base de données n'a pas htmlContent
-          textContent: t.body || '', // body -> textContent
+          htmlContent: t.body || '', // CORRECTION: body de Supabase contient le HTML
+          textContent: t.body?.replace(/<[^>]*>/g, '') || '', // Version texte sans HTML
           variables: [], // La base de données n'a pas variables
         })));
       }
