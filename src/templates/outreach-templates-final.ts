@@ -31,7 +31,7 @@ const HEADER_HTML = `
 
 export const salesTemplates: EmailTemplate[] = [
   {
-    id: 'step-1-presentation',
+    id: 'step-1-start',
     name: '1. Présentation Site Web',
     category: 'sale',
     subject: '🎁 Une surprise pour {{companyName}} : Votre nouveau site est prêt',

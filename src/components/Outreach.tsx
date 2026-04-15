@@ -49,7 +49,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
   // Nouveaux états pour workflow et paiement
   const [workflowMode, setWorkflowMode] = useState<'manual' | 'automated'>('manual');
-  const [selectedWorkflowTemplate, setSelectedWorkflowTemplate] = useState('step-1-presentation');
+  const [selectedWorkflowTemplate, setSelectedWorkflowTemplate] = useState('step-1-start');
   const [paymentLinks, setPaymentLinks] = useState<Record<string, { link: string; amount: number; created: string }>>({});
   const [devisLinks, setDevisLinks] = useState<Record<string, string>>({});
   const [invoiceLinks, setInvoiceLinks] = useState<Record<string, string>>({});
@@ -212,7 +212,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       
       // --- LOGIQUE DE RAPPEL AUTOMATIQUE J+1 ---
       let nextReminderId = '';
-      if (templateId === 'step-1-presentation') nextReminderId = 'reminder1_after_email1';
+      if (templateId === 'step-1-start') nextReminderId = 'reminder1_after_email1';
       if (templateId === 'step-2-devis') nextReminderId = 'reminder2_after_devis';
       if (templateId === 'step-4-paiement') nextReminderId = 'reminder3_final_payment';
 
@@ -388,7 +388,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
   };
 
   // Wrappers pour le workflow (utilisés dans le JSX)
-  const sendEmail1Demo = (lead: Lead) => sendWorkflowEmail(lead, 'step-1-presentation');
+  const sendEmail1Demo = (lead: Lead) => sendWorkflowEmail(lead, 'step-1-start');
   const sendEmail2WithPayment = (lead: Lead) => sendWorkflowEmail(lead, 'step-2-devis');
   const sendEmail3Confirmation = (lead: Lead) => sendWorkflowEmail(lead, 'step-3-depot');
 
@@ -760,7 +760,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                   {/* Step Checklist (NOUVEAU) */}
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {[
-                      { id: 'step-1-presentation', label: 'Présentation' },
+                      { id: 'step-1-start', label: 'Présentation' },
                       { id: 'step-2-devis', label: 'Devis' },
                       { id: 'reminder1_after_email1', label: 'R1' },
                       { id: 'reminder2_after_devis', label: 'R2' },
