@@ -19,10 +19,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { id, type, url, redirect } = req.query;
   let targetUrl = (url || redirect) as string;
 
-  // FILTRE ANTI-ROBOTS : On ignore les pré-chargements de Google, Outlook, etc.
-  const userAgent = req.headers['user-agent'] || '';
-  const isBot = /bot|google|proxy|scanner|prewarm|monitor|preview/i.test(userAgent) || userAgent.includes('GoogleImageProxy');
-
   if (!id || !type) {
     return res.status(400).json({ error: 'Missing ID or type' });
   }
@@ -34,23 +30,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: lead, error: leadError } = await supabase.from('leads').select('*').eq('id', leadId).single();
     if (leadError || !lead) {
       console.error('[Tracking] Lead not found:', leadId);
-    }
-
-    // --- DOUBLE SÉCURITÉ ANTI-FAUX POSITIFS ---
-    // 1. Délai de Réalité Humaine : Impossible d'ouvrir en moins de 10s après l'envoi
-    const sentAt = lead?.email_sent_date ? new Date(lead.email_sent_date).getTime() : 0;
-    const secondsSinceSent = (Date.now() - sentAt) / 1000;
-    const isTooFast = trackType === 'email_opened' && secondsSinceSent < 10;
-
-    // 2. Filtre de Robots renforcé (Outlook, Google, Yahoo, Bots)
-    const isBotDetected = isBot || /outlook|microsoft|yahoo|imageproxy|cloud|aws|headless|phantom|chrome-lighthouse/i.test(userAgent);
-
-    // Si c'est un robot ou trop rapide, on renvoie l'image sans rien enregistrer en base
-    if (trackType === 'email_opened' && (isBotDetected || isTooFast)) {
-      const pixel = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
-      res.setHeader('Content-Type', 'image/gif');
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      return res.send(pixel);
     }
 
     let updateData: any = {};
