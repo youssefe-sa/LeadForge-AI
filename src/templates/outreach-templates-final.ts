@@ -10,7 +10,10 @@ export interface EmailTemplate {
   textContent: string;
   variables: string[];
   category: 'sale' | 'reminder';
+  language: 'FR' | 'US';
 }
+
+import { usSalesTemplates } from './outreach-templates-us';
 
 const LOGO_SVG = `
     <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
@@ -30,6 +33,7 @@ const HEADER_HTML = `
 `;
 
 export const salesTemplates: EmailTemplate[] = [
+  ...usSalesTemplates,
   {
     id: 'step-1-start',
     name: '1. Présentation Site Web',
@@ -128,6 +132,7 @@ export const salesTemplates: EmailTemplate[] = [
     id: 'step-4-paiement',
     name: '4. Paiement Final',
     category: 'sale',
+    language: 'FR',
     subject: '🎉 Votre site {{companyName}} est prêt !',
     variables: ['firstName', 'companyName', 'websiteLink', 'finalPaymentLink'],
     htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">

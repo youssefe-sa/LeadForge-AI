@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Lead, ApiConfig, EmailTemplate, callLLM, useScheduledEmails, ScheduledEmail } from '../lib/supabase-store';
 import { supabase } from '../lib/supabase';
 import { salesTemplates, reminderTemplates, getTemplateById } from '../templates/outreach-templates-final';
+import { generateAndSaveDevis, generateAndSaveInvoice } from '../lib/generateDocuments';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -96,11 +97,16 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const hasGmailSmtp = !!(apiConfig.gmailSmtpUser && apiConfig.gmailSmtpPassword);
   const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.nvidiaKey || apiConfig.openrouterKey);
 
+  // Filter templates based on active region
+  const filteredTemplates = (templates || []).filter(t => (t.language || 'FR') === apiConfig.region);
+
   // LOG DIAGNOSTIC
   console.log('🔍 Outreach Dashboard:', {
     leadsCount: leads.length,
     scheduledCount: scheduled.length,
-    hasSmtp: hasGmailSmtp
+    hasSmtp: hasGmailSmtp,
+    region: apiConfig.region,
+    availableTemplates: filteredTemplates.length
   });
 
   const ready = leads.filter(l => l.siteGenerated && !l.emailSent && l.email);
@@ -207,8 +213,8 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   };
 
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
-    // UNIFICATION : On donne la priorité aux templates de la BASE DE DONNÉES
-    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+    // UNIFICATION : On donne la priorité aux templates de la BASE DE DONNÉES (filtrés par région)
+    const allTemplates = [...filteredTemplates, ...salesTemplates, ...reminderTemplates];
     const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
     
     const base = personalizeTemplateContent(template, lead, apiConfig);
@@ -248,14 +254,29 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     if (!hasGmailSmtp) { alert('Configurez Gmail SMTP dans les Paramètres'); return; }
     if (!lead.email) { alert("Ce lead n'a pas d'email"); return; }
 
-    // UNIFICATION : On cherche d'abord dans les templates de la DB (prop templates)
-    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+    // UNIFICATION : On cherche d'abord dans les templates de la DB (filtrés par région)
+    const allTemplates = [...filteredTemplates, ...salesTemplates, ...reminderTemplates];
     const template = allTemplates.find(t => t.id === templateId);
     if (!template) return;
 
+    // AUTO-GÉNÉRATION DES DOCUMENTS SI MANQUANTS
+    const currentLead = { ...lead };
+    if (templateId.includes('devis') && !currentLead.devis_url) {
+      setLogs(prev => [...prev, `📄 Génération du devis (${apiConfig.region})...`]);
+      currentLead.devis_url = await generateAndSaveDevis(currentLead as any, '146', apiConfig.region);
+    }
+    if (templateId.includes('paiement') && !currentLead.invoice_url) {
+      setLogs(prev => [...prev, `📄 Génération de la facture d'acompte (${apiConfig.region})...`]);
+      currentLead.invoice_url = await generateAndSaveInvoice(currentLead as any, '146', 'deposit', apiConfig.region);
+    }
+    if (templateId.includes('paid') && !currentLead.invoice_url) {
+      setLogs(prev => [...prev, `📄 Génération de la facture finale (${apiConfig.region})...`]);
+      currentLead.invoice_url = await generateAndSaveInvoice(currentLead as any, '146', 'final', apiConfig.region);
+    }
+
     // SÉCURITÉ : Extraire le contenu (body si DB, htmlContent si Local)
     const rawContent = (template as any).body || template.htmlContent;
-    const { subject, body } = personalizeTemplateContent({ ...template, htmlContent: rawContent }, lead, apiConfig);
+    const { subject, body } = personalizeTemplateContent({ ...template, htmlContent: rawContent }, currentLead as any, apiConfig);
     
     const result = await sendEmailViaApi({
       to: lead.email,
@@ -2112,7 +2133,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                       
                       <div style={{ display: 'flex', gap: 16, fontSize: 10, color: C.tx3, fontFamily: "'DM Mono', monospace" }}>
                         <span>📧 {lead.email}</span>
-                        <span>📅 {lead.emailSentDate ? new Date(lead.emailSentDate).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}</span>
+                        <span>📅 {lead.emailSentDate ? new Date(lead.emailSentDate).toLocaleDateString(apiConfig.region === 'US' ? 'en-US' : 'fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}</span>
                         <span>🏢 {lead.sector || 'N/A'}</span>
                         <span>🌍 {lead.city || 'N/A'}</span>
                       </div>
@@ -2122,23 +2143,23 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                   {/* Informations détaillées sur les emails */}
                   <div style={{ marginBottom: 12 }}>
                     <div style={{ fontSize: 10, fontWeight: 600, color: C.tx2, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      📧 Détails des emails envoyés
+                      📧 {apiConfig.region === 'US' ? 'Email Sequence Details' : 'Détails des emails envoyés'}
                       <span style={{ fontSize: 9, color: C.tx3, fontWeight: 400 }}>
-                        ({(lead.sentSteps || []).length}/8 étapes)
+                        ({(lead.sentSteps || []).length}/8 {apiConfig.region === 'US' ? 'steps' : 'étapes'})
                       </span>
                     </div>
                     
                     {/* Grille d'étapes détaillées sur une ligne */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 2 }}>
                       {[
-                        { id: 'step-1-start', label: 'Présentation', icon: '📧', desc: 'Email initial de présentation' },
-                        { id: 'step-2-devis', label: 'Devis', icon: '📄', desc: 'Devis et lien de paiement' },
-                        { id: 'reminder1_after_email1', label: 'Rappel 1', icon: '⏰', desc: 'Rappel 3j après présentation' },
-                        { id: 'reminder2_after_devis', label: 'Rappel 2', icon: '⏰', desc: 'Rappel 2j avant expiration' },
-                        { id: 'step-3-depot', label: 'Acompte', icon: '💰', desc: 'Confirmation acompte 46€' },
-                        { id: 'reminder3_final_payment', label: 'Rappel 3', icon: '⏰', desc: 'Rappel 3j après paiement final' },
-                        { id: 'step-5-confirmation', label: 'Solde', icon: '🏆', desc: 'Confirmation solde 100€' },
-                        { id: 'step-6-livraison', label: 'Livraison', icon: '📦', desc: 'Livraison du site web' }
+                        { id: 'step-1-start', label: apiConfig.region === 'US' ? 'Draft' : 'Présentation', icon: '📧', desc: apiConfig.region === 'US' ? 'Initial draft email' : 'Email initial de présentation' },
+                        { id: 'step-2-devis', label: apiConfig.region === 'US' ? 'Quote' : 'Devis', icon: '📄', desc: apiConfig.region === 'US' ? 'Quote & Payment link' : 'Devis et lien de paiement' },
+                        { id: 'reminder1_after_email1', label: apiConfig.region === 'US' ? 'Rmnd 1' : 'Rappel 1', icon: '⏰', desc: apiConfig.region === 'US' ? '3d follow-up after draft' : 'Rappel 3j après présentation' },
+                        { id: 'reminder2_after_devis', label: apiConfig.region === 'US' ? 'Rmnd 2' : 'Rappel 2', icon: '⏰', desc: apiConfig.region === 'US' ? '2d before quote expires' : 'Rappel 2j avant expiration' },
+                        { id: 'step-3-depot', label: apiConfig.region === 'US' ? 'Deposit' : 'Acompte', icon: '💰', desc: apiConfig.region === 'US' ? `Deposit confirmation (${apiConfig.region === 'US' ? '$46' : '46€'})` : 'Confirmation acompte 46€' },
+                        { id: 'reminder3_final_payment', label: apiConfig.region === 'US' ? 'Rmnd 3' : 'Rappel 3', icon: '⏰', desc: apiConfig.region === 'US' ? 'Follow-up after final delivery' : 'Rappel 3j après paiement final' },
+                        { id: 'step-5-confirmation', label: apiConfig.region === 'US' ? 'Paid' : 'Solde', icon: '🏆', desc: apiConfig.region === 'US' ? 'Final balance confirmation' : 'Confirmation solde 100€' },
+                        { id: 'step-6-livraison', label: apiConfig.region === 'US' ? 'Live' : 'Livraison', icon: '📦', desc: apiConfig.region === 'US' ? 'Admin access & Login' : 'Livraison du site web' }
                       ].map(step => {
                         const isSent = (lead.sentSteps || []).includes(step.id);
                         const isPending = scheduled.some(s => s.lead_id === lead.id && s.template_id === step.id);

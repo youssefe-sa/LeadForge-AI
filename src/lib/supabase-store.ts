@@ -124,6 +124,7 @@ export interface EmailTemplate {
   textContent: string;
   variables: string[];
   category: 'sale' | 'reminder';
+  language: 'FR' | 'US';
 }
 
 export interface ScheduledEmail {
