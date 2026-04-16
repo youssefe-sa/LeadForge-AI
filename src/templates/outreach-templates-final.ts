@@ -38,6 +38,7 @@ export const salesTemplates: EmailTemplate[] = [
     id: 'step-1-start',
     name: '1. Présentation Site Web',
     category: 'sale',
+    language: 'FR',
     subject: '🎁 Une surprise pour {{companyName}} : Votre nouveau site est prêt',
     variables: ['firstName', 'companyName', 'websiteLink', 'startProjectLink'],
     htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 10px; background: #ffffff;">
@@ -78,6 +79,7 @@ export const salesTemplates: EmailTemplate[] = [
     id: 'step-2-devis',
     name: '2. Devis & Paiement',
     category: 'sale',
+    language: 'FR',
     subject: '📄 Confirmation & Devis Officiel - {{companyName}}',
     variables: ['firstName', 'companyName', 'devisLink', 'paymentLink'],
     htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
@@ -107,6 +109,7 @@ export const salesTemplates: EmailTemplate[] = [
     id: 'step-3-depot',
     name: '3. Confirmation Acompte',
     category: 'sale',
+    language: 'FR',
     subject: '✅ Confirmation de votre acompte - {{companyName}}',
     variables: ['firstName', 'companyName', 'invoiceLink', 'deliveryDate'],
     htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
@@ -161,6 +164,7 @@ export const salesTemplates: EmailTemplate[] = [
     id: 'step-5-confirmation',
     name: '5. Confirmation Finale',
     category: 'sale',
+    language: 'FR',
     subject: '✅ Paiement reçu ! {{companyName}} est activé',
     variables: ['firstName', 'companyName', 'finalInvoiceLink'],
     htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
@@ -180,6 +184,7 @@ export const salesTemplates: EmailTemplate[] = [
     id: 'step-6-livraison',
     name: '6. Accès Admin',
     category: 'sale',
+    language: 'FR',
     subject: '🔐 Vos Accès Administrateur - {{companyName}}',
     variables: ['firstName', 'companyName', 'adminLink', 'adminUsername', 'adminPassword', 'documentationLink'],
     htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
@@ -205,6 +210,7 @@ export const reminderTemplates: EmailTemplate[] = [
     id: 'reminder1_after_email1',
     name: 'Rappel 1 - Après Email 1',
     category: 'reminder',
+    language: 'FR',
     subject: 'Suivi : Votre site web pour {{companyName}}',
     variables: ['firstName', 'companyName', 'websiteLink', 'startProjectLink'],
     htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 8px; background: #ffffff;">
@@ -225,6 +231,7 @@ export const reminderTemplates: EmailTemplate[] = [
     id: 'reminder2_after_devis',
     name: 'Rappel 2 - Relance Devis',
     category: 'reminder',
+    language: 'FR',
     subject: 'Dernière étape pour {{companyName}}',
     variables: ['firstName', 'companyName', 'devisLink', 'paymentLink'],
     htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 8px; background: #ffffff;">
@@ -241,6 +248,7 @@ export const reminderTemplates: EmailTemplate[] = [
     id: 'reminder3_final_payment',
     name: 'Rappel 3 - Solde Final',
     category: 'reminder',
+    language: 'FR',
     subject: '⚡ Activation urgente : Votre site {{companyName}}',
     variables: ['firstName', 'companyName', 'websiteLink', 'finalPaymentLink'],
     htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 8px; background: #ffffff;">

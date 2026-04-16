@@ -177,7 +177,8 @@ export const defaultEmailTemplates: EmailTemplate[] = [
     category: 'sale',
     htmlContent: '',
     textContent: 'Bonjour,\n\nJe me permets de vous contacter car j\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web professionnel.\n\nJ\'ai pris l\'initiative de créer une maquette de site web spécialement conçue pour votre restaurant. Vous pouvez la découvrir ici :\n\n{landingUrl}\n\nCe site inclut :\n- Menu en ligne avec photos\n- Réservation en ligne\n- Avis Google intégrés\n- Optimisé pour Google (SEO local)\n\nLe site est prêt à être mis en ligne pour seulement 499€. Si cela vous intéresse, n\'hésitez pas à me répondre.\n\nCordialement',
-    variables: ['name', 'city', 'landingUrl']
+    variables: ['name', 'city', 'landingUrl'],
+    language: 'FR'
   },
   { 
     id: '2', 
@@ -186,7 +187,8 @@ export const defaultEmailTemplates: EmailTemplate[] = [
     category: 'sale',
     htmlContent: '',
     textContent: 'Bonjour,\n\nJe vous contacte car j\'ai vu que {name} à {city} n\'a pas de site web.\n\nJ\'ai créé un site web professionnel pour votre commerce :\n\n{landingUrl}\n\n- Catalogue produits\n- Horaires et localisation\n- Visible sur Google\n\nRépondez à cet email pour en discuter.\n\nCordialement',
-    variables: ['name', 'city', 'landingUrl']
+    variables: ['name', 'city', 'landingUrl'],
+    language: 'FR'
   },
   { 
     id: '3', 
@@ -195,7 +197,8 @@ export const defaultEmailTemplates: EmailTemplate[] = [
     category: 'sale',
     htmlContent: '',
     textContent: 'Bonjour,\n\nJ\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web.\n\nJ\'ai créé un site web professionnel spécialement pour vous :\n\n{landingUrl}\n\n- Design moderne et professionnel\n- Optimisé pour mobile\n- Visible sur Google\n\nDécouvrez-le et n\'hésitez pas à me contacter.\n\nCordialement',
-    variables: ['name', 'city', 'landingUrl']
+    variables: ['name', 'city', 'landingUrl'],
+    language: 'FR'
   },
 ];
 
@@ -771,6 +774,7 @@ export function useEmailTemplates() {
           htmlContent: t.body || '',
           textContent: t.body?.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() || '',
           variables: extractVariables(t.body || ''),
+          language: (t.language || 'FR') as 'FR' | 'US',
         }));
 
         setTemplates(mappedTemplates);

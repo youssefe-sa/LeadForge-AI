@@ -213,7 +213,7 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
   }, []);
 
   // ── SHORTER, MORE EFFECTIVE AI PROMPT ──
-  const buildShortPrompt = (lead: Lead, styleHint?: string): { prompt: string; system: string } => {
+  const buildShortPrompt = (lead: Lead, idx: number, styleHint?: string): { prompt: string; system: string } => {
     const pal = getSectorPalette(lead.sector);
     const n = safeStr(lead.name);
     const sector = safeStr(lead.sector) || 'Professionnel';
@@ -238,21 +238,45 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
 
     const system = apiConfig.region === 'US' ? 
     `You are an expert web developer and UI/UX designer. Create MODERN, PROFESSIONAL, and UNIQUE websites.
-    Mandatory Writing Language: ENGLISH (US/UK).` :
+    Mandatory Writing Language: ENGLISH (US/UK).
+    
+PRINCIPLES:
+- Clean and modern design
+- Semantic HTML5 structure
+- Responsive CSS and smooth animations
+- Content tailored to the sector and US/UK culture
+- Optimized performance
+
+STRICT RULES:
+- NEVER use videos or iframes
+- NEVER use external content from specific French sources (Pappers, etc.)
+- ONLY use vanilla HTML/CSS/JavaScript
+- Static images only
+- Complete structure with nav, sections, and footer
+
+DIRECTIVES:
+- Use the provided colors and fonts
+- Integrate images harmoniously
+- Create a unique design for each business
+- Ensure perfect responsiveness
+- Valid and well-structured HTML
+
+Return ONLY the complete HTML code, without markdown.` 
+    : 
     `Tu es un expert en développement web et design UI/UX. Crée des sites web MODERNES, PROFESSIONNELS et UNIQUES.
-    Langue de rédaction obligatoire : FRANÇAIS (Français).`;
+    Langue de rédaction obligatoire : FRANÇAIS (Français).
     
 PRINCIPES:
 - Design épuré et moderne
 - Structure HTML5 sémantique
 - CSS responsive et animations fluides
-- Contenu personnalisé selon le secteur (${apiConfig.region === 'US' ? 'culture US/UK' : 'culture française'})
+- Contenu personnalisé selon le secteur (culture française)
 - Performance optimisée
 
 RÈGLES STRICTES:
 - JAMAIS de vidéos ou iframes
 - JAMAIS de contenu externe (Pappers, etc.)
-- UNiquement HTML/CSS/JavaScript vanilla
+- UNIQUEMENT HTML/CSS/JavaScript vanilla
 - Images statiques uniquement
 - Structure complète avec nav, sections, footer
 
@@ -265,7 +289,46 @@ Directives:
 
 Retourne UNIQUEMENT le code HTML complet, sans markdown.`;
 
-    const prompt = `Crée un site web PROFESSIONNEL pour "${n}" (${sector} à ${city || 'France'}).
+    const prompt = apiConfig.region === 'US' ? 
+      `Create a PROFESSIONAL website for "${n}" (${sector} in ${city || 'USA'}).
+STYLE: Modern, clean and unique design
+PALETTE: ${pal.p} (primary), ${pal.p2} (secondary), ${pal.dk} (dark), ${pal.lt} (light)
+FONTS: headings=${pal.font}, body=Plus Jakarta Sans
+
+BUSINESS INFO:
+- Company: ${n}
+- Sector: ${sector} 
+- Location: ${city || 'USA'}, ${addr || ''}
+- Contact: ${ph || 'N/A'}, ${em || 'N/A'}
+- Rating: ${rating > 0 ? rating + '/5 (' + reviews + ' reviews)' : 'Not rated'}
+${revTexts ? '\nCUSTOMER REVIEWS:\n' + revTexts : ''}
+
+IMAGES:
+${allImgs.slice(0, 6).map((u, i) => `${i + 1}. ${u}`).join('\n')}
+
+Style hint: ${styles[idx % styles.length]}
+
+SECTIONS OBLIGATOIRES:
+1. Hero with title, subtitle, CTA buttons
+2. Responsive fixed navigation
+3. Services (6-8 cards)
+4. Portfolio/Gallery
+5. Testimonials
+6. Contact with form
+7. Footer
+
+REQUIREMENTS:
+- Unique and professional design
+- 100% responsive
+- Smooth animations
+- Semantic HTML
+- Min 5000 characters
+- NO VIDEOS, NO IFRAMES
+- ONLY VANILLA HTML/CSS/JS
+
+Return ONLY the complete HTML.`
+      :
+      `Crée un site web PROFESSIONNEL pour "${n}" (${sector} à ${city || 'France'}).
 
 STYLE: Design moderne, épuré et unique
 PALETTE: ${pal.p} (primaire), ${pal.p2} (secondaire), ${pal.dk} (sombre), ${pal.lt} (clair)
