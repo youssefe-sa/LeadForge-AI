@@ -25,9 +25,9 @@ export interface UltimateContent {
 
 const SECTOR_ULTIMATE_TEMPLATES = {
   plomberie: {
-    primary: '#2563eb',
-    secondary: '#1d4ed8',
-    accent: '#60a5fa',
+    primary: '#1e40af',
+    secondary: '#1e3a8a',
+    accent: '#3b82f6',
     background: '#f8fafc',
     services: [
       { name: 'Dépannage Urgence', description: 'Intervention rapide pour toutes vos urgences', features: ['Disponible 24/7', 'Intervention sous 2h', 'Devis gratuit'] },
@@ -43,9 +43,9 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     ctaText: 'Appeler maintenant'
   },
   electricien: {
-    primary: '#dc2626',
-    secondary: '#b91c1c',
-    accent: '#f87171',
+    primary: '#991b1b',
+    secondary: '#7f1d1d',
+    accent: '#dc2626',
     background: '#f8fafc',
     services: [
       { name: 'Mise aux Normes', description: 'Mise en conformité de votre installation', features: ['Consuel garanti', 'Normes NFC 15-100', 'Diagnostic sécurité'] },
@@ -61,9 +61,9 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     ctaText: 'Appeler maintenant'
   },
   coiffeur: {
-    primary: '#7c3aed',
-    secondary: '#6d28d9',
-    accent: '#a78bfa',
+    primary: '#6b21a8',
+    secondary: '#581c87',
+    accent: '#7c3aed',
     background: '#f8fafc',
     services: [
       { name: 'Coupe Femme', description: 'Coupe moderne et sur-mesure', features: ['Visagisme', 'Techniques modernes', 'Coiffage'] },
@@ -79,9 +79,9 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     ctaText: 'Appeler maintenant'
   },
   restaurant: {
-    primary: '#ea580c',
-    secondary: '#c2410c',
-    accent: '#fb923c',
+    primary: '#c2410c',
+    secondary: '#9a3412',
+    accent: '#ea580c',
     background: '#f8fafc',
     services: [
       { name: 'Carte Restaurant', description: "Cuisine moderne et de saison", features: ['Produits frais', 'Plats maison', 'Végétarien'] },
@@ -97,9 +97,9 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     ctaText: 'Réserver'
   },
   garage: {
-    primary: '#059669',
-    secondary: '#047857',
-    accent: '#34d399',
+    primary: '#166534',
+    secondary: '#14532d',
+    accent: '#059669',
     background: '#f8fafc',
     services: [
       { name: 'Diagnostic Électronique', description: 'Analyse des calculateurs de votre véhicule', features: ['Valises constructeurs', 'Lecture codes pannes', 'Effacement'] },
@@ -115,9 +115,9 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     ctaText: 'Appeler maintenant'
   },
   default: {
-    primary: '#334155',
-    secondary: '#1e293b',
-    accent: '#94a3b8',
+    primary: '#1e293b',
+    secondary: '#334155',
+    accent: '#475569',
     background: '#f8fafc',
     services: [
       { name: 'Consultation', description: 'Analyse de vos besoins', features: ['Diagnostic sur mesure', 'Plan d\'action', 'Écoute active'] },
@@ -395,13 +395,17 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 function buildUltimateHTML(content: UltimateContent, template: any, sectorFallbacks: string[] = []): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   
-  // Dynamic Unique Vibe Generator
+  // Dynamic Professional Color Generator (pas de couleurs vives)
   let nameHash = 0;
   for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
-  const hue = (nameHash % 360);
-  const primaryColor = `hsl(${hue}, 70%, 45%)`;
-  const secondaryColor = `hsl(${(hue + 60) % 360}, 65%, 40%)`;
-  const accentColor = `hsl(${(hue + 200) % 360}, 80%, 60%)`;
+  
+  // Limitation aux tons professionnels uniquement
+  const professionalHues = [200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190];
+  const hue = professionalHues[nameHash % professionalHues.length];
+  
+  const primaryColor = `hsl(${hue}, 60%, 35%)`;
+  const secondaryColor = `hsl(${hue}, 70%, 25%)`;
+  const accentColor = `hsl(${hue}, 65%, 45%)`;
   
   // Variation Logic
   const patternType = nameHash % 4;
