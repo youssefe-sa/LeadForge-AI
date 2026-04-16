@@ -30,17 +30,17 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#60a5fa',
     background: '#f8fafc',
     services: [
-      { name: 'Dépannage Urgence', description: 'Intervention rapide 24/7 pour toutes vos urgences de plomberie', features: ['Disponible 24/7', 'Intervention sous 2h', 'Devis transparent'] },
-      { name: 'Installation Sanitaire', description: 'Pose professionnelle de tous vos équipements sanitaires', features: ['Salle de bain complète', 'Cuisine équipée', 'Dépannage'] },
-      { name: 'Chauffage & Climatisation', description: 'Installation et entretien de vos systèmes de chauffage', features: ['Pompes à chaleur', 'Chaudières', "Economie d'énergie"] },
-      { name: 'Diagnostic Fuites', description: 'Détection précise et réparation de toutes les fuites', features: ['Recherche non destructive', 'Caméra endoscopique', 'Assurance'] },
-      { name: 'Rénovation Complète', description: 'Transformation haute de gamme de votre salle de bain', features: ['Design sur mesure', 'Matériaux premium', 'Livraison clé en main'] },
-      { name: 'Plomberie Générale', description: 'Tous travaux de plomberie pour professionnels et particuliers', features: ['Mise aux normes', 'Garantie décennale', 'SAV réactif'] }
+      { name: 'Dépannage Urgence', description: 'Intervention rapide pour toutes vos urgences', features: ['Disponible 24/7', 'Intervention sous 2h', 'Devis gratuit'] },
+      { name: 'Installation Sanitaire', description: 'Pose professionnelle de vos équipements', features: ['Salle de bain', 'Cuisine', 'Dépannage'] },
+      { name: 'Chauffage & Climatisation', description: 'Installation et entretien de vos systèmes', features: ['Pompes à chaleur', 'Chaudières', 'Économie'] },
+      { name: 'Diagnostic Fuites', description: 'Détection précise et réparation des fuites', features: ['Recherche non destructive', 'Caméra', 'Garantie'] },
+      { name: 'Rénovation Complète', description: 'Transformation de votre salle de bain', features: ['Design sur mesure', 'Matériaux qualité', 'Livraison clé en main'] },
+      { name: 'Plomberie Générale', description: 'Tous travaux de plomberie', features: ['Mise aux normes', 'Garantie décennale', 'SAV réactif'] }
     ],
-    heroTitle: 'Votre Expert Plomberie',
-    heroSubtitle: "Intervention d'excellence et garantie dans toute la région",
-    aboutText: "Artisan certifié spécialisé dans les interventions premium. Nous garantissons un service d'excellence, réactif et doté d'une finition parfaite.",
-    ctaText: 'Intervention'
+    heroTitle: 'Plombier Qualifié',
+    heroSubtitle: "Intervention rapide et travail garanti dans toute la région",
+    aboutText: "Artisan qualifié avec plus de 15 ans d'expérience. Intervention rapide et travail garanti.",
+    ctaText: 'Appeler maintenant'
   },
   electricien: {
     primary: '#dc2626',
@@ -48,17 +48,17 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#f87171',
     background: '#f8fafc',
     services: [
-      { name: 'Mise aux Normes', description: 'Mise en conformité totale de votre installation', features: ['Consuel garanti', 'Normes NFC 15-100', 'Diagnostic de sécurité'] },
-      { name: 'Tableau Électrique', description: 'Installation et rénovation de tableaux électriques', features: ['Sécurité certifiée', 'Marques premium', 'Protection optimale'] },
-      { name: 'Éclairage Architectonique', description: 'Mise en lumière moderne et design', features: ['LED Premium', 'Étude photométrique', 'Contrôle à distance'] },
-      { name: 'Maison Connectée', description: 'Installation de systèmes domotiques intelligents', features: ['Gestion smartphone', 'Scénarios de vie', 'Sécurité'] },
-      { name: 'Dépannage Électrique', description: 'Diagnostic pointu et réparation instantanée', features: ['Intervention 24/7', 'Outils de précision', 'Fiabilité totale'] },
-      { name: 'Diagnostic Complet', description: 'Bilan de votre installation électrique', features: ['Rapport détaillé', 'Conseil expert', 'Devis chiffré'] }
+      { name: 'Mise aux Normes', description: 'Mise en conformité de votre installation', features: ['Consuel garanti', 'Normes NFC 15-100', 'Diagnostic sécurité'] },
+      { name: 'Tableau Électrique', description: 'Installation et rénovation de tableaux', features: ['Sécurité certifiée', 'Matériel qualité', 'Protection optimale'] },
+      { name: 'Éclairage', description: 'Installation d\'éclairage moderne', features: ['LED', 'Étude photométrique', 'Télécommande'] },
+      { name: 'Domotique', description: 'Installation de systèmes intelligents', features: ['Gestion smartphone', 'Scénarios', 'Sécurité'] },
+      { name: 'Dépannage Électrique', description: 'Diagnostic et réparation rapide', features: ['Intervention 24/7', 'Outils précision', 'Fiabilité'] },
+      { name: 'Diagnostic Complet', description: 'Bilan de votre installation', features: ['Rapport détaillé', 'Conseil expert', 'Devis gratuit'] }
     ],
-    heroTitle: 'Excellence Électrique',
-    heroSubtitle: "L'énergie sûre et connectée, maîtrisée par des experts",
-    aboutText: "Entreprise d'électricité qualifiée, nous concevons, installons et sécurisons vos réseaux avec des technologies de pointe.",
-    ctaText: 'Diagnostic'
+    heroTitle: 'Électricien Qualifié',
+    heroSubtitle: "Intervention rapide et travail garanti dans toute la région",
+    aboutText: "Artisan qualifié avec plus de 15 ans d'expérience. Mise aux normes et dépannage électrique.",
+    ctaText: 'Appeler maintenant'
   },
   coiffeur: {
     primary: '#7c3aed',
@@ -66,17 +66,17 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#a78bfa',
     background: '#f8fafc',
     services: [
-      { name: 'Création Femme', description: 'Coupe tendance et sur-mesure pour sublimer votre visage', features: ['Visagisme', 'Techniques modernes', 'Coiffage wavy'] },
-      { name: 'Barber & Homme', description: 'Service barbier authentique et coupes structurées', features: ['Tracé millimétré', 'Soins barbe bio', 'Finition rasoir'] },
-      { name: 'Coloration Premium', description: 'Nuances parfaites, balayages subtils et respect du cheveu', features: ['Poudres naturelles', 'Ombré Hair', 'Protection Olaplex'] },
-      { name: 'Soin Profond', description: 'Rituels de soin luxueux pour une fibre capillaire réparée', features: ['Botox capillaire', 'Bain hydratant', 'Massage crânien relaxant'] },
-      { name: 'Extensions', description: 'Longueur et volume avec des extensions 100% naturelles', features: ['Kératine ou bandes', 'Invisible', 'Durabilité maximum'] },
-      { name: 'Haute Coiffure', description: 'Chignons et attaches pour vos plus beaux événements', features: ['Mariage', 'Essai personnalisé', 'Tenue parfaite'] }
+      { name: 'Coupe Femme', description: 'Coupe moderne et sur-mesure', features: ['Visagisme', 'Techniques modernes', 'Coiffage'] },
+      { name: 'Barber Homme', description: 'Service barbier et coupes structurées', features: ['Tracé précis', 'Soins barbe', 'Finition rasoir'] },
+      { name: 'Coloration', description: 'Nuances parfaites et balayages', features: ['Produits naturels', 'Ombré Hair', 'Protection cheveux'] },
+      { name: 'Soin Profond', description: 'Rituels soin pour cheveux réparés', features: ['Botox capillaire', 'Bain hydratant', 'Massage relaxant'] },
+      { name: 'Extensions', description: 'Longueur et volume avec extensions naturelles', features: ['Kératine', 'Pose invisible', 'Durabilité'] },
+      { name: 'Coiffure Événement', description: 'Chignons et coiffes pour événements', features: ['Mariage', 'Essai personnalisé', 'Tenue parfaite'] }
     ],
-    heroTitle: "L'Atelier de Coiffure",
-    heroSubtitle: "Révélez votre beauté entre les mains d'experts passionnés",
-    aboutText: "Un salon d'exception où chaque détail est pensé pour votre bien-être. Notre équipe artistique maîtrise les techniques les plus sophistiquées.",
-    ctaText: 'Réserver'
+    heroTitle: 'Salon de Coiffure',
+    heroSubtitle: "Coiffure professionnelle et qualité garantie",
+    aboutText: "Salon de coiffure avec plus de 15 ans d'expérience. Coupes modernes et colorations de qualité.",
+    ctaText: 'Appeler maintenant'
   },
   restaurant: {
     primary: '#ea580c',
@@ -84,16 +84,16 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#fb923c',
     background: '#f8fafc',
     services: [
-      { name: 'Carte Signature', description: "Une cuisine d'inspiration, moderne et de saison", features: ['Produits exceptionnels', "Ferme à l'assiette", 'Végétarien disponible'] },
-      { name: 'Menu Dégustation', description: 'Le voyage culinaire ultime en plusieurs temps', features: ['Accord Mets & Vins', '7 services', 'Surprise du Chef'] },
-      { name: "Cave d'Exception", description: 'Notre sommelier vous guide à travers nos meilleurs flacons', features: ['Vignobles rares', 'Grands crus', 'Mixologie créative'] },
-      { name: 'Privatisation', description: 'Des espaces élégants pour vos événements privés', features: ['Service dédié', 'Menus personnalisés', "Jusqu'à 100 convives"] },
-      { name: 'Brunch Premium', description: 'Le rendez-vous dominical incontournable et généreux', features: ['Buffet Signature', 'Viennoiseries maison', 'Jus fraîchement pressés'] },
-      { name: 'Service Traiteur', description: "L'excellence de notre cuisine où vous le souhaitez", features: ['Cocktails chics', 'Dîners de gala', 'Mise en scène'] }
+      { name: 'Carte Restaurant', description: "Cuisine moderne et de saison", features: ['Produits frais', 'Plats maison', 'Végétarien'] },
+      { name: 'Menu Dégustation', description: 'Découverte culinaire en plusieurs services', features: ['Accord Mets & Vins', '5 services', 'Surprise Chef'] },
+      { name: 'Vins et Boissons', description: 'Sélection de vins et cocktails', features: ['Vins locaux', 'Grands crus', 'Cocktails maison'] },
+      { name: 'Événements Privés', description: 'Organisation de vos événements', features: ['Service dédié', 'Menus personnalisés', 'Jusqu\'à 80 personnes'] },
+      { name: 'Brunch', description: 'Formule brunch le week-end', features: ['Buffet complet', 'Viennoiseries maison', 'Jus frais'] },
+      { name: 'Traiteur', description: "Service traiteur à domicile", features: ['Cocktails', 'Dîners', 'Livraison'] }
     ],
-    heroTitle: 'Expérience Culinaire Unique',
-    heroSubtitle: "L'harmonie parfaite entre gastronomie moderne et atmosphère élégante",
-    aboutText: 'Nous repoussons les limites de la tradition culinaire pour offrir un moment inoubliable, où les produits nobles racontent une histoire dans chaque assiette.',
+    heroTitle: 'Restaurant',
+    heroSubtitle: "Cuisine de qualité et service professionnel",
+    aboutText: "Restaurant avec plus de 15 ans d'expérience. Cuisine maison et produits frais de saison.",
     ctaText: 'Réserver'
   },
   garage: {
@@ -102,17 +102,17 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#34d399',
     background: '#f8fafc',
     services: [
-      { name: 'Diagnostic Électronique', description: 'Analyse précise de tous les calculateurs de votre véhicule', features: ['Valises constructeurs', 'Lecture de codes pannes', 'Effacement'] },
-      { name: 'Entretien Constructeur', description: 'Révisions respectant scrupuleusement les cahiers des charges', features: ['Maintien garantie', 'Pièces origine', 'Huile premium'] },
-      { name: 'Liaison au Sol', description: 'Techniciens experts en pneumatique et comportement', features: ['Géométrie 3D', 'Pneus Haute Perf', 'Amortisseurs'] },
-      { name: 'Carrosserie Premium', description: 'Restauration esthétique parfaite sans différence de teinte', features: ['Spectromètre', 'Cabine de chauffe', 'Detaling inclus'] },
-      { name: 'Moteur & Boîte', description: 'Interventions lourdes, remplacement de distribution ou embrayage', features: ['Outillage spécifique', 'Reconditionnement', 'Vidange BVA'] },
-      { name: 'Voitures de Prestige', description: 'Une équipe spécialisée dans les véhicules sportifs et luxe', features: ['Manipulation soigneuse', 'Local sécurisé', 'Expertise pointue'] }
+      { name: 'Diagnostic Électronique', description: 'Analyse des calculateurs de votre véhicule', features: ['Valises constructeurs', 'Lecture codes pannes', 'Effacement'] },
+      { name: 'Entretien Véhicule', description: 'Révisions selon constructeur', features: ['Maintien garantie', 'Pièces origine', 'Huile qualité'] },
+      { name: 'Pneumatique', description: 'Experts en pneus et géométrie', features: ['Géométrie 3D', 'Pneus performance', 'Amortisseurs'] },
+      { name: 'Carrosserie', description: 'Réparation esthétique et peinture', features: ['Spectromètre', 'Cabine peinture', 'Detailing'] },
+      { name: 'Moteur & Boîte', description: 'Réparation moteur et boîte de vitesses', features: ['Outillage spécialisé', 'Reconditionnement', 'Vidange'] },
+      { name: 'Véhicules Premium', description: 'Spécialiste véhicules sportifs et luxe', features: ['Manipulation soigneuse', 'Local sécurisé', 'Expertise'] }
     ],
-    heroTitle: 'Le Pôle Mécanique Prémium',
-    heroSubtitle: "L'expertise absolue pour sublimer et entretenir votre véhicule",
-    aboutText: "Notre garage de pointe rassemble l'élite des techniciens pour offrir à votre véhicule un entretien sans compromis.",
-    ctaText: 'Rendez-vous'
+    heroTitle: 'Garage Qualifié',
+    heroSubtitle: "Entretien professionnel et réparation garantie",
+    aboutText: "Garage avec plus de 15 ans d'expérience. Réparation mécanique et entretien véhicule.",
+    ctaText: 'Appeler maintenant'
   },
   default: {
     primary: '#334155',
@@ -120,17 +120,17 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#94a3b8',
     background: '#f8fafc',
     services: [
-      { name: 'Consultation Experte', description: 'Analyse approfondie de vos besoins stratégiques', features: ['Diagnostic sur mesure', "Plan d'action", 'Écoute active'] },
-      { name: 'Solutions Premium', description: 'Implémentation de services à forte valeur ajoutée', features: ['Qualité irréprochable', 'Suivi de performance', 'Finitions parfaites'] },
-      { name: 'Accompagnement VIP', description: 'Un interlocuteur dédié tout au long du processus', features: ['Ligne directe', 'RDV prioritaire', 'Bilan mensuel'] },
-      { name: 'Innovation & Technologie', description: 'Utilisation des meilleurs outils du marché', features: ['Méthodes agiles', 'Veille constante', 'Equipement de pointe'] },
-      { name: 'Stratégie Sur-Mesure', description: 'Vos objectifs se transforment en résultats mesurables', features: ['ROI assuré', 'Alignement parfait', 'Transparence absolue'] },
-      { name: 'Service Client 24/7', description: 'Une présence permanente quand vous avez besoin de nous', features: ['Assistance immédiate', 'Proactivité', 'Garanties solides'] }
+      { name: 'Consultation', description: 'Analyse de vos besoins', features: ['Diagnostic sur mesure', 'Plan d\'action', 'Écoute active'] },
+      { name: 'Services Qualité', description: 'Solutions professionnelles', features: ['Qualité garantie', 'Suivi performance', 'Finitions parfaites'] },
+      { name: 'Accompagnement', description: 'Un interlocuteur dédié', features: ['Ligne directe', 'RDV prioritaire', 'Bilan mensuel'] },
+      { name: 'Innovation', description: 'Meilleurs outils du marché', features: ['Méthodes agiles', 'Veille constante', 'Équipement pointe'] },
+      { name: 'Stratégie', description: 'Résultats mesurables', features: ['ROI garanti', 'Alignement parfait', 'Transparence'] },
+      { name: 'Service Client', description: 'Assistance permanente', features: ['Support immédiat', 'Proactivité', 'Garanties solides'] }
     ],
-    heroTitle: "Services Professionnels d'Excellence",
-    heroSubtitle: "L'alliance de la rigueur et de l'innovation pour votre réussite",
-    aboutText: "Nous bâtissons des relations durables basées sur la performance et l'intégrité. Notre ambition est d'élever vos standards et de vous accompagner vers le succès absolu.",
-    ctaText: 'Démarrer'
+    heroTitle: 'Professionnel Qualifié',
+    heroSubtitle: "Services professionnels et qualité garantie",
+    aboutText: "Professionnel avec plus de 15 ans d'expérience. Services de qualité et satisfaction garantie.",
+    ctaText: 'Appeler maintenant'
   }
 };
 
@@ -564,21 +564,21 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             }
         }
 
-        /* ADVANCED DYNAMIC ANIMATIONS 2026 */
+        /* ANIMATIONS PROFESSIONNELLES SUBTILES */
         .reveal { 
             opacity: 0; 
-            transform: ${animStyle === 0 ? 'translateY(50px)' : 'scale(0.9) blur(10px)'}; 
-            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); 
+            transform: translateY(30px); 
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1); 
         }
-        .reveal.active { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
-        .reveal-left { opacity: 0; transform: translateX(-60px); transition: all 1.2s ease-out; }
+        .reveal-left { opacity: 0; transform: translateX(-30px); transition: all 0.8s ease-out; }
         .reveal-left.active { opacity: 1; transform: translateX(0); }
 
-        .reveal-right { opacity: 0; transform: translateX(60px); transition: all 1.2s ease-out; }
+        .reveal-right { opacity: 0; transform: translateX(30px); transition: all 0.8s ease-out; }
         .reveal-right.active { opacity: 1; transform: translateX(0); }
 
-        .stagger-item { opacity: 0; transform: translateY(20px); transition: 0.5s ease-out; }
+        .stagger-item { opacity: 0; transform: translateY(15px); transition: 0.6s ease-out; }
         .active .stagger-item { opacity: 1; transform: translateY(0); }
 
         /* DYNAMIC PATTERN INJECTION */
@@ -818,9 +818,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             color: var(--text-main);
         }
         .hero h1 span {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary);
+            font-weight: 800;
         }
         .hero p {
             font-size: clamp(1.125rem, 2.5vw, 1.375rem);
@@ -846,8 +845,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             font-size: 1.1rem;
         }
         .btn-glow:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 50px -10px var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px var(--primary);
         }
         
         /* Mobile Buttons */
@@ -902,7 +901,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             border: 1px solid rgba(0,0,0,0.03);
             transition: transform 0.3s;
         }
-        .step-card:hover { transform: translateY(-5px); box-shadow: var(--glow); }
+        .step-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
         .step-number {
             width: 60px; height: 60px;
             border-radius: 50%;
@@ -941,9 +940,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         }
         .card:hover::before { opacity: 1; }
         .card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(${primaryRgb}, 0.2);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05), var(--glow);
+            transform: translateY(-4px);
+            border-color: rgba(${primaryRgb}, 0.15);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
         }
         .card > * { position: relative; z-index: 1; }
         
