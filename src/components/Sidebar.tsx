@@ -166,61 +166,55 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount, confi
           </div>
         </div>
 
-        {/* Region Switcher Simple */}
+        {/* Region Switcher Professional */}
         <div style={{ 
-          display: 'flex', 
-          gap: 4,
+          display: 'inline-flex', 
           background: C.surface2, 
           borderRadius: 20, 
-          padding: 4,
+          padding: 2,
           border: `1px solid ${C.border}`,
-          marginBottom: 12,
-          position: 'relative',
-          zIndex: 9999
+          marginBottom: 10,
+          position: 'relative'
         }}>
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('CLIC FR DETECTÉ');
-              updateConfig({ region: 'FR' });
-            }}
+            onClick={() => updateConfig({ region: 'FR' })}
             style={{
-              flex: 1,
-              padding: '6px 10px',
+              padding: '4px 14px',
               fontSize: 10,
-              fontWeight: 700,
+              fontWeight: config.region === 'FR' ? 700 : 500,
               border: 'none',
-              borderRadius: 16,
+              borderRadius: 18,
               background: config.region === 'FR' ? C.accent : 'transparent',
-              color: config.region === 'FR' ? '#fff' : C.tx2,
+              color: config.region === 'FR' ? '#fff' : C.tx3,
               cursor: 'pointer',
-              pointerEvents: 'auto'
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              transition: 'all 0.25s ease',
+              boxShadow: config.region === 'FR' ? '0 2px 4px rgba(212, 80, 10, 0.2)' : 'none'
             }}
           >
-            FR
+            <span>🇫🇷</span> FR
           </button>
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('CLIC US DETECTÉ');
-              updateConfig({ region: 'US' });
-            }}
+            onClick={() => updateConfig({ region: 'US' })}
             style={{
-              flex: 1,
-              padding: '6px 10px',
+              padding: '4px 14px',
               fontSize: 10,
-              fontWeight: 700,
+              fontWeight: config.region === 'US' ? 700 : 500,
               border: 'none',
-              borderRadius: 16,
+              borderRadius: 18,
               background: config.region === 'US' ? C.accent : 'transparent',
-              color: config.region === 'US' ? '#fff' : C.tx2,
+              color: config.region === 'US' ? '#fff' : C.tx3,
               cursor: 'pointer',
-              pointerEvents: 'auto'
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              transition: 'all 0.25s ease',
+              boxShadow: config.region === 'US' ? '0 2px 4px rgba(212, 80, 10, 0.2)' : 'none'
             }}
           >
-            US
+            <span>🇺🇸</span> US
           </button>
         </div>
       </div>

@@ -314,7 +314,8 @@ export const configService = {
       gmailSmtpFromEmail: data.gmail_smtp_from_email || '',
       gmailSmtpSecure: data.gmail_smtp_secure || false,
       whopDepositLink: data.whop_deposit_link || '',
-      whopFinalPaymentLink: data.whop_final_payment_link || ''
+      whopFinalPaymentLink: data.whop_final_payment_link || '',
+      region: data.region || 'FR'
     };
   },
 
@@ -337,6 +338,7 @@ export const configService = {
       whop_final_payment_link: config.whopFinalPaymentLink || null,
       unsplash_key: config.unsplashKey || null,
       pexels_key: config.pexelsKey || null,
+      region: config.region || 'FR',
     };
 
     console.log('🚀 Updating api_config (id=1):', row);
