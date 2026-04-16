@@ -71,8 +71,6 @@ export interface Database {
           id: number;
           groq_key?: string;
           openrouter_key?: string;
-          gemini_key?: string;
-          nvidia_key?: string;
           serper_key?: string;
           unsplash_key?: string;
           pexels_key?: string;
@@ -83,7 +81,6 @@ export interface Database {
           gmail_smtp_from_name?: string;
           gmail_smtp_from_email?: string;
           gmail_smtp_secure?: boolean;
-          region?: string;
           created_at: string;
           updated_at: string;
         };
@@ -97,7 +94,6 @@ export interface Database {
           sector: string;
           subject: string;
           body: string;
-          language?: string;
           created_at: string;
           updated_at: string;
         };
@@ -318,8 +314,7 @@ export const configService = {
       gmailSmtpFromEmail: data.gmail_smtp_from_email || '',
       gmailSmtpSecure: data.gmail_smtp_secure || false,
       whopDepositLink: data.whop_deposit_link || '',
-      whopFinalPaymentLink: data.whop_final_payment_link || '',
-      region: data.region || 'FR'
+      whopFinalPaymentLink: data.whop_final_payment_link || ''
     };
   },
 
@@ -342,7 +337,6 @@ export const configService = {
       whop_final_payment_link: config.whopFinalPaymentLink || null,
       unsplash_key: config.unsplashKey || null,
       pexels_key: config.pexelsKey || null,
-      region: config.region || 'FR',
     };
 
     console.log('🚀 Updating api_config (id=1):', row);

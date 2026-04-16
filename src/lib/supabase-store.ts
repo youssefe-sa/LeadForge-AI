@@ -109,7 +109,6 @@ export interface ApiConfig {
   // Payment Configuration
   whopDepositLink: string; // Lien pour paiement 46$ (dépôt)
   whopFinalPaymentLink: string; // Lien pour paiement 100$ (paiement final)
-  region: 'FR' | 'US';
 }
 
 export interface ApiStatus {
@@ -124,7 +123,6 @@ export interface EmailTemplate {
   textContent: string;
   variables: string[];
   category: 'sale' | 'reminder';
-  language: 'FR' | 'US';
 }
 
 export interface ScheduledEmail {
@@ -166,7 +164,6 @@ export const defaultApiConfig: ApiConfig = {
   // Payment defaults
   whopDepositLink: '',
   whopFinalPaymentLink: '',
-  region: 'FR',
 };
 
 export const defaultEmailTemplates: EmailTemplate[] = [
@@ -177,8 +174,7 @@ export const defaultEmailTemplates: EmailTemplate[] = [
     category: 'sale',
     htmlContent: '',
     textContent: 'Bonjour,\n\nJe me permets de vous contacter car j\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web professionnel.\n\nJ\'ai pris l\'initiative de créer une maquette de site web spécialement conçue pour votre restaurant. Vous pouvez la découvrir ici :\n\n{landingUrl}\n\nCe site inclut :\n- Menu en ligne avec photos\n- Réservation en ligne\n- Avis Google intégrés\n- Optimisé pour Google (SEO local)\n\nLe site est prêt à être mis en ligne pour seulement 499€. Si cela vous intéresse, n\'hésitez pas à me répondre.\n\nCordialement',
-    variables: ['name', 'city', 'landingUrl'],
-    language: 'FR'
+    variables: ['name', 'city', 'landingUrl']
   },
   { 
     id: '2', 
@@ -187,8 +183,7 @@ export const defaultEmailTemplates: EmailTemplate[] = [
     category: 'sale',
     htmlContent: '',
     textContent: 'Bonjour,\n\nJe vous contacte car j\'ai vu que {name} à {city} n\'a pas de site web.\n\nJ\'ai créé un site web professionnel pour votre commerce :\n\n{landingUrl}\n\n- Catalogue produits\n- Horaires et localisation\n- Visible sur Google\n\nRépondez à cet email pour en discuter.\n\nCordialement',
-    variables: ['name', 'city', 'landingUrl'],
-    language: 'FR'
+    variables: ['name', 'city', 'landingUrl']
   },
   { 
     id: '3', 
@@ -197,8 +192,7 @@ export const defaultEmailTemplates: EmailTemplate[] = [
     category: 'sale',
     htmlContent: '',
     textContent: 'Bonjour,\n\nJ\'ai remarqué que {name} à {city} ne dispose pas encore d\'un site web.\n\nJ\'ai créé un site web professionnel spécialement pour vous :\n\n{landingUrl}\n\n- Design moderne et professionnel\n- Optimisé pour mobile\n- Visible sur Google\n\nDécouvrez-le et n\'hésitez pas à me contacter.\n\nCordialement',
-    variables: ['name', 'city', 'landingUrl'],
-    language: 'FR'
+    variables: ['name', 'city', 'landingUrl']
   },
 ];
 
@@ -696,12 +690,7 @@ export function useApiConfig() {
       console.log('Loading config from Supabase...');
       const supabaseConfig = await configService.get();
       console.log('Config loaded:', supabaseConfig);
-      if (supabaseConfig) {
-        setConfig({
-          ...supabaseConfig,
-          region: (supabaseConfig as any).region || 'FR'
-        } as ApiConfig);
-      }
+      setConfig(supabaseConfig);
     } catch (err) {
       console.error('Failed to load config:', err);
       setError(err instanceof Error ? err.message : 'Failed to load config');
@@ -731,17 +720,17 @@ export function useApiConfig() {
   }, [loadConfig]);
 
   const updateConfig = useCallback(async (updates: Partial<ApiConfig>) => {
-    // Mettre à jour l'état local immédiatement pour une interface réactive
-    const newConfig = { ...config, ...updates };
-    setConfig(newConfig);
-    
+    setLoading(true);
     setError(null);
+    
     try {
-      // Tenter la mise à jour en base de données
-      await configService.update(updates);
+      const newConfig = { ...config, ...updates };
+      await configService.update(newConfig);
+      setConfig(newConfig);
     } catch (err) {
-      console.warn('Note: La mise à jour DB a échoué (normal si la colonne region manque):', err);
-      // On ne bloque pas l'UI car l'état local est déjà à jour
+      setError(err instanceof Error ? err.message : 'Failed to update config');
+    } finally {
+      setLoading(false);
     }
   }, [config]);
 
@@ -774,7 +763,6 @@ export function useEmailTemplates() {
           htmlContent: t.body || '',
           textContent: t.body?.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() || '',
           variables: extractVariables(t.body || ''),
-          language: (t.language || 'FR') as 'FR' | 'US',
         }));
 
         setTemplates(mappedTemplates);
