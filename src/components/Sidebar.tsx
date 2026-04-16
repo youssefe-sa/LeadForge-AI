@@ -166,60 +166,61 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount, confi
           </div>
         </div>
 
-        {/* Region Switcher Compact */}
+        {/* Region Switcher Simple */}
         <div style={{ 
-          display: 'inline-flex', 
+          display: 'flex', 
+          gap: 4,
           background: C.surface2, 
           borderRadius: 20, 
-          padding: 3,
+          padding: 4,
           border: `1px solid ${C.border}`,
-          marginBottom: 8
+          marginBottom: 12,
+          position: 'relative',
+          zIndex: 9999
         }}>
           <button
-            onClick={() => {
-              console.log('🔘 Clic FR');
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('CLIC FR DETECTÉ');
               updateConfig({ region: 'FR' });
             }}
             style={{
-              padding: '4px 12px',
+              flex: 1,
+              padding: '6px 10px',
               fontSize: 10,
-              fontWeight: config.region === 'FR' ? 700 : 500,
+              fontWeight: 700,
               border: 'none',
-              borderRadius: 18,
+              borderRadius: 16,
               background: config.region === 'FR' ? C.accent : 'transparent',
-              color: config.region === 'FR' ? '#fff' : C.tx3,
+              color: config.region === 'FR' ? '#fff' : C.tx2,
               cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: config.region === 'FR' ? '0 2px 4px rgba(212, 80, 10, 0.3)' : 'none'
+              pointerEvents: 'auto'
             }}
           >
-            <span>🇫🇷</span> FR
+            FR
           </button>
           <button
-            onClick={() => {
-              console.log('🔘 Clic US');
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('CLIC US DETECTÉ');
               updateConfig({ region: 'US' });
             }}
             style={{
-              padding: '4px 12px',
+              flex: 1,
+              padding: '6px 10px',
               fontSize: 10,
-              fontWeight: config.region === 'US' ? 700 : 500,
+              fontWeight: 700,
               border: 'none',
-              borderRadius: 18,
+              borderRadius: 16,
               background: config.region === 'US' ? C.accent : 'transparent',
-              color: config.region === 'US' ? '#fff' : C.tx3,
+              color: config.region === 'US' ? '#fff' : C.tx2,
               cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: config.region === 'US' ? '0 2px 4px rgba(212, 80, 10, 0.3)' : 'none'
+              pointerEvents: 'auto'
             }}
           >
-            <span>🇺🇸</span> US
+            US
           </button>
         </div>
       </div>
