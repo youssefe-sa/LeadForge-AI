@@ -291,10 +291,8 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const heroTitle = aiContent?.heroTitle || template.heroTitle;
   const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle}${city ? ' à ' + city : ''}`;
   
-  // Limiter le CTA à 2 mots maximum
-  let rawCtaText = aiContent?.cta || template.ctaText;
-  const ctaWords = rawCtaText.split(/\s+/).filter((w: string) => w.length > 0);
-  const ctaText = ctaWords.slice(0, 2).join(' ');
+  // Remplacer la logique compliquée de slice() par ceci :
+  const ctaText = aiContent?.cta || template.ctaText || "Demander un devis";
   
   let finalServices = template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
@@ -868,7 +866,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             font-weight: 400;
         }
         .btn-cta {
-            background: var(--accent);
+            background: var(--primary);
             color: #ffffff;
             padding: 1rem 2.5rem;
             border-radius: 10px;
@@ -885,7 +883,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         }
         .btn-cta:hover {
             transform: translateY(-2px);
-            background: var(--primary);
+            background: var(--secondary);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
         
@@ -1038,8 +1036,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             color: white;
             padding: 5rem 2rem 2rem;
             margin-top: 4rem;
-            border-top-left-radius: 40px;
-            border-top-right-radius: 40px;
         }
         .footer-grid {
             max-width: 1200px; margin: 0 auto;
@@ -1461,7 +1457,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         <!-- <div class="pattern-waves"></div> -->
         <div class="hero-content reveal active" style="position: relative; z-index: 1;">
             <div class="hero-badge"><i data-lucide="${heroBadge.icon}" width="18"></i> ${heroBadge.text}</div>
-            <h1 style="text-align: left; font-size: clamp(3rem, 6vw, 5.5rem); margin-bottom: 0.5rem; line-height: 1.1; color: var(--text-main);">
+            <h1 style="text-align: left; font-size: clamp(3rem, 6vw, 5rem); margin-bottom: 0.5rem; line-height: 1.1; color: var(--text-main);">
                 ${logoInfo.word1} <span style="color: var(--primary);">${logoInfo.word2}</span>
             </h1>
             <h2 style="text-align: left; font-size: clamp(1.2rem, 3vw, 2rem); font-family: 'Outfit'; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem; opacity: 0.8;">${slogan}</h2>
@@ -1486,9 +1482,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             </div>
         </div>
         <div class="hero-image-col reveal active" style="position: relative; z-index: 1;">
-            <div style="position: relative; border-radius: 40px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.05); padding: 1rem; background: white;">
-                <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" style="width: 100%; height: 500px; display: block; object-fit: cover; border-radius: 30px;">
-                <!-- Supprimé : motifs décoratifs pour contraste optimal sur mobile -->
+            <div style="position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); background: white;">
+                <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" style="width: 100%; height: 500px; object-fit: cover;">
             </div>
         </div>
     </section>
@@ -1528,7 +1523,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
 
     <!-- Nos Valeurs -->
     <section class="container bg-alternate" id="valeurs">
-        <div class="anim-shape" style="top: -5%; right: -5%; width: 120px; height: 120px; background: rgba(var(--primary-rgb), 0.1); border-radius: 30%;"></div>
+        <!-- Supprimé : anim-shape pour design plus propre -->
         <div class="section-header reveal" style="position: relative; z-index: 1;">
             <h2>Les valeurs qui nous animent</h2>
             <p>Ce qui fait de nous le partenaire idéal pour vos projets ambitieux.</p>
@@ -1607,7 +1602,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
 
     <!-- Process (4 Démarches) -->
     <section class="container" id="process">
-        <div class="anim-shape" style="bottom: 10%; left: 0%; width: 80px; height: 80px; border: 4px solid var(--secondary); transform: rotate(20deg); opacity: 0.1;"></div>
+        <!-- Supprimé : anim-shape pour design plus propre -->
         <div class="section-header reveal">
             <h2>Notre démarche en 4 étapes</h2>
             <p>Une méthodologie claire et transparente pour garantir le succès de votre projet.</p>
@@ -1645,19 +1640,16 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         <div class="grid-3">
             ${services.map((s, i) => `
             <div class="card glass reveal zoom-hover" style="transition-delay: ${i * 100}ms">
-                ${getImg(i + 2) ? `
-                <div style="height: 200px; margin: -3rem -3rem 2rem; border-radius: 20px 20px 0 0; overflow: hidden; position: relative;">
-                    <img src="${getImg(i + 2)}" ${imgErr(i + 2)} alt="${s.name}" style="width: 100%; height: 100%; object-fit: cover;">
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100%; background: linear-gradient(to top, rgba(255,255,255,0.4), transparent);"></div>
-                </div>` : ''}
-                <div class="card-icon" style="${getImg(i + 2) ? 'margin-top: -1rem;' : ''} background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
-                    <i data-lucide="${['shield', 'layers', 'box', 'award', 'cpu', 'gem'][i%6]}" width="32" height="32"></i>
+                <div class="card-icon" style="background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
+                    <i data-lucide="settings" width="24" height="24"></i>
                 </div>
-                <h3>${s.name}</h3>
-                <p>${s.description}</p>
-                <ul class="feature-list">
+                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">${s.name}</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">${s.description}</p>
+                <ul style="list-style: none; padding: 0;">
                     ${s.features.map(f => `
-                        <li><i data-lucide="check-circle-2"></i> ${f}</li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                            <i data-lucide="check-circle-2" style="color: var(--primary);"></i> ${f}
+                        </li>
                     `).join('')}
                 </ul>
             </div>
@@ -1674,6 +1666,17 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             <h2>Ils l'ont vérifié, ils l'ont approuvé</h2>
             <p>Découvrez pourquoi 100% de nos clients nous recommandent à leur entourage.</p>
         </div>
+        
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 3rem;">
+            <div style="font-size: 3rem; font-weight: 800; color: var(--text-main); line-height: 1;">${rating}</div>
+            <div>
+                <div style="display: flex; color: #f59e0b; gap: 4px; margin-bottom: 4px;">
+                    <i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i>
+                </div>
+                <div style="color: var(--text-muted); font-weight: 500;">Basé sur ${reviews} avis Google</div>
+            </div>
+        </div>
+        
         <div class="grid-3">
             ${testimonials.map((t, i) => `
             <div class="card testimonial-card glass reveal" style="transition-delay: ${(i%3) * 100}ms">
@@ -1681,7 +1684,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
                     <div class="stars">
                         ${Array(t.rating).fill('<i data-lucide="star" fill="currentColor"></i>').join('')}
                     </div>
-                    <p style="color: var(--text-main); font-size: 1.125rem; font-weight: 500; font-style: italic; line-height: 1.6;">"${t.text}"</p>
+                    <p style="color: var(--text-main); font-size: 1.125rem; font-weight: 500; font-style: italic; line-height: 1.6; 
+                      display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;">"${t.text}"</p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem; margin-top: 2rem; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1.5rem;">
                     <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items:center; justify-content:center; font-weight: 700; color: white; font-size: 1.25rem;">
