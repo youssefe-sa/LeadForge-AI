@@ -32,6 +32,7 @@ const C = {
   // 60% - Couleurs claires (fond)
   bg: getCssVar('bg', '#F7F6F2'),      // Blanc cassé
   surface: getCssVar('surface', '#FFFFFF'),   // Blanc pur
+  surface2: getCssVar('surface2', '#F2F1EC'), // Gris très clair
   
   // 30% - Couleurs secondaires (texte, footer)
   tx: getCssVar('text', '#1C1B18'),       // Gris foncé principal
@@ -162,13 +163,13 @@ const PROFESSIONAL_IMAGES: Record<string, string[]> = {
 
 function getCuratedFallback(sector: string, index: number): string {
   const s = (sector || '').toLowerCase();
-  for (const [k, v] of Object.entries(CURATED_FALLBACKS)) {
+  for (const [k, v] of Object.entries(PROFESSIONAL_IMAGES)) {
     if (k !== 'default' && s.includes(k)) return v[index % v.length];
   }
-  if (s.includes('beauté') || s.includes('beauty') || s.includes('esthéti')) return CURATED_FALLBACKS.salon[index % 6];
-  if (s.includes('hotel') || s.includes('riad')) return CURATED_FALLBACKS.hôtel[index % 6];
-  if (s.includes('barb')) return CURATED_FALLBACKS.coiffeur[index % 6];
-  return CURATED_FALLBACKS.default[index % 6];
+  if (s.includes('beauté') || s.includes('beauty') || s.includes('esthéti')) return PROFESSIONAL_IMAGES.salon[index % 6];
+  if (s.includes('hotel') || s.includes('riad')) return PROFESSIONAL_IMAGES.hôtel[index % 6];
+  if (s.includes('barb')) return PROFESSIONAL_IMAGES.coiffeur[index % 6];
+  return PROFESSIONAL_IMAGES.default[index % 6];
 }
 
 export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: Props) {
