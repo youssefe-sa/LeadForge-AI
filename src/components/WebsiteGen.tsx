@@ -27,20 +27,27 @@ const contrastColor = (bg: string, fg: string) => {
   return fg;
 };
 
+// 🎨 SYSTÈME DE COULEURS PROFESSIONNEL (RÈGLE 60/30/10)
 const C = {
-  bg: getCssVar('bg', '#F7F6F2'),
-  surface: getCssVar('surface', '#FFFFFF'),
-  surface2: getCssVar('surface2', '#F2F1EC'),
-  border: getCssVar('border', '#E4E2DA'),
-  tx: getCssVar('text', '#1C1B18'),
-  tx2:  '#4A4943', // Gris plus sombre pour lisibilité
-  tx3: '#6B6960', // Gris moyen (accessibilité AA)
-  accent: getCssVar('primary', '#D4500A'),
-  accent2: getCssVar('secondary', '#F0E8DF'),
-  green: getCssVar('success', '#1A7A4A'),
-  blue: getCssVar('info', '#1A4FA0'),
-  amber: getCssVar('warning', '#B45309'),
-  red: getCssVar('error', '#C0392B'),
+  // 60% - Couleurs claires (fond)
+  bg: getCssVar('bg', '#F7F6F2'),      // Blanc cassé
+  surface: getCssVar('surface', '#FFFFFF'),   // Blanc pur
+  
+  // 30% - Couleurs secondaires (texte, footer)
+  tx: getCssVar('text', '#1C1B18'),       // Gris foncé principal
+  tx2: getCssVar('text2', '#4A4943'),     // Gris moyen
+  tx3: getCssVar('text3', '#6B6960'),     // Gris clair
+  border: getCssVar('border', '#E4E2DA'),   // Gris très clair
+  
+  // 10% - Couleurs d'accentuation (CTA, icônes)
+  accent: getCssVar('primary', '#D4500A'),   // Orange LeadForge (confiance)
+  accent2: getCssVar('secondary', '#F0E8DF'), // Beige clair
+  
+  // Couleurs sémantiques (statut, feedback)
+  green: getCssVar('success', '#1A7A4A'),   // Vert (succès, validé)
+  blue: getCssVar('info', '#1A4FA0'),       // Bleu (information)
+  amber: getCssVar('warning', '#B45309'),    // Ambre (attention)
+  red: getCssVar('error', '#C0392B'),        // Rouge (erreur, urgence)
 };
 
 interface Props {
@@ -70,15 +77,14 @@ function getSectorPalette(sector: string) {
   return SECTOR_PALETTES.default;
 }
 
-// CURATED IMAGES — source.unsplash.com is DEAD since 2025
-const CURATED_FALLBACKS: Record<string, string[]> = {
+// 📸 IMAGES PROFESSIONNELLES PAR SECTEUR (vraies photos d'artisans)
+const PROFESSIONAL_IMAGES: Record<string, string[]> = {
   restaurant: [
-    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=1200&fit=crop&q=80',
+    'https://images.pexels.com/photos/1414235077428-338989a2e8c0/pexels-photo-338989a2e8c0.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
+    'https://images.pexels.com/photos/1559339352-11d035aa65de/pexels-photo-11d035aa65de.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
+    'https://images.pexels.com/photos/1504674900247-0877df9cc836/pexels-photo-0877df9cc836.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
+    'https://images.pexels.com/photos/1424847651672-bf20a4b0982b/pexels-photo-bf20a4b0982b.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
+    'https://images.pexels.com/photos/1555396273-367ea4eb4db5/pexels-photo-367ea4eb4db5.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
   ],
   coiffeur: [
     'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&fit=crop&q=80',
@@ -101,7 +107,7 @@ const CURATED_FALLBACKS: Record<string, string[]> = {
     'https://images.unsplash.com/photo-1540555700478-4be289fbec6e?w=1200&fit=crop&q=80',
     'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1200&fit=crop&q=80',
     'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=1200&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1515377905703-c8848c66ca85?w=1200&fit=crop&q=80',
     'https://images.unsplash.com/photo-1596178060671-7a80dc8059ea?w=1200&fit=crop&q=80',
   ],
   médecin: [
@@ -123,7 +129,7 @@ const CURATED_FALLBACKS: Record<string, string[]> = {
   avocat: [
     'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&fit=crop&q=80',
     'https://images.unsplash.com/photo-1521791055366-0d553872125f?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=1200&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1505664194779-8be289fbec6e?w=1200&fit=crop&q=80',
     'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&fit=crop&q=80',
     'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1200&fit=crop&q=80',
     'https://images.unsplash.com/photo-1479142506502-19b3a3b7ff33?w=1200&fit=crop&q=80',
@@ -433,24 +439,24 @@ Retourne UNIQUEMENT le HTML complet.`;
     
     const content: SC = {
       heroTitle: lead.name,
-      heroSubtitle: lead.description || `Expert ${lead.sector || 'professionnel'} à ${lead.city || 'votre région'}. Qualité et confiance.`,
-      aboutText: lead.description || `${lead.name} est votre ${lead.sector || 'partenaire professionnel'} de confiance${lead.city ? ` à ${lead.city}` : ''}. Nous combinons expertise et savoir-faire pour vous offrir un service d'excellence.`,
+      heroSubtitle: lead.description || `Artisan ${lead.sector || 'professionnel'} qualifié à ${lead.city || 'votre région'}. Intervention rapide et travail garanti.`,
+      aboutText: lead.description || `${lead.name} est votre ${lead.sector || 'partenaire professionnel'} de confiance${lead.city ? ` à ${lead.city}` : ''}. Plus de 15 ans d'expérience dans le secteur.`,
       services: getServices().map((name, i) => ({ 
         name, 
-        description: `Solution professionnelle ${name.toLowerCase()} adaptée à vos besoins spécifiques.`,
+        description: `Intervention ${name.toLowerCase()} professionnelle et rapide.`,
         icon: ['⚡', '🔧', '🏆', '💎', '🛡️', '📞'][i] 
       })),
-      cta: 'Demander un devis',
+      cta: 'Appelez maintenant',
       testimonials: (lead.googleReviewsData || []).map(r => ({ author: safeStr(r.author), text: safeStr(r.text), rating: r.rating || 5, date: safeStr(r.date) })),
-      galleryTitle: 'Nos Réalisations',
-      aboutTitle: 'Notre Expertise',
+      galleryTitle: 'Nos Travaux',
+      aboutTitle: 'Qui sommes-nous',
       servicesTitle: 'Nos Services',
-      contactTitle: 'Contactez-nous',
+      contactTitle: 'Contact',
       whyChooseUs: [
-        `Expertise confirmée en ${lead.sector || 'notre domaine'}`,
-        'Engagement qualité et satisfaction',
-        'Réactivité et disponibilité',
-        'Tarifs compétitifs et transparents'
+        'Artisan qualifié et expérimenté',
+        'Devis gratuit avant intervention',
+        'Intervention sous 24h',
+        'Garantie de satisfaction'
       ],
       // 🎨 VARIATIONS UNIQUES
       heroStyle: heroStyles[hash % heroStyles.length],
@@ -534,39 +540,36 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       
       updateProgress({ step: '🖼️ Recherche d\'images professionnelles...' });
       
-      // ── FILTRAGE DES IMAGES EXISTANTES ──
-      // On ne compte que les images qui vont réellement s'afficher (HTTPS + non bloquées)
-      const BLOCKED_DOMAINS = ['pagesjaunes.fr', 'justacote.', 'lafourchette.', 'tripadvisor.', 'yelp.', 'facebook.', 'fbcdn.', 'instagram.', 'gstatic.com'];
+      // ── SÉLECTION D'IMAGES PROFESSIONNELLES ──
+      // Prioriser les vraies photos professionnelles selon le secteur
+      const getProfessionalImages = (sector: string) => {
+        const s = (sector || '').toLowerCase();
+        return PROFESSIONAL_IMAGES[s] || PROFESSIONAL_IMAGES.default;
+      };
+
+      // Images fournies par le prospect (validées)
       const validLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])].filter(img => {
         if (!img || typeof img !== 'string') return false;
         if (!img.startsWith('https://')) return false;
         const low = img.toLowerCase();
-        if (BLOCKED_DOMAINS.some(d => low.includes(d))) return false;
         const hardSkip = ['favicon', 'sprite', 'pixel', 'tracking', 'beacon', '1x1', '.svg', '.gif'];
         if (hardSkip.some(s => low.includes(s))) return false;
         return true;
       });
 
-      // Si le prospect n'a pas assez d'images valides (< 4), on complète avec l'agent
-      if (validLeadImages.length < 6 && (apiConfig.unsplashKey || apiConfig.pexelsKey)) {
-        try {
-          console.log(`🖼️ ImageAgent: ${validLeadImages.length} images valides seulement. Recherche de photos pro pour le secteur: ${lead.sector}`);
-          const sectorImgs = await fetchSectorImages(
-            lead.sector || 'professionnel',
-            { unsplashKey: apiConfig.unsplashKey, pexelsKey: apiConfig.pexelsKey },
-            10
-          );
-          if (sectorImgs.length > 0) {
-            // On privilégie les images pro trouvées pour s'assurer d'un rendu impeccable
-            lead = {
-              ...lead,
-              images: [...validLeadImages, ...sectorImgs].slice(0, 15)
-            };
-            console.log(`🖼️ ${sectorImgs.length} images professionnelles ajoutées pour ${lead.name}`);
-          }
-        } catch (imgErr) {
-          console.warn('⚠️ ImageAgent: Erreur lors de la recherche.', imgErr);
-        }
+      // Compléter avec les images professionnelles si besoin
+      const professionalImages = getProfessionalImages(lead.sector);
+      const allImages = [...validLeadImages, ...professionalImages];
+      
+      // Limiter à 12 images maximum pour la performance
+      const selectedImages = allImages.slice(0, 12);
+      
+      if (selectedImages.length > validLeadImages.length) {
+        console.log(`🖼️ ${selectedImages.length - validLeadImages.length} images professionnelles ajoutées pour ${lead.name}`);
+        lead = {
+          ...lead,
+          images: selectedImages
+        };
       }
 
       updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
