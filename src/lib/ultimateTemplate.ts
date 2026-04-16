@@ -395,26 +395,32 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 function buildUltimateHTML(content: UltimateContent, template: any, sectorFallbacks: string[] = []): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   
-  // Dynamic Professional Color Generator (pas de couleurs vives)
+  // Utilisation stricte des couleurs de la charte par métier
+  const primaryColor = template.primary;
+  const secondaryColor = template.secondary;
+  const accentColor = template.accent;
+
+  // Convertir le HEX primaire en RGB pour les effets de fond
+  const hexToRgb = (hex: string) => {
+    let r = 0, g = 0, b = 0;
+    if (hex.length == 7) {
+      r = parseInt(hex.substring(1, 3), 16);
+      g = parseInt(hex.substring(3, 5), 16);
+      b = parseInt(hex.substring(5, 7), 16);
+    }
+    return `${r}, ${g}, ${b}`;
+  };
+  const primaryRgb = hexToRgb(template.primary);
+  
+  // Variation Logic (gardé pour les patterns et animations)
   let nameHash = 0;
   for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
-  
-  // Limitation aux tons professionnels uniquement
-  const professionalHues = [200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190];
-  const hue = professionalHues[nameHash % professionalHues.length];
-  
-  const primaryColor = `hsl(${hue}, 60%, 35%)`;
-  const secondaryColor = `hsl(${hue}, 70%, 25%)`;
-  const accentColor = `hsl(${hue}, 65%, 45%)`;
-  
-  // Variation Logic
   const patternType = nameHash % 4;
   const fontPair = nameHash % 3;
   const animStyle = nameHash % 2;
   const shapesType = nameHash % 3;
 
   const logoInfo = getLogoInfo(companyName);
-  const primaryRgb = `${hue}, 70%, 45%`;
   const cleanPhoneLink = phone ? phone.replace(/[^0-9+]/g, '') : '';
   const mapQuery = encodeURIComponent(address + (content.city ? ', ' + content.city : ''));
 
@@ -512,7 +518,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             --primary: ${primaryColor};
             --secondary: ${secondaryColor};
             --accent: ${accentColor};
-            --primary-rgb: ${hue}, 70%, 45%;
+            --primary-rgb: ${primaryRgb};
             
             --bg-base: #f8fafc;
             --bg-glass: rgba(255, 255, 255, 0.7);
@@ -520,7 +526,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             --text-muted: #475569;
             --font-head: ${fontPair === 0 ? "'Outfit'" : fontPair === 1 ? "'Plus Jakarta Sans'" : "'Lexend'"}, sans-serif;
             
-            --glow: 0 10px 40px hsla(${hue}, 70%, 45%, 0.1);
+            --glow: 0 10px 40px rgba(${primaryRgb}, 0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -832,30 +838,31 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             margin: 0 auto 3.5rem;
             font-weight: 400;
         }
-        .btn-glow {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+        .btn-cta {
+            background: var(--accent);
+            color: #ffffff;
             padding: 1rem 2.5rem;
-            border-radius: 100px;
+            border-radius: 10px;
             font-weight: 700;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.75rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 40px -10px var(--primary);
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
             font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .btn-glow:hover {
+        .btn-cta:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px -5px var(--primary);
+            background: var(--primary);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
         
         /* Mobile Buttons */
         @media (max-width: 768px) {
-            .btn-glow {
+            .btn-cta {
                 padding: 0.875rem 2rem;
                 font-size: 1rem;
                 width: 100%;
@@ -1421,23 +1428,12 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     <!-- Hero -->
     <section class="hero bg-grid">
         <div class="bg-pattern"></div>
-        <!-- Floating animated decorations - Specialized per site -->
-        ${shapesType === 0 ? `
-            <div class="anim-shape" style="top: 10%; left: 5%; width: 100px; height: 100px; border-radius: 50%; border: 15px solid hsla(${hue}, 70%, 50%, 0.1);"></div>
-            <div class="anim-shape" style="bottom: 15%; right: 10%; width: 150px; height: 150px; border-radius: 50%; background: hsla(${hue}, 70%, 50%, 0.05);"></div>
-        ` : shapesType === 1 ? `
-            <div class="anim-shape" style="top: 15%; right: 5%; width: 80px; height: 80px; background: hsla(${hue}, 70%, 50%, 0.1); transform: rotate(45deg);"></div>
-            <div class="anim-shape" style="bottom: 20%; left: 8%; width: 120px; height: 120px; border: 10px solid hsla(${hue}, 70%, 50%, 0.05); transform: rotate(15deg);"></div>
-        ` : `
-            <div class="anim-shape" style="top: 10%; left: 50%; width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 100px solid hsla(${hue}, 70%, 50%, 0.08);"></div>
-            <div class="anim-shape" style="bottom: 10%; right: 40%; width: 100px; height: 100px; border: 4px solid var(--secondary); opacity: 0.1; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
-        `}
-        <div class="pattern-waves"></div>
+        <!-- Désactivé : animations géométriques pour design plus propre -->
+        <!-- <div class="pattern-waves"></div> -->
         <div class="hero-content reveal active" style="position: relative; z-index: 1;">
             <div class="hero-badge"><i data-lucide="shield-check" width="18"></i> 2026 Innovation Premium</div>
-            <h1 style="text-align: left; font-size: clamp(3rem, 6vw, 5.5rem); margin-bottom: 0.5rem; line-height: 1.1;">
-                <span style="color: var(--primary);">${logoInfo.word1}</span><br>
-                <span style="background: linear-gradient(135deg, var(--secondary), #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${logoInfo.word2}</span>
+            <h1 style="text-align: left; font-size: clamp(3rem, 6vw, 5.5rem); margin-bottom: 0.5rem; line-height: 1.1; color: var(--text-main);">
+                ${logoInfo.word1} <span style="color: var(--primary);">${logoInfo.word2}</span>
             </h1>
             <h2 style="text-align: left; font-size: clamp(1.2rem, 3vw, 2rem); font-family: 'Outfit'; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem; opacity: 0.8;">${slogan}</h2>
             <p style="text-align: left; margin-bottom: 2.5rem; font-size: 1.15rem;">${heroSubtitle}</p>
@@ -1455,7 +1451,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             </div>
 
             <div style="text-align: left;">
-                <a href="#contact" class="btn-glow">
+                <a href="#contact" class="btn-cta">
                     ${ctaText} <i data-lucide="arrow-right"></i>
                 </a>
             </div>
@@ -1475,7 +1471,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     <section class="container" id="about">
         <div class="bg-pattern"></div>
         <div class="section-header reveal">
-            <h2>L'art de l'excellence professionnelle</h2>
+            <h2>Un professionnel de confiance à votre service</h2>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem; align-items: center; position: relative; z-index: 1;">
             <div class="reveal reveal-left" style="position: relative;">
@@ -1617,8 +1613,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     <!-- Services -->
     <section class="container bg-alternate" id="services">
         <div class="section-header reveal" style="position: relative; z-index: 1;">
-            <h2>Notre Expertise Premium</h2>
-            <p>L'alliance parfaite de la maîtrise technique et des outils les plus modernes.</p>
+            <h2>Nos Services et Interventions</h2>
+            <p>Des prestations de qualité, réalisées dans le respect des normes et des délais.</p>
         </div>
         <div class="grid-3">
             ${services.map((s, i) => `
@@ -1703,7 +1699,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
                     <div class="form-group">
                         <textarea class="form-control" rows="4" placeholder="Détaillez votre besoin..." required></textarea>
                     </div>
-                    <button type="submit" class="btn-glow" style="width: 100%; justify-content: center;">
+                    <button type="submit" class="btn-cta" style="width: 100%; justify-content: center;">
                         <i data-lucide="send"></i> Envoyer la demande
                     </button>
                     <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-light);">
