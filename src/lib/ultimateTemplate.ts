@@ -1608,7 +1608,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
               { title: 'Assurance RC Pro', icon: 'briefcase' },
               { title: 'Certification Qualité', icon: 'award' },
               { title: 'Satisfaction Garantie', icon: 'heart' }
-            ]).map((g, i) => `
+            ]).map((g: any, i: number) => `
             <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: ${i * 100}ms; background: white;">
                 <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="${g.icon}" width="32" height="32"></i></div>
                 <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">${g.title}</h3>
