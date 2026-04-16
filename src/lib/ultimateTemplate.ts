@@ -138,34 +138,34 @@ const SECTOR_ULTIMATE_TEMPLATES = {
 // Ces images sont garanties sans logos d'entreprises tierces ni textes publicitaires.
 const SECTOR_IMAGES: Record<string, string[]> = {
   plomberie: [
-    'https://images.unsplash.com/photo-1504148455328-497c5efdf13a?w=1200&q=80', // Outils
-    'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=1200&q=80', // Tuyauterie
-    'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=80', // Mains travaillant
-    'https://images.unsplash.com/photo-1590610904018-05260f852656?w=1200&q=80'  // Robinetterie neutre
+    'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=1200&q=80', // Plombier en intervention
+    'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=80', // Artisan plombier au travail
+    'https://images.unsplash.com/photo-1504148455328-497c5efdf13a?w=1200&q=80', // Outils professionnels
+    'https://images.unsplash.com/photo-1590610904018-05260f852656?w=1200&q=80'  // Plombier professionnel
   ],
   electricien: [
-    'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&q=80', // Tableau électrique neutre
-    'https://images.unsplash.com/photo-1558210857-39d4a984f246?w=1200&q=80', // Fils et outils
-    'https://images.unsplash.com/photo-1563770660941-20978e87081b?w=1200&q=80', // Intervention
-    'https://images.unsplash.com/photo-1454165833267-033f23bdf586?w=1200&q=80'  // Plan neutre
+    'https://images.unsplash.com/photo-1563770660941-20978e87081b?w=1200&q=80', // Électricien en intervention
+    'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&q=80', // Électricien au travail
+    'https://images.unsplash.com/photo-1558210857-39d4a984f246?w=1200&q=80', // Électricien professionnel
+    'https://images.unsplash.com/photo-1454165833267-033f23bdf586?w=1200&q=80'  // Artisan électricien
   ],
   coiffeur: [
-    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80', // Salon neutre
-    'https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=1200&q=80', // Ciseaux
-    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=80', // Coupe de cheveux
-    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80'  // Barber neutre
+    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=80', // Coiffeur professionnel au travail
+    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80', // Artisan coiffeur
+    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80', // Barbier professionnel
+    'https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=1200&q=80'  // Coiffeur en intervention
   ],
   restaurant: [
-    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80', // Salle neutre
-    'https://images.unsplash.com/photo-1550966841-3ee71448f522?w=1200&q=80', // Plat gastronomique
-    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=80', // Intérieur élégant
-    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80'  // Cuisine
+    'https://images.unsplash.com/photo-1550966841-3ee71448f522?w=1200&q=80', // Chef professionnel
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80', // Restaurant professionnel
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80', // Chef au travail
+    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=80'  // Service restaurant
   ],
   garage: [
-    'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200&q=80', // Atelier neutre
-    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80', // Moteur
-    'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=1200&q=80', // Mecanicien (mains)
-    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80'  // Roues/Pneus
+    'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=1200&q=80', // Mécanicien professionnel
+    'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200&q=80', // Garage professionnel
+    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80', // Mécanicien au travail
+    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80'  // Artisan garagiste
   ],
   nettoyage: [
     'https://images.unsplash.com/photo-1581578731522-a0034a49f763?w=1200&q=80', // Produits nettoyage
@@ -246,6 +246,34 @@ function getLogoInfo(name: string) {
   const initials = finalWords[0].charAt(0) + finalWords[1].charAt(0);
   const text = finalWords.join(' ');
   return { initials: initials.toUpperCase(), text, word1: finalWords[0], word2: finalWords[1] };
+}
+
+function getHeroBadge(sector: string): { icon: string; text: string } {
+  const s = (sector || '').toLowerCase();
+  
+  if (s.includes('plombber') || s.includes('plomb')) {
+    return { icon: 'zap', text: 'Dépannage rapide garanti' };
+  }
+  if (s.includes('électricien') || s.includes('electric')) {
+    return { icon: 'zap', text: 'Électricien certifié' };
+  }
+  if (s.includes('coiff') || s.includes('barb')) {
+    return { icon: 'scissors', text: 'Coiffeur professionnel' };
+  }
+  if (s.includes('restaurant') || s.includes('cuisin')) {
+    return { icon: 'chef-hat', text: 'Chef qualifié' };
+  }
+  if (s.includes('garage') || s.includes('mécan')) {
+    return { icon: 'wrench', text: 'Garage agréé' };
+  }
+  if (s.includes('nettoy') || s.includes('ménage')) {
+    return { icon: 'sparkles', text: 'Service nettoyage pro' };
+  }
+  if (s.includes('jardin') || s.includes('paysag')) {
+    return { icon: 'leaf', text: 'Jardinier expert' };
+  }
+  
+  return { icon: 'shield-check', text: 'Professionnel certifié' };
 }
 
 export function generateUltimateSite(lead: any, aiContent?: any): string {
@@ -421,6 +449,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
   const shapesType = nameHash % 3;
 
   const logoInfo = getLogoInfo(companyName);
+  const heroBadge = getHeroBadge(content.sector);
   const cleanPhoneLink = phone ? phone.replace(/[^0-9+]/g, '') : '';
   const mapQuery = encodeURIComponent(address + (content.city ? ', ' + content.city : ''));
 
@@ -1431,7 +1460,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         <!-- Désactivé : animations géométriques pour design plus propre -->
         <!-- <div class="pattern-waves"></div> -->
         <div class="hero-content reveal active" style="position: relative; z-index: 1;">
-            <div class="hero-badge"><i data-lucide="shield-check" width="18"></i> 2026 Innovation Premium</div>
+            <div class="hero-badge"><i data-lucide="${heroBadge.icon}" width="18"></i> ${heroBadge.text}</div>
             <h1 style="text-align: left; font-size: clamp(3rem, 6vw, 5.5rem); margin-bottom: 0.5rem; line-height: 1.1; color: var(--text-main);">
                 ${logoInfo.word1} <span style="color: var(--primary);">${logoInfo.word2}</span>
             </h1>
@@ -1459,10 +1488,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         <div class="hero-image-col reveal active" style="position: relative; z-index: 1;">
             <div style="position: relative; border-radius: 40px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.05); padding: 1rem; background: white;">
                 <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" style="width: 100%; height: 500px; display: block; object-fit: cover; border-radius: 30px;">
-                <div style="position: absolute; top:0; left:0; right:0; bottom:0; background: radial-gradient(circle at center, transparent 40%, rgba(var(--primary-rgb), 0.05)); pointer-events: none;"></div>
-                <!-- Motifs professionnels sur l'image -->
-                <div style="position: absolute; bottom: 2rem; left: -2rem; background: var(--primary); height: 100px; width: 100px; border-radius: 50%; opacity: 0.1; filter: blur(20px);"></div>
-                <div style="position: absolute; top: -1rem; right: 2rem; background: var(--secondary); height: 80px; width: 80px; border-radius: 30px; transform: rotate(45deg); opacity: 0.1; filter: blur(10px);"></div>
+                <!-- Supprimé : motifs décoratifs pour contraste optimal sur mobile -->
             </div>
         </div>
     </section>
@@ -1560,20 +1586,20 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             <p>Travaillez l'esprit serein grâce à nos couvertures complètes conformes à la législation.</p>
         </div>
         <div class="valeurs-grid">
-            <div class="valeur-card reveal" style="border-top: 4px solid #10b981; transition-delay: 100ms; background: white;">
-                <div class="valeur-icon" style="background: rgba(16,185,129,0.1); color: #10b981;"><i data-lucide="shield-check" width="32" height="32"></i></div>
+            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: 100ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="shield-check" width="32" height="32"></i></div>
                 <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Garantie Décennale</h3>
             </div>
-            <div class="valeur-card reveal" style="border-top: 4px solid #3b82f6; transition-delay: 200ms; background: white;">
-                <div class="valeur-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;"><i data-lucide="briefcase" width="32" height="32"></i></div>
+            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: 200ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="briefcase" width="32" height="32"></i></div>
                 <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Assurance RC Pro</h3>
             </div>
-            <div class="valeur-card reveal" style="border-top: 4px solid #f59e0b; transition-delay: 300ms; background: white;">
-                <div class="valeur-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;"><i data-lucide="award" width="32" height="32"></i></div>
+            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: 300ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="award" width="32" height="32"></i></div>
                 <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Certification Qualité</h3>
             </div>
-            <div class="valeur-card reveal" style="border-top: 4px solid #8b5cf6; transition-delay: 400ms; background: white;">
-                <div class="valeur-icon" style="background: rgba(139,92,246,0.1); color: #8b5cf6;"><i data-lucide="lock" width="32" height="32"></i></div>
+            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: 400ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="lock" width="32" height="32"></i></div>
                 <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Assurance Tous Risques</h3>
             </div>
         </div>
