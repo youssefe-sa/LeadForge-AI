@@ -37,27 +37,39 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       { name: 'Rénovation Complète', description: 'Transformation de votre salle de bain', features: ['Design sur mesure', 'Matériaux qualité', 'Livraison clé en main'] },
       { name: 'Plomberie Générale', description: 'Tous travaux de plomberie', features: ['Mise aux normes', 'Garantie décennale', 'SAV réactif'] }
     ],
+    guarantees: [
+      { title: 'Garantie Décennale', icon: 'shield-check' },
+      { title: 'Intervention Rapide', icon: 'clock' },
+      { title: 'Devis Transparent', icon: 'file-text' },
+      { title: 'Travail Garanti', icon: 'check-square' }
+    ],
     heroTitle: 'Plombier Qualifié',
     heroSubtitle: "Intervention rapide et travail garanti dans toute la région",
     aboutText: "Artisan qualifié avec plus de 15 ans d'expérience. Intervention rapide et travail garanti.",
     ctaText: 'Appeler maintenant'
   },
   electricien: {
-    primary: '#991b1b',
-    secondary: '#7f1d1d',
-    accent: '#dc2626',
+    primary: '#1e40af',
+    secondary: '#1e3a8a',
+    accent: '#2563eb',
     background: '#f8fafc',
     services: [
-      { name: 'Mise aux Normes', description: 'Mise en conformité de votre installation', features: ['Consuel garanti', 'Normes NFC 15-100', 'Diagnostic sécurité'] },
-      { name: 'Tableau Électrique', description: 'Installation et rénovation de tableaux', features: ['Sécurité certifiée', 'Matériel qualité', 'Protection optimale'] },
-      { name: 'Éclairage', description: 'Installation d\'éclairage moderne', features: ['LED', 'Étude photométrique', 'Télécommande'] },
-      { name: 'Domotique', description: 'Installation de systèmes intelligents', features: ['Gestion smartphone', 'Scénarios', 'Sécurité'] },
-      { name: 'Dépannage Électrique', description: 'Diagnostic et réparation rapide', features: ['Intervention 24/7', 'Outils précision', 'Fiabilité'] },
-      { name: 'Diagnostic Complet', description: 'Bilan de votre installation', features: ['Rapport détaillé', 'Conseil expert', 'Devis gratuit'] }
+      { name: 'Installation Électrique', description: 'Mise aux normes complètes de votre installation électrique', features: ['Norme NFC 15-100', 'Tableau modulaire', 'Mise à la terre'] },
+      { name: 'Dépannage Urgence', description: 'Intervention rapide 24/7 pour toutes pannes électriques', features: ['Intervention 2h', 'Diagnostic précis', 'Réparation garantie'] },
+      { name: 'Domotique & Connectique', description: 'Installation de systèmes domotiques et connectés', features: ['Objets connectés', 'Scénarios automatisés', 'Application mobile'] },
+      { name: 'Tableau Électrique', description: 'Mise à niveau et remplacement de tableaux électriques', features: ['Disjoncteurs modulaires', 'Protection différentielle', 'Câblage sécurisé'] },
+      { name: 'Prises & Interrupteurs', description: 'Installation et remplacement de points électriques', features: ['Prises standards', 'Variateurs', 'Télérupteurs'] },
+      { name: 'Éclairage Design', description: 'Création d\'éclairages design et fonctionnels', features: ['LED design', 'Variateurs', 'Automatisation'] }
+    ],
+    guarantees: [
+      { title: 'Garantie Décennale', icon: 'shield-check' },
+      { title: 'Norme NFC 15-100', icon: 'check-square' },
+      { title: 'Intervention Rapide', icon: 'clock' },
+      { title: 'Devis Transparent', icon: 'file-text' }
     ],
     heroTitle: 'Électricien Qualifié',
-    heroSubtitle: "Intervention rapide et travail garanti dans toute la région",
-    aboutText: "Artisan qualifié avec plus de 15 ans d'expérience. Mise aux normes et dépannage électrique.",
+    heroSubtitle: "Solutions électriques professionnelles et sécurisées",
+    aboutText: "Électricien avec plus de 15 ans d'expérience. Interventions dépannage et installations conformes aux normes.",
     ctaText: 'Appeler maintenant'
   },
   coiffeur: {
@@ -72,6 +84,12 @@ const SECTOR_ULTIMATE_TEMPLATES = {
       { name: 'Soin Profond', description: 'Rituels soin pour cheveux réparés', features: ['Botox capillaire', 'Bain hydratant', 'Massage relaxant'] },
       { name: 'Extensions', description: 'Longueur et volume avec extensions naturelles', features: ['Kératine', 'Pose invisible', 'Durabilité'] },
       { name: 'Coiffure Événement', description: 'Chignons et coiffes pour événements', features: ['Mariage', 'Essai personnalisé', 'Tenue parfaite'] }
+    ],
+    guarantees: [
+      { title: 'Produits Naturels', icon: 'leaf' },
+      { title: 'Hygiène Stricte', icon: 'sparkles' },
+      { title: 'Visagisme Expert', icon: 'scissors' },
+      { title: 'Satisfaction Garantie', icon: 'heart' }
     ],
     heroTitle: 'Salon de Coiffure',
     heroSubtitle: "Coiffure professionnelle et qualité garantie",
@@ -560,7 +578,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-base);
+            background-color: #f8fafc;
             color: var(--text-main);
             overflow-x: hidden;
             line-height: 1.7;
@@ -618,15 +636,10 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         .stagger-item { opacity: 0; transform: translateY(15px); transition: 0.6s ease-out; }
         .active .stagger-item { opacity: 1; transform: translateY(0); }
 
-        /* DYNAMIC PATTERN INJECTION */
-        .bg-pattern {
-            position: absolute; top:0; left:0; width:100%; height:100%;
-            pointer-events: none; opacity: 0.05; z-index: 0;
-            ${patternType === 0 ? `background-image: radial-gradient(var(--primary) 1.5px, transparent 1.5px); background-size: 25px 25px;` : 
-              patternType === 1 ? `background-image: linear-gradient(var(--primary) 1px, transparent 1px), linear-gradient(90deg, var(--primary) 1px, transparent 1px); background-size: 40px 40px;` :
-              patternType === 2 ? `background: repeating-linear-gradient(45deg, var(--primary), var(--primary) 1px, transparent 1px, transparent 12px);` :
-              `background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px); background-size: 15px 15px;`}
-        }
+        /* DYNAMIC PATTERN INJECTION - SUPPRIMÉ POUR DESIGN MODERNE */
+        .bg-pattern { display: none; }
+        .pattern-waves { display: none; }
+        .bg-grid { background-image: none !important; }
 
         /* Top Marquee Defilant */
         .top-marquee {
@@ -707,7 +720,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             background-size: 30px 30px;
         }
         .bg-alternate {
-            background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(var(--primary-rgb), 0.03) 50%, rgba(255,255,255,0) 100%);
+            background-color: #f8fafc; /* Gris extrêmement clair */
+            border-top: 1px solid rgba(0,0,0,0.03); /* Ligne de séparation quasi invisible mais élégante */
+            border-bottom: 1px solid rgba(0,0,0,0.03);
         }
         .blob-1 {
             background: var(--primary);
@@ -910,10 +925,12 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             margin-bottom: 4rem;
         }
         .section-header h2 {
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-size: clamp(2.2rem, 4vw, 3rem);
             margin-bottom: 1.25rem;
-            font-weight: 800;
+            font-weight: 700;
+            color: #1e293b;
             letter-spacing: -0.02em;
+            text-transform: capitalize;
         }
         .section-header p {
             color: var(--text-muted);
@@ -1481,15 +1498,20 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
                 </a>
             </div>
         </div>
-        <div class="hero-image-col reveal active" style="position: relative; z-index: 1;">
-            <div style="position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); background: white;">
-                <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" style="width: 100%; height: 500px; object-fit: cover;">
+        <div class="hero-image-col reveal reveal-left" style="position: relative; z-index: 1;">
+            <!-- Les éléments décoratifs (les mêmes que dans About) -->
+            <div style="position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; background: radial-gradient(var(--primary) 2px, transparent 2px); background-size: 10px 10px; z-index: 0; opacity: 0.2;"></div>
+            <div style="position: absolute; bottom: -20px; right: -20px; border: 4px solid var(--primary); width: 80%; height: 80%; border-radius: 30px; z-index: 0; opacity: 0.1;"></div>
+            
+            <div style="position: relative; border-radius: 30px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.1); z-index: 1; border: 8px solid white; background: white;">
+                <!-- NOTE IMPORTANTE: J'ai mis object-fit: contain; au cas où c'est un logo -->
+                <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" style="width: 100%; height: 450px; object-fit: contain; display: block;">
             </div>
         </div>
     </section>
 
     <!-- A Propos -->
-    <section class="container" id="about">
+    <section class="container bg-alternate" id="about">
         <div class="bg-pattern"></div>
         <div class="section-header reveal">
             <h2>Un professionnel de confiance à votre service</h2>
@@ -1556,20 +1578,20 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     <section class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
         <div class="stats-banner reveal">
             <div class="stat-banner-item">
-                <h3>${reviews}+</h3>
-                <div style="font-weight: 500; opacity: 0.9;">Clients Satisfaits</div>
+                <h3>${(reviews || 0) > 0 ? (reviews || 0) + '+' : '100%'}</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Avis Vérifiés</div>
             </div>
             <div class="stat-banner-item">
-                <h3>10+</h3>
-                <div style="font-weight: 500; opacity: 0.9;">Ans d'Expérience</div>
+                <h3>24/7</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Disponibilité</div>
             </div>
             <div class="stat-banner-item">
-                <h3>${(reviews || 42) * 5}+</h3>
-                <div style="font-weight: 500; opacity: 0.9;">Projets Réalisés</div>
+                <h3>${rating}/5</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Note Google</div>
             </div>
             <div class="stat-banner-item">
                 <h3>100%</h3>
-                <div style="font-weight: 500; opacity: 0.9;">Satisfaction Garantie</div>
+                <div style="font-weight: 500; opacity: 0.9;">Satisfaction</div>
             </div>
         </div>
     </section>
@@ -1581,22 +1603,17 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             <p>Travaillez l'esprit serein grâce à nos couvertures complètes conformes à la législation.</p>
         </div>
         <div class="valeurs-grid">
-            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: 100ms; background: white;">
-                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="shield-check" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Garantie Décennale</h3>
+            ${(template.guarantees || [
+              { title: 'Garantie Décennale', icon: 'shield-check' },
+              { title: 'Assurance RC Pro', icon: 'briefcase' },
+              { title: 'Certification Qualité', icon: 'award' },
+              { title: 'Satisfaction Garantie', icon: 'heart' }
+            ]).map((g, i) => `
+            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: ${i * 100}ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="${g.icon}" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">${g.title}</h3>
             </div>
-            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: 200ms; background: white;">
-                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="briefcase" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Assurance RC Pro</h3>
-            </div>
-            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: 300ms; background: white;">
-                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="award" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Certification Qualité</h3>
-            </div>
-            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: 400ms; background: white;">
-                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="lock" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Assurance Tous Risques</h3>
-            </div>
+            `).join('')}
         </div>
     </section>
 
@@ -1632,7 +1649,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     </section>
 
     <!-- Services -->
-    <section class="container bg-alternate" id="services">
+    <section class="container" id="services">
         <div class="section-header reveal" style="position: relative; z-index: 1;">
             <h2>Nos Services et Interventions</h2>
             <p>Des prestations de qualité, réalisées dans le respect des normes et des délais.</p>
@@ -1781,7 +1798,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 ${companyName}. Tous droits réservés. Créé Services-Siteup.</p>
+            <p>&copy; ${new Date().getFullYear()} ${companyName}. Tous droits réservés. Créé par Services-Siteup.</p>
         </div>
     </footer>
 
