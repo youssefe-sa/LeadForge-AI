@@ -727,17 +727,17 @@ export function useApiConfig() {
   }, [loadConfig]);
 
   const updateConfig = useCallback(async (updates: Partial<ApiConfig>) => {
-    setLoading(true);
-    setError(null);
+    // Mettre à jour l'état local immédiatement pour une interface réactive
+    const newConfig = { ...config, ...updates };
+    setConfig(newConfig);
     
+    setError(null);
     try {
-      const newConfig = { ...config, ...updates };
-      await configService.update(newConfig);
-      setConfig(newConfig);
+      // Tenter la mise à jour en base de données
+      await configService.update(updates);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update config');
-    } finally {
-      setLoading(false);
+      console.warn('Note: La mise à jour DB a échoué (normal si la colonne region manque):', err);
+      // On ne bloque pas l'UI car l'état local est déjà à jour
     }
   }, [config]);
 

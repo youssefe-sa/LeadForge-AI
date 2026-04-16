@@ -176,7 +176,10 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount, confi
           marginBottom: 8
         }}>
           <button
-            onClick={() => updateConfig({ region: 'FR' })}
+            onClick={() => {
+              console.log('🔘 Clic FR');
+              updateConfig({ region: 'FR' });
+            }}
             style={{
               padding: '4px 12px',
               fontSize: 10,
@@ -196,7 +199,10 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount, confi
             <span>🇫🇷</span> FR
           </button>
           <button
-            onClick={() => updateConfig({ region: 'US' })}
+            onClick={() => {
+              console.log('🔘 Clic US');
+              updateConfig({ region: 'US' });
+            }}
             style={{
               padding: '4px 12px',
               fontSize: 10,
