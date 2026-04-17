@@ -1220,16 +1220,6 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
                   color: previewMode === 'mobile' ? C.blue : C.tx3,
                 }}>📱</button>
                 <div style={{ width: 1, height: 20, background: C.border }} />
-                <button onClick={() => setShowEditor(!showEditor)} style={{
-                  padding: '5px 14px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
-                  border: `1px solid ${showEditor ? C.accent : C.border}`,
-                  background: showEditor ? C.accent2 : C.surface,
-                  color: showEditor ? C.accent : C.tx2, fontWeight: 600,
-                }}>✏️ Éditeur IA</button>
-                <button onClick={changePalette} style={{
-                  padding: '5px 14px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
-                  border: `1px solid ${C.amber}`, background: '#fffbeb', color: C.amber, fontWeight: 500,
-                }}>🎨 Palette</button>
                 <button onClick={() => {
                   window.open(previewLead.siteUrl, '_blank');
                 }} style={{
