@@ -222,6 +222,11 @@ function getSectorImagesFallback(sector: string): string[] {
   if (normalizedSector.includes('nettoyag') || normalizedSector.includes('propreté')) return SECTOR_IMAGES.nettoyage;
   if (normalizedSector.includes('jardin') || normalizedSector.includes('paysag')) return SECTOR_IMAGES.jardin;
   if (normalizedSector.includes('coach') || normalizedSector.includes('sport') || normalizedSector.includes('fitness')) return SECTOR_IMAGES.fitness;
+  if (normalizedSector.includes('électricien') || normalizedSector.includes('electricien') || normalizedSector.includes('electric')) return SECTOR_IMAGES.electricien;
+  if (normalizedSector.includes('plomb') || normalizedSector.includes('plomberie')) return SECTOR_IMAGES.plomberie;
+  if (normalizedSector.includes('coiff') || normalizedSector.includes('barb')) return SECTOR_IMAGES.coiffeur;
+  if (normalizedSector.includes('restaurant') || normalizedSector.includes('cuisin')) return SECTOR_IMAGES.restaurant;
+  if (normalizedSector.includes('garage') || normalizedSector.includes('mécan')) return SECTOR_IMAGES.garage;
   
   for (const [key, images] of Object.entries(SECTOR_IMAGES)) {
     if (normalizedSector.includes(key)) return images;
