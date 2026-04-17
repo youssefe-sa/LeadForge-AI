@@ -930,7 +930,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             font-weight: 700;
             color: #1e293b;
             letter-spacing: -0.02em;
-            text-transform: capitalize;
         }
         .section-header p {
             color: var(--text-muted);
@@ -1658,7 +1657,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             ${services.map((s, i) => `
             <div class="card glass reveal zoom-hover" style="transition-delay: ${i * 100}ms">
                 <div class="card-icon" style="background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
-                    <i data-lucide="settings" width="24" height="24"></i>
+                    <i data-lucide="${['zap', 'tool', 'home', 'shield', 'settings', 'check-circle'][i%6]}" width="40" height="40" style="color: var(--primary);"></i>
                 </div>
                 <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">${s.name}</h3>
                 <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">${s.description}</p>
@@ -1698,7 +1697,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             ${testimonials.map((t, i) => `
             <div class="card testimonial-card glass reveal" style="transition-delay: ${(i%3) * 100}ms">
                 <div>
-                    <div class="stars">
+                    <div class="stars" style="margin-bottom: 1rem;">
                         ${Array(t.rating).fill('<i data-lucide="star" fill="currentColor"></i>').join('')}
                     </div>
                     <p style="color: var(--text-main); font-size: 1.125rem; font-weight: 500; font-style: italic; line-height: 1.6; 
