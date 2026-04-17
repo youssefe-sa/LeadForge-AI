@@ -1886,7 +1886,10 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         </div>
     </div>
 
-    <!-- ... -->
+    <div id="modal-mentions" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modal-mentions')">&times;</span>
+            <h2>Mentions Légales</h2>
             <p>Le présent site est édité par l'entreprise <strong>${companyName}</strong>, située au <strong>${address}</strong>.</p>
             <p>Directeur de la publication : Le Gérant de ${companyName}.</p>
             <h3>2. Hébergement</h3>
