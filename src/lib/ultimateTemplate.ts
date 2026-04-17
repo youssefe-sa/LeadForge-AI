@@ -1999,7 +1999,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             const val = chatText.value.trim();
             if(!val) return;
             
-            // User msg
+            // Message de l'utilisateur
             const uMsg = document.createElement('div');
             uMsg.style.cssText = 'background: var(--primary); color: white; padding: 1rem; border-radius: 12px; border-bottom-right-radius: 0; align-self: flex-end; max-width: 85%; font-size: 0.95rem;';
             uMsg.textContent = val;
@@ -2007,24 +2007,32 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             chatText.value = '';
             chatBody.scrollTo(0, chatBody.scrollHeight);
 
-            // Bot typing
+            // Bot typing (Simulation d'intelligence contextuelle)
             setTimeout(() => {
                 const bMsg = document.createElement('div');
-                bMsg.style.cssText = 'background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 0.95rem; align-self: flex-start; max-width: 85%;';
+                bMsg.style.cssText = 'background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 0.95rem; align-self: flex-start; max-width: 85%; line-height: 1.5;';
                 
                 if(chatStep === 0) {
-                    bMsg.textContent = "Je comprends. Pour que notre équipe puisse traiter votre demande rapidement, pouvez-vous me laisser votre numéro de téléphone ?";
+                    // L'IA utilise le secteur et la ville pour prouver qu'elle "comprend"
+                    bMsg.innerHTML = "D'accord, je comprends. En tant que spécialiste <strong>${content.sector}</strong> sur <strong>${city || 'la région'}</strong>, nous traitons ce genre de demande tous les jours.<br><br>Est-ce qu'il s'agit d'une <strong>urgence</strong> ou d'une demande de <strong>devis sur rendez-vous</strong> ?";
                     chatStep++;
-                } else if (chatStep === 1) {
-                    bMsg.textContent = "C'est bien noté ! Un de nos experts va vous recontacter sur ce numéro dans les plus brefs délais. Bonne journée !";
+                } 
+                else if (chatStep === 1) {
+                    // L'IA demande l'info cruciale après avoir écouté
+                    bMsg.innerHTML = "C'est bien noté. Pour que le bon technicien puisse préparer votre dossier et vous rappeler immédiatement avec une estimation, <strong>quel est votre numéro de téléphone ?</strong>";
+                    chatStep++;
+                }
+                else if (chatStep === 2) {
+                    // Conclusion
+                    bMsg.innerHTML = "Parfait ! J'ai transmis toutes ces informations à notre équipe. Un expert <strong>${logoInfo.word1}</strong> va vous appeler sur ce numéro d'ici quelques minutes. Merci pour votre confiance !";
                     document.getElementById('chat-text').disabled = true;
-                    document.getElementById('chat-text').placeholder = "Demande envoyée.";
+                    document.getElementById('chat-text').placeholder = "Conversation terminée.";
                     chatStep++;
                 }
                 
                 chatBody.appendChild(bMsg);
                 chatBody.scrollTo(0, chatBody.scrollHeight);
-            }, 1200);
+            }, 1500); // 1.5s pour faire "plus réfléchi"
         }
         chatText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
 
@@ -2037,25 +2045,39 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             document.getElementById(id).style.display = 'none';
             document.body.style.overflow = 'auto';
         }
-        // Auto-Popup après 3.5 secondes
-window.addEventListener('load', function() {
-    if (!sessionStorage.getItem('popupShown')) {
-        setTimeout(function() {
-            document.getElementById('contact-modal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            sessionStorage.setItem('popupShown', 'true');
-        }, 3500); 
-    }
-});
+        
+        // Auto-Popup au Scroll (50% de la page)
+        let popupTriggered = false; // Sécurité pour ne pas déclencher 100 fois
 
-// Fermer le modal en cliquant à l'extérieur
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('contact-modal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-});
+        window.addEventListener('scroll', function() {
+            // Si le popup a déjà été vu dans cette session, on annule
+            if (sessionStorage.getItem('popupShown')) return;
+            if (popupTriggered) return;
+
+            // Calcul du pourcentage de scroll
+            const scrollPosition = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollPercentage = (scrollPosition / (documentHeight - windowHeight)) * 100;
+
+            // Si on dépasse 50% (milieu du site)
+            if (scrollPercentage > 50) {
+                popupTriggered = true; // On bloque les futurs déclenchements
+                
+                document.getElementById('contact-modal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                sessionStorage.setItem('popupShown', 'true');
+            }
+        });
+
+        // Fermer le modal en cliquant à l'extérieur
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('contact-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
     </script>
 </body>
 </html>`;
