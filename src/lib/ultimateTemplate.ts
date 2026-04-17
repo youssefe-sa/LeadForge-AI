@@ -720,9 +720,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             background-size: 30px 30px;
         }
         .bg-alternate {
-            background-color: #f8fafc; /* Gris extrêmement clair */
-            border-top: 1px solid rgba(0,0,0,0.03); /* Ligne de séparation quasi invisible mais élégante */
-            border-bottom: 1px solid rgba(0,0,0,0.03);
+            background-color: #f1f5f9; /* Un gris légèrement plus sombre pour un vrai contraste */
+            border-top: 1px solid rgba(0,0,0,0.05); /* Ligne de séparation subtile */
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         .blob-1 {
             background: var(--primary);
@@ -1543,7 +1543,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     </section>
 
     <!-- Nos Valeurs -->
-    <section class="container bg-alternate" id="valeurs">
+    <section class="container" id="valeurs">
         <!-- Supprimé : anim-shape pour design plus propre -->
         <div class="section-header reveal" style="position: relative; z-index: 1;">
             <h2>Les valeurs qui nous animent</h2>
@@ -1648,7 +1648,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     </section>
 
     <!-- Services -->
-    <section class="container" id="services">
+    <section class="container bg-alternate" id="services">
         <div class="section-header reveal" style="position: relative; z-index: 1;">
             <h2>Nos Services et Interventions</h2>
             <p>Des prestations de qualité, réalisées dans le respect des normes et des délais.</p>
@@ -1657,7 +1657,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             ${services.map((s, i) => `
             <div class="card glass reveal zoom-hover" style="transition-delay: ${i * 100}ms">
                 <div class="card-icon" style="background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
-                    <i data-lucide="${['zap', 'tool', 'home', 'shield', 'settings', 'check-circle'][i%6]}" width="40" height="40" style="color: var(--primary);"></i>
+                    <i data-lucide="${['zap', 'wrench', 'home', 'shield-check', 'settings', 'check-circle'][i%6]}" width="40" height="40" style="color: var(--primary);"></i>
                 </div>
                 <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">${s.name}</h3>
                 <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">${s.description}</p>
@@ -1718,7 +1718,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     </section>
 
     <!-- Maps & Contact -->
-    <section class="container" id="contact">
+    <section class="container bg-alternate" id="contact">
         <div class="section-header reveal">
             <h2>Passez à l'action dès aujourd'hui</h2>
             <p>Notre équipe est prête à intervenir. Contactez-nous pour un diagnostic rapide.</p>
