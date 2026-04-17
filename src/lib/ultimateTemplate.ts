@@ -477,6 +477,10 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 function buildUltimateHTML(content: UltimateContent, template: any, sectorFallbacks: string[] = []): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   
+  // onerror JS inline pour chaque <img> — fallback vers les belles images
+  const imgErr = (fallbackSlot: number) =>
+    `onerror="this.onerror=null;this.src='${allImages[fallbackSlot % Math.max(allImages.length,1)]}'"`;
+  
   // Utilisation stricte des couleurs de la charte par métier
   const primaryColor = template.primary;
   const secondaryColor = template.secondary;
@@ -528,10 +532,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     if (sectorFallbacks.length > 0) return sectorFallbacks[slot % sectorFallbacks.length];
     return emergencyFallback;
   };
-
-  // onerror JS inline pour chaque <img> — 3 niveaux de fallback
-  const imgErr = (fallbackSlot: number) =>
-    `onerror="this.onerror=null;this.src='${sectorFallbacks[fallbackSlot % Math.max(sectorFallbacks.length,1)] || emergencyFallback}'"`;
 
   return `<!DOCTYPE html>
 <html lang="fr" class="scroll-smooth" style="overflow-x: hidden;">
