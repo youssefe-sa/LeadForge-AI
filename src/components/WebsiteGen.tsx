@@ -529,7 +529,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
   };
 
   // ── GENERATE SITE — TEMPLATE PREMIUM PROFESSIONNEL ──
-  const generateSite = async (lead: Lead) => {
+  const generateSite = async (lead: Lead): Promise<string> => {
     console.log(`🔧 generateSite called for: ${lead.name}`);
     updateProgress({ step: '📝 Génération du contenu...' });
     
@@ -614,6 +614,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       
       console.log(`✅ Site généré avec succès pour: ${lead.name}`);
       
+      return html; // Retourner le code HTML
+      
     } catch (e) {
       console.error(`❌ Erreur lors de la génération du site pour ${lead.name}:`, e);
       updateProgress({ step: '🔄 Fallback template...' });
@@ -627,6 +629,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         await supabase.storage.from('websites').upload(fileName, emergencyHtml, { contentType: 'text/html', cacheControl: '3600', upsert: true });
         const { data: publicUrlData } = supabase.storage.from('websites').getPublicUrl(fileName);
         const siteUrl = publicUrlData.publicUrl;
+        
+        return emergencyHtml; // Retourner le code HTML de fallback
         const baseUrl = 'https://www.services-siteup.online';
         const cleanUrl = `${baseUrl}/api/sites/${lead.id}`;
         
@@ -648,6 +652,9 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         });
       }
     }
+    
+    // Retour par défaut en cas d'erreur
+    return generateUltimateSite(lead, await generateContent(lead));
   };
 
   // ── EMERGENCY TEMPLATE (100% FOOLPROOF) ──
@@ -909,6 +916,35 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
   };
 
   const openPreview = (id: string) => { setPreviewId(id); setChatMessages([]); setShowEditor(false); };
+
+  // ── TÉLÉCHARGER LE CODE HTML DU SITE ──
+  const downloadSiteCode = async (lead: Lead) => {
+    try {
+      startProcessing('download-code', 'websitegen-download');
+      updateProgress({ current: 1, total: 1, name: lead.name, step: '📥 Génération du code HTML...' });
+      
+      // Récupérer le code HTML généré
+      const htmlContent = await generateSite(lead);
+      
+      // Créer un blob et déclencher le téléchargement
+      const blob = new Blob([htmlContent as string], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${lead.name.replace(/[^a-zA-Z0-9]/g, '_')}_site.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      updateProgress({ step: '✅ Code téléchargé avec succès' });
+    } catch (error) {
+      console.error('Erreur lors du téléchargement du code:', error);
+      updateProgress({ step: '❌ Erreur lors du téléchargement' });
+    } finally {
+      stopProcessing();
+    }
+  };
 
   // ── CHANGER PALETTE DE COULEURS ──
   const changePalette = async () => {
@@ -1221,7 +1257,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
                 }}>📱</button>
                 <div style={{ width: 1, height: 20, background: C.border }} />
                 <button onClick={() => {
-                  window.open(previewLead.siteUrl, '_blank');
+                  downloadSiteCode(previewLead);
                 }} style={{
                   padding: '5px 14px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
                   border: `1px solid ${C.green}`, background: '#f0fdf4', color: C.green, fontWeight: 500,
