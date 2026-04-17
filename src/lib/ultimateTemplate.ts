@@ -219,18 +219,27 @@ const SECTOR_IMAGES: Record<string, string[]> = {
 
 function getSectorImagesFallback(sector: string): string[] {
   const normalizedSector = (sector || '').toLowerCase();
-  if (normalizedSector.includes('nettoyag') || normalizedSector.includes('propreté')) return SECTOR_IMAGES.nettoyage;
-  if (normalizedSector.includes('jardin') || normalizedSector.includes('paysag')) return SECTOR_IMAGES.jardin;
-  if (normalizedSector.includes('coach') || normalizedSector.includes('sport') || normalizedSector.includes('fitness')) return SECTOR_IMAGES.fitness;
-  if (normalizedSector.includes('électricien') || normalizedSector.includes('electricien') || normalizedSector.includes('electric')) return SECTOR_IMAGES.electricien;
-  if (normalizedSector.includes('plomb') || normalizedSector.includes('plomberie')) return SECTOR_IMAGES.plomberie;
-  if (normalizedSector.includes('coiff') || normalizedSector.includes('barb')) return SECTOR_IMAGES.coiffeur;
-  if (normalizedSector.includes('restaurant') || normalizedSector.includes('cuisin')) return SECTOR_IMAGES.restaurant;
-  if (normalizedSector.includes('garage') || normalizedSector.includes('mécan')) return SECTOR_IMAGES.garage;
   
+  // Vérifications spécifiques avec accents et variations
+  if (normalizedSector.includes('nettoyag') || normalizedSector.includes('propreté') || normalizedSector.includes('ménage')) return SECTOR_IMAGES.nettoyage;
+  if (normalizedSector.includes('jardin') || normalizedSector.includes('paysag') || normalizedSector.includes('espaces verts')) return SECTOR_IMAGES.jardin;
+  if (normalizedSector.includes('coach') || normalizedSector.includes('sport') || normalizedSector.includes('fitness') || normalizedSector.includes('salle')) return SECTOR_IMAGES.fitness;
+  if (normalizedSector.includes('électricien') || normalizedSector.includes('electricien') || normalizedSector.includes('electric')) return SECTOR_IMAGES.electricien;
+  if (normalizedSector.includes('plomb') || normalizedSector.includes('plomberie') || normalizedSector.includes('chauffage') || normalizedSector.includes('clim')) return SECTOR_IMAGES.plomberie;
+  if (normalizedSector.includes('coiff') || normalizedSector.includes('barb') || normalizedSector.includes('salon')) return SECTOR_IMAGES.coiffeur;
+  if (normalizedSector.includes('restaurant') || normalizedSector.includes('cuisin') || normalizedSector.includes('traiteur')) return SECTOR_IMAGES.restaurant;
+  if (normalizedSector.includes('garage') || normalizedSector.includes('mécan') || normalizedSector.includes('auto') || normalizedSector.includes('carrosserie')) return SECTOR_IMAGES.garage;
+  
+  // Ajout de vérifications pour les nouveaux secteurs
+  if (normalizedSector.includes('médec') || normalizedSector.includes('clinique') || normalizedSector.includes('dentiste') || normalizedSector.includes('santé')) return SECTOR_IMAGES.medical;
+  if (normalizedSector.includes('avocat') || normalizedSector.includes('notaire') || normalizedSector.includes('juridi') || normalizedSector.includes('droit')) return SECTOR_IMAGES.avocat;
+  
+  // Vérification générique avec toutes les clés disponibles
   for (const [key, images] of Object.entries(SECTOR_IMAGES)) {
     if (normalizedSector.includes(key)) return images;
   }
+  
+  // Fallback garanti - toujours retourner des images par défaut
   return SECTOR_IMAGES.default;
 }
 
@@ -482,9 +491,11 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 function buildUltimateHTML(content: UltimateContent, template: any, sectorFallbacks: string[] = []): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   
-  // onerror JS inline pour chaque <img> — fallback vers les belles images
-  const imgErr = (fallbackSlot: number) =>
-    `onerror="this.onerror=null;this.src='${allImages[fallbackSlot % Math.max(allImages.length,1)]}'"`;
+  // onerror JS inline pour chaque <img> - fallback vers les belles images
+  const imgErr = (fallbackSlot: number) => {
+    const fallbackUrl = getImg(fallbackSlot);
+    return `onerror="this.onerror=null;this.src='${fallbackUrl}'"`;
+  };
   
   // Utilisation stricte des couleurs de la charte par métier
   const primaryColor = template.primary;
@@ -530,11 +541,18 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
   
   const getImg = (slot: number): string => {
     // Priorité 1 : image réelle du prospect pour ce slot
-    if (allImages[slot]) return allImages[slot];
+    if (allImages && allImages[slot] && allImages[slot].startsWith('https://')) return allImages[slot];
     // Priorité 2 : image réelle en rotation si pool insuffisant
-    if (allImages.length > 0) return allImages[slot % allImages.length];
+    if (allImages && allImages.length > 0) {
+      const fallbackImg = allImages[slot % allImages.length];
+      if (fallbackImg && fallbackImg.startsWith('https://')) return fallbackImg;
+    }
     // Priorité 3 : fallback sectoriel neutre
-    if (sectorFallbacks.length > 0) return sectorFallbacks[slot % sectorFallbacks.length];
+    if (sectorFallbacks && sectorFallbacks.length > 0) {
+      const sectorImg = sectorFallbacks[slot % sectorFallbacks.length];
+      if (sectorImg && sectorImg.startsWith('https://')) return sectorImg;
+    }
+    // Fallback ultime garanti
     return emergencyFallback;
   };
 

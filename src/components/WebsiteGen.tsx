@@ -654,7 +654,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     }
     
     // Retour par défaut en cas d'erreur
-    return generateUltimateSite(lead, await generateContent(lead));
+    return generateUltimateSite(lead);
   };
 
   // ── EMERGENCY TEMPLATE (100% FOOLPROOF) ──
