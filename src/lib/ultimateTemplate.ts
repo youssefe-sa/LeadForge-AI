@@ -263,18 +263,35 @@ function getLogoInfo(name: string, sector: string = 'default') {
   let word1 = "";
   let word2 = "";
 
-  // S'il n'y a qu'un seul mot (ex: "SEG" ou "Bazar")
+  // S'il n'y a qu'un seul mot (ex: "SEG" ou "BIQ-ELECTRICITE")
   if (words.length === 1) {
-      word1 = words[0].toUpperCase(); // On met SEG en majuscule
+      // On met la première lettre en majuscule et le reste en minuscules pour faire plus joli
+      // "BIQ-ELECTRICITE" deviendra "Biq-electricite"
+      word1 = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
       
-      // On ajoute un mot selon le secteur
+      const lowerWord1 = word1.toLowerCase();
       const s = sector.toLowerCase();
-      if (s.includes('elec')) word2 = "Électricité";
-      else if (s.includes('plomb')) word2 = "Plomberie";
-      else if (s.includes('garage') || s.includes('auto')) word2 = "Automobile";
-      else word2 = "Services";
-  } 
-  // S'il y a plusieurs mots (ex: "Bazar Electricité")
+
+      // ANTI-RÉPÉTITION : On vérifie si le métier est DÉJÀ dans le nom
+      if (s.includes('elec') && !lowerWord1.includes('elec')) {
+          word2 = "Électricité";
+      } 
+      else if (s.includes('plomb') && !lowerWord1.includes('plomb')) {
+          word2 = "Plomberie";
+      } 
+      else if ((s.includes('garage') || s.includes('auto')) && !lowerWord1.includes('auto') && !lowerWord1.includes('garage')) {
+          word2 = "Automobile";
+      } 
+      else if (!lowerWord1.includes('service') && !lowerWord1.includes('pro')) {
+          // Si le mot n'est lié à rien de connu, on ajoute "Services"
+          // SAUF s'il y a déjà le mot "Service" ou "Pro" dedans
+          word2 = "Services";
+      } 
+      else {
+          // Si le métier est déjà dans le nom (ex: BIQ-ELECTRICITE), on n'ajoute RIEN !
+          word2 = "";
+      }
+  }// S'il y a plusieurs mots (ex: "Bazar Electricité")
   else {
       word1 = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
       word2 = words.slice(1).join(' ').charAt(0).toUpperCase() + words.slice(1).join(' ').slice(1).toLowerCase();
