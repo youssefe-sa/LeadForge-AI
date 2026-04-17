@@ -1871,9 +1871,14 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
 
     <!-- Chatbot Window -->
     <div class="chat-window" id="chat-window">
-        <div class="chat-header" style="background: var(--primary); color: white; padding: 1.25rem; font-family: 'Outfit'; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-            <div style="width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px rgba(34,197,94,0.5);"></div>
-            Service Client - ${logoInfo.word1}
+        <div class="chat-header" style="background: var(--primary); color: white; padding: 1.25rem; font-family: 'Outfit'; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px rgba(34,197,94,0.5);"></div>
+                Service Client - ${logoInfo.word1}
+            </div>
+            <button onclick="document.getElementById('chat-window').classList.remove('open')" style="background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Fermer la discussion">
+                <i data-lucide="x" width="24"></i>
+            </button>
         </div>
         <div class="chat-body" id="chat-body" style="flex: 1; padding: 1.5rem; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 1rem;">
             <div class="chat-msg" style="background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 0.95rem; align-self: flex-start; max-width: 85%;">
@@ -2010,32 +2015,47 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             chatText.value = '';
             chatBody.scrollTo(0, chatBody.scrollHeight);
 
-            // Bot typing (Simulation d'intelligence contextuelle)
+            // Simulation de réflexion (temps aléatoire entre 1s et 2s pour faire humain)
             setTimeout(() => {
                 const bMsg = document.createElement('div');
                 bMsg.style.cssText = 'background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 0.95rem; align-self: flex-start; max-width: 85%; line-height: 1.5;';
                 
-                if(chatStep === 0) {
-                    // L'IA utilise le secteur et la ville pour prouver qu'elle "comprend"
-                    bMsg.innerHTML = "D'accord, je comprends. En tant que spécialiste <strong>${content.sector}</strong> sur <strong>${city || 'la région'}</strong>, nous traitons ce genre de demande tous les jours.<br><br>Est-ce qu'il s'agit d'une <strong>urgence</strong> ou d'une demande de <strong>devis sur rendez-vous</strong> ?";
-                    chatStep++;
+                const lowerVal = val.toLowerCase();
+                
+                if (chatStep === 0) {
+                    // Détection : Si c'est juste une salutation (mot court)
+                    if (lowerVal === 'bonjour' || lowerVal === 'salut' || lowerVal === 'bonsoir' || lowerVal === 'hello' || lowerVal === 'coucou') {
+                        bMsg.innerHTML = "Bonjour ! Comment puis-je vous aider concrètement avec votre besoin aujourd'hui ?";
+                        // On n'incrémente PAS le chatStep, on attend qu'il explique son problème
+                    } else {
+                        // S'il a expliqué son problème (ou répondu à la salutation)
+                        bMsg.innerHTML = "D'accord, je comprends. En tant que spécialiste <strong>${content.sector}</strong> sur <strong>${city || 'la région'}</strong>, nous traitons ce genre de demande tous les jours.<br><br>Est-ce qu'il s'agit d'une <strong>urgence</strong> ou d'une demande de <strong>devis sur rendez-vous</strong> ?";
+                        chatStep++;
+                    }
                 } 
                 else if (chatStep === 1) {
-                    // L'IA demande l'info cruciale après avoir écouté
-                    bMsg.innerHTML = "C'est bien noté. Pour que le bon technicien puisse préparer votre dossier et vous rappeler immédiatement avec une estimation, <strong>quel est votre numéro de téléphone ?</strong>";
+                    bMsg.innerHTML = "C'est bien noté. Pour que le bon technicien puisse préparer votre dossier et vous rappeler immédiatement, <strong>quel est votre numéro de téléphone ?</strong>";
                     chatStep++;
                 }
                 else if (chatStep === 2) {
-                    // Conclusion
-                    bMsg.innerHTML = "Parfait ! J'ai transmis toutes ces informations à notre équipe. Un expert <strong>${logoInfo.word1}</strong> va vous appeler sur ce numéro d'ici quelques minutes. Merci pour votre confiance !";
-                    document.getElementById('chat-text').disabled = true;
-                    document.getElementById('chat-text').placeholder = "Conversation terminée.";
-                    chatStep++;
+                    // Détection : On vérifie s'il y a au moins 9 chiffres dans sa réponse
+                    const numCount = (lowerVal.match(/[0-9]/g) || []).length;
+                    
+                    if (numCount >= 9) {
+                        bMsg.innerHTML = "Parfait ! J'ai transmis vos coordonnées à notre équipe. Un expert <strong>${logoInfo.word1}</strong> va vous appeler sur ce numéro d'ici quelques minutes. Merci pour votre confiance !";
+                        document.getElementById('chat-text').disabled = true;
+                        document.getElementById('chat-text').placeholder = "Conversation terminée.";
+                        chatStep++;
+                    } else {
+                        // S'il n'a pas mis de numéro valide
+                        bMsg.innerHTML = "Je n'ai pas bien reconnu le format de votre numéro. Pourriez-vous me l'écrire à nouveau (ex: 06 12 34 56 78) ?";
+                        // On n'incrémente PAS le chatStep, pour l'obliger à donner son numéro
+                    }
                 }
                 
                 chatBody.appendChild(bMsg);
                 chatBody.scrollTo(0, chatBody.scrollHeight);
-            }, 1500); // 1.5s pour faire "plus réfléchi"
+            }, 1000 + Math.random() * 1000); // Le temps de réponse varie un peu comme un vrai humain
         }
         chatText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
 
