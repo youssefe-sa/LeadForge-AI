@@ -431,24 +431,23 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 
   const realImages = [...new Set(realImagesRaw)];
 
-  // ── FALLBACKS SECTORIELS NEUTRES (sans branding concurrent) ──
+  // 1. On récupère les belles images Unsplash selon le métier (DÉJÀ DYNAMIQUE !)
+  // Si c'est un plombier, ça prendra les photos de tuyaux. Si c'est un coiffeur, les ciseaux.
   const fallbacks = getSectorImagesFallback(lead.sector);
 
-  // ── DISTRIBUTION PAR SECTION (7 slots: Hero + About + 5 Services) ──
-  // Priorité: image réelle du prospect → fallback sectoriel
-  const getSlotImage = (slot: number): string => {
-    if (realImages[slot]) return realImages[slot];
-    const fallbackIndex = slot % fallbacks.length;
-    return fallbacks[fallbackIndex];
-  };
-
-  // Image Hero = première image réelle, sinon premier fallback
-  const heroImage = realImages[0] || fallbacks[0];
+  // 2. On FORCE l'utilisation de la première belle image pour le Hero
+  const heroImage = fallbacks[0]; 
   
-  // Pool complet = réelles d'abord, complétées par fallbacks
-  const allImages = realImages.length >= 6
-    ? realImages
-    : [...realImages, ...fallbacks].slice(0, Math.max(6, realImages.length + fallbacks.length));
+  // 3. On distribue les autres belles images pour le reste du site (Qui sommes-nous, etc.)
+  // L'utilisation du modulo (%) garantit que même si tu n'as que 3 images pour un métier, 
+  // le code va boucler et ne jamais planter.
+  const allImages = [
+      fallbacks[0],                                       // Slot 0 : Hero
+      fallbacks[1 % fallbacks.length],                    // Slot 1 : Qui sommes-nous
+      fallbacks[2 % fallbacks.length],                    // Slot 2 : (Réserve)
+      fallbacks[3 % fallbacks.length],                    // Slot3 : (Réserve)
+      fallbacks[4 % fallbacks.length]                     // Slot 4 : (Réserve)
+  ];
 
   const content: UltimateContent = {
     companyName, 
