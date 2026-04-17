@@ -253,17 +253,38 @@ function getUltimateTemplate(sector: string) {
 }
 
 // Nettoyeur de texte de logo selon les instructions (2 lettres, 2 mots sans les articles)
-function getLogoInfo(name: string) {
-  if (!name) return { initials: "CO", text: "Company" };
+function getLogoInfo(name: string, sector: string = 'default') {
+  if (!name) return { initials: "CO", text: "Company", word1: "Company", word2: "Pro" };
+  
   const skip = ['le', 'la', 'les', 'de', 'du', 'des', "l'", "d'", 'à', 'a', 'et', '&', 'en', 'pour'];
   let cleanName = name.replace(/['']/g, "' ");
   const words = cleanName.split(/\s+/).filter(w => w.length > 0 && !skip.includes(w.toLowerCase()));
-  const finalWords = words.slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
-  if (finalWords.length === 0) finalWords.push("Pro", "Service");
-  if (finalWords.length === 1) finalWords.push("Pro");
-  const initials = finalWords[0].charAt(0) + finalWords[1].charAt(0);
-  const text = finalWords.join(' ');
-  return { initials: initials.toUpperCase(), text, word1: finalWords[0], word2: finalWords[1] };
+  
+  let word1 = "";
+  let word2 = "";
+
+  // S'il n'y a qu'un seul mot (ex: "SEG" ou "Bazar")
+  if (words.length === 1) {
+      word1 = words[0].toUpperCase(); // On met SEG en majuscule
+      
+      // On ajoute un mot selon le secteur
+      const s = sector.toLowerCase();
+      if (s.includes('elec')) word2 = "Électricité";
+      else if (s.includes('plomb')) word2 = "Plomberie";
+      else if (s.includes('garage') || s.includes('auto')) word2 = "Automobile";
+      else word2 = "Services";
+  } 
+  // S'il y a plusieurs mots (ex: "Bazar Electricité")
+  else {
+      word1 = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
+      word2 = words.slice(1).join(' ').charAt(0).toUpperCase() + words.slice(1).join(' ').slice(1).toLowerCase();
+  }
+
+  // Les initiales pour le logo (2 premières lettres du nom propre)
+  const initials = (word1.substring(0, 2)).toUpperCase();
+  const text = name;
+  
+  return { initials, text, word1, word2 };
 }
 
 function getHeroBadge(sector: string): { icon: string; text: string } {
@@ -310,7 +331,11 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle}${city ? ' à ' + city : ''}`;
   
   // Remplacer la logique compliquée de slice() par ceci :
-  const ctaText = aiContent?.cta || template.ctaText || "Demander un devis";
+  let ctaText = aiContent?.cta || template.ctaText || "Demander un devis";
+  // Si l'IA sort une phrase de plus de 22 caractères, on force un texte court standard
+  if (ctaText.length > 22) {
+      ctaText = "Demander un devis";
+  }
   
   let finalServices = template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
@@ -464,10 +489,16 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
   const animStyle = nameHash % 2;
   const shapesType = nameHash % 3;
 
-  const logoInfo = getLogoInfo(companyName);
+  const logoInfo = getLogoInfo(companyName, content.sector);
   const heroBadge = getHeroBadge(content.sector);
   const cleanPhoneLink = phone ? phone.replace(/[^0-9+]/g, '') : '';
   const mapQuery = encodeURIComponent(address + (content.city ? ', ' + content.city : ''));
+
+  // Génération dynamique du Favicon SVG
+  const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="${primaryColor}"/><text x="50%" y="50%" font-family="sans-serif" font-size="45" font-weight="bold" fill="white" dominant-baseline="central" text-anchor="middle">${logoInfo.initials}</text></svg>`;
+
+  // On l'encode pour pouvoir le mettre directement dans le href
+  const faviconDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(faviconSvg)}`;
 
   // ── IMAGE DISTRIBUTION INTELLIGENTE PAR SLOT ──
   // Chaque section a sa propre image, pas de rotation aveugle.
@@ -494,6 +525,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/svg+xml" href="${faviconDataUrl}">
     <title>${companyName} - ${content.sector} à ${city} | Services Professionnels</title>
     
     <!-- SEO Meta Tags -->
@@ -895,6 +927,10 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             cursor: pointer;
             font-size: 1.1rem;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            white-space: nowrap;        /* Interdit le retour à la ligne */
+            overflow: hidden;           /* Cache ce qui déborde au cas où */
+            text-overflow: ellipsis;    /* Met des "..." si c'est vraiment trop long sur un tout petit téléphone */
+            justify-content: center;
         }
         .btn-cta:hover {
             transform: translateY(-2px);
