@@ -399,18 +399,15 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
     ...(lead.websiteImages || [])
   ].filter(img => {
     if (!img || typeof img !== 'string') return false;
-    
-    // 1. Forcer HTTPS pour éviter le Mixed Content
     if (!img.startsWith('https://')) return false;
 
     const lowerImg = img.toLowerCase();
 
-    // 2. Bloquer les domaines avec protection anti-hotlink
-    if (BLOCKED_DOMAINS.some(d => lowerImg.includes(d))) return false;
-
-    // 3. Filtrer les artefacts techniques et logos de concurrents
-    const hardSkip = ['favicon', 'sprite', 'pixel', 'tracking', 'beacon', '.gif', '1x1', '.svg'];
+    // NOUVEAU : On bloque les mots-clés liés aux images d'erreur ou de protection
+    const hardSkip = ['favicon', 'sprite', 'pixel', 'tracking', 'beacon', '.gif', '1x1', '.svg', 'hotlink', 'placeholder', 'error', 'blank', 'default'];
     if (hardSkip.some(s => lowerImg.includes(s))) return false;
+    
+    if (BLOCKED_DOMAINS.some(d => lowerImg.includes(d))) return false;
     
     return true;
   });
@@ -1528,9 +1525,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             </div>
 
             <div style="text-align: left;">
-                <a href="#contact" class="btn-cta">
+                <button onclick="document.getElementById('contact-modal').style.display='block'; document.body.style.overflow='hidden';" class="btn-cta" style="border: none;">
                     ${ctaText} <i data-lucide="arrow-right"></i>
-                </a>
+                </button>
             </div>
         </div>
         <div class="hero-image-col reveal reveal-left" style="position: relative; z-index: 1;">
@@ -1540,7 +1537,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             
             <div style="position: relative; border-radius: 30px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.1); z-index: 1; border: 8px solid white; background: white;">
                 <!-- NOTE IMPORTANTE: J'ai mis object-fit: contain; au cas où c'est un logo -->
-                <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" style="width: 100%; height: 450px; object-fit: contain; display: block;">
+                <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" style="width: 100%; height: 450px; display: block; object-fit: cover;">
             </div>
         </div>
     </section>
@@ -1792,6 +1789,28 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         </div>
     </section>
 
+    <!-- Modal Contact Auto-Popup -->
+<div id="contact-modal" class="modal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px);">
+    <div style="background-color: white; margin: 10vh auto; padding: 3rem; border-radius: 24px; width: 90%; max-width: 500px; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.2);">
+        <span onclick="document.getElementById('contact-modal').style.display='none'; document.body.style.overflow='auto';" style="position: absolute; right: 1.5rem; top: 1.5rem; font-size: 1.5rem; cursor: pointer; color: #64748b; background: #f1f5f9; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</span>
+        
+        <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; text-align: center;">Demander une intervention</h3>
+        <p style="color: var(--text-muted); text-align: center; margin-bottom: 2rem; font-size: 0.95rem;">Laissez vos coordonnées, un expert vous rappelle immédiatement.</p>
+        
+        <form onsubmit="event.preventDefault(); alert('Demande envoyée ! Nous vous rappelons très vite.'); document.getElementById('contact-modal').style.display='none'; document.body.style.overflow='auto';">
+            <div style="margin-bottom: 1rem;">
+                <input type="text" placeholder="Votre nom" required style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; outline: none; font-family: 'Inter';">
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <input type="tel" placeholder="Votre numéro de téléphone" required style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; outline: none; font-family: 'Inter';">
+            </div>
+            <button type="submit" style="width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                <i data-lucide="phone-call" width="20"></i> Être rappelé(e)
+            </button>
+        </form>
+    </div>
+</div>
+
     <!-- Professional Footer -->
     <footer>
         <div class="footer-grid">
@@ -1852,25 +1871,22 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
 
     <!-- Chatbot Window -->
     <div class="chat-window" id="chat-window">
-        <div class="chat-header">
-            <div style="width: 10px; height: 10px; background: #22c55e; border-radius: 50%;"></div>
-            Assistant IA - ${logoInfo.text}
+        <div class="chat-header" style="background: var(--primary); color: white; padding: 1.25rem; font-family: 'Outfit'; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+            <div style="width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px rgba(34,197,94,0.5);"></div>
+            Service Client - ${logoInfo.word1}
         </div>
-        <div class="chat-body" id="chat-body">
-            <div class="chat-msg">Bonjour ! Je suis l'assistant virtuel de ${logoInfo.text}. Comment puis-je vous aider aujourd'hui ? Avez-vous une question sur nos services ?</div>
+        <div class="chat-body" id="chat-body" style="flex: 1; padding: 1.5rem; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 1rem;">
+            <div class="chat-msg" style="background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 0.95rem; align-self: flex-start; max-width: 85%;">
+                Bonjour ! Bienvenue chez ${logoInfo.text}. Comment puis-je vous aider aujourd'hui ?
+            </div>
         </div>
-        <div class="chat-input">
-            <input type="text" id="chat-text" placeholder="Écrivez votre message...">
-            <button onclick="sendMsg()" style="background: none; border: none; color: var(--primary); cursor: pointer;"><i data-lucide="send"></i></button>
+        <div class="chat-input" style="padding: 1rem; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px;">
+            <input type="text" id="chat-text" placeholder="Écrivez votre message..." style="flex: 1; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; padding: 0.75rem 1rem; border-radius: 100px; font-family: 'Inter';">
+            <button onclick="sendMsg()" style="background: var(--primary); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i data-lucide="send" width="18"></i></button>
         </div>
     </div>
 
-    <!-- Modals for Policies -->
-    <div id="modal-mentions" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('modal-mentions')">&times;</span>
-            <h2>Mentions Légales</h2>
-            <h3>1. Édition du site</h3>
+    <!-- ... -->
             <p>Le présent site est édité par l'entreprise <strong>${companyName}</strong>, située au <strong>${address}</strong>.</p>
             <p>Directeur de la publication : Le Gérant de ${companyName}.</p>
             <h3>2. Hébergement</h3>
@@ -1977,18 +1993,15 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             chatWindow.classList.toggle('open');
         });
 
+        let chatStep = 0;
+
         function sendMsg() {
             const val = chatText.value.trim();
             if(!val) return;
             
             // User msg
             const uMsg = document.createElement('div');
-            uMsg.className = 'chat-msg';
-            uMsg.style.background = 'var(--primary)';
-            uMsg.style.color = 'white';
-            uMsg.style.marginLeft = 'auto';
-            uMsg.style.borderBottomLeftRadius = '12px';
-            uMsg.style.borderBottomRightRadius = '0';
+            uMsg.style.cssText = 'background: var(--primary); color: white; padding: 1rem; border-radius: 12px; border-bottom-right-radius: 0; align-self: flex-end; max-width: 85%; font-size: 0.95rem;';
             uMsg.textContent = val;
             chatBody.appendChild(uMsg);
             chatText.value = '';
@@ -1997,19 +2010,21 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             // Bot typing
             setTimeout(() => {
                 const bMsg = document.createElement('div');
-                bMsg.className = 'chat-msg';
+                bMsg.style.cssText = 'background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 0.95rem; align-self: flex-start; max-width: 85%;';
                 
-                const responses = [
-                    "C'est noté ! Je transfère votre demande à notre équipe experte. Pouvez-vous me laisser vos coordonnées ?",
-                    "Excellente question. Nos tarifs sur-mesure nécessitent une étude rapide. Appelez-nous au ${phone} pour vérifier.",
-                    "Oui, nous couvrons bien cette prestation. Souhaitez-vous planifier un diagnostic gratuit ?",
-                    "Pour cette demande spécifique, le plus rapide est de nous laisser votre numéro. Acceptez-vous ?"
-                ];
-                bMsg.textContent = responses[Math.floor(Math.random() * responses.length)];
+                if(chatStep === 0) {
+                    bMsg.textContent = "Je comprends. Pour que notre équipe puisse traiter votre demande rapidement, pouvez-vous me laisser votre numéro de téléphone ?";
+                    chatStep++;
+                } else if (chatStep === 1) {
+                    bMsg.textContent = "C'est bien noté ! Un de nos experts va vous recontacter sur ce numéro dans les plus brefs délais. Bonne journée !";
+                    document.getElementById('chat-text').disabled = true;
+                    document.getElementById('chat-text').placeholder = "Demande envoyée.";
+                    chatStep++;
+                }
                 
                 chatBody.appendChild(bMsg);
                 chatBody.scrollTo(0, chatBody.scrollHeight);
-            }, 1000);
+            }, 1200);
         }
         chatText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
 
@@ -2022,12 +2037,25 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             document.getElementById(id).style.display = 'none';
             document.body.style.overflow = 'auto';
         }
-        window.onclick = function(event) {
-            if (event.target.className === 'modal') {
-                event.target.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-        }
+        // Auto-Popup après 3.5 secondes
+window.addEventListener('load', function() {
+    if (!sessionStorage.getItem('popupShown')) {
+        setTimeout(function() {
+            document.getElementById('contact-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            sessionStorage.setItem('popupShown', 'true');
+        }, 3500); 
+    }
+});
+
+// Fermer le modal en cliquant à l'extérieur
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('contact-modal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+});
     </script>
 </body>
 </html>`;
