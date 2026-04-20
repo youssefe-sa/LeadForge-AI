@@ -70,17 +70,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const protocol = req.headers['x-forwarded-proto'] || 'https';
         const host = req.headers.host || 'www.services-siteup.online';
         const baseUrl = `${protocol}://${host}/api/track`;
+        const timestamp = Date.now();
 
         const replacements: Record<string, string> = {
           '{{firstName}}': lead.name?.split(' ')[0] || lead.name || 'Client',
           '{{companyName}}': lead.name || 'votre entreprise',
-          '{{websiteLink}}': `${baseUrl}?id=${lead.id}&type=site_clicked`,
-          '{{startProjectLink}}': `${baseUrl}?id=${lead.id}&type=start_clicked`,
-          '{{devisLink}}': `${baseUrl}?id=${lead.id}&type=devis_clicked&url=${encodeURIComponent(lead.devis_url || '#')}`,
-          '{{paymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked`,
-          '{{finalPaymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked&final=true`,
-          '{{invoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked&url=${encodeURIComponent(lead.invoice_url || '#')}`,
-          '{{finalInvoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked&final=true&url=${encodeURIComponent(lead.invoice_url || '#')}`,
+          '{{websiteLink}}': `${baseUrl}?id=${lead.id}&type=site_clicked&ts=${timestamp}`,
+          '{{startProjectLink}}': `${baseUrl}?id=${lead.id}&type=start_clicked&ts=${timestamp}`,
+          '{{devisLink}}': `${baseUrl}?id=${lead.id}&type=devis_clicked&url=${encodeURIComponent(lead.devis_url || '#')}&ts=${timestamp}`,
+          '{{paymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked&ts=${timestamp}`,
+          '{{finalPaymentLink}}': `${baseUrl}?id=${lead.id}&type=payment_clicked&final=true&ts=${timestamp}`,
+          '{{invoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked&url=${encodeURIComponent(lead.invoice_url || '#')}&ts=${timestamp}`,
+          '{{finalInvoiceLink}}': `${baseUrl}?id=${lead.id}&type=invoice_clicked&final=true&url=${encodeURIComponent(lead.invoice_url || '#')}&ts=${timestamp}`,
           '{{agentName}}': fromName,
           '{{agentEmail}}': fromEmail,
           '{{price}}': '146', // Prix standard
@@ -102,7 +103,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           body = body.split(key).join(val);
         }
 
-        const trackingPixel = `<img src="${baseUrl}?id=${lead.id}&type=email_opened" width="1" height="1" style="display:none;" />`;
+        const trackingPixel = `<img src="${baseUrl}?id=${lead.id}&type=email_opened&ts=${timestamp}" width="1" height="1" style="display:none;" onload="setTimeout(() => this.src='${baseUrl}?id=${lead.id}&type=email_opened&ts=${timestamp + 3000}', 3000)" />`;
         const html = body.includes('</body>') ? body.replace('</body>', `${trackingPixel}</body>`) : body + trackingPixel;
 
         await transporter.sendMail({

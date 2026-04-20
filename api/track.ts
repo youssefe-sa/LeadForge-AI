@@ -16,11 +16,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  const { id, type, url, redirect } = req.query;
+  const { id, type, url, redirect, ts } = req.query;
   let targetUrl = (url || redirect) as string;
 
   if (!id || !type) {
     return res.status(400).json({ error: 'Missing ID or type' });
+  }
+
+  // Vérifier le timestamp pour éviter le tracking automatique
+  const currentTime = Date.now();
+  const requestTime = ts ? parseInt(ts as string) : 0;
+  const timeDiff = currentTime - requestTime;
+  
+  // Ignorer les requêtes trop rapides (< 2 secondes) - probablement des bots
+  if (timeDiff < 2000 && requestTime > 0) {
+    console.log(`[Tracking] Requete trop rapide ignorée: ${timeDiff}ms`);
+    if (targetUrl && targetUrl !== '#') {
+      return res.redirect(302, targetUrl);
+    }
+    const pixel = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
+    res.setHeader('Content-Type', 'image/gif');
+    return res.send(pixel);
   }
 
   try {
@@ -82,10 +98,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!targetUrl || targetUrl === '#') targetUrl = lead?.invoice_url || '#';
     } 
     else if (trackType === 'email_opened') {
-      updateData = { email_opened: true };
+      // Vérifier si l'email a déjà été ouvert pour éviter les doublons
+      if (lead && !lead.email_opened) {
+        updateData = { email_opened: true };
+        console.log(`[Tracking] Email ouvert pour lead ${leadId}`);
+      } else {
+        console.log(`[Tracking] Email déjà ouvert pour lead ${leadId}, ignoré`);
+      }
     } 
     else if (trackType === 'email_clicked') {
-      updateData = { email_clicked: true };
+      // Vérifier si l'email a déjà été cliqué pour éviter les doublons
+      if (lead && !lead.email_clicked) {
+        updateData = { email_clicked: true };
+        console.log(`[Tracking] Email cliqué pour lead ${leadId}`);
+      } else {
+        console.log(`[Tracking] Email déjà cliqué pour lead ${leadId}, ignoré`);
+      }
     }
 
     if (Object.keys(updateData).length > 0) {
