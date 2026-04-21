@@ -83,8 +83,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           });
 
           await supabase.from('email_logs').insert([{
-            lead_id: leadId || null, to_email: to, subject, status: 'sent', sent_at: new Date().toISOString(),
-            message_id: (info as { messageId: string }).messageId
+            lead_id: leadId || null, to_email: to, subject, status: 'sent', sent_at: new Date().toISOString()
           }]);
 
           if (leadId) {
@@ -168,8 +167,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     await supabase.from('email_logs').insert([{
       lead_id: leadId || null, to_email: to, subject, body: html,
-      status: 'sent', sent_at: new Date().toISOString(),
-      message_id: (info as { messageId: string }).messageId
+      status: 'sent', sent_at: new Date().toISOString()
     }]);
 
     if (leadId) {

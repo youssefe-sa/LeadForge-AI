@@ -125,18 +125,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }).eq('id', lead.id);
         }
 
-        const emailResult = await transporter.sendMail({
-          from: `"${fromName}" <${fromEmail}>`,
-          to: `"${lead.name}" <${lead.email}>`,
-          subject,
-          html,
-          text: body.replace(/<[^>]*>/g, '') // Version texte simplifiée
-        });
-
         await supabase.from('scheduled_emails').update({ 
           status: 'sent', 
-          updated_at: new Date().toISOString(),
-          message_id: emailResult.messageId
+          updated_at: new Date().toISOString() 
         }).eq('id', job.id);
 
         results.push({ job_id: job.id, status: 'success' });

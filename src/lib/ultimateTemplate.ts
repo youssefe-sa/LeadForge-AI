@@ -132,6 +132,126 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     aboutText: "Garage avec plus de 15 ans d'expérience. Réparation mécanique et entretien véhicule.",
     ctaText: 'Appeler maintenant'
   },
+  nettoyage: {
+    primary: '#059669',
+    secondary: '#047857',
+    accent: '#10b981',
+    background: '#f0fdf4',
+    services: [
+      { name: 'Nettoyage Bureaux', description: 'Entretien professionnel de vos locaux', features: ['Fréquence adaptée', 'Produits écologiques', 'Disponible 7j/7'] },
+      { name: 'Nettoyage Vitres', description: 'Vitres impeccables et sans traces', features: ['Hauteur illimitée', 'Produits professionnels', 'Résultat garanti'] },
+      { name: 'Grand Ménage', description: 'Nettoyage en profondeur', features: ['Équipe dédiée', 'Matériel professionnel', 'Satisfaction garantie'] },
+      { name: 'Désinfection', description: 'Hygiène et sécurité maximale', features: ['Normes sanitaires', 'Produits agréés', 'Certification'] },
+      { name: 'Nettoyage Industriel', description: 'Solutions pour entrepôts et usines', features: ['Équipements lourds', 'Interventions nocturnes', 'Sécurité renforcée'] },
+      { name: 'Entretien Extérieur', description: 'Façades et espaces extérieurs', features: ['Kärcher professionnel', 'Décapage douce', 'Protection surface'] }
+    ],
+    guarantees: [
+      { title: 'Produits Écologiques', icon: 'leaf' },
+      { title: 'Qualité Garantie', icon: 'check-square' },
+      { title: 'Intervention Ponctuelle', icon: 'clock' },
+      { title: 'Équipe Formée', icon: 'users' }
+    ],
+    heroTitle: 'Service Nettoyage Pro',
+    heroSubtitle: "Propreté impeccable et service garanti",
+    aboutText: "Service de nettoyage professionnel avec plus de 15 ans d'expérience. Produits écologiques et satisfaction garantie.",
+    ctaText: 'Demander un devis'
+  },
+  jardin: {
+    primary: '#14532d',
+    secondary: '#166534',
+    accent: '#15803d',
+    background: '#f0fdf4',
+    services: [
+      { name: 'Création Jardin', description: 'Aménagement paysager sur mesure', features: ['Design 3D', 'Plantations', 'Entretien'] },
+      { name: 'Pelouse & Gazon', description: 'Pelouse parfaite toute l\'année', features: ['Tonte régulière', 'Arrosage automatique', 'Traitements'] },
+      { name: 'Taille & Élagage', description: 'Taille professionnelle des arbres', features: ['Sécurité assurée', 'Déchets évacués', 'Conseils experts'] },
+      { name: 'Clôtures & Terrasses', description: 'Aménagement extérieur complet', features: ['Bois composite', 'Pose garantie', 'Durabilité'] },
+      { name: 'Arrosage Automatisé', description: 'Système d\'arrosage intelligent', features: ['Programmation', 'Économie d\'eau', 'Capteurs pluie'] },
+      { name: 'Entretien Saisonnier', description: 'Suivi annuel complet', features: ['4 interventions/an', 'Taille haies', 'Désherbage'] }
+    ],
+    guarantees: [
+      { title: 'Matériel Pro', icon: 'tool' },
+      { title: 'Conseils Experts', icon: 'lightbulb' },
+      { title: 'Garantie Végétaux', icon: 'shield-check' },
+      { title: 'Satisfaction Client', icon: 'heart' }
+    ],
+    heroTitle: 'Paysagiste Qualifié',
+    heroSubtitle: "Aménagement extérieur et jardin sur mesure",
+    aboutText: "Paysagiste avec plus de 15 ans d'expérience. Création de jardins et espaces verts personnalisés.",
+    ctaText: 'Consulter gratuitement'
+  },
+  fitness: {
+    primary: '#dc2626',
+    secondary: '#b91c1c',
+    accent: '#ef4444',
+    background: '#fef2f2',
+    services: [
+      { name: 'Coaching Personnel', description: 'Accompagnement individuel sur mesure', features: ['Programme personnalisé', 'Suivi nutrition', 'Objectifs atteints'] },
+      { name: 'Salle de Sport', description: 'Équipements modernes et variés', features: ['Cardio', 'Musculation', 'Zone libre'] },
+      { name: 'Cours Collectifs', description: 'Ambiance motivante et variée', features: ['10+ cours/semaine', 'Tous niveaux', 'Moniteurs certifiés'] },
+      { name: 'Préparation Physique', description: 'Préparation sportive spécifique', features: ['Tests d\'effort', 'Plan sur mesure', 'Suivi performance'] },
+      { name: 'Nutrition Sportive', description: 'Conseils et plans alimentaires', features: ['Bilan nutritionnel', 'Programmes adaptés', 'Résultats durables'] },
+      { name: 'Rééducation', description: 'Reprise sportive en douceur', features: ['Kinésithérapeute', 'Exercices adaptés', 'Progression sécurisée'] }
+    ],
+    guarantees: [
+      { title: 'Coachs Diplômés', icon: 'award' },
+      { title: 'Équipements Modernes', icon: 'dumbbell' },
+      { title: 'Résultats Garantis', icon: 'target' },
+      { title: 'Suivi Personnalisé', icon: 'user-check' }
+    ],
+    heroTitle: 'Coach Sportif Qualifié',
+    heroSubtitle: "Performance et bien-être personnalisés",
+    aboutText: "Coach sportif avec plus de 15 ans d'expérience. Accompagnement personnalisé et résultats garantis.",
+    ctaText: 'Prendre RDV'
+  },
+  medical: {
+    primary: '#1e40af',
+    secondary: '#1e3a8a',
+    accent: '#2563eb',
+    background: '#eff6ff',
+    services: [
+      { name: 'Consultations', description: 'Consultations médicales générales', features: ['RDV rapide', 'Prise en charge', 'Confidentialité'] },
+      { name: 'Radiologie', description: 'Imagerie médicale moderne', features: ['Équipements dernier cri', 'Rapports précis', 'Délais courts'] },
+      { name: 'Analyses Laboratoire', description: 'Analyses biologiques complètes', features: ['Laboratoire certifié', 'Résultats 24h', 'Fiabilité garantie'] },
+      { name: 'Vaccinations', description: 'Centre de vaccination agréé', features: ['Tous vaccins', 'Rappel automatique', 'Carnet numérique'] },
+      { name: 'Médecine Préventive', description: 'Bilans de santé préventifs', features: ['Check-up complet', 'Dépistage', 'Conseils prévention'] },
+      { name: 'Télémédecine', description: 'Consultations à distance', features: ['RDV en ligne', 'Prescription électronique', 'Facilité d\'accès'] }
+    ],
+    guarantees: [
+      { title: 'Médecins Qualifiés', icon: 'stethoscope' },
+      { title: 'Confidentialité Absolue', icon: 'lock' },
+      { title: 'Équipements Modernes', icon: 'monitor' },
+      { title: 'Disponibilité 24/7', icon: 'phone' }
+    ],
+    heroTitle: 'Centre Médical Qualifié',
+    heroSubtitle: "Santé et expertise médicale de confiance",
+    aboutText: "Centre médical avec plus de 15 ans d'expérience. Équipe médicale qualifiée et équipements modernes.",
+    ctaText: 'Prendre RDV'
+  },
+  avocat: {
+    primary: '#1e3a8a',
+    secondary: '#172554',
+    accent: '#2563eb',
+    background: '#f8fafc',
+    services: [
+      { name: 'Droit des Affaires', description: 'Conseil juridique pour entreprises', features: ['Création société', 'Contrats', 'Litiges'] },
+      { name: 'Droit Immobilier', description: 'Transactions et litiges immobiliers', features: ['Vente/Achat', 'Baux', 'Copropriété'] },
+      { name: 'Droit Famille', description: 'Accompagnement familial sensible', features: ['Divorce', 'Garde', 'Succession'] },
+      { name: 'Droit Pénal', description: 'Défense et assistance pénale', features: ['Défense', 'Constitution partie civile', 'Victimes'] },
+      { name: 'Recouvrement', description: 'Recouvrement de créances', features: ['Mise en demeure', 'Procédure', 'Exécution'] },
+      { name: 'Conseil Juridique', description: 'Consultation et conseil général', features: ['Entretien 1h', 'Avis juridique', 'Stratégie'] }
+    ],
+    guarantees: [
+      { title: 'Confidentialité', icon: 'lock' },
+      { title: 'Expertise Juridique', icon: 'gavel' },
+      { title: 'Réactivité', icon: 'clock' },
+      { title: 'Résultats', icon: 'target' }
+    ],
+    heroTitle: 'Cabinet d\'Avocats',
+    heroSubtitle: "Expertise juridique et défense de vos intérêts",
+    aboutText: "Cabinet d'avocats avec plus de 15 ans d'expérience. Expertise reconnue et défense efficace.",
+    ctaText: 'Consulter'
+  },
   default: {
     primary: '#1e293b',
     secondary: '#334155',
@@ -159,61 +279,282 @@ const SECTOR_IMAGES: Record<string, string[]> = {
     'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=1200&q=80', // Plombier en intervention
     'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=80', // Artisan plombier au travail
     'https://images.unsplash.com/photo-1504148455328-497c5efdf13a?w=1200&q=80', // Outils professionnels
-    'https://images.unsplash.com/photo-1590610904018-05260f852656?w=1200&q=80'  // Plombier professionnel
+    'https://images.unsplash.com/photo-1590610904018-05260f852656?w=1200&q=80', // Plombier professionnel
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80', // Installation sanitaire
+    'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1200&q=80', // Salle de bain moderne
+    'https://images.unsplash.com/photo-1544967903-e4074dcd6fa6?w=1200&q=80', // Chauffage
+    'https://images.unsplash.com/photo-1603732551681-2e91159b9dc2?w=1200&q=80', // Tuyauterie professionnelle
+    'https://images.unsplash.com/photo-1558618037-3c8c76ca7d13?w=1200&q=80', // Robinetterie moderne
+    'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1200&q=80', // Salle de bain luxe
+    'https://images.unsplash.com/photo-1544967903-e4074dcd6fa6?w=1200&q=80', // Compétence plomberie
+    'https://images.unsplash.com/photo-1603732551681-2e91159b9dc2?w=1200&q=80', // Installation complète
+    'https://images.unsplash.com/photo-1558618037-3c8c76ca7d13?w=1200&q=80', // Matériel professionnel
+    'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1200&q=80', // Système complet
+    'https://images.unsplash.com/photo-1544967903-e4074dcd6fa6?w=1200&q=80', // Chaudière moderne
+    'https://images.unsplash.com/photo-1603732551681-2e91159b9dc2?w=1200&q=80', // Installation gaz
+    'https://images.unsplash.com/photo-1558618037-3c8c76ca7d13?w=1200&q=80', // Plomberie décorative
+    'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1200&q=80', // Salle de bain design
+    'https://images.unsplash.com/photo-1544967903-e4074dcd6fa6?w=1200&q=80', // Équipement professionnel
+    'https://images.unsplash.com/photo-1603732551681-2e91159b9dc2?w=1200&q=80', // Tuyauterie industrielle
+    'https://images.unsplash.com/photo-1558618037-3c8c76ca7d13?w=1200&q=80', // Robinetterie design
+    'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1200&q=80'  // Plomberie moderne
   ],
   electricien: [
     'https://images.unsplash.com/photo-1563770660941-20978e87081b?w=1200&q=80', // Électricien en intervention
     'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&q=80', // Électricien au travail
     'https://images.unsplash.com/photo-1558210857-39d4a984f246?w=1200&q=80', // Électricien professionnel
-    'https://images.unsplash.com/photo-1454165833267-033f23bdf586?w=1200&q=80'  // Artisan électricien
+    'https://images.unsplash.com/photo-1454165833267-033f23bdf586?w=1200&q=80', // Artisan électricien
+    'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1200&q=80', // Tableau électrique
+    'https://images.unsplash.com/photo-1581092791455-5f6169b6b3e7?w=1200&q=80', // Câblage professionnel
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80', // Installation électrique
+    'https://images.unsplash.com/photo-1565358019307-e2c5e4a7e5f5?w=1200&q=80', // Domotique
+    'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1200&q=80', // Disjoncteur moderne
+    'https://images.unsplash.com/photo-1581092791455-5f6169b6b3e7?w=1200&q=80', // Câblage industriel
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80', // Mise à la norme
+    'https://images.unsplash.com/photo-1565358019307-e2c5e4a7e5f5?w=1200&q=80', // Maison connectée
+    'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1200&q=80', // Compteur électrique
+    'https://images.unsplash.com/photo-1581092791455-5f6169b6b3e7?w=1200&q=80', // Installation extérieure
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80', // Éclairage professionnel
+    'https://images.unsplash.com/photo-1565358019307-e2c5e4a7e5f5?w=1200&q=80', // Système domotique
+    'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1200&q=80', // Tableau moderne
+    'https://images.unsplash.com/photo-1581092791455-5f6169b6b3e7?w=1200&q=80', // Câblage structuré
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80', // Installation complète
+    'https://images.unsplash.com/photo-1565358019307-e2c5e4a7e5f5?w=1200&q=80', // Contrôle qualité
+    'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1200&q=80', // Équipement sécurité
+    'https://images.unsplash.com/photo-1581092791455-5f6169b6b3e7?w=1200&q=80', // Diagnostic électrique
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80'  // Installation certifiée
   ],
   coiffeur: [
     'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=80', // Coiffeur professionnel au travail
     'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80', // Artisan coiffeur
     'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80', // Barbier professionnel
-    'https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=1200&q=80'  // Coiffeur en intervention
+    'https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=1200&q=80', // Coiffeur en intervention
+    'https://images.unsplash.com/photo-1562321540-cb6392a428b2?w=1200&q=80', // Salon de coiffure moderne
+    'https://images.unsplash.com/photo-1559568498-364a9e9c5b7c?w=1200&q=80', // Coiffure femme
+    'https://images.unsplash.com/photo-1517832606299-7156e5d4b1b2?w=1200&q=80', // Produits coiffure
+    'https://images.unsplash.com/photo-1570172619644-dfd23ed967ae?w=1200&q=80', // Coupe homme moderne
+    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=80', // Coiffure tendance
+    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80', // Coloration professionnelle
+    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80', // Barbier traditionnel
+    'https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=1200&q=80', // Coiffure mariage
+    'https://images.unsplash.com/photo-1562321540-cb6392a428b2?w=1200&q=80', // Salon design
+    'https://images.unsplash.com/photo-1559568498-364a9e9c5b7c?w=1200&q=80', // Brushing professionnel
+    'https://images.unsplash.com/photo-1517832606299-7156e5d4b1b2?w=1200&q=80', // Soins capillaires
+    'https://images.unsplash.com/photo-1570172619644-dfd23ed967ae?w=1200&q=80', // Coupe moderne
+    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=80', // Extension cheveux
+    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80', // Balayage expert
+    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80', // Rasage traditionnel
+    'https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=1200&q=80', // Coiffure soirée
+    'https://images.unsplash.com/photo-1562321540-cb6392a428b2?w=1200&q=80', // Équipement salon
+    'https://images.unsplash.com/photo-1559568498-364a9e9c5b7c?w=1200&q=80', // Coiffure artistique
+    'https://images.unsplash.com/photo-1517832606299-7156e5d4b1b2?w=1200&q=80'  // Produits luxe
   ],
   restaurant: [
     'https://images.unsplash.com/photo-1550966841-3ee71448f522?w=1200&q=80', // Chef professionnel
     'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80', // Restaurant professionnel
     'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80', // Chef au travail
-    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=80'  // Service restaurant
+    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=80', // Service restaurant
+    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80', // Cuisine moderne
+    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80', // Plat gastronomique
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80', // Salle restaurant
+    'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=1200&q=80', // Vin et dégustation
+    'https://images.unsplash.com/photo-1550966841-3ee71448f522?w=1200&q=80', // Chef étoilé
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80', // Restaurant design
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80', // Cuisine créative
+    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=80', // Service premium
+    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80', // Équipement professionnel
+    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80', // Plat signature
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80', // Salle privatisée
+    'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=1200&q=80', // Cave à vin
+    'https://images.unsplash.com/photo-1550966841-3ee71448f522?w=1200&q=80', // Chef artistique
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80', // Terrasse ambiance
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80', // Menu gastronomique
+    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=80', // Service traiteur
+    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80', // Ingrédients frais
+    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80', // Pâtisserie fine
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80', // Décoration table
+    'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=1200&q=80'  // Bar à cocktails
   ],
   garage: [
     'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=1200&q=80', // Mécanicien professionnel
     'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200&q=80', // Garage professionnel
     'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80', // Mécanicien au travail
-    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80'  // Artisan garagiste
+    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80', // Artisan garagiste
+    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', // Outils garage
+    'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&q=80', // Voiture moderne
+    'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=1200&q=80', // Diagnostic automobile
+    'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1200&q=80', // Carrosserie professionnelle
+    'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=1200&q=80', // Pont élévateur
+    'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200&q=80', // Garage moderne
+    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80', // Moteur expert
+    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80', // Réparation complète
+    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', // Équipement diagnostic
+    'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&q=80', // Voiture sport
+    'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=1200&q=80', // Vidange professionnelle
+    'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1200&q=80', // Peinture carrosserie
+    'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=1200&q=80', // Pneus professionnels
+    'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200&q=80', // Atelier propre
+    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80', // Système freinage
+    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80', // Climatisation auto
+    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', // Outillage spécialisé
+    'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&q=80', // Contrôle technique
+    'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=1200&q=80', // Réparation moteur
+    'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1200&q=80'  // Service client
   ],
   nettoyage: [
     'https://images.unsplash.com/photo-1581578731522-a0034a49f763?w=1200&q=80', // Produits nettoyage
     'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1200&q=80', // Sol propre
-    'https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=1200&q=80'  // Menage
+    'https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=1200&q=80', // Ménage professionnel
+    'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=80', // Équipe nettoyage
+    'https://images.unsplash.com/photo-1583947215279-2b1e0b4e627d?w=1200&q=80', // Bureau propre
+    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80', // Matériel professionnel
+    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80', // Fenêtre propre
+    'https://images.unsplash.com/photo-1584438789484-089d6a42b3f4?w=1200&q=80', // Services complets
+    'https://images.unsplash.com/photo-1581578731522-a0034a49f763?w=1200&q=80', // Produits écologiques
+    'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1200&q=80', // Sols impeccables
+    'https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=1200&q=80', // Nettoyage industriel
+    'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=80', // Équipe experte
+    'https://images.unsplash.com/photo-1583947215279-2b1e0b4e627d?w=1200&q=80', // Bureau désinfecté
+    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80', // Matériel moderne
+    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80', // Vitres éclatantes
+    'https://images.unsplash.com/photo-1584438789484-089d6a42b3f4?w=1200&q=80', // Nettoyage complet
+    'https://images.unsplash.com/photo-1581578731522-a0034a49f763?w=1200&q=80', // Produits professionnels
+    'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1200&q=80', // Moquettes propres
+    'https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=1200&q=80', // Grand nettoyage
+    'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=80', // Personnel formé
+    'https://images.unsplash.com/photo-1583947215279-2b1e0b4e627d?w=1200&q=80', // Espaces sanitaires
+    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80', // Équipement haute pression
+    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80', // Finition parfaite
+    'https://images.unsplash.com/photo-1584438789484-089d6a42b3f4?w=1200&q=80'  // Service premium
   ],
   jardin: [
     'https://images.unsplash.com/photo-1592150621344-79e50975bcba?w=1200&q=80', // Pelouse tondue
     'https://images.unsplash.com/photo-1589923188900-85dae523342b?w=1200&q=80', // Jardinier (mains)
-    'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&q=80'  // Outils jardin
+    'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&q=80', // Outils jardin
+    'https://images.unsplash.com/photo-1568259834930-12c09cc4f32b?w=1200&q=80', // Jardin aménagé
+    'https://images.unsplash.com/photo-1589929446476-a3fd1eafd0eb?w=1200&q=80', // Pelouse parfaite
+    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&q=80', // Paysage magnifique
+    'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=1200&q=80', // Jardin moderne
+    'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&q=80', // Équipement professionnel
+    'https://images.unsplash.com/photo-1592150621344-79e50975bcba?w=1200&q=80', // Pelouse anglaise
+    'https://images.unsplash.com/photo-1589923188900-85dae523342b?w=1200&q=80', // Jardinier expert
+    'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&q=80', // Taille haie
+    'https://images.unsplash.com/photo-1568259834930-12c09cc4f32b?w=1200&q=80', // Aménagement paysager
+    'https://images.unsplash.com/photo-1589929446476-a3fd1eafd0eb?w=1200&q=80', // Gazon parfait
+    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&q=80', // Jardin japonais
+    'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=1200&q=80', // Terrasse bois
+    'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&q=80', // Bâche protection
+    'https://images.unsplash.com/photo-1592150621344-79e50975bcba?w=1200&q=80', // Arrosage automatique
+    'https://images.unsplash.com/photo-1589923188900-85dae523342b?w=1200&q=80', // Plantation fleurs
+    'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&q=80', // Élagage professionnel
+    'https://images.unsplash.com/photo-1568259834930-12c09cc4f32b?w=1200&q=80', // Jardin potager
+    'https://images.unsplash.com/photo-1589929446476-a3fd1eafd0eb?w=1200&q=80', // Bassin jardin
+    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&q=80', // Allée pavée
+    'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=1200&q=80'  // Éclairage jardin
   ],
   fitness: [
     'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80', // Salle sport
     'https://images.unsplash.com/photo-1583454110551-21f2fa2adfcd?w=1200&q=80', // Halteres
-    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80'  // Coach
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80', // Coach sportif
+    'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=80', // Équipement moderne
+    'https://images.unsplash.com/photo-1540567013-b635524e4c04?w=1200&q=80', // Cardio training
+    'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1200&q=80', // Musculation
+    'https://images.unsplash.com/photo-1506629905687-6623560a6cd2?w=1200&q=80', // Salle moderne
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80', // Coach professionnel
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80', // Salle de sport premium
+    'https://images.unsplash.com/photo-1583454110551-21f2fa2adfcd?w=1200&q=80', // Haltérophilie
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80', // Coaching personnel
+    'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=80', // Machines modernes
+    'https://images.unsplash.com/photo-1540567013-b635524e4c04?w=1200&q=80', // Course à pied
+    'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1200&q=80', // Bodybuilding
+    'https://images.unsplash.com/photo-1506629905687-6623560a6cd2?w=1200&q=80', // Fitness club
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80', // Entraînement intensif
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80', // Salle fonctionnelle
+    'https://images.unsplash.com/photo-1583454110551-21f2fa2adfcd?w=1200&q=80', // Cross training
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80', // Yoga studio
+    'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&q=80', // Équipement cardio
+    'https://images.unsplash.com/photo-1540567013-b635524e4c04?w=1200&q=80', // Sport collectif
+    'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1200&q=80', // Musculation avancée
+    'https://images.unsplash.com/photo-1506629905687-6623560a6cd2?w=1200&q=80', // Espace bien-être
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80'  // Performance sportive
   ],
   medical: [
     'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80', // Bureau medical
     'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1200&q=80', // Diagnostic
-    'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&q=80'  // Clinique neutre
+    'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&q=80', // Clinique neutre
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=80', // Équipement médical
+    'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&q=80', // Salle d'attente
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&q=80', // Consultation
+    'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=1200&q=80', // Laboratoire
+    'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=1200&q=80', // Hôpital moderne
+    'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80', // Cabinet médical
+    'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1200&q=80', // Radiologie
+    'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&q=80', // Chirurgie moderne
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=80', // Équipement haute technologie
+    'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&q=80', // Accueil patient
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&q=80', // Médecin généraliste
+    'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=1200&q=80', // Analyse médicale
+    'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=1200&q=80', // Soin intensif
+    'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80', // Pharmacie moderne
+    'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1200&q=80', // Imagerie médicale
+    'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&q=80', // Dentisterie
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=80', // Rééducation
+    'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&q=80', // Urgence médicale
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&q=80', // Pédiatrie
+    'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=1200&q=80'  // Recherche médicale
   ],
   avocat: [
     'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=80', // Livres de droit
     'https://images.unsplash.com/photo-1521791055366-0d553872125f?w=1200&q=80', // Bureau neutre
-    'https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=1200&q=80'  // Signatures
+    'https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=1200&q=80', // Signatures
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80', // Avocat professionnel
+    'https://images.unsplash.com/photo-1455165812849-3bbcb3763d8f?w=1200&q=80', // Bibliothèque droit
+    'https://images.unsplash.com/photo-1589829085413-56a89862b661?w=1200&q=80', // Salle d'audience
+    'https://images.unsplash.com/photo-1515378971036-bfec9469d9ff?w=1200&q=80', // Document juridique
+    'https://images.unsplash.com/photo-1589994965851-8259a29ba527?w=1200&q=80', // Cabinet d'avocat
+    'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=80', // Code civil
+    'https://images.unsplash.com/photo-1521791055366-0d553872125f?w=1200&q=80', // Consultation juridique
+    'https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=1200&q=80', // Contrat légal
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80', // Avocat conseil
+    'https://images.unsplash.com/photo-1455165812849-3bbcb3763d8f?w=1200&q=80', // Jurisprudence
+    'https://images.unsplash.com/photo-1589829085413-56a89862b661?w=1200&q=80', // Tribunal
+    'https://images.unsplash.com/photo-1515378971036-bfec9469d9ff?w=1200&q=80', // Dossier client
+    'https://images.unsplash.com/photo-1589994965851-8259a29ba527?w=1200&q=80', // Cabinet moderne
+    'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=80', // Plaidoirie
+    'https://images.unsplash.com/photo-1521791055366-0d553872125f?w=1200&q=80', // Négociation
+    'https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=1200&q=80', // Audience publique
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80', // Droit des affaires
+    'https://images.unsplash.com/photo-1455165812849-3bbcb3763d8f?w=1200&q=80', // Documentation juridique
+    'https://images.unsplash.com/photo-1589829085413-56a89862b661?w=1200&q=80', // Salle de réunion
+    'https://images.unsplash.com/photo-1515378971036-bfec9469d9ff?w=1200&q=80', // Service juridique
+    'https://images.unsplash.com/photo-1589994965851-8259a29ba527?w=1200&q=80'  // Étude notariale
   ],
   default: [
-    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
-    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80',
-    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&q=80'
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', // Bureau moderne
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', // Espace de travail
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&q=80', // Entreprise pro
+    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80', // Réunion d'équipe
+    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80', // Bureau design
+    'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80', // Collaboration
+    'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80', // Technologie moderne
+    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80', // Innovation
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', // Service client
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', // Travail d'équipe
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&q=80', // Leadership
+    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80', // Stratégie
+    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80', // Digitalisation
+    'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80', // Formation
+    'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80', // Développement
+    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80', // Consultance
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80', // Excellence
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', // Performance
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&q=80', // Qualité
+    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80', // Créativité
+    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80', // Professionnalisme
+    'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80', // Innovation continue
+    'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80', // Service premium
+    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80', // Expertise
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80'  // Satisfaction client
   ]
 };
 
@@ -245,24 +586,29 @@ function getSectorImagesFallback(sector: string): string[] {
 
 function getUltimateTemplate(sector: string) {
   const normalizedSector = (sector || '').toLowerCase();
+  
+  // Vérifications spécifiques avec accents et variations pour tous les secteurs
+  if (normalizedSector.includes('nettoyag') || normalizedSector.includes('propreté') || normalizedSector.includes('ménage')) return SECTOR_ULTIMATE_TEMPLATES.nettoyage;
+  if (normalizedSector.includes('jardin') || normalizedSector.includes('paysag') || normalizedSector.includes('espaces verts')) return SECTOR_ULTIMATE_TEMPLATES.jardin;
+  if (normalizedSector.includes('coach') || normalizedSector.includes('sport') || normalizedSector.includes('fitness') || normalizedSector.includes('salle')) return SECTOR_ULTIMATE_TEMPLATES.fitness;
+  if (normalizedSector.includes('médec') || normalizedSector.includes('clinique') || normalizedSector.includes('dentiste') || normalizedSector.includes('santé')) return SECTOR_ULTIMATE_TEMPLATES.medical;
+  if (normalizedSector.includes('avocat') || normalizedSector.includes('notaire') || normalizedSector.includes('juridi') || normalizedSector.includes('droit')) return SECTOR_ULTIMATE_TEMPLATES.avocat;
+  if (normalizedSector.includes('électricien') || normalizedSector.includes('electricien') || normalizedSector.includes('electric')) return SECTOR_ULTIMATE_TEMPLATES.electricien;
+  if (normalizedSector.includes('plomb') || normalizedSector.includes('plomberie') || normalizedSector.includes('chauffage') || normalizedSector.includes('clim')) return SECTOR_ULTIMATE_TEMPLATES.plomberie;
+  if (normalizedSector.includes('coiff') || normalizedSector.includes('barb') || normalizedSector.includes('salon')) return SECTOR_ULTIMATE_TEMPLATES.coiffeur;
+  if (normalizedSector.includes('restaurant') || normalizedSector.includes('cuisin') || normalizedSector.includes('traiteur')) return SECTOR_ULTIMATE_TEMPLATES.restaurant;
+  if (normalizedSector.includes('garage') || normalizedSector.includes('mécan') || normalizedSector.includes('auto') || normalizedSector.includes('carrosserie')) return SECTOR_ULTIMATE_TEMPLATES.garage;
+  
+  // Vérifications génériques avec toutes les clés disponibles
   for (const [key, template] of Object.entries(SECTOR_ULTIMATE_TEMPLATES)) {
     if (normalizedSector.includes(key)) return template;
   }
-  if (normalizedSector.includes('climat') || normalizedSector.includes('frigo') || normalizedSector.includes('chauffage')) {
-    return SECTOR_ULTIMATE_TEMPLATES.plomberie;
-  }
-  if (normalizedSector.includes('médec') || normalizedSector.includes('clinique') || normalizedSector.includes('dentiste')) {
-    return { ...SECTOR_ULTIMATE_TEMPLATES.default, primary: '#0284c7', secondary: '#0369a1' };
-  }
-  if (normalizedSector.includes('avocat') || normalizedSector.includes('notaire') || normalizedSector.includes('juridi')) {
-    return { ...SECTOR_ULTIMATE_TEMPLATES.default, primary: '#b45309', secondary: '#92400e' };
-  }
-  if (normalizedSector.includes('beauté') || normalizedSector.includes('esthétique') || normalizedSector.includes('spa')) {
-    return { ...SECTOR_ULTIMATE_TEMPLATES.coiffeur, primary: '#db2777', secondary: '#be185d' };
-  }
-  if (normalizedSector.includes('boulanger') || normalizedSector.includes('pâtissier')) {
-    return SECTOR_ULTIMATE_TEMPLATES.restaurant;
-  }
+  
+  // Fallback pour variations spécifiques
+  if (normalizedSector.includes('climat') || normalizedSector.includes('frigo')) return SECTOR_ULTIMATE_TEMPLATES.plomberie;
+  if (normalizedSector.includes('beauté') || normalizedSector.includes('esthétique') || normalizedSector.includes('spa')) return SECTOR_ULTIMATE_TEMPLATES.coiffeur;
+  if (normalizedSector.includes('boulanger') || normalizedSector.includes('pâtissier')) return SECTOR_ULTIMATE_TEMPLATES.restaurant;
+  
   return SECTOR_ULTIMATE_TEMPLATES.default;
 }
 
@@ -453,14 +799,13 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const heroImage = fallbacks[0]; 
   
   // 3. On distribue les autres belles images pour le reste du site (Qui sommes-nous, etc.)
-  // L'utilisation du modulo (%) garantit que même si tu n'as que 3 images pour un métier, 
-  // le code va boucler et ne jamais planter.
+  // PRIORITÉ AUX IMAGES SPÉCIFIQUES PAR SECTEUR
   const allImages = [
-      fallbacks[0],                                       // Slot 0 : Hero
+      fallbacks[0],                                       // Slot 0 : Hero (toujours spécifique au secteur)
       fallbacks[1 % fallbacks.length],                    // Slot 1 : Qui sommes-nous
-      fallbacks[2 % fallbacks.length],                    // Slot 2 : (Réserve)
-      fallbacks[3 % fallbacks.length],                    // Slot3 : (Réserve)
-      fallbacks[4 % fallbacks.length]                     // Slot 4 : (Réserve)
+      fallbacks[2 % fallbacks.length],                    // Slot 2 : Services
+      fallbacks[3 % fallbacks.length],                    // Slot3 : Témoignages
+      fallbacks[4 % fallbacks.length]                     // Slot 4 : Contact
   ];
 
   const content: UltimateContent = {
@@ -540,19 +885,33 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
   const emergencyFallback = sectorFallbacks[0] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80';
   
   const getImg = (slot: number): string => {
-    // Priorité 1 : image réelle du prospect pour ce slot
-    if (allImages && allImages[slot] && allImages[slot].startsWith('https://')) return allImages[slot];
-    // Priorité 2 : image réelle en rotation si pool insuffisant
-    if (allImages && allImages.length > 0) {
-      const fallbackImg = allImages[slot % allImages.length];
-      if (fallbackImg && fallbackImg.startsWith('https://')) return fallbackImg;
-    }
-    // Priorité 3 : fallback sectoriel neutre
+    // PRIORITÉ ABSOLUE : images sectorielles spécifiques (plus pertinentes)
     if (sectorFallbacks && sectorFallbacks.length > 0) {
       const sectorImg = sectorFallbacks[slot % sectorFallbacks.length];
       if (sectorImg && sectorImg.startsWith('https://')) return sectorImg;
     }
-    // Fallback ultime garanti
+    // Priorité 2 : image réelle du prospect (si disponible et valide)
+    if (allImages && allImages[slot] && allImages[slot].startsWith('https://')) {
+      // Vérifier que l'image réelle n'est pas générique
+      const img = allImages[slot];
+      const lowerImg = img.toLowerCase();
+      const genericKeywords = ['logo', 'icon', 'favicon', 'default', 'placeholder', 'generic'];
+      if (!genericKeywords.some(keyword => lowerImg.includes(keyword))) {
+        return img;
+      }
+    }
+    // Priorité 3 : image réelle en rotation si pool insuffisant
+    if (allImages && allImages.length > 0) {
+      const fallbackImg = allImages[slot % allImages.length];
+      if (fallbackImg && fallbackImg.startsWith('https://')) {
+        const lowerImg = fallbackImg.toLowerCase();
+        const genericKeywords = ['logo', 'icon', 'favicon', 'default', 'placeholder', 'generic'];
+        if (!genericKeywords.some(keyword => lowerImg.includes(keyword))) {
+          return fallbackImg;
+        }
+      }
+    }
+    // Fallback ultime garanti (toujours sectoriel)
     return emergencyFallback;
   };
 
