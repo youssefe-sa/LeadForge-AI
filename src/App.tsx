@@ -9,13 +9,12 @@ import Outreach from './components/Outreach';
 import Pipeline from './components/Pipeline';
 import Settings from './components/Settings';
 import Campaigns from './components/Campaigns';
-import BounceManagement from './components/BounceManagement';
 import { NotificationContainer, ApiStatusIndicator } from './components/Notifications';
 import Login from './components/Login';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 
-type View = 'dashboard' | 'scorer' | 'website' | 'outreach' | 'pipeline' | 'campaigns' | 'settings' | 'bounces';
+type View = 'dashboard' | 'scorer' | 'website' | 'outreach' | 'pipeline' | 'campaigns' | 'settings';
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -100,9 +99,6 @@ export default function App() {
             )}
             {view === 'settings' && (
               <Settings config={config} updateConfig={updateConfig} statuses={{}} setStatus={() => {}} onClearData={() => {}} />
-            )}
-            {view === 'bounces' && (
-              <BounceManagement />
             )}
           </ErrorBoundary>
         </main>

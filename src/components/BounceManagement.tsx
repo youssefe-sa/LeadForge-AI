@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 
 interface Bounce {
   id: string;
@@ -19,6 +19,11 @@ interface BounceStats {
   timeouts: number;
   unique_emails_bounced: number;
 }
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL || '',
+  process.env.VITE_SUPABASE_ANON_KEY || ''
+);
 
 export default function BounceManagement() {
   const [bounces, setBounces] = useState<Bounce[]>([]);
@@ -47,20 +52,10 @@ export default function BounceManagement() {
 
       const { data, error } = await query;
       
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // La table n'existe pas encore
-          setBounces([]);
-          setError('La table email_bounces n\'existe pas encore. Veuillez appliquer la migration SQL.');
-        } else {
-          throw error;
-        }
-      } else {
-        setBounces(data || []);
-      }
+      if (error) throw error;
+      setBounces(data || []);
     } catch (err: any) {
       setError(err.message);
-      setBounces([]);
     } finally {
       setLoading(false);
     }
@@ -74,34 +69,10 @@ export default function BounceManagement() {
         .order('bounce_date', { ascending: false })
         .limit(1);
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // La vue n'existe pas encore, créer des stats par défaut
-          setStats({
-            total_bounces: 0,
-            hard_bounces: 0,
-            soft_bounces: 0,
-            complaints: 0,
-            timeouts: 0,
-            unique_emails_bounced: 0
-          });
-        } else {
-          throw error;
-        }
-      } else {
-        setStats(data?.[0] || null);
-      }
+      if (error) throw error;
+      setStats(data?.[0] || null);
     } catch (err: any) {
       console.error('Error fetching stats:', err);
-      // Stats par défaut en cas d'erreur
-      setStats({
-        total_bounces: 0,
-        hard_bounces: 0,
-        soft_bounces: 0,
-        complaints: 0,
-        timeouts: 0,
-        unique_emails_bounced: 0
-      });
     }
   };
 
@@ -191,7 +162,7 @@ export default function BounceManagement() {
             <option value="hard">Emails invalides</option>
             <option value="soft">Erreurs temporaires</option>
             <option value="complaint">Spam signalés</option>
-            <option value="timeout">D&eacute;lai d&eacute;pass&eacute;</option>
+            <option value="timeout">Délai dépassé</option>
           </select>
           <button
             onClick={fetchBounces}
@@ -263,9 +234,9 @@ export default function BounceManagement() {
         <h3 className="text-sm font-medium text-blue-900 mb-2">Actions recommandées:</h3>
         <ul className="text-sm text-blue-700 space-y-1">
           <li>• Supprimer les leads avec des emails invalides (hard bounces)</li>
-          <li>• R&eacute;essayer l&apos;envoi aux soft bounces apr&egrave;s 24-48h</li>
+          <li>• Réessayer l'envoi aux soft bounces après 24-48h</li>
           <li>• Désinscrire les leads ayant signalé spam (complaints)</li>
-          <li>• Nettoyer r&eacute;guli&egrave;rement les anciens bounces (&gt; 90 jours)</li>
+          <li>• Nettoyer régulièrement les anciens bounces (> 90 jours)</li>
         </ul>
       </div>
     </div>
