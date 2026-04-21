@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 
 interface Bounce {
   id: string;
@@ -19,11 +19,6 @@ interface BounceStats {
   timeouts: number;
   unique_emails_bounced: number;
 }
-
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL || '',
-  process.env.VITE_SUPABASE_ANON_KEY || ''
-);
 
 export default function BounceManagement() {
   const [bounces, setBounces] = useState<Bounce[]>([]);
@@ -52,10 +47,20 @@ export default function BounceManagement() {
 
       const { data, error } = await query;
       
-      if (error) throw error;
-      setBounces(data || []);
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // La table n'existe pas encore
+          setBounces([]);
+          setError('La table email_bounces n\'existe pas encore. Veuillez appliquer la migration SQL.');
+        } else {
+          throw error;
+        }
+      } else {
+        setBounces(data || []);
+      }
     } catch (err: any) {
       setError(err.message);
+      setBounces([]);
     } finally {
       setLoading(false);
     }
@@ -69,10 +74,34 @@ export default function BounceManagement() {
         .order('bounce_date', { ascending: false })
         .limit(1);
 
-      if (error) throw error;
-      setStats(data?.[0] || null);
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // La vue n'existe pas encore, créer des stats par défaut
+          setStats({
+            total_bounces: 0,
+            hard_bounces: 0,
+            soft_bounces: 0,
+            complaints: 0,
+            timeouts: 0,
+            unique_emails_bounced: 0
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        setStats(data?.[0] || null);
+      }
     } catch (err: any) {
       console.error('Error fetching stats:', err);
+      // Stats par défaut en cas d'erreur
+      setStats({
+        total_bounces: 0,
+        hard_bounces: 0,
+        soft_bounces: 0,
+        complaints: 0,
+        timeouts: 0,
+        unique_emails_bounced: 0
+      });
     }
   };
 
