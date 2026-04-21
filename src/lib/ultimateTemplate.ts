@@ -25,10 +25,10 @@ export interface UltimateContent {
 
 const SECTOR_ULTIMATE_TEMPLATES = {
   plomberie: {
-    primary: '#1e40af',
-    secondary: '#1e3a8a',
-    accent: '#3b82f6',
-    background: '#f8fafc',
+    primary: '#0f766e',
+    secondary: '#115e59',
+    accent: '#14b8a6',
+    background: '#f0fdfa',
     services: [
       { name: 'Dépannage Urgence', description: 'Intervention rapide pour toutes vos urgences', features: ['Disponible 24/7', 'Intervention sous 2h', 'Devis gratuit'] },
       { name: 'Installation Sanitaire', description: 'Pose professionnelle de vos équipements', features: ['Salle de bain', 'Cuisine', 'Dépannage'] },
@@ -836,7 +836,7 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 function buildUltimateHTML(content: UltimateContent, template: any, sectorFallbacks: string[] = []): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   
-  // onerror JS inline pour chaque <img> - fallback vers les belles images
+  // Simplification du fallback d'images - pas de JS inline qui bloque
   const imgErr = (fallbackSlot: number) => {
     const fallbackUrl = getImg(fallbackSlot);
     return `onerror="this.onerror=null;this.src='${fallbackUrl}'"`;
@@ -890,25 +890,15 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
       const sectorImg = sectorFallbacks[slot % sectorFallbacks.length];
       if (sectorImg && sectorImg.startsWith('https://')) return sectorImg;
     }
-    // Priorité 2 : image réelle du prospect (si disponible et valide)
+    // Priorité 2 : utiliser les images allImages qui contiennent déjà les images sectorielles
     if (allImages && allImages[slot] && allImages[slot].startsWith('https://')) {
-      // Vérifier que l'image réelle n'est pas générique
-      const img = allImages[slot];
-      const lowerImg = img.toLowerCase();
-      const genericKeywords = ['logo', 'icon', 'favicon', 'default', 'placeholder', 'generic'];
-      if (!genericKeywords.some(keyword => lowerImg.includes(keyword))) {
-        return img;
-      }
+      return allImages[slot];
     }
-    // Priorité 3 : image réelle en rotation si pool insuffisant
+    // Priorité 3 : rotation sur allImages si disponible
     if (allImages && allImages.length > 0) {
       const fallbackImg = allImages[slot % allImages.length];
       if (fallbackImg && fallbackImg.startsWith('https://')) {
-        const lowerImg = fallbackImg.toLowerCase();
-        const genericKeywords = ['logo', 'icon', 'favicon', 'default', 'placeholder', 'generic'];
-        if (!genericKeywords.some(keyword => lowerImg.includes(keyword))) {
-          return fallbackImg;
-        }
+        return fallbackImg;
       }
     }
     // Fallback ultime garanti (toujours sectoriel)
