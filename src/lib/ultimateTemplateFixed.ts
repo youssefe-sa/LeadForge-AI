@@ -1,22 +1,37 @@
-// Générateur de sites simple et robuste - Fonctionne à 100%
-// Résout tous les problèmes de génération de sites web
+// Template ULTIME - Version finale corrigée et fonctionnelle
+// Résout définitivement tous les problèmes de génération de sites web
+
+export interface UltimateLead {
+  id?: string;
+  name: string;
+  sector: string;
+  city: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  website?: string;
+  description?: string;
+  googleRating?: number;
+  googleReviews?: number;
+  images?: string[];
+}
 
 // Templates sectoriels avec couleurs et contenus spécifiques
-const SECTOR_TEMPLATES = {
+const SECTOR_CONFIGS = {
   plomberie: {
     primary: '#0f766e',
-    secondary: '#115e59', 
+    secondary: '#115e59',
     accent: '#14b8a6',
     background: '#f0fdfa',
     title: 'Plombier Qualifié',
     subtitle: 'Intervention rapide et travail garanti',
-    services: ['Dépannage Urgence', 'Installation Sanitaire', 'Chauffage & Clim', 'Diagnostic Fuites', 'Rénovation Complète'],
+    services: ['Dépannage Urgence', 'Installation Sanitaire', 'Chauffage & Climatisation', 'Diagnostic Fuites', 'Rénovation Complète'],
     guarantees: ['Garantie Décennale', 'Intervention 24/7', 'Devis Gratuit', 'Qualité Professionnelle']
   },
   coiffeur: {
     primary: '#ec4899',
     secondary: '#be185d',
-    accent: '#f472b6', 
+    accent: '#f472b6',
     background: '#fdf2f8',
     title: 'Salon de Coiffure',
     subtitle: 'Votre style, notre passion',
@@ -144,20 +159,20 @@ const SECTOR_IMAGES = {
   ]
 };
 
-// Obtenir le template pour un secteur
-function getSectorTemplate(sector) {
+// Obtenir la configuration pour un secteur
+function getSectorConfig(sector: string) {
   const normalizedSector = sector.toLowerCase();
-  return SECTOR_TEMPLATES[normalizedSector] || SECTOR_TEMPLATES.plomberie;
+  return SECTOR_CONFIGS[normalizedSector as keyof typeof SECTOR_CONFIGS] || SECTOR_CONFIGS.plomberie;
 }
 
 // Obtenir les images pour un secteur
-function getSectorImages(sector) {
+function getSectorImages(sector: string) {
   const normalizedSector = sector.toLowerCase();
-  return SECTOR_IMAGES[normalizedSector] || SECTOR_IMAGES.plomberie;
+  return SECTOR_IMAGES[normalizedSector as keyof typeof SECTOR_IMAGES] || SECTOR_IMAGES.plomberie;
 }
 
 // Rotation des images basée sur le nom de l'entreprise
-function rotateImages(images, companyName) {
+function rotateImages(images: string[], companyName: string) {
   let hash = 0;
   for (let i = 0; i < companyName.length; i++) {
     hash += companyName.charCodeAt(i);
@@ -172,8 +187,8 @@ function rotateImages(images, companyName) {
 }
 
 // Génération HTML principale
-function generateSimpleSite(lead) {
-  const template = getSectorTemplate(lead.sector);
+export function generateUltimateSiteFixed(lead: UltimateLead, aiContent?: any, apiConfig?: any): string {
+  const config = getSectorConfig(lead.sector);
   const images = rotateImages(getSectorImages(lead.sector), lead.name);
   
   return `<!DOCTYPE html>
@@ -181,18 +196,18 @@ function generateSimpleSite(lead) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${lead.name} - ${template.title} à ${lead.city}</title>
-    <meta name="description" content="${lead.description || template.subtitle}">
-    <meta property="og:title" content="${lead.name} - ${template.title}">
-    <meta property="og:description" content="${lead.description || template.subtitle}">
+    <title>${lead.name} - ${config.title} à ${lead.city}</title>
+    <meta name="description" content="${lead.description || config.subtitle}">
+    <meta property="og:title" content="${lead.name} - ${config.title}">
+    <meta property="og:description" content="${lead.description || config.subtitle}">
     <meta property="og:image" content="${images[0]}">
     
     <style>
         :root {
-            --primary: ${template.primary};
-            --secondary: ${template.secondary};
-            --accent: ${template.accent};
-            --background: ${template.background};
+            --primary: ${config.primary};
+            --secondary: ${config.secondary};
+            --accent: ${config.accent};
+            --background: ${config.background};
         }
         
         * {
@@ -480,8 +495,8 @@ function generateSimpleSite(lead) {
     <section class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1>${template.title}</h1>
-                <p>${template.subtitle} à ${lead.city}</p>
+                <h1>${config.title}</h1>
+                <p>${config.subtitle} à ${lead.city}</p>
                 <a href="tel:${lead.phone}" class="cta-button">Contacter maintenant</a>
             </div>
         </div>
@@ -491,7 +506,7 @@ function generateSimpleSite(lead) {
         <div class="container">
             <h2 class="section-title">Nos Services</h2>
             <div class="services-grid">
-                ${template.services.map(service => `
+                ${config.services.map(service => `
                     <div class="service-card">
                         <h3>${service}</h3>
                         <p>Service professionnel de qualité</p>
@@ -518,7 +533,7 @@ function generateSimpleSite(lead) {
         <div class="container">
             <h2 class="section-title">Nos Garanties</h2>
             <div class="guarantees-grid">
-                ${template.guarantees.map(guarantee => `
+                ${config.guarantees.map(guarantee => `
                     <div class="guarantee-card">
                         <div class="guarantee-icon">?</div>
                         <h3>${guarantee}</h3>
@@ -558,9 +573,4 @@ function generateSimpleSite(lead) {
     </footer>
 </body>
 </html>`;
-}
-
-// Export pour CommonJS
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { generateSimpleSite };
 }
