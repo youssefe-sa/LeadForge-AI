@@ -692,7 +692,89 @@ function getHeroBadge(sector: string): { icon: string; text: string } {
   return { icon: 'shield-check', text: 'Professionnel certifié' };
 }
 
-export function generateUltimateSite(lead: any, aiContent?: any): string {
+export function generateUltimateSite(lead: any, aiContent?: any, apiConfig?: any): string {
+  // SYSTÈME INTELLIGENT AVEC IA - GÉNÉRATION AUTOMATIQUE
+  // Utilise les clés LLM existantes (Groq, Gemini, NVIDIA, OpenRouter)
+  const sector = (lead.sector || '').toLowerCase();
+  
+  try {
+    // Utiliser le système intelligent avec IA et les clés existantes
+    const { createIntelligentLayoutGenerator } = require('./intelligentLayoutGenerator');
+    
+    // Récupérer la config API si non fournie
+    let config = apiConfig;
+    if (!config) {
+      // Tenter de récupérer depuis le store ou l'environnement
+      try {
+        const { useApiConfig } = require('./supabase-store');
+        const configHook = useApiConfig();
+        config = configHook.config;
+      } catch (e) {
+        // Fallback vers config par défaut
+        config = {
+          groqKey: process.env.GROQ_API_KEY || '',
+          geminiKey: process.env.GEMINI_API_KEY || '',
+          nvidiaKey: process.env.NVIDIA_API_KEY || '',
+          openrouterKey: process.env.OPENROUTER_API_KEY || '',
+          defaultLlm: 'groq',
+          serperKey: '',
+          unsplashKey: '',
+          pexelsKey: ''
+        };
+      }
+    }
+    
+    // Créer le générateur intelligent avec la config
+    const intelligentLayoutGenerator = createIntelligentLayoutGenerator(config);
+    
+    // Préparer les données enrichies complètes
+    const enrichedData = {
+      sector: sector,
+      companyName: lead.name || 'Entreprise',
+      city: lead.city || '',
+      description: aiContent?.aboutText || lead.description,
+      services: aiContent?.services || [],
+      specialties: aiContent?.specialties || [],
+      certifications: aiContent?.certifications || [],
+      experience: aiContent?.experience || '',
+      portfolio: aiContent?.portfolio || lead.images || [],
+      pricing: aiContent?.pricing || '',
+      customFields: aiContent?.customFields || {},
+      businessSize: aiContent?.businessSize || 'small',
+      targetAudience: aiContent?.targetAudience || '',
+      uniqueFeatures: aiContent?.uniqueFeatures || [],
+      competitiveAdvantages: aiContent?.competitiveAdvantages || [],
+      businessModel: aiContent?.businessModel || ''
+    };
+    
+    // Générer le HTML intelligent avec IA
+    return intelligentLayoutGenerator.generateHTML(enrichedData);
+    
+  } catch (error) {
+    console.error('Erreur système intelligent IA, fallback vers système classique:', error);
+    
+    // Fallback vers le système sectoriel classique
+    const specificSectors = ['coiffeur', 'plomberie', 'restaurant', 'garage', 'electricien', 'fitness', 'medical', 'avocat', 'nettoyage', 'jardin'];
+    
+    if (specificSectors.includes(sector)) {
+      const { generateSectorSpecificHTML } = require('./sectorTemplates');
+      
+      const enrichedData = aiContent ? {
+        description: aiContent.aboutText,
+        services: aiContent.services,
+        specialties: aiContent.specialties || [],
+        certifications: aiContent.certifications || [],
+        experience: aiContent.experience || '',
+        portfolio: aiContent.portfolio || [],
+        pricing: aiContent.pricing || '',
+        customFields: aiContent.customFields || {}
+      } : undefined;
+      
+      return generateSectorSpecificHTML(sector, lead, enrichedData);
+    }
+  }
+  
+  // Fallback ultime vers l'ancien système
   const template = getUltimateTemplate(lead.sector);
   const companyName = lead.name || 'Entreprise Premium';
   const city = lead.city || '';
