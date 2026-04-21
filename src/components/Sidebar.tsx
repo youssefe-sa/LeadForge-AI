@@ -224,6 +224,27 @@ export default function Sidebar({ active, onNavigate, leadCount, apiCount }: Pro
             borderRadius: 6, 
             border: 'none',
             cursor: 'pointer',
+            background: active === 'bounces' ? C.accent2 : 'transparent',
+            textAlign: 'left',
+            transition: 'all 0.2s ease',
+          }}
+          onClick={() => onNavigate('bounces')}
+          onMouseEnter={e => { if (active !== 'bounces') (e.currentTarget as HTMLElement).style.background = C.surface2; }}
+          onMouseLeave={e => { if (active !== 'bounces') (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+        >
+          <span style={{ fontSize: 14 }}>📧</span>
+          <span style={{ fontSize: 13, fontWeight: active === 'bounces' ? 600 : 400, color: active === 'bounces' ? C.tx : C.tx2 }}>Emails en Erreur</span>
+        </button>
+        <button 
+          style={{
+            width: '100%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 10,
+            padding: '12px', 
+            borderRadius: 6, 
+            border: 'none',
+            cursor: 'pointer',
             background: active === 'settings' ? C.accent2 : 'transparent',
             textAlign: 'left',
             transition: 'all 0.2s ease',
