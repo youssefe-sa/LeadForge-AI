@@ -798,14 +798,14 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   // 2. On FORCE l'utilisation de la première belle image pour le Hero
   const heroImage = fallbacks[0]; 
   
-  // 3. On distribue les autres belles images pour le reste du site (Qui sommes-nous, etc.)
-  // PRIORITÉ AUX IMAGES SPÉCIFIQUES PAR SECTEUR
+  // 3. Distribution intelligente des images spécifiques par secteur
+  // PRIORITÉ ABSOLUE AUX IMAGES SECTORIELLES
   const allImages = [
       fallbacks[0],                                       // Slot 0 : Hero (toujours spécifique au secteur)
-      fallbacks[1 % fallbacks.length],                    // Slot 1 : Qui sommes-nous
-      fallbacks[2 % fallbacks.length],                    // Slot 2 : Services
-      fallbacks[3 % fallbacks.length],                    // Slot3 : Témoignages
-      fallbacks[4 % fallbacks.length]                     // Slot 4 : Contact
+      fallbacks[1],                                       // Slot 1 : Qui sommes-nous
+      fallbacks[2],                                       // Slot 2 : Services
+      fallbacks[3],                                       // Slot3 : Témoignages
+      fallbacks[4]                                        // Slot 4 : Contact
   ];
 
   const content: UltimateContent = {
@@ -992,7 +992,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             --accent: ${accentColor};
             --primary-rgb: ${primaryRgb};
             
-            --bg-base: #f8fafc;
+            --bg-base: ${template.background};
             --bg-glass: rgba(255, 255, 255, 0.7);
             --text-main: #0f172a;
             --text-muted: #475569;
@@ -1005,7 +1005,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            background-color: var(--bg-base);
             color: var(--text-main);
             overflow-x: hidden;
             line-height: 1.7;
@@ -1125,7 +1125,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             top: 0; left: 0; right: 0; bottom: 0;
             overflow: hidden;
             z-index: -1;
-            background: #f8fafc;
+            background: var(--bg-base);
         }
         .blob {
             position: absolute;
