@@ -798,15 +798,17 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   // 2. On FORCE l'utilisation de la première belle image pour le Hero
   const heroImage = fallbacks[0]; 
   
-  // 3. Distribution intelligente des images spécifiques par secteur
-  // PRIORITÉ ABSOLUE AUX IMAGES SECTORIELLES
-  const allImages = [
-      fallbacks[0],                                       // Slot 0 : Hero (toujours spécifique au secteur)
-      fallbacks[1],                                       // Slot 1 : Qui sommes-nous
-      fallbacks[2],                                       // Slot 2 : Services
-      fallbacks[3],                                       // Slot3 : Témoignages
-      fallbacks[4]                                        // Slot 4 : Contact
-  ];
+  // 3. Distribution ROTATIVE des images spécifiques par secteur
+  // Utiliser un hash du nom pour garantir l'unicité par entreprise
+  let imageHash = 0;
+  for (let i = 0; i < companyName.length; i++) imageHash += companyName.charCodeAt(i);
+  const startIndex = imageHash % fallbacks.length;
+  
+  const allImages = [];
+  for (let i = 0; i < 5; i++) {
+    const imageIndex = (startIndex + i) % fallbacks.length;
+    allImages.push(fallbacks[imageIndex]);
+  }
 
   const content: UltimateContent = {
     companyName, 
@@ -886,8 +888,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
   
   const getImg = (slot: number): string => {
     // PRIORITÉ ABSOLUE : images sectorielles spécifiques (plus pertinentes)
-    if (sectorFallbacks && sectorFallbacks.length > 0) {
-      const sectorImg = sectorFallbacks[slot % sectorFallbacks.length];
+    if (sectorFallbacks && sectorFallbacks.length > 0 && slot < sectorFallbacks.length) {
+      const sectorImg = sectorFallbacks[slot];
       if (sectorImg && sectorImg.startsWith('https://')) return sectorImg;
     }
     // Priorité 2 : utiliser les images allImages qui contiennent déjà les images sectorielles
@@ -1963,34 +1965,20 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         </div>
     </section>
 
-    <!-- Nos Valeurs -->
+    <!-- Nos Garanties -->
     <section class="container" id="valeurs">
-        <!-- Supprimé : anim-shape pour design plus propre -->
         <div class="section-header reveal" style="position: relative; z-index: 1;">
-            <h2>Les valeurs qui nous animent</h2>
-            <p>Ce qui fait de nous le partenaire idéal pour vos projets ambitieux.</p>
+            <h2>Nos garanties</h2>
+            <p>Les engagements qui font la différence et votre tranquillité d'esprit.</p>
         </div>
         <div class="valeurs-grid">
-            <div class="valeur-card reveal" style="transition-delay: 100ms">
-                <div class="valeur-icon"><i data-lucide="shield" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">Fiabilité</h3>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Nous tenons nos promesses. La confiance de nos clients est notre bien le plus précieux.</p>
+            ${template.guarantees.map((garantie: any, index: number) => `
+            <div class="valeur-card reveal" style="transition-delay: ${index * 100}ms">
+                <div class="valeur-icon"><i data-lucide="${garantie.icon}" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">${garantie.title}</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Un engagement pris pour votre satisfaction et votre sécurité.</p>
             </div>
-            <div class="valeur-card reveal" style="transition-delay: 200ms">
-                <div class="valeur-icon"><i data-lucide="lightbulb" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">Innovation</h3>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Nous utilisons les approches les plus modernes pour garantir des résultats durables.</p>
-            </div>
-            <div class="valeur-card reveal" style="transition-delay: 300ms">
-                <div class="valeur-icon"><i data-lucide="heart" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">Passion</h3>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Un amour profond du travail bien fait et une implication totale dans chaque détail.</p>
-            </div>
-            <div class="valeur-card reveal" style="transition-delay: 400ms">
-                <div class="valeur-icon"><i data-lucide="gem" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">Excellence</h3>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Le standard minimum : une qualité irréprochable et un niveau de finition parfait.</p>
-            </div>
+            `).join('')}
         </div>
     </section>
 
