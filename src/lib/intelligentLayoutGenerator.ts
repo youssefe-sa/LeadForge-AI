@@ -4,6 +4,26 @@
 
 import { callLLMForWebsite, ApiConfig } from './supabase-store';
 
+// Interfaces manquantes pour TypeScript
+interface SectionComponent {
+  type: string;
+  content: string;
+  dataBinding: string;
+}
+
+interface ColorScheme {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+}
+
+interface Typography {
+  headings: string;
+  body: string;
+  accent: string;
+}
+
 // Interface pour les données enrichies complètes
 interface EnrichedLeadData {
   sector: string;
