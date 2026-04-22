@@ -32,23 +32,23 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#14b8a6',
     background: '#f0fdfa',
     services: [
-      { name: 'Dépannage Urgence', description: 'Intervention rapide pour toutes vos urgences', features: ['Disponible 24/7', 'Intervention sous 2h', 'Devis gratuit'] },
-      { name: 'Installation Sanitaire', description: 'Pose professionnelle de vos équipements', features: ['Salle de bain', 'Cuisine', 'Dépannage'] },
-      { name: 'Chauffage & Climatisation', description: 'Installation et entretien de vos systèmes', features: ['Pompes à chaleur', 'Chaudières', 'Économie'] },
-      { name: 'Diagnostic Fuites', description: 'Détection précise et réparation des fuites', features: ['Recherche non destructive', 'Caméra', 'Garantie'] },
-      { name: 'Rénovation Complète', description: 'Transformation de votre salle de bain', features: ['Design sur mesure', 'Matériaux qualité', 'Livraison clé en main'] },
-      { name: 'Plomberie Générale', description: 'Tous travaux de plomberie', features: ['Mise aux normes', 'Garantie décennale', 'SAV réactif'] }
+      { name: 'Dépannage 24h/24', description: 'Intervention d\'urgence sur toutes fuites et pannes', features: ['Disponible 7j/7', 'Arrivée sous 1h30', 'Sans surprise tarifaire'] },
+      { name: 'Installation Sanitaire', description: 'Pose et remplacement de vos appareils', features: ['Robinetterie', 'Éviers', 'WC', 'Douches'] },
+      { name: 'Chauffage & Chaudière', description: 'Installation et réparation chauffage', features: ['Chaudières gaz/fioul', 'Pompes à chaleur', 'Détartrage'] },
+      { name: 'Détection de Fuites', description: 'Localisation précise sans casse', features: ['Caméra thermique', 'Gaz traceur', 'Colmatage immédiat'] },
+      { name: 'Rénovation Salle de Bain', description: 'Création et rénovation complète', features: ['Devis gratuit', 'Aide au choix', 'Clé en main'] },
+      { name: 'Entretien Annuel', description: 'Maintenance préventive', features: ['Contrôle chauffage', 'Détartrage', 'Mise aux normes'] }
     ],
     guarantees: [
       { title: 'Garantie Décennale', icon: 'shield-check' },
-      { title: 'Intervention Rapide', icon: 'clock' },
-      { title: 'Devis Transparent', icon: 'file-text' },
-      { title: 'Travail Garanti', icon: 'check-square' }
+      { title: 'Intervention < 2h', icon: 'clock' },
+      { title: 'Devis Gratuit', icon: 'file-text' },
+      { title: 'Artisan Qualifié', icon: 'check-square' }
     ],
-    heroTitle: 'Plombier Qualifié',
-    heroSubtitle: "Intervention rapide et travail garanti dans toute la région",
-    aboutText: "Artisan qualifié avec plus de 15 ans d'expérience. Intervention rapide et travail garanti.",
-    ctaText: 'Appeler maintenant'
+    heroTitle: 'Artisan Plombier',
+    heroSubtitle: "L'artisan du tuyau à votre service - De la fuite d'eau à la rénovation complète",
+    aboutText: "Plombier chauffagiste depuis plus de 15 ans, je mets mon savoir-faire au service de vos installations. Artisan passionné, je garantis un travail soigné, des délais respectés et des tarifs transparents.",
+    ctaText: 'Demandez un devis'
   },
   electricien: {
     primary: '#1e40af',
@@ -56,23 +56,23 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#2563eb',
     background: '#f8fafc',
     services: [
-      { name: 'Installation Électrique', description: 'Mise aux normes complètes de votre installation électrique', features: ['Norme NFC 15-100', 'Tableau modulaire', 'Mise à la terre'] },
-      { name: 'Dépannage Urgence', description: 'Intervention rapide 24/7 pour toutes pannes électriques', features: ['Intervention 2h', 'Diagnostic précis', 'Réparation garantie'] },
-      { name: 'Domotique & Connectique', description: 'Installation de systèmes domotiques et connectés', features: ['Objets connectés', 'Scénarios automatisés', 'Application mobile'] },
-      { name: 'Tableau Électrique', description: 'Mise à niveau et remplacement de tableaux électriques', features: ['Disjoncteurs modulaires', 'Protection différentielle', 'Câblage sécurisé'] },
-      { name: 'Prises & Interrupteurs', description: 'Installation et remplacement de points électriques', features: ['Prises standards', 'Variateurs', 'Télérupteurs'] },
-      { name: 'Éclairage Design', description: 'Création d\'éclairages design et fonctionnels', features: ['LED design', 'Variateurs', 'Automatisation'] }
+      { name: 'Mise aux Normes', description: 'Remise à neuf de votre installation électrique', features: ['Norme NFC 15-100', 'Tableau électrique neuf', 'Mise à la terre'] },
+      { name: 'Dépannage Électrique', description: 'Pannes, court-circuits, disjonctions', features: ['Intervention rapide', 'Diagnostic complet', 'Réparation durable'] },
+      { name: 'Installation Complète', description: 'Construction ou rénovation électrique', features: ['Câblage complet', 'Points de lumière', 'Prises et inters'] },
+      { name: 'Domotique & Smart Home', description: 'Maison connectée et automatisée', features: ['Volets roulants', 'Éclairage auto', 'Thermostats'] },
+      { name: 'Éclairage LED', description: 'Solutions éclairage économiques', features: ['Spots encastrés', 'Suspensions design', 'Éclairage extérieur'] },
+      { name: 'Charging Véhicule', description: 'Installation bornes de recharge', features: ['Wallbox particulier', 'Borne entreprise', 'Certification IRVE'] }
     ],
     guarantees: [
-      { title: 'Garantie Décennale', icon: 'shield-check' },
-      { title: 'Norme NFC 15-100', icon: 'check-square' },
-      { title: 'Intervention Rapide', icon: 'clock' },
-      { title: 'Devis Transparent', icon: 'file-text' }
+      { title: 'Consuel Certifié', icon: 'shield-check' },
+      { title: 'Garantie Décennale', icon: 'check-square' },
+      { title: 'Intervention < 2h', icon: 'clock' },
+      { title: 'Devis Gratuit', icon: 'file-text' }
     ],
-    heroTitle: 'Électricien Qualifié',
-    heroSubtitle: "Solutions électriques professionnelles et sécurisées",
-    aboutText: "Électricien avec plus de 15 ans d'expérience. Interventions dépannage et installations conformes aux normes.",
-    ctaText: 'Appeler maintenant'
+    heroTitle: 'Électricien Agréé',
+    heroSubtitle: "Votre expert électricien pour des installations sûres et modernes",
+    aboutText: "Électricien certifié Consuel avec 15 ans d'expérience. Je sécurise votre habitat grâce à des installations conformes et durables. Artisan sérieux, intervention rapide et devis transparent.",
+    ctaText: 'Contactez-moi'
   },
   coiffeur: {
     primary: '#6b21a8',
@@ -80,23 +80,23 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#7c3aed',
     background: '#f8fafc',
     services: [
-      { name: 'Coupe Femme', description: 'Coupe moderne et sur-mesure', features: ['Visagisme', 'Techniques modernes', 'Coiffage'] },
-      { name: 'Barber Homme', description: 'Service barbier et coupes structurées', features: ['Tracé précis', 'Soins barbe', 'Finition rasoir'] },
-      { name: 'Coloration', description: 'Nuances parfaites et balayages', features: ['Produits naturels', 'Ombré Hair', 'Protection cheveux'] },
-      { name: 'Soin Profond', description: 'Rituels soin pour cheveux réparés', features: ['Botox capillaire', 'Bain hydratant', 'Massage relaxant'] },
-      { name: 'Extensions', description: 'Longueur et volume avec extensions naturelles', features: ['Kératine', 'Pose invisible', 'Durabilité'] },
-      { name: 'Coiffure Événement', description: 'Chignons et coiffes pour événements', features: ['Mariage', 'Essai personnalisé', 'Tenue parfaite'] }
+      { name: 'Coupes & Styles', description: 'Coupe sur-mesure femme et homme', features: ['Visagisme personnalisé', 'Techniques actuelles', 'Conseil entretien'] },
+      { name: 'Barbier Traditionnel', description: 'Rasage et soins barbe', features: ['Rasage à l\'ancienne', 'Taille précise', 'Soins barbe'] },
+      { name: 'Coloration Expert', description: 'Balayages, ombrés et couleurs', features: ['Coloration végétale', 'Mèches sur mesure', 'Glitter color'] },
+      { name: 'Soins Capillaires', description: 'Traitements réparateurs', features: ['Botox capillaire', 'Kératine', 'Massage crânien'] },
+      { name: 'Extensions Volume', description: 'Rajouts longueur et épaisseur', features: ['Pose à froid', 'Tape-in', 'Entretien inclus'] },
+      { name: 'Chignons & Événements', description: 'Coiffures de cérémonie', features: ['Mariage', 'Sofreh aghd', 'Maquillage combo'] }
     ],
     guarantees: [
-      { title: 'Produits Naturels', icon: 'leaf' },
-      { title: 'Hygiène Stricte', icon: 'sparkles' },
-      { title: 'Visagisme Expert', icon: 'scissors' },
-      { title: 'Satisfaction Garantie', icon: 'heart' }
+      { title: 'Produits Bio', icon: 'leaf' },
+      { title: 'Stérilisation Outils', icon: 'sparkles' },
+      { title: 'Formation Continue', icon: 'scissors' },
+      { title: 'Satisfait ou Refait', icon: 'heart' }
     ],
-    heroTitle: 'Salon de Coiffure',
-    heroSubtitle: "Coiffure professionnelle et qualité garantie",
-    aboutText: "Salon de coiffure avec plus de 15 ans d'expérience. Coupes modernes et colorations de qualité.",
-    ctaText: 'Appeler maintenant'
+    heroTitle: 'Coiffeur Visagiste',
+    heroSubtitle: "L'art de sublimer vos cheveux avec passion et expertise",
+    aboutText: "Coiffeur passionné depuis 15 ans, je crée des looks qui vous ressemblent. Spécialiste du visagisme et des techniques modernes, je veille à la santé de vos cheveux avec des produits naturels et de qualité.",
+    ctaText: 'Prendre rendez-vous'
   },
   restaurant: {
     primary: '#c2410c',
@@ -104,17 +104,17 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#ea580c',
     background: '#f8fafc',
     services: [
-      { name: 'Carte Restaurant', description: "Cuisine moderne et de saison", features: ['Produits frais', 'Plats maison', 'Végétarien'] },
-      { name: 'Menu Dégustation', description: 'Découverte culinaire en plusieurs services', features: ['Accord Mets & Vins', '5 services', 'Surprise Chef'] },
-      { name: 'Vins et Boissons', description: 'Sélection de vins et cocktails', features: ['Vins locaux', 'Grands crus', 'Cocktails maison'] },
-      { name: 'Événements Privés', description: 'Organisation de vos événements', features: ['Service dédié', 'Menus personnalisés', 'Jusqu\'à 80 personnes'] },
-      { name: 'Brunch', description: 'Formule brunch le week-end', features: ['Buffet complet', 'Viennoiseries maison', 'Jus frais'] },
-      { name: 'Traiteur', description: "Service traiteur à domicile", features: ['Cocktails', 'Dîners', 'Livraison'] }
+      { name: 'Cuisine Maison', description: 'Plats préparés sur place', features: ['Produits locaux', 'Recettes authentiques', 'Fait minute'] },
+      { name: 'Menu du Jour', description: 'Formule déjeuner économique', features: ['Entrée + Plat + Dessert', 'Produits frais', 'Cuisson minute'] },
+      { name: 'Spécialités', description: 'Nos plats signature', features: ['Recettes du terroir', 'Grillades', 'Poissons frais'] },
+      { name: 'Événements & Groupes', description: 'Repas de famille et séminaires', features: ['Menu groupe', 'Salle privative', 'Sur mesure'] },
+      { name: 'Service Traiteur', description: 'Livraison et à emporter', features: ['Plateaux repas', 'Buffets', 'Livraison pro'] },
+      { name: 'Boissons & Vins', description: 'Carte des vins et cocktails', features: ['Vins régionaux', 'Cocktails maison', 'Bières artisanales'] }
     ],
-    heroTitle: 'Restaurant',
-    heroSubtitle: "Cuisine de qualité et service professionnel",
-    aboutText: "Restaurant avec plus de 15 ans d'expérience. Cuisine maison et produits frais de saison.",
-    ctaText: 'Réserver'
+    heroTitle: 'Restaurant Traditionnel',
+    heroSubtitle: "Cuisine authentique et accueil chaleureux depuis 2009",
+    aboutText: "Chef passionné depuis 15 ans, je cuisine avec cœur des plats généreux et savoureux. Produits frais du marché, recettes authentiques et ambiance conviviale vous attendent dans notre établissement.",
+    ctaText: 'Réserver une table'
   },
   garage: {
     primary: '#166534',
@@ -122,17 +122,23 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#059669',
     background: '#f8fafc',
     services: [
-      { name: 'Diagnostic Électronique', description: 'Analyse des calculateurs de votre véhicule', features: ['Valises constructeurs', 'Lecture codes pannes', 'Effacement'] },
-      { name: 'Entretien Véhicule', description: 'Révisions selon constructeur', features: ['Maintien garantie', 'Pièces origine', 'Huile qualité'] },
-      { name: 'Pneumatique', description: 'Experts en pneus et géométrie', features: ['Géométrie 3D', 'Pneus performance', 'Amortisseurs'] },
-      { name: 'Carrosserie', description: 'Réparation esthétique et peinture', features: ['Spectromètre', 'Cabine peinture', 'Detailing'] },
-      { name: 'Moteur & Boîte', description: 'Réparation moteur et boîte de vitesses', features: ['Outillage spécialisé', 'Reconditionnement', 'Vidange'] },
-      { name: 'Véhicules Premium', description: 'Spécialiste véhicules sportifs et luxe', features: ['Manipulation soigneuse', 'Local sécurisé', 'Expertise'] }
+      { name: 'Mécanique Générale', description: 'Entretien et réparation toutes marques', features: ['Révisions constructeur', 'Courroies', 'Freins'] },
+      { name: 'Diagnostic Auto', description: 'Analyse électronique complète', features: ['Valise multimarque', 'Effacement défauts', 'Paramétrage'] },
+      { name: 'Pneumatiques', description: 'Montage, équilibrage, géométrie', features: ['Pneus toutes saisons', 'Pneus run-flat', 'Parallélisme'] },
+      { name: 'Climatisation', description: 'Recharge et réparation clim', features: ['Recharge gaz R134a', 'Détection fuites', 'Filtre habitacle'] },
+      { name: 'Carrosserie', description: 'Réparation et peinture', features: ['Débosselage', 'Peinture à la nuance', 'Polissage optique'] },
+      { name: 'Contrôle Technique', description: 'Préparation et contre-visite', features: ['Pré-contrôle', 'Réparations conformité', 'Accompagnement'] }
     ],
-    heroTitle: 'Garage Qualifié',
-    heroSubtitle: "Entretien professionnel et réparation garantie",
-    aboutText: "Garage avec plus de 15 ans d'expérience. Réparation mécanique et entretien véhicule.",
-    ctaText: 'Appeler maintenant'
+    guarantees: [
+      { title: 'Devis Gratuit', icon: 'file-text' },
+      { title: 'Garantie Pièces', icon: 'shield-check' },
+      { title: 'Intervention Rapide', icon: 'clock' },
+      { title: 'Véhicule de Courtoisie', icon: 'car' }
+    ],
+    heroTitle: 'Garage Automobile',
+    heroSubtitle: "Mécanicien passionné, votre véhicule entre de bonnes mains",
+    aboutText: "Mécanicien automobile depuis 15 ans, j'entretiens et répare toutes marques avec passion. Diagnostic précis, devis transparents et respect des délais. Votre sécurité routière est ma priorité.",
+    ctaText: 'Demandez un RDV'
   },
   nettoyage: {
     primary: '#059669',
@@ -140,23 +146,23 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#10b981',
     background: '#f0fdf4',
     services: [
-      { name: 'Nettoyage Bureaux', description: 'Entretien professionnel de vos locaux', features: ['Fréquence adaptée', 'Produits écologiques', 'Disponible 7j/7'] },
-      { name: 'Nettoyage Vitres', description: 'Vitres impeccables et sans traces', features: ['Hauteur illimitée', 'Produits professionnels', 'Résultat garanti'] },
-      { name: 'Grand Ménage', description: 'Nettoyage en profondeur', features: ['Équipe dédiée', 'Matériel professionnel', 'Satisfaction garantie'] },
-      { name: 'Désinfection', description: 'Hygiène et sécurité maximale', features: ['Normes sanitaires', 'Produits agréés', 'Certification'] },
-      { name: 'Nettoyage Industriel', description: 'Solutions pour entrepôts et usines', features: ['Équipements lourds', 'Interventions nocturnes', 'Sécurité renforcée'] },
-      { name: 'Entretien Extérieur', description: 'Façades et espaces extérieurs', features: ['Kärcher professionnel', 'Décapage douce', 'Protection surface'] }
+      { name: 'Nettoyage de Bureaux', description: 'Entretien quotidien de vos locaux professionnels', features: ['Poussière, sols, vitres', 'Produits écolabels', 'Horaires flexibles'] },
+      { name: 'Nettoyage Vitres', description: 'Vitres intérieures et extérieures', features: ['Accès difficile', 'Sans traces garanti', 'Bâtiments R+10'] },
+      { name: 'Grand Nettoyage', description: 'Nettoyage en profondeur résidentiel', features: ['Cuisine dégraissée', 'Salle de bain désinfectée', 'Sol ciré'] },
+      { name: 'Désinfection', description: 'Traitement anti-bactérien et virucide', features: ['Certifié COVID', 'Produits bio', 'Rapport de traitement'] },
+      { name: 'Nettoyage Industriel', description: 'Entrepôts, usines, ateliers', features: ['Monobrosse industrielle', 'Aspirateur eau/poussière', 'Horaires de nuit'] },
+      { name: 'Remise en État', description: 'Après travaux ou déménagement', features: ['Évacuation gravats', 'Nettoyage fin', 'Livraison clé en main'] }
     ],
     guarantees: [
-      { title: 'Produits Écologiques', icon: 'leaf' },
-      { title: 'Qualité Garantie', icon: 'check-square' },
-      { title: 'Intervention Ponctuelle', icon: 'clock' },
-      { title: 'Équipe Formée', icon: 'users' }
+      { title: 'Produits Écolabels', icon: 'leaf' },
+      { title: 'Personnel Formé', icon: 'users' },
+      { title: 'Intervention Fiable', icon: 'clock' },
+      { title: 'Assurance Responsabilité', icon: 'shield-check' }
     ],
-    heroTitle: 'Service Nettoyage Pro',
-    heroSubtitle: "Propreté impeccable et service garanti",
-    aboutText: "Service de nettoyage professionnel avec plus de 15 ans d'expérience. Produits écologiques et satisfaction garantie.",
-    ctaText: 'Demander un devis'
+    heroTitle: 'Société de Nettoyage',
+    heroSubtitle: "Propreté professionnelle et écologique pour vos espaces",
+    aboutText: "Entreprise de nettoyage depuis 15 ans, nos équipes formées interviennent avec rigueur et discrétion. Produits écolabels, matériel professionnel et engagement qualité pour des locaux toujours impeccables.",
+    ctaText: 'Demandez un devis'
   },
   jardin: {
     primary: '#14532d',
@@ -164,23 +170,23 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#15803d',
     background: '#f0fdf4',
     services: [
-      { name: 'Création Jardin', description: 'Aménagement paysager sur mesure', features: ['Design 3D', 'Plantations', 'Entretien'] },
-      { name: 'Pelouse & Gazon', description: 'Pelouse parfaite toute l\'année', features: ['Tonte régulière', 'Arrosage automatique', 'Traitements'] },
-      { name: 'Taille & Élagage', description: 'Taille professionnelle des arbres', features: ['Sécurité assurée', 'Déchets évacués', 'Conseils experts'] },
-      { name: 'Clôtures & Terrasses', description: 'Aménagement extérieur complet', features: ['Bois composite', 'Pose garantie', 'Durabilité'] },
-      { name: 'Arrosage Automatisé', description: 'Système d\'arrosage intelligent', features: ['Programmation', 'Économie d\'eau', 'Capteurs pluie'] },
-      { name: 'Entretien Saisonnier', description: 'Suivi annuel complet', features: ['4 interventions/an', 'Taille haies', 'Désherbage'] }
+      { name: 'Création de Jardins', description: 'Aménagement paysager complet', features: ['Plan sur mesure', 'Plantations adaptées', 'Gazon en rouleaux'] },
+      { name: 'Tonte & Entretien', description: 'Pelouse et massifs entretenus', features: ['Tonte régulière', 'Taille haies', 'Désherbage manuel'] },
+      { name: 'Élagage & Abattage', description: 'Arbres et arbustes sécurisés', features: ['Élagage raisonné', 'Grimper pro', 'Broyage branches'] },
+      { name: 'Terrasses & Clôtures', description: 'Aménagement structure bois', features: ['Terrasse pin/ipé', 'Clôture occultation', 'Pergolas'] },
+      { name: 'Arrosage Automatique', description: 'Installation système arrosage', features: ['Goutte à goutte', 'Tuyères enterrées', 'Programmateur connecté'] },
+      { name: 'Potager & Verger', description: 'Création et entretien potager', features: ['Bacs surélevés', 'Compostage', 'Taille fruitiers'] }
     ],
     guarantees: [
-      { title: 'Matériel Pro', icon: 'tool' },
-      { title: 'Conseils Experts', icon: 'lightbulb' },
-      { title: 'Garantie Végétaux', icon: 'shield-check' },
-      { title: 'Satisfaction Client', icon: 'heart' }
+      { title: 'Plantes Garanties', icon: 'sprout' },
+      { title: 'Intervention Propre', icon: 'sparkles' },
+      { title: 'Conseils Saisonniers', icon: 'sun' },
+      { title: 'Paysagiste Qualifié', icon: 'tree-deciduous' }
     ],
-    heroTitle: 'Paysagiste Qualifié',
-    heroSubtitle: "Aménagement extérieur et jardin sur mesure",
-    aboutText: "Paysagiste avec plus de 15 ans d'expérience. Création de jardins et espaces verts personnalisés.",
-    ctaText: 'Consulter gratuitement'
+    heroTitle: 'Jardinier Paysagiste',
+    heroSubtitle: "Création et entretien de jardins uniques et harmonieux",
+    aboutText: "Paysagiste passionné depuis 15 ans, je conçois et entretiens des espaces verts qui vivent au rythme des saisons. De la création paysagère à l'élagage expert, chaque geste est pensé pour la santé de vos plantes.",
+    ctaText: 'Demandez un devis'
   },
   fitness: {
     primary: '#dc2626',
@@ -188,23 +194,23 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#ef4444',
     background: '#fef2f2',
     services: [
-      { name: 'Coaching Personnel', description: 'Accompagnement individuel sur mesure', features: ['Programme personnalisé', 'Suivi nutrition', 'Objectifs atteints'] },
-      { name: 'Salle de Sport', description: 'Équipements modernes et variés', features: ['Cardio', 'Musculation', 'Zone libre'] },
-      { name: 'Cours Collectifs', description: 'Ambiance motivante et variée', features: ['10+ cours/semaine', 'Tous niveaux', 'Moniteurs certifiés'] },
-      { name: 'Préparation Physique', description: 'Préparation sportive spécifique', features: ['Tests d\'effort', 'Plan sur mesure', 'Suivi performance'] },
-      { name: 'Nutrition Sportive', description: 'Conseils et plans alimentaires', features: ['Bilan nutritionnel', 'Programmes adaptés', 'Résultats durables'] },
-      { name: 'Rééducation', description: 'Reprise sportive en douceur', features: ['Kinésithérapeute', 'Exercices adaptés', 'Progression sécurisée'] }
+      { name: 'Coaching Personnel', description: 'Accompagnement individuel sur mesure', features: ['Bilan morpho', 'Programme adapté', 'Suivi hebdo'] },
+      { name: 'Cours Collectifs', description: 'Groupes dynamiques et motivants', features: ['HIIT', 'Yoga', 'Zumba', 'Musculation guidée'] },
+      { name: 'Musculation Libre', description: 'Espace haltères et machines', features: ['Poids libres', 'Machines guidées', 'Cage à squat'] },
+      { name: 'Cardio Zone', description: 'Équipements endurance modernes', features: ['Tapis connectés', 'Vélos elliptiques', 'Rameurs'] },
+      { name: 'Préparation Physique', description: 'Prépa compétition ou remise en forme', features: ['Tests perf', 'Plan nutrition', 'Récupération'] },
+      { name: 'Espace Bien-être', description: 'Détente après effort', features: ['Sauna', 'Douche jets', 'Casiers sécurisés'] }
     ],
     guarantees: [
       { title: 'Coachs Diplômés', icon: 'award' },
-      { title: 'Équipements Modernes', icon: 'dumbbell' },
-      { title: 'Résultats Garantis', icon: 'target' },
-      { title: 'Suivi Personnalisé', icon: 'user-check' }
+      { title: 'Matériel Neuf', icon: 'dumbbell' },
+      { title: 'Sans Engagement', icon: 'check-circle' },
+      { title: 'Accès 6h-23h', icon: 'clock' }
     ],
-    heroTitle: 'Coach Sportif Qualifié',
-    heroSubtitle: "Performance et bien-être personnalisés",
-    aboutText: "Coach sportif avec plus de 15 ans d'expérience. Accompagnement personnalisé et résultats garantis.",
-    ctaText: 'Prendre RDV'
+    heroTitle: 'Coach Sportif',
+    heroSubtitle: "Votre coach personnel pour atteindre vos objectifs fitness",
+    aboutText: "Coach sportif diplômé d'État avec 15 ans d'expérience. Que vous cherchiez à perdre du poids, gagner en muscle ou préparer une compétition, je vous accompagne avec des programmes personnalisés.",
+    ctaText: 'Essai offert'
   },
   medical: {
     primary: '#1e40af',
@@ -212,23 +218,23 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#2563eb',
     background: '#eff6ff',
     services: [
-      { name: 'Consultations', description: 'Consultations médicales générales', features: ['RDV rapide', 'Prise en charge', 'Confidentialité'] },
-      { name: 'Radiologie', description: 'Imagerie médicale moderne', features: ['Équipements dernier cri', 'Rapports précis', 'Délais courts'] },
-      { name: 'Analyses Laboratoire', description: 'Analyses biologiques complètes', features: ['Laboratoire certifié', 'Résultats 24h', 'Fiabilité garantie'] },
-      { name: 'Vaccinations', description: 'Centre de vaccination agréé', features: ['Tous vaccins', 'Rappel automatique', 'Carnet numérique'] },
-      { name: 'Médecine Préventive', description: 'Bilans de santé préventifs', features: ['Check-up complet', 'Dépistage', 'Conseils prévention'] },
-      { name: 'Télémédecine', description: 'Consultations à distance', features: ['RDV en ligne', 'Prescription électronique', 'Facilité d\'accès'] }
+      { name: 'Médecine Générale', description: 'Consultations et suivi de santé', features: ['Bilan annuel', 'Vaccinations', 'Certificats'] },
+      { name: 'Kinésithérapie', description: 'Rééducation et réadaptation', features: ['Massages médicaux', 'Rééducation post-op', 'Posturologie'] },
+      { name: 'Ostéopathie', description: 'Soins sans médicaments', features: ['Bébés', 'Femmes enceintes', 'Sportifs'] },
+      { name: 'Infirmier à Domicile', description: 'Soins à votre domicile', features: ['Injections', 'Pansements', 'Prélèvements'] },
+      { name: 'Analyses Biologiques', description: 'Laboratoire sur place', features: ['Prise de sang', 'Tests rapides', 'Résultats 24h'] },
+      { name: 'Télémédecine', description: 'Consultation vidéo', features: ['Ordonnance électronique', '7j/7 disponible', 'Sans déplacement'] }
     ],
     guarantees: [
-      { title: 'Médecins Qualifiés', icon: 'stethoscope' },
-      { title: 'Confidentialité Absolue', icon: 'lock' },
-      { title: 'Équipements Modernes', icon: 'monitor' },
-      { title: 'Disponibilité 24/7', icon: 'phone' }
+      { title: 'Conventionné Secteur 1', icon: 'stethoscope' },
+      { title: '3ème Payant', icon: 'credit-card' },
+      { title: 'RDV sous 48h', icon: 'calendar' },
+      { title: 'Équipe Pluridisciplinaire', icon: 'users' }
     ],
-    heroTitle: 'Centre Médical Qualifié',
-    heroSubtitle: "Santé et expertise médicale de confiance",
-    aboutText: "Centre médical avec plus de 15 ans d'expérience. Équipe médicale qualifiée et équipements modernes.",
-    ctaText: 'Prendre RDV'
+    heroTitle: 'Cabinet Médical',
+    heroSubtitle: "Votre santé entre les mains de professionnels qualifiés",
+    aboutText: "Médecin généraliste depuis 15 ans, je vous accueille dans un cabinet moderne et chaleureux. Écoute, diagnostic précis et suivi personnalisé. Collaboration avec une équipe de spécialistes pour une prise en charge complète.",
+    ctaText: 'Prendre rendez-vous'
   },
   avocat: {
     primary: '#1e3a8a',
@@ -236,23 +242,23 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#2563eb',
     background: '#f8fafc',
     services: [
-      { name: 'Droit des Affaires', description: 'Conseil juridique pour entreprises', features: ['Création société', 'Contrats', 'Litiges'] },
-      { name: 'Droit Immobilier', description: 'Transactions et litiges immobiliers', features: ['Vente/Achat', 'Baux', 'Copropriété'] },
-      { name: 'Droit Famille', description: 'Accompagnement familial sensible', features: ['Divorce', 'Garde', 'Succession'] },
-      { name: 'Droit Pénal', description: 'Défense et assistance pénale', features: ['Défense', 'Constitution partie civile', 'Victimes'] },
-      { name: 'Recouvrement', description: 'Recouvrement de créances', features: ['Mise en demeure', 'Procédure', 'Exécution'] },
-      { name: 'Conseil Juridique', description: 'Consultation et conseil général', features: ['Entretien 1h', 'Avis juridique', 'Stratégie'] }
+      { name: 'Droit Civil & Famille', description: 'Divorce, succession, bail', features: ['Divorce amiable/contentieux', 'Régime matrimonial', 'Garde alternée'] },
+      { name: 'Droit Pénal', description: 'Défense et assistance victimes', features: ['Garde à vue', 'Tribunal correctionnel', 'Victimes préjudice'] },
+      { name: 'Droit du Travail', description: 'Licenciement et contentieux', features: ['Rupture conventionnelle', 'Harcèlement', 'Prud\'hommes'] },
+      { name: 'Droit des Affaires', description: 'Conseil entreprises et particuliers', features: ['Création société', 'Contrats commerciaux', 'Recouvrement'] },
+      { name: 'Immobilier', description: 'Vente, achat, litiges', features: ['Promesse vente', 'Copropriété', 'Malfaisance construction'] },
+      { name: 'Droit Routier', description: 'Permis, accidents, infractions', features: ['Retrait permis', 'Excès vitesse', 'Défense pénale'] }
     ],
     guarantees: [
-      { title: 'Confidentialité', icon: 'lock' },
-      { title: 'Expertise Juridique', icon: 'gavel' },
-      { title: 'Réactivité', icon: 'clock' },
-      { title: 'Résultats', icon: 'target' }
+      { title: 'Avocat au Barreau', icon: 'scale' },
+      { title: 'Consultation Privée', icon: 'shield' },
+      { title: 'Défense Déterminée', icon: 'sword' },
+      { title: 'Honoraires Transparent', icon: 'file-text' }
     ],
-    heroTitle: 'Cabinet d\'Avocats',
-    heroSubtitle: "Expertise juridique et défense de vos intérêts",
-    aboutText: "Cabinet d'avocats avec plus de 15 ans d'expérience. Expertise reconnue et défense efficace.",
-    ctaText: 'Consulter'
+    heroTitle: 'Avocat à la Cour',
+    heroSubtitle: "Conseil juridique personnalisé et défense de vos droits",
+    aboutText: "Avocat inscrit au Barreau depuis 15 ans, je défends vos intérêts avec rigueur et détermination. Droit civil, pénal, travail ou affaires, chaque dossier mérite une stratégie sur mesure et une écoute attentive.",
+    ctaText: 'Prendre rendez-vous'
   },
   default: {
     primary: '#1e293b',
@@ -260,17 +266,17 @@ const SECTOR_ULTIMATE_TEMPLATES = {
     accent: '#475569',
     background: '#f8fafc',
     services: [
-      { name: 'Consultation', description: 'Analyse de vos besoins', features: ['Diagnostic sur mesure', 'Plan d\'action', 'Écoute active'] },
-      { name: 'Services Qualité', description: 'Solutions professionnelles', features: ['Qualité garantie', 'Suivi performance', 'Finitions parfaites'] },
-      { name: 'Accompagnement', description: 'Un interlocuteur dédié', features: ['Ligne directe', 'RDV prioritaire', 'Bilan mensuel'] },
-      { name: 'Innovation', description: 'Meilleurs outils du marché', features: ['Méthodes agiles', 'Veille constante', 'Équipement pointe'] },
-      { name: 'Stratégie', description: 'Résultats mesurables', features: ['ROI garanti', 'Alignement parfait', 'Transparence'] },
-      { name: 'Service Client', description: 'Assistance permanente', features: ['Support immédiat', 'Proactivité', 'Garanties solides'] }
+      { name: 'Prestation Sur Mesure', description: 'Services adaptés à vos besoins spécifiques', features: ['Étude personnalisée', 'Devis détaillé', 'Écoute attentive'] },
+      { name: 'Intervention Pro', description: 'Travail soigné et professionnel', features: ['Matériel adapté', 'Techniques actuelles', 'Respect des normes'] },
+      { name: 'Conseil Expert', description: 'Accompagnement et recommandations', features: ['Diagnostic complet', 'Solutions pertinentes', 'Suivi personnalisé'] },
+      { name: 'Service Rapide', description: 'Réactivité et respect des délais', features: ['Intervention rapide', 'Horaires flexibles', 'Urgences traitées'] },
+      { name: 'Garantie Qualité', description: 'Engagement résultat et satisfaction', features: ['Contrôle qualité', 'Corrections incluses', 'SAV réactif'] },
+      { name: 'Tarifs Transparents', description: 'Honoraires clairs et justifiés', features: ['Devis gratuit', 'Pas de surprise', 'Facilités paiement'] }
     ],
-    heroTitle: 'Professionnel Qualifié',
-    heroSubtitle: "Services professionnels et qualité garantie",
-    aboutText: "Professionnel avec plus de 15 ans d'expérience. Services de qualité et satisfaction garantie.",
-    ctaText: 'Appeler maintenant'
+    heroTitle: 'Artisan Professionnel',
+    heroSubtitle: "Votre expert de confiance pour des prestations de qualité",
+    aboutText: "Artisan passionné depuis 15 ans, je mets mon savoir-faire et mon expertise à votre service. Chaque projet est unique et mérite une attention particulière. Qualité, transparence et satisfaction sont mes priorités.",
+    ctaText: 'Contactez-moi'
   }
 };
 
