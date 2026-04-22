@@ -793,21 +793,25 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 
   const realImages = [...new Set(realImagesRaw)];
 
-  // 1. On récupère les belles images Unsplash selon le métier (DÉJÀ DYNAMIQUE !)
-  // Si c'est un plombier, ça prendra les photos de tuyaux. Si c'est un coiffeur, les ciseaux.
+  // 1. Récupérer les images sectorielles spécifiques (plombier = tuyaux, coiffeur = ciseaux...)
   const fallbacks = getSectorImagesFallback(lead.sector);
 
-  // 2. On FORCE l'utilisation de la première belle image pour le Hero
-  const heroImage = fallbacks[0]; 
-  
-  // 3. Distribution ROTATIVE des images spécifiques par secteur
-  // Utiliser un hash du nom pour garantir l'unicité par entreprise
+  // 2. Hash robuste basé sur le nom d'entreprise pour garantir l'unicité des images
   let imageHash = 0;
-  for (let i = 0; i < companyName.length; i++) imageHash += companyName.charCodeAt(i);
+  for (let i = 0; i < companyName.length; i++) {
+    imageHash = ((imageHash << 5) - imageHash) + companyName.charCodeAt(i);
+    imageHash |= 0; // Convertir en entier 32-bit
+  }
+  imageHash = Math.abs(imageHash);
+  
   const startIndex = imageHash % fallbacks.length;
   
+  // 3. Hero image = image unique selon le hash du nom (PAS toujours la première !)
+  const heroImage = fallbacks[startIndex];
+  
+  // 4. Distribution ROTATIVE des images - 5 images différentes du hero
   const allImages = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 1; i <= 5; i++) {
     const imageIndex = (startIndex + i) % fallbacks.length;
     allImages.push(fallbacks[imageIndex]);
   }
@@ -891,24 +895,31 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
   // Sinon → fallback sectoriel neutre garanti.
   const emergencyFallback = sectorFallbacks[0] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80';
   
+  // Hash du nom pour distribution UNIQUE des images par entreprise
+  let companyHash = 0;
+  for (let i = 0; i < companyName.length; i++) {
+    companyHash = ((companyHash << 5) - companyHash) + companyName.charCodeAt(i);
+    companyHash |= 0;
+  }
+  companyHash = Math.abs(companyHash);
+  
   const getImg = (slot: number): string => {
-    // PRIORITÉ ABSOLUE : images sectorielles spécifiques (plus pertinentes)
-    if (sectorFallbacks && sectorFallbacks.length > 0 && slot < sectorFallbacks.length) {
-      const sectorImg = sectorFallbacks[slot];
+    // Calculer un index UNIQUE basé sur le hash du nom + le slot
+    // Ainsi "A.Leont" slot 1 ≠ "Sooo" slot 1 — images différentes garanties !
+    const uniqueIndex = (companyHash + slot) % (sectorFallbacks.length || 1);
+    
+    // PRIORITÉ : image sectorielle unique selon le hash
+    if (sectorFallbacks && sectorFallbacks.length > 0 && sectorFallbacks[uniqueIndex]) {
+      const sectorImg = sectorFallbacks[uniqueIndex];
       if (sectorImg && sectorImg.startsWith('https://')) return sectorImg;
     }
-    // Priorité 2 : utiliser les images allImages qui contiennent déjà les images sectorielles
-    if (allImages && allImages[slot] && allImages[slot].startsWith('https://')) {
-      return allImages[slot];
+    
+    // Fallback : rotation classique sur allImages
+    if (allImages && allImages[slot % allImages.length] && allImages[slot % allImages.length].startsWith('https://')) {
+      return allImages[slot % allImages.length];
     }
-    // Priorité 3 : rotation sur allImages si disponible
-    if (allImages && allImages.length > 0) {
-      const fallbackImg = allImages[slot % allImages.length];
-      if (fallbackImg && fallbackImg.startsWith('https://')) {
-        return fallbackImg;
-      }
-    }
-    // Fallback ultime garanti (toujours sectoriel)
+    
+    // Fallback ultime garanti
     return emergencyFallback;
   };
 
