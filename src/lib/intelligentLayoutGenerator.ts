@@ -1,6 +1,6 @@
 // Système intelligent de génération de layouts avec IA
 // Analyse automatique du secteur et des données enrichies pour créer des layouts uniques
-// Utilise le système LLM existant de LeadForge (Groq, Gemini, NVIDIA, OpenRouter)
+// Utilise le système LLM existant avec fallback automatique
 
 import { callLLMForWebsite, ApiConfig } from './supabase-store';
 
@@ -22,26 +22,6 @@ interface EnrichedLeadData {
   uniqueFeatures?: string[];
   competitiveAdvantages?: string[];
   businessModel?: string;
-}
-
-// Interfaces pour le layout
-interface SectionComponent {
-  type: string;
-  content: string;
-  dataBinding?: string;
-}
-
-interface ColorScheme {
-  primary: string;
-  secondary: string;
-  accent: string;
-  background: string;
-}
-
-interface Typography {
-  headings: string;
-  body: string;
-  accent: string;
 }
 
 // Layout généré par l'IA
@@ -90,10 +70,29 @@ interface LayoutInteractions {
 }
 
 export class IntelligentLayoutGenerator {
-  private apiConfig: ApiConfig;
+  private config: ApiConfig;
 
-  constructor(apiConfig: ApiConfig) {
-    this.apiConfig = apiConfig;
+  constructor(config?: ApiConfig) {
+    // Utiliser la configuration existante ou une configuration par défaut
+    this.config = config || {
+      groqKey: process.env.GROQ_API_KEY || '',
+      geminiKey: process.env.GEMINI_API_KEY || '',
+      nvidiaKey: process.env.NVIDIA_API_KEY || '',
+      openrouterKey: process.env.OPENROUTER_API_KEY || '',
+      defaultLlm: 'groq',
+      serperKey: process.env.SERPER_API_KEY || '',
+      unsplashKey: process.env.UNSPLASH_API_KEY || '',
+      pexelsKey: process.env.PEXELS_API_KEY || '',
+      gmailSmtpUser: process.env.GMAIL_SMTP_EMAIL || '',
+      gmailSmtpFromEmail: process.env.GMAIL_SMTP_EMAIL || '',
+      gmailSmtpFromName: process.env.GMAIL_SMTP_NAME || '',
+      gmailSmtpPassword: process.env.GMAIL_SMTP_PASSWORD || '',
+      gmailSmtpHost: process.env.GMAIL_SMTP_HOST || 'smtp.gmail.com',
+      gmailSmtpPort: Number(process.env.GMAIL_SMTP_PORT) || 587,
+      gmailSmtpSecure: true,
+      whopDepositLink: '',
+      whopFinalPaymentLink: ''
+    };
   }
 
   // Fonction principale - génère un layout intelligent
@@ -137,14 +136,23 @@ export class IntelligentLayoutGenerator {
     - visualStyle: style visuel recommandé
     `;
 
-    const systemPrompt = "Tu es un expert business analyst. Génère une analyse JSON structurée et précise.";
-
     try {
-      const response = await callLLMForWebsite(this.apiConfig, analysisPrompt, systemPrompt);
-      return response || '';
+      const response = await callLLMForWebsite(this.config, analysisPrompt, 
+        "Tu es un expert en analyse business. Génère une analyse structurée et précise.");
+      return response;
     } catch (error) {
-      console.error('Erreur analyse business:', error);
-      return '{}';
+      console.error('Erreur analyse secteur:', error);
+      // Fallback si le LLM échoue
+      return JSON.stringify({
+        businessType: data.sector,
+        primaryServices: data.services?.slice(0, 5) || [],
+        uniqueValue: "Service professionnel de qualité",
+        customerNeeds: "Solutions fiables et rapides",
+        conversionGoals: "Générer des contacts et devis",
+        requiredFeatures: ["contact", "services"],
+        recommendedSections: ["hero", "services", "contact"],
+        visualStyle: "modern"
+      });
     }
   }
 
@@ -226,14 +234,19 @@ export class IntelligentLayoutGenerator {
 
   // Appel à l'IA pour générer le layout
   private async callAI(prompt: string): Promise<string> {
-    const systemPrompt = "Tu es un expert en design web et UX. Génère un layout JSON structuré et créatif. Retourne UNIQUEMENT du JSON valide.";
-
     try {
-      const response = await callLLMForWebsite(this.apiConfig, prompt, systemPrompt);
-      return response || '';
+      const response = await callLLMForWebsite(this.config, prompt, 
+        "Tu es un expert en design web et UX. Génère des layouts HTML personnalisés et professionnels.");
+      return response;
     } catch (error) {
-      console.error('Erreur génération layout:', error);
-      return '{}';
+      console.error('Erreur génération layout IA:', error);
+      // Fallback si le LLM échoue
+      return JSON.stringify({
+        sections: this.getDefaultSections('default'),
+        features: this.getDefaultFeatures('default'),
+        styling: this.getDefaultStyling('default'),
+        interactions: this.getDefaultInteractions('default')
+      });
     }
   }
 
@@ -541,7 +554,5 @@ export class IntelligentLayoutGenerator {
   }
 }
 
-// Export pour utilisation (nécessite apiConfig)
-export function createIntelligentLayoutGenerator(apiConfig: ApiConfig): IntelligentLayoutGenerator {
-  return new IntelligentLayoutGenerator(apiConfig);
-}
+// Export pour utilisation
+export const intelligentLayoutGenerator = new IntelligentLayoutGenerator();
