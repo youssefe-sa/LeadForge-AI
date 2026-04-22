@@ -592,7 +592,7 @@ function buildPlombierHTML(content: any, layout: any): string {
         <!-- Services intervention -->
         <section class="services-intervention">
             <h2>Services d'intervention</h2>
-            ${content.enrichedServices.map((service: any) => `
+            ${(content.enrichedServices || []).map((service: any) => `
                 <div class="intervention-card">
                     <h3>${service.name}</h3>
                     <p>${service.description}</p>
@@ -607,7 +607,7 @@ function buildPlombierHTML(content: any, layout: any): string {
         <section class="certifications-showcase">
             <h2>Nos certifications</h2>
             <div class="certifications-grid">
-                ${content.certifications.map((cert: string) => `
+                ${(content.certifications || []).map((cert: string) => `
                     <div class="certification-badge">
                         <span>${cert}</span>
                     </div>
@@ -619,7 +619,7 @@ function buildPlombierHTML(content: any, layout: any): string {
         <section class="project-gallery">
             <h2>Projets réalisés</h2>
             <div class="projects-grid">
-                ${content.portfolio.map((img: string) => `
+                ${(content.portfolio || []).map((img: string) => `
                     <div class="project-item">
                         <img src="${img}" alt="Projet plomberie" />
                         <div class="project-info">

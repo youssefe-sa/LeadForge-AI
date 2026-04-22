@@ -693,34 +693,8 @@ function getHeroBadge(sector: string): { icon: string; text: string } {
 }
 
 export function generateUltimateSite(lead: any, aiContent?: any): string {
-  // UTILISER DIRECTEMENT L'ANCIEN SYSTÈME FONCTIONNEL (le système intelligent cause des pages blanches)
+  // Système unique avec variantes dynamiques pour TOUS les secteurs
   const sector = (lead.sector || '').toLowerCase();
-  
-  // Fallback vers le système sectoriel classique
-  const specificSectors = ['coiffeur', 'plomberie', 'restaurant', 'garage', 'electricien', 'fitness', 'medical', 'avocat', 'nettoyage', 'jardin'];
-  
-  if (specificSectors.includes(sector)) {
-    try {
-      const { generateSectorSpecificHTML } = require('./sectorTemplates');
-      
-      const enrichedData = aiContent ? {
-        description: aiContent.aboutText,
-        services: aiContent.services,
-        specialties: aiContent.specialties || [],
-        certifications: aiContent.certifications || [],
-        experience: aiContent.experience || '',
-        portfolio: aiContent.portfolio || [],
-        pricing: aiContent.pricing || '',
-        customFields: aiContent.customFields || {}
-      } : undefined;
-      
-      return generateSectorSpecificHTML(sector, lead, enrichedData);
-    } catch (error) {
-      console.error('Erreur système sectoriel, fallback vers système classique:', error);
-    }
-  }
-  
-  // Fallback ultime vers l'ancien système
   const template = getUltimateTemplate(lead.sector);
   const companyName = lead.name || 'Entreprise Premium';
   const city = lead.city || '';
@@ -860,10 +834,13 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
     allImages
   };
 
-  return buildUltimateHTML(content, template, fallbacks);
+  // Layout variant basé sur le hash du nom (0-3) pour varier la structure du site
+  const layoutVariant = nameHash % 4;
+  
+  return buildUltimateHTML(content, template, fallbacks, layoutVariant);
 }
 
-function buildUltimateHTML(content: UltimateContent, template: any, sectorFallbacks: string[] = []): string {
+function buildUltimateHTML(content: UltimateContent, template: any, sectorFallbacks: string[] = [], layoutVariant: number = 0): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   
   // Simplification du fallback d'images - pas de JS inline qui bloque
@@ -1862,9 +1839,42 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
             }
         }
         
+        /* === LAYOUT VARIANTS - Dynamic structure per company === */
+        .layout-variant-0 .section-process { display: block; }
+        .layout-variant-0 .section-stats { display: block; }
+        .layout-variant-0 .section-assurances { display: block; }
+        .layout-variant-0 .hero-centered { display: block; }
+        .layout-variant-0 .hero-split { display: none; }
+        
+        .layout-variant-1 .section-process { display: none; }
+        .layout-variant-1 .section-stats { display: block; }
+        .layout-variant-1 .section-assurances { display: block; }
+        .layout-variant-1 .hero-centered { display: none; }
+        .layout-variant-1 .hero-split { display: grid; grid-template-columns: 1fr 1fr; align-items: center; text-align: left; }
+        .layout-variant-1 .hero-split .hero-content { text-align: left; }
+        .layout-variant-1 .hero-split .hero-visual { display: block; }
+        
+        .layout-variant-2 .section-process { display: block; }
+        .layout-variant-2 .section-stats { display: none; }
+        .layout-variant-2 .section-assurances { display: none; }
+        .layout-variant-2 .hero-centered { display: block; }
+        .layout-variant-2 .hero-split { display: none; }
+        .layout-variant-2 .services-grid { grid-template-columns: repeat(2, 1fr); }
+        
+        .layout-variant-3 .section-process { display: none; }
+        .layout-variant-3 .section-stats { display: none; }
+        .layout-variant-3 .section-assurances { display: block; }
+        .layout-variant-3 .hero-centered { display: none; }
+        .layout-variant-3 .hero-split { display: grid; grid-template-columns: 1fr 1fr; align-items: center; text-align: left; }
+        .layout-variant-3 .hero-split .hero-content { text-align: left; }
+        .layout-variant-3 .hero-split .hero-visual { display: block; }
+        .layout-variant-3 .services-grid { grid-template-columns: 1fr; }
+        .layout-variant-3 .testimonial-grid { grid-template-columns: 1fr 1fr; }
+        
+        .hero-visual { display: none; }
     </style>
 </head>
-<body>
+<body class="layout-variant-${layoutVariant}">
 
     <!-- Marquee Banner -->
     <div class="top-marquee">
@@ -1917,8 +1927,24 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
         </div>
     </nav>
 
-    <!-- Hero -->
-    <section class="hero bg-grid">
+    <!-- Hero Centered (Variant 0 & 2) -->
+    <section class="hero bg-grid hero-centered" style="text-align: center; padding: 140px 20px 100px;">
+        <div class="bg-pattern"></div>
+        <div class="hero-content reveal active" style="position: relative; z-index: 1; max-width: 800px; margin: 0 auto;">
+            <div class="hero-badge" style="display: inline-flex;"><i data-lucide="${heroBadge.icon}" width="18"></i> ${heroBadge.text}</div>
+            <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 0.5rem; line-height: 1.1; color: var(--text-main);">
+                ${logoInfo.word1} <span style="color: var(--primary);">${logoInfo.word2}</span>
+            </h1>
+            <h2 style="font-size: clamp(1.1rem, 2.5vw, 1.6rem); font-family: 'Outfit'; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem; opacity: 0.8;">${slogan}</h2>
+            <p style="margin-bottom: 2.5rem; font-size: 1.15rem; max-width: 600px; margin-left: auto; margin-right: auto;">${heroSubtitle}</p>
+            <button onclick="document.getElementById('contact-modal').style.display='block'; document.body.style.overflow='hidden';" class="btn-cta" style="border: none; margin: 0 auto; display: inline-flex;">
+                ${ctaText} <i data-lucide="arrow-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Hero Split (Variant 1 & 3) -->
+    <section class="hero bg-grid hero-split">
         <div class="bg-pattern"></div>
         <!-- Désactivé : animations géométriques pour design plus propre -->
         <!-- <div class="pattern-waves"></div> -->
@@ -2011,7 +2037,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     </section>
 
     <!-- Nos Chiffres Clés -->
-    <section class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+    <section class="container section-stats" style="padding-top: 2rem; padding-bottom: 2rem;">
         <div class="stats-banner reveal">
             <div class="stat-banner-item">
                 <h3>${(reviews || 0) > 0 ? (reviews || 0) + '+' : '100%'}</h3>
@@ -2033,7 +2059,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     </section>
 
     <!-- Garanties & Assurances -->
-    <section class="container bg-alternate" id="garanties" style="background: rgba(255,255,255,0.4); backdrop-filter: blur(10px); margin: 3rem auto; border-radius: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);">
+    <section class="container bg-alternate section-assurances" id="garanties" style="background: rgba(255,255,255,0.4); backdrop-filter: blur(10px); margin: 3rem auto; border-radius: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);">
         <div class="section-header reveal">
             <h2>Garanties & Assurances</h2>
             <p>Travaillez l'esprit serein grâce à nos couvertures complètes conformes à la législation.</p>
@@ -2054,7 +2080,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     </section>
 
     <!-- Process (4 Démarches) -->
-    <section class="container" id="process">
+    <section class="container section-process" id="process">
         <!-- Supprimé : anim-shape pour design plus propre -->
         <div class="section-header reveal">
             <h2>Notre démarche en 4 étapes</h2>
@@ -2111,7 +2137,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
     </section>
 
     <!-- Testimonials (6 Avis) -->
-    <section class="container" id="testimonials">
+    <section class="container testimonial-grid" id="testimonials">
         <div class="section-header reveal" style="position: relative; z-index: 1;">
             <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.03); padding: 0.5rem 1rem; border-radius: 100px; margin-bottom: 1rem; font-weight: 600; font-size: 0.9rem;">
                 <i data-lucide="map-pin" width="16" style="color: #ea4335;"></i> Avis authentiques vérifiés par Google Maps
