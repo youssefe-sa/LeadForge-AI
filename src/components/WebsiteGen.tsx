@@ -4,6 +4,7 @@ import { generateUltimateSite } from '../lib/ultimateTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { fetchSectorImages } from '../lib/imageAgent';
 import { supabase } from '../lib/supabase';
+import { getSectorImages } from '../lib/pexelsImages';
 
 const getCssVar = (name: string, fallback: string) => {
   const val = getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim();
@@ -78,100 +79,6 @@ function getSectorPalette(sector: string) {
   return SECTOR_PALETTES.default;
 }
 
-// 📸 IMAGES PROFESSIONNELLES PAR SECTEUR (vraies photos d'artisans)
-const PROFESSIONAL_IMAGES: Record<string, string[]> = {
-  restaurant: [
-    'https://images.pexels.com/photos/1414235077428-338989a2e8c0/pexels-photo-338989a2e8c0.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
-    'https://images.pexels.com/photos/1559339352-11d035aa65de/pexels-photo-11d035aa65de.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
-    'https://images.pexels.com/photos/1504674900247-0877df9cc836/pexels-photo-0877df9cc836.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
-    'https://images.pexels.com/photos/1424847651672-bf20a4b0982b/pexels-photo-bf20a4b0982b.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
-    'https://images.pexels.com/photos/1555396273-367ea4eb4db5/pexels-photo-367ea4eb4db5.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=1200',
-  ],
-  coiffeur: [
-    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1521590832167-7228fcb8c1b5?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1200&fit=crop&q=80',
-  ],
-  salon: [
-    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1596178060810-72f53ce9a65c?w=1200&fit=crop&q=80',
-  ],
-  spa: [
-    'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1540555700478-4be289fbec6e?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1515377905703-c8848c66ca85?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1596178060671-7a80dc8059ea?w=1200&fit=crop&q=80',
-  ],
-  médecin: [
-    'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1551076805-e1869033e561?w=1200&fit=crop&q=80',
-  ],
-  dentiste: [
-    'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1571772996211-2f02c9727629?w=1200&fit=crop&q=80',
-  ],
-  avocat: [
-    'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1521791055366-0d553872125f?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1505664194779-8be289fbec6e?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1479142506502-19b3a3b7ff33?w=1200&fit=crop&q=80',
-  ],
-  hôtel: [
-    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1455587734955-081b22074882?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1200&fit=crop&q=80',
-  ],
-  garage: [
-    'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=1200&fit=crop&q=80',
-  ],
-  default: [
-    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1200&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&fit=crop&q=80',
-  ],
-};
-
-function getCuratedFallback(sector: string, index: number): string {
-  const s = (sector || '').toLowerCase();
-  for (const [k, v] of Object.entries(PROFESSIONAL_IMAGES)) {
-    if (k !== 'default' && s.includes(k)) return v[index % v.length];
-  }
-  if (s.includes('beauté') || s.includes('beauty') || s.includes('esthéti')) return PROFESSIONAL_IMAGES.salon[index % 6];
-  if (s.includes('hotel') || s.includes('riad')) return PROFESSIONAL_IMAGES.hôtel[index % 6];
-  if (s.includes('barb')) return PROFESSIONAL_IMAGES.coiffeur[index % 6];
-  return PROFESSIONAL_IMAGES.default[index % 6];
-}
-
 export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: Props) {
   // Utiliser l'état local de processing pour WebsiteGen
   const { isProcessing, isPaused, progress, startProcessing, updateProgress, stopProcessing, pauseProcessing, resumeProcessing } = useWebsiteGenState();
@@ -233,10 +140,13 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
     const rating = lead.googleRating;
     const reviews = lead.googleReviews;
 
-    const rawImgs = [...new Set([...(lead.images || []), ...(lead.websiteImages || [])].filter(u => typeof u === 'string' && u.startsWith('http')))];
-    const allImgs = rawImgs.map(u => proxyImg(u, 1200));
-    let _fbIdx = 0;
-    while (allImgs.length < 6) { allImgs.push(getCuratedFallback(lead.sector, _fbIdx)); _fbIdx++; }
+    // ── IMAGES SECTORIELLES PEXELS UNIQUEMENT ──
+    // On utilise UNIQUEMENT les images Pexels professionnelles et fiables
+    // pour éviter les images incohérentes (fruits, photos personnelles, etc.)
+    const sectorImages = getSectorImages(lead.sector);
+    // Mélanger les images pour avoir de la variété
+    const shuffled = [...sectorImages].sort(() => Math.random() - 0.5);
+    const allImgs = shuffled.slice(0, 6);
 
     const revTexts = (lead.googleReviewsData || []).filter(r => r && safeStr(r.text).length > 5).slice(0, 4)
       .map(r => `"${safeStr(r.text)}" — ${safeStr(r.author)} (${r.rating}★)`).join('\n');
@@ -541,37 +451,16 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       
       updateProgress({ step: '🖼️ Recherche d\'images professionnelles...' });
       
-      // ── SÉLECTION D'IMAGES PROFESSIONNELLES ──
-      // Prioriser les vraies photos professionnelles selon le secteur
-      const getProfessionalImages = (sector: string) => {
-        const s = (sector || '').toLowerCase();
-        return PROFESSIONAL_IMAGES[s] || PROFESSIONAL_IMAGES.default;
+      // ── IMAGES SECTORIELLES PEXELS UNIQUEMENT ──
+      // On utilise UNIQUEMENT les images Pexels professionnelles et fiables
+      // pour éviter les images incohérentes (fruits, photos personnelles, etc.)
+      const selectedImages = getSectorImages(lead.sector).slice(0, 12);
+      
+      console.log(`🖼️ ${selectedImages.length} images Pexels sectorielles utilisées pour ${lead.name}`);
+      lead = {
+        ...lead,
+        images: selectedImages
       };
-
-      // Images fournies par le prospect (validées)
-      const validLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])].filter(img => {
-        if (!img || typeof img !== 'string') return false;
-        if (!img.startsWith('https://')) return false;
-        const low = img.toLowerCase();
-        const hardSkip = ['favicon', 'sprite', 'pixel', 'tracking', 'beacon', '1x1', '.svg', '.gif'];
-        if (hardSkip.some(s => low.includes(s))) return false;
-        return true;
-      });
-
-      // Compléter avec les images professionnelles si besoin
-      const professionalImages = getProfessionalImages(lead.sector);
-      const allImages = [...validLeadImages, ...professionalImages];
-      
-      // Limiter à 12 images maximum pour la performance
-      const selectedImages = allImages.slice(0, 12);
-      
-      if (selectedImages.length > validLeadImages.length) {
-        console.log(`🖼️ ${selectedImages.length - validLeadImages.length} images professionnelles ajoutées pour ${lead.name}`);
-        lead = {
-          ...lead,
-          images: selectedImages
-        };
-      }
 
       updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
       const html = generateUltimateSite(lead, content);

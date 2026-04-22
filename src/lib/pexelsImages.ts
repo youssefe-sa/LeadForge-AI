@@ -157,27 +157,80 @@ export const SECTOR_SEARCH_QUERIES: Record<string, string[]> = {
 
 // Fonction pour obtenir les images d'un secteur
 export function getSectorImages(sector: string): string[] {
-  const normalizedSector = (sector || '').toLowerCase();
+  const normalizedSector = (sector || '').toLowerCase().trim();
   
-  // Chercher le secteur exact
+  // Log pour debugging
+  console.log(`🔍 Recherche d'images pour le secteur: "${normalizedSector}"`);
+  
+  // Chercher le secteur exact dans les clés
   for (const [key, images] of Object.entries(SECTOR_PEXELS_IMAGES)) {
-    if (normalizedSector.includes(key)) {
+    if (normalizedSector === key || normalizedSector.includes(key)) {
+      console.log(`✅ Secteur trouvé: ${key}`);
       return images;
     }
   }
   
-  // Vérifications spécifiques
-  if (normalizedSector.includes('plomb') || normalizedSector.includes('plumber')) return SECTOR_PEXELS_IMAGES.plomberie;
-  if (normalizedSector.includes('electri') || normalizedSector.includes('electrician')) return SECTOR_PEXELS_IMAGES.electricien;
-  if (normalizedSector.includes('coiff') || normalizedSector.includes('hair') || normalizedSector.includes('barber')) return SECTOR_PEXELS_IMAGES.coiffeur;
-  if (normalizedSector.includes('restaurant') || normalizedSector.includes('chef') || normalizedSector.includes('food')) return SECTOR_PEXELS_IMAGES.restaurant;
-  if (normalizedSector.includes('garage') || normalizedSector.includes('mecan') || normalizedSector.includes('auto')) return SECTOR_PEXELS_IMAGES.garage;
-  if (normalizedSector.includes('nettoya') || normalizedSector.includes('clean')) return SECTOR_PEXELS_IMAGES.nettoyage;
-  if (normalizedSector.includes('jardin') || normalizedSector.includes('garden') || normalizedSector.includes('paysag')) return SECTOR_PEXELS_IMAGES.jardin;
-  if (normalizedSector.includes('fitness') || normalizedSector.includes('gym') || normalizedSector.includes('sport')) return SECTOR_PEXELS_IMAGES.fitness;
-  if (normalizedSector.includes('medical') || normalizedSector.includes('doctor') || normalizedSector.includes('sante')) return SECTOR_PEXELS_IMAGES.medical;
-  if (normalizedSector.includes('avocat') || normalizedSector.includes('lawyer') || normalizedSector.includes('law')) return SECTOR_PEXELS_IMAGES.avocat;
+  // Vérifications spécifiques - PLomberie (plombier, plomberie, plumbing)
+  if (normalizedSector.includes('plomb') || normalizedSector.includes('plumber') || normalizedSector.includes('tuyau') || normalizedSector.includes('robinet')) {
+    console.log(`✅ Secteur identifié: plomberie`);
+    return SECTOR_PEXELS_IMAGES.plomberie;
+  }
   
+  // Électricien (électricien, electricien, électricité)
+  if (normalizedSector.includes('electri') || normalizedSector.includes('électri') || normalizedSector.includes('electrician') || normalizedSector.includes('cabl') || normalizedSector.includes('tableau')) {
+    console.log(`✅ Secteur identifié: electricien`);
+    return SECTOR_PEXELS_IMAGES.electricien;
+  }
+  
+  // Coiffeur (coiffeur, coiffeuse, salon, barbier)
+  if (normalizedSector.includes('coiff') || normalizedSector.includes('hair') || normalizedSector.includes('barber') || normalizedSector.includes('salon') || normalizedSector.includes('coupe')) {
+    console.log(`✅ Secteur identifié: coiffeur`);
+    return SECTOR_PEXELS_IMAGES.coiffeur;
+  }
+  
+  // Restaurant
+  if (normalizedSector.includes('restaurant') || normalizedSector.includes('chef') || normalizedSector.includes('traiteur') || normalizedSector.includes('cuisine') || normalizedSector.includes('boulanger') || normalizedSector.includes('pâtissier')) {
+    console.log(`✅ Secteur identifié: restaurant`);
+    return SECTOR_PEXELS_IMAGES.restaurant;
+  }
+  
+  // Garage / Mécanicien
+  if (normalizedSector.includes('garage') || normalizedSector.includes('mecan') || normalizedSector.includes('mécan') || normalizedSector.includes('auto') || normalizedSector.includes('voiture') || normalizedSector.includes('carrossier')) {
+    console.log(`✅ Secteur identifié: garage`);
+    return SECTOR_PEXELS_IMAGES.garage;
+  }
+  
+  // Nettoyage
+  if (normalizedSector.includes('nettoya') || normalizedSector.includes('clean') || normalizedSector.includes('ménage') || normalizedSector.includes('menage') || normalizedSector.includes('propre')) {
+    console.log(`✅ Secteur identifié: nettoyage`);
+    return SECTOR_PEXELS_IMAGES.nettoyage;
+  }
+  
+  // Jardin
+  if (normalizedSector.includes('jardin') || normalizedSector.includes('garden') || normalizedSector.includes('paysag') || normalizedSector.includes('espace vert')) {
+    console.log(`✅ Secteur identifié: jardin`);
+    return SECTOR_PEXELS_IMAGES.jardin;
+  }
+  
+  // Fitness
+  if (normalizedSector.includes('fitness') || normalizedSector.includes('gym') || normalizedSector.includes('sport') || normalizedSector.includes('coach') || normalizedSector.includes('muscu')) {
+    console.log(`✅ Secteur identifié: fitness`);
+    return SECTOR_PEXELS_IMAGES.fitness;
+  }
+  
+  // Médical
+  if (normalizedSector.includes('medical') || normalizedSector.includes('médical') || normalizedSector.includes('doctor') || normalizedSector.includes('docteur') || normalizedSector.includes('sante') || normalizedSector.includes('santé') || normalizedSector.includes('médecin') || normalizedSector.includes('infirmier') || normalizedSector.includes('kiné') || normalizedSector.includes('dentiste')) {
+    console.log(`✅ Secteur identifié: medical`);
+    return SECTOR_PEXELS_IMAGES.medical;
+  }
+  
+  // Avocat / Juridique
+  if (normalizedSector.includes('avocat') || normalizedSector.includes('lawyer') || normalizedSector.includes('law') || normalizedSector.includes('juridique') || normalizedSector.includes('notaire') || normalizedSector.includes('droit')) {
+    console.log(`✅ Secteur identifié: avocat`);
+    return SECTOR_PEXELS_IMAGES.avocat;
+  }
+  
+  console.log(`⚠️ Secteur non reconnu: "${normalizedSector}" - Utilisation des images par défaut`);
   return SECTOR_PEXELS_IMAGES.default;
 }
 
