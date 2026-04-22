@@ -1,4 +1,5 @@
 // Templates sectoriels avec VARIATION DYNAMIQUE - Chaque prospect = site unique
+import { getSectorImages } from './pexelsImages';
 
 // Interface pour les données enrichies des prospects
 interface EnrichedProspectData {
@@ -656,17 +657,11 @@ function buildDefaultHTML(content: any, layout: any): string {
   // Générer un titre de secteur capitalisé
   const sectorTitle = content.sector ? content.sector.charAt(0).toUpperCase() + content.sector.slice(1) : 'Professionnel';
   
-  // Images variées selon le hash
-  const defaultImages = [
-    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
-    'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=1200&q=80',
-    'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1200&q=80',
-    'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=1200&q=80',
-    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&q=80',
-    'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&q=80'
-  ];
-  
-  const shuffledImages = shuffleArray(defaultImages, layout.companyHash || 12345);
+  // ── IMAGES SECTORIELLES PEXELS UNIQUEMENT ──
+  // On utilise les images Pexels professionnelles spécifiques au secteur
+  // pour éviter les images génériques de bureau ou incorrectes
+  const sectorImages = getSectorImages(content.sector);
+  const shuffledImages = shuffleArray(sectorImages, layout.companyHash || 12345);
   const selectedImages = shuffledImages.slice(0, 4);
   
   // Palette de couleurs dynamique si non fournie

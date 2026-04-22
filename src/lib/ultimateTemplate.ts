@@ -464,39 +464,11 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   ];
   const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
 
-  // ── COLLECTE IMAGES RÉELLES (champs existants dans Lead) ──
-  // Domaines connus pour bloquer l'intégration externe (CORS/Hotlinking)
-  const BLOCKED_DOMAINS = [
-    'pagesjaunes.fr', 
-    'justacote.com', 
-    'justacote.fr', 
-    'lafourchette.com', 
-    'tripadvisor.', 
-    'yelp.com',
-    'facebook.com',
-    'fbcdn.net',
-    'instagram.com'
-  ];
-
-  const realImagesRaw = [
-    ...(lead.images || []),
-    ...(lead.websiteImages || [])
-  ].filter(img => {
-    if (!img || typeof img !== 'string') return false;
-    if (!img.startsWith('https://')) return false;
-
-    const lowerImg = img.toLowerCase();
-
-    // NOUVEAU : On bloque les mots-clés liés aux images d'erreur ou de protection
-    const hardSkip = ['favicon', 'sprite', 'pixel', 'tracking', 'beacon', '.gif', '1x1', '.svg', 'hotlink', 'placeholder', 'error', 'blank', 'default'];
-    if (hardSkip.some(s => lowerImg.includes(s))) return false;
-    
-    if (BLOCKED_DOMAINS.some(d => lowerImg.includes(d))) return false;
-    
-    return true;
-  });
-
-  const realImages = [...new Set(realImagesRaw)];
+  // ── IMAGES SECTORIELLES PEXELS UNIQUEMENT ──
+  // On utilise UNIQUEMENT les images Pexels professionnelles et fiables
+  // pour éviter les images incohérentes (fruits, photos personnelles, etc.)
+  // venant de lead.images ou lead.websiteImages qui peuvent contenir n'importe quoi.
+  // Chaque secteur a ses propres images d'artisans "en action".
 
   // 1. Récupérer les images sectorielles spécifiques (plombier = tuyaux, coiffeur = ciseaux...)
   const fallbacks = getSectorImagesFallback(lead.sector);
