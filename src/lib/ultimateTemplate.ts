@@ -693,43 +693,14 @@ function getHeroBadge(sector: string): { icon: string; text: string } {
 }
 
 export function generateUltimateSite(lead: any, aiContent?: any): string {
-  // SYSTÈME INTELLIGENT AVEC IA - GÉNÉRATION AUTOMATIQUE
+  // UTILISER DIRECTEMENT L'ANCIEN SYSTÈME FONCTIONNEL (le système intelligent cause des pages blanches)
   const sector = (lead.sector || '').toLowerCase();
   
-  try {
-    // Utiliser le système intelligent avec IA
-    const { intelligentLayoutGenerator } = require('./intelligentLayoutGenerator');
-    
-    // Préparer les données enrichies complètes
-    const enrichedData = {
-      sector: sector,
-      companyName: lead.name || 'Entreprise',
-      city: lead.city || '',
-      description: aiContent?.aboutText || lead.description,
-      services: aiContent?.services || [],
-      specialties: aiContent?.specialties || [],
-      certifications: aiContent?.certifications || [],
-      experience: aiContent?.experience || '',
-      portfolio: aiContent?.portfolio || lead.images || [],
-      pricing: aiContent?.pricing || '',
-      customFields: aiContent?.customFields || {},
-      businessSize: aiContent?.businessSize || 'small',
-      targetAudience: aiContent?.targetAudience || '',
-      uniqueFeatures: aiContent?.uniqueFeatures || [],
-      competitiveAdvantages: aiContent?.competitiveAdvantages || [],
-      businessModel: aiContent?.businessModel || ''
-    };
-    
-    // Générer le HTML intelligent avec IA
-    return intelligentLayoutGenerator.generateHTML(enrichedData);
-    
-  } catch (error) {
-    console.error('Erreur système intelligent IA, fallback vers système classique:', error);
-    
-    // Fallback vers le système sectoriel classique
-    const specificSectors = ['coiffeur', 'plomberie', 'restaurant', 'garage', 'electricien', 'fitness', 'medical', 'avocat', 'nettoyage', 'jardin'];
-    
-    if (specificSectors.includes(sector)) {
+  // Fallback vers le système sectoriel classique
+  const specificSectors = ['coiffeur', 'plomberie', 'restaurant', 'garage', 'electricien', 'fitness', 'medical', 'avocat', 'nettoyage', 'jardin'];
+  
+  if (specificSectors.includes(sector)) {
+    try {
       const { generateSectorSpecificHTML } = require('./sectorTemplates');
       
       const enrichedData = aiContent ? {
@@ -744,6 +715,8 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
       } : undefined;
       
       return generateSectorSpecificHTML(sector, lead, enrichedData);
+    } catch (error) {
+      console.error('Erreur système sectoriel, fallback vers système classique:', error);
     }
   }
   
