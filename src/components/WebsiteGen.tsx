@@ -1,10 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, safeStr, proxyImg } from '../lib/supabase-store';
-import { generateUltimateSite } from '../lib/ultimateTemplate';
+import { generateUltimateSite, generateUltimateSiteAsync } from '../lib/ultimateTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
-import { fetchSectorImages } from '../lib/imageAgent';
 import { supabase } from '../lib/supabase';
-import { getSectorImages } from '../lib/pexelsImages';
 
 const getCssVar = (name: string, fallback: string) => {
   const val = getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim();
@@ -140,26 +138,17 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
     const rating = lead.googleRating;
     const reviews = lead.googleReviews;
 
-    // ── SYSTÈME D'IMAGES HYBRIDE: RÉELLES + PEXELS ──
-    // Priorité 1: Images réelles du lead (Google Maps, site web) - filtrées
-    // Priorité 2: Images Pexels sectorielles professionnelles (fallback)
+    // ── IMAGES RÉELLES DU LEAD UNIQUEMENT (pour prompt IA) ──
+    // Les images Pexels sont gérées dynamiquement par generateUltimateSiteAsync
     const BLOCKED_KEYWORDS = ['food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking'];
-    const rawLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])]
+    const allImgs = [...(lead.images || []), ...(lead.websiteImages || [])]
       .filter(img => {
         if (!img || typeof img !== 'string') return false;
         if (!img.startsWith('https://')) return false;
         const low = img.toLowerCase();
         if (BLOCKED_KEYWORDS.some(kw => low.includes(kw))) return false;
         return true;
-      });
-    
-    // Compléter avec les images Pexels sectorielles
-    const sectorImages = getSectorImages(lead.sector);
-    const combinedImages = [...rawLeadImages];
-    while (combinedImages.length < 6) {
-      combinedImages.push(sectorImages[combinedImages.length % sectorImages.length]);
-    }
-    const allImgs = combinedImages.slice(0, 6);
+      }).slice(0, 6);
 
     const revTexts = (lead.googleReviewsData || []).filter(r => r && safeStr(r.text).length > 5).slice(0, 4)
       .map(r => `"${safeStr(r.text)}" — ${safeStr(r.author)} (${r.rating}★)`).join('\n');
@@ -465,34 +454,14 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const content = await generateContent(lead);
       console.log(`✅ Content generated for ${lead.name}`);
       
-      updateProgress({ step: '🖼️ Recherche d\'images professionnelles...' });
+      updateProgress({ step: '🖼️ API Pexels + Storage...' });
       
-      // ── SYSTÈME D'IMAGES HYBRIDE: RÉELLES + PEXELS ──
-      const BLOCKED_KEYWORDS = ['food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking'];
-      const rawLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])]
-        .filter(img => {
-          if (!img || typeof img !== 'string') return false;
-          if (!img.startsWith('https://')) return false;
-          const low = img.toLowerCase();
-          if (BLOCKED_KEYWORDS.some(kw => low.includes(kw))) return false;
-          return true;
-        });
+      // Les images sont maintenant gérées par generateUltimateSiteAsync
+      // PRIORITÉ 1: Images réelles du lead
+      // PRIORITÉ 2: API Pexels dynamique → Supabase Storage
       
-      const sectorImages = getSectorImages(lead.sector);
-      const selectedImages = [...rawLeadImages];
-      while (selectedImages.length < 12) {
-        selectedImages.push(sectorImages[selectedImages.length % sectorImages.length]);
-      }
-      const finalImages = selectedImages.slice(0, 12);
-      
-      console.log(`🖼️ ${lead.name}: ${rawLeadImages.length} images réelles + ${12 - rawLeadImages.length} images Pexels`);
-      lead = {
-        ...lead,
-        images: finalImages
-      };
-
       updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
-      const html = generateUltimateSite(lead, content);
+      const html = await generateUltimateSiteAsync(lead, content);
       console.log(`✅ HTML generated for ${lead.name}`);
       
       updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
@@ -540,7 +509,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       
       try {
         console.log(`🔄 Using fallback template for ${lead.name}`);
-        const emergencyHtml = generateUltimateSite(lead);
+        const emergencyHtml = await generateUltimateSiteAsync(lead);
         updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
         
         const fileName = `${lead.id}.html`;
@@ -572,7 +541,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     }
     
     // Retour par défaut en cas d'erreur
-    return generateUltimateSite(lead);
+    return await generateUltimateSiteAsync(lead);
   };
 
   // ── EMERGENCY TEMPLATE (100% FOOLPROOF) ──
@@ -823,7 +792,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       }
 
       // Re-générer instantanément le HTML localement. Le Design n'est jamais cassé !
-      const newHtml = generateUltimateSite(previewLead, newContent);
+      const newHtml = await generateUltimateSiteAsync(previewLead, newContent);
       await updateLead(previewLead.id, { siteHtml: newHtml });
       
       setChatMessages(prev => [...prev, { role: 'assistant', text: "✅ J'ai méticuleusement appliqué tes modifications: \"" + msg + "\". Mon design Premium est préservé ! ❤️" }]);
@@ -872,7 +841,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     
     try {
       const content = await generateContent(previewLead);
-      const html = generateUltimateSite(previewLead, content);
+      const html = await generateUltimateSiteAsync(previewLead, content);
       
       const fileName = `${previewLead.id}.html`;
       await supabase.storage.from('websites').upload(fileName, html, { contentType: 'text/html', cacheControl: '3600', upsert: true });

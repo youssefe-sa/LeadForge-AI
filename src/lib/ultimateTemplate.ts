@@ -2,6 +2,7 @@
 // Résultat professionnel de pointe. Glassmorphism clair, complet, avec chatbot et WhatsApp.
 
 import { getSectorImages, SECTOR_PEXELS_IMAGES } from './pexelsImages';
+import { getImagesForLead } from './pexelsApi';
 
 export interface UltimateContent {
   companyName: string;
@@ -542,6 +543,135 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   };
 
   // Layout variant basé sur le hash du nom (0-3) pour varier la structure du site
+  const layoutVariant = nameHash % 4;
+  
+  return buildUltimateHTML(content, template, combinedImages, layoutVariant);
+}
+
+/**
+ * Version ASYNC avec API Pexels dynamique + Supabase Storage
+ * PRIORITÉ 1: Images réelles du lead
+ * PRIORITÉ 2: Images API Pexels téléchargées dans Supabase Storage
+ */
+export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Promise<string> {
+  // Système unique avec variantes dynamiques pour TOUS les secteurs
+  const sector = (lead.sector || '').toLowerCase();
+  const template = getUltimateTemplate(lead.sector);
+  const companyName = lead.name || 'Entreprise Premium';
+  const city = lead.city || '';
+  const phone = lead.phone || '+33 6 12 34 56 78';
+  const email = lead.email || 'contact@entreprise.fr';
+  const address = lead.address || (city ? `Centre Ville, ${city}` : 'France');
+  const website = lead.website || '';
+  const rating = lead.googleRating || 5;
+  const reviews = lead.googleReviews || 42;
+  
+  const description = aiContent?.aboutText || lead.description || template.aboutText;
+  const heroTitle = aiContent?.heroTitle || template.heroTitle;
+  const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle}${city ? ' à ' + city : ''}`;
+  
+  // Hash du nom pour variété
+  let nameHash = 0;
+  for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
+  
+  // Slogan variant
+  const baseSlogan = aiContent?.slogan || "L'excellence à votre service";
+  const sloganVariations = [
+    baseSlogan,
+    "L'art de la perfection au quotidien",
+    "Solutions premium sur-mesure",
+    "Excellence & Passion",
+    "Votre partenaire de confiance"
+  ];
+  const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
+
+  // ── NOUVEAU SYSTÈME: API PEXELS + SUPABASE STORAGE ──
+  // Récupérer les images (réelles + API Pexels stockées)
+  let combinedImages: string[] = [];
+  try {
+    combinedImages = await getImagesForLead(lead, 6);
+    console.log(`✅ Images API Pexels chargées pour ${lead.name}: ${combinedImages.length} images`);
+  } catch (error) {
+    console.error('❌ Erreur chargement images API Pexels:', error);
+    // Fallback sur les images statiques
+    combinedImages = getSectorImagesFallback(lead.sector);
+  }
+  
+  // Hash robuste pour distribution unique
+  let imageHash = 0;
+  for (let i = 0; i < companyName.length; i++) {
+    imageHash = ((imageHash << 5) - imageHash) + companyName.charCodeAt(i);
+    imageHash |= 0;
+  }
+  imageHash = Math.abs(imageHash);
+  
+  const startIndex = imageHash % combinedImages.length;
+  const heroImage = combinedImages[startIndex];
+  
+  const allImages = [];
+  for (let i = 1; i <= 5; i++) {
+    const imageIndex = (startIndex + i) % combinedImages.length;
+    allImages.push(combinedImages[imageIndex]);
+  }
+
+  // Services avec fallback
+  let finalServices = template.services;
+  if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
+    finalServices = aiContent.services.map((s: any, idx: number) => ({
+      name: s.name || `Service ${idx+1}`,
+      description: s.description || '',
+      features: template.services[idx % template.services.length].features
+    }));
+  }
+
+  // Avis
+  let testimonials = (lead.googleReviewsData || []).map((review: any) => ({
+    author: review.author || 'Client VIP',
+    text: review.text || "Une prestation exceptionnelle.",
+    rating: review.rating || 5,
+    date: review.date || 'Récemment'
+  }));
+
+  const fallbackReviews = [
+    { author: 'Emma L.', text: "Une expérience tout simplement majestueuse...", rating: 5, date: 'Il y a 1 semaine' },
+    { author: 'Arthur D.', text: "Service d'excellence du début à la fin...", rating: 5, date: 'Il y a 2 semaines' },
+    { author: 'Sophie M.', text: "Je recommande vivement cette entreprise...", rating: 5, date: 'Il y a 3 semaines' },
+    { author: 'Lucas P.', text: "Professionnalisme et expertise remarquables...", rating: 5, date: 'Il y a 1 mois' },
+    { author: 'Marie B.', text: "Un service client irréprochable...", rating: 5, date: 'Il y a 1 mois' },
+    { author: 'Thomas R.', text: "Excellence et qualité au rendez-vous...", rating: 5, date: 'Il y a 2 mois' }
+  ];
+
+  while (testimonials.length < 6) {
+    testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
+  }
+  testimonials = testimonials.slice(0, 6);
+
+  // CTA
+  let ctaText = aiContent?.cta || template.ctaText || "Demander un devis";
+  if (ctaText.length > 22) ctaText = "Demander un devis";
+
+  const content: UltimateContent = {
+    companyName, 
+    sector: lead.sector || 'Professionnel', 
+    city, 
+    description, 
+    phone, 
+    email, 
+    address, 
+    website, 
+    rating, 
+    reviews,
+    services: finalServices, 
+    testimonials, 
+    heroTitle, 
+    heroSubtitle, 
+    aboutText: description, 
+    ctaText, 
+    slogan: finalSlogan, 
+    heroImage, 
+    allImages
+  };
+
   const layoutVariant = nameHash % 4;
   
   return buildUltimateHTML(content, template, combinedImages, layoutVariant);
