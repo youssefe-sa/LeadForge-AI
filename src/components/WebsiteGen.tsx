@@ -192,7 +192,10 @@ INFOS CLIENT:
 - Rating: ${rating > 0 ? rating + '/5 (' + reviews + ' avis)' : 'Non noté'}
 ${revTexts ? '\nAVIS CLIENTS:\n' + revTexts : ''}
 
-IMAGES: ${allImgs.slice(0, 6).map((u, i) => `${i + 1}. ${u}`).join('\n')}
+IMAGES OBLIGATOIRES (UTILISER EXACTEMENT CES URLS, AUCUNE AUTRE IMAGE AUTORISÉE):
+${allImgs.slice(0, 6).map((u, i) => `${i + 1}. ${u}`).join('\n')}
+
+⚠️ RÈGLE ABSOLUE : Tu dois utiliser UNIQUEMENT les 6 images ci-dessus. Tu ne dois PAS chercher d'autres images sur internet ou utiliser des images de substitution comme des fruits, des légumes, ou des photos sans rapport avec le métier. Si le secteur est "plombier", utilise uniquement des images de plomberie.
 
 SECTIONS OBLIGATOIRES:
 1. Hero avec titre, sous-titre, boutons CTA
