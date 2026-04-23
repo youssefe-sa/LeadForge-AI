@@ -464,34 +464,60 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   ];
   const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
 
-  // ── IMAGES SECTORIELLES PEXELS UNIQUEMENT ──
-  // On utilise UNIQUEMENT les images Pexels professionnelles et fiables
-  // pour éviter les images incohérentes (fruits, photos personnelles, etc.)
-  // venant de lead.images ou lead.websiteImages qui peuvent contenir n'importe quoi.
-  // Chaque secteur a ses propres images d'artisans "en action".
-
-  // 1. Récupérer les images sectorielles spécifiques (plombier = tuyaux, coiffeur = ciseaux...)
-  const fallbacks = getSectorImagesFallback(lead.sector);
-
-  // 2. Hash robuste basé sur le nom d'entreprise pour garantir l'unicité des images
+  // ── SYSTÈME D'IMAGES HYBRIDE: RÉELLES + PEXELS ──
+  // Priorité 1: Images réelles du lead (Google Maps, site web) - filtrées
+  // Priorité 2: Images Pexels sectorielles professionnelles (fallback)
+  
+  // 1. Récupérer et filtrer les images réelles du lead
+  const BLOCKED_KEYWORDS = ['food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking', 'recipe', 'meal', 'dessert', 'cake', 'pizza', 'burger', 'restaurant-menu'];
+  const BLOCKED_DOMAINS = ['tripadvisor.com', 'yelp.com', 'facebook.com', 'instagram.com', 'pagesjaunes.fr'];
+  
+  const rawLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])]
+    .filter(img => {
+      if (!img || typeof img !== 'string') return false;
+      if (!img.startsWith('https://')) return false;
+      const low = img.toLowerCase();
+      // Bloquer les images de nourriture
+      if (BLOCKED_KEYWORDS.some(kw => low.includes(kw))) return false;
+      // Bloquer les domaines suspects
+      if (BLOCKED_DOMAINS.some(d => low.includes(d))) return false;
+      // Bloquer les favicons et images techniques
+      if (low.includes('favicon') || low.includes('sprite') || low.includes('pixel')) return false;
+      return true;
+    });
+  
+  // 2. Récupérer les images sectorielles Pexels (fallback garanti)
+  const sectorImages = getSectorImagesFallback(lead.sector);
+  
+  // 3. Combiner: images réelles en priorité, compléter avec Pexels
+  const combinedImages = [...rawLeadImages];
+  while (combinedImages.length < 6) {
+    const sectorIndex = combinedImages.length % sectorImages.length;
+    combinedImages.push(sectorImages[sectorIndex]);
+  }
+  
+  // 4. Hash robuste basé sur le nom pour distribution unique
   let imageHash = 0;
   for (let i = 0; i < companyName.length; i++) {
     imageHash = ((imageHash << 5) - imageHash) + companyName.charCodeAt(i);
-    imageHash |= 0; // Convertir en entier 32-bit
+    imageHash |= 0;
   }
   imageHash = Math.abs(imageHash);
   
-  const startIndex = imageHash % fallbacks.length;
+  const startIndex = imageHash % combinedImages.length;
   
-  // 3. Hero image = image unique selon le hash du nom (PAS toujours la première !)
-  const heroImage = fallbacks[startIndex];
+  // 5. Hero image = première image disponible (réelle si possible)
+  const heroImage = combinedImages[startIndex];
   
-  // 4. Distribution ROTATIVE des images - 5 images différentes du hero
+  // 6. Sélectionner 5 images différentes pour les autres sections
   const allImages = [];
   for (let i = 1; i <= 5; i++) {
-    const imageIndex = (startIndex + i) % fallbacks.length;
-    allImages.push(fallbacks[imageIndex]);
+    const imageIndex = (startIndex + i) % combinedImages.length;
+    allImages.push(combinedImages[imageIndex]);
   }
+  
+  // 7. Log pour debugging
+  console.log(`🖼️ ${lead.name}: ${rawLeadImages.length} images réelles + ${6 - rawLeadImages.length} images Pexels`);
 
   const content: UltimateContent = {
     companyName, 
@@ -518,10 +544,10 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   // Layout variant basé sur le hash du nom (0-3) pour varier la structure du site
   const layoutVariant = nameHash % 4;
   
-  return buildUltimateHTML(content, template, fallbacks, layoutVariant);
+  return buildUltimateHTML(content, template, combinedImages, layoutVariant);
 }
 
-function buildUltimateHTML(content: UltimateContent, template: any, sectorFallbacks: string[] = [], layoutVariant: number = 0): string {
+function buildUltimateHTML(content: UltimateContent, template: any, combinedImages: string[] = [], layoutVariant: number = 0): string {
   const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   
   // Simplification du fallback d'images - pas de JS inline qui bloque
@@ -570,7 +596,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
   // Chaque section a sa propre image, pas de rotation aveugle.
   // Si une image réelle existe pour ce slot → on l'utilise.
   // Sinon → fallback sectoriel neutre garanti.
-  const emergencyFallback = sectorFallbacks[0] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80';
+  const emergencyFallback = combinedImages[0] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80';
   
   // Hash du nom pour distribution UNIQUE des images par entreprise
   let companyHash = 0;
@@ -583,12 +609,12 @@ function buildUltimateHTML(content: UltimateContent, template: any, sectorFallba
   const getImg = (slot: number): string => {
     // Calculer un index UNIQUE basé sur le hash du nom + le slot
     // Ainsi "A.Leont" slot 1 ≠ "Sooo" slot 1 — images différentes garanties !
-    const uniqueIndex = (companyHash + slot) % (sectorFallbacks.length || 1);
+    const uniqueIndex = (companyHash + slot) % (combinedImages.length || 1);
     
-    // PRIORITÉ : image sectorielle unique selon le hash
-    if (sectorFallbacks && sectorFallbacks.length > 0 && sectorFallbacks[uniqueIndex]) {
-      const sectorImg = sectorFallbacks[uniqueIndex];
-      if (sectorImg && sectorImg.startsWith('https://')) return sectorImg;
+    // PRIORITÉ : image du pool combiné (réelles + Pexels) selon le hash
+    if (combinedImages && combinedImages.length > 0 && combinedImages[uniqueIndex]) {
+      const selectedImg = combinedImages[uniqueIndex];
+      if (selectedImg && selectedImg.startsWith('https://')) return selectedImg;
     }
     
     // Fallback : rotation classique sur allImages

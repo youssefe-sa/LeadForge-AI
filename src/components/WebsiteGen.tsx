@@ -140,13 +140,26 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
     const rating = lead.googleRating;
     const reviews = lead.googleReviews;
 
-    // ── IMAGES SECTORIELLES PEXELS UNIQUEMENT ──
-    // On utilise UNIQUEMENT les images Pexels professionnelles et fiables
-    // pour éviter les images incohérentes (fruits, photos personnelles, etc.)
+    // ── SYSTÈME D'IMAGES HYBRIDE: RÉELLES + PEXELS ──
+    // Priorité 1: Images réelles du lead (Google Maps, site web) - filtrées
+    // Priorité 2: Images Pexels sectorielles professionnelles (fallback)
+    const BLOCKED_KEYWORDS = ['food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking'];
+    const rawLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])]
+      .filter(img => {
+        if (!img || typeof img !== 'string') return false;
+        if (!img.startsWith('https://')) return false;
+        const low = img.toLowerCase();
+        if (BLOCKED_KEYWORDS.some(kw => low.includes(kw))) return false;
+        return true;
+      });
+    
+    // Compléter avec les images Pexels sectorielles
     const sectorImages = getSectorImages(lead.sector);
-    // Mélanger les images pour avoir de la variété
-    const shuffled = [...sectorImages].sort(() => Math.random() - 0.5);
-    const allImgs = shuffled.slice(0, 6);
+    const combinedImages = [...rawLeadImages];
+    while (combinedImages.length < 6) {
+      combinedImages.push(sectorImages[combinedImages.length % sectorImages.length]);
+    }
+    const allImgs = combinedImages.slice(0, 6);
 
     const revTexts = (lead.googleReviewsData || []).filter(r => r && safeStr(r.text).length > 5).slice(0, 4)
       .map(r => `"${safeStr(r.text)}" — ${safeStr(r.author)} (${r.rating}★)`).join('\n');
@@ -454,15 +467,28 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       
       updateProgress({ step: '🖼️ Recherche d\'images professionnelles...' });
       
-      // ── IMAGES SECTORIELLES PEXELS UNIQUEMENT ──
-      // On utilise UNIQUEMENT les images Pexels professionnelles et fiables
-      // pour éviter les images incohérentes (fruits, photos personnelles, etc.)
-      const selectedImages = getSectorImages(lead.sector).slice(0, 12);
+      // ── SYSTÈME D'IMAGES HYBRIDE: RÉELLES + PEXELS ──
+      const BLOCKED_KEYWORDS = ['food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking'];
+      const rawLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])]
+        .filter(img => {
+          if (!img || typeof img !== 'string') return false;
+          if (!img.startsWith('https://')) return false;
+          const low = img.toLowerCase();
+          if (BLOCKED_KEYWORDS.some(kw => low.includes(kw))) return false;
+          return true;
+        });
       
-      console.log(`🖼️ ${selectedImages.length} images Pexels sectorielles utilisées pour ${lead.name}`);
+      const sectorImages = getSectorImages(lead.sector);
+      const selectedImages = [...rawLeadImages];
+      while (selectedImages.length < 12) {
+        selectedImages.push(sectorImages[selectedImages.length % sectorImages.length]);
+      }
+      const finalImages = selectedImages.slice(0, 12);
+      
+      console.log(`🖼️ ${lead.name}: ${rawLeadImages.length} images réelles + ${12 - rawLeadImages.length} images Pexels`);
       lead = {
         ...lead,
-        images: selectedImages
+        images: finalImages
       };
 
       updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
