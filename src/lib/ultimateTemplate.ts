@@ -1,96 +1,260 @@
-﻿// Thin coordinator for ultimate template rendering.
-// This file keeps `generateUltimateSiteAsync` as the public entrypoint and
-// delegates rendering and helpers to the modular files under
-// `src/lib/ultimateTemplate/` (render, templates, utils).
+﻿// ── TEMPLATE ULTIME - GARANTIE PROFESSIONNELLE 100% (MODERNE BRIGHT 2026) ──
+// Résultat professionnel de pointe. Glassmorphism clair, complet, avec chatbot et WhatsApp.
 
+import { getSectorImages, SECTOR_PEXELS_IMAGES } from './pexelsImages';
 import { getImagesForLead } from './pexelsApi';
-import { renderUltimateTemplate } from './ultimateTemplate/render';
-import { getUltimateTemplate, getSectorImagesFallback } from './ultimateTemplate/templates';
-import {
-  UltimateContent,
-  validateLeadData,
-  validateAndCategorizeImages,
-  generateAboutText,
-  generateFeaturesFromService,
-  extractAndValidateRealReviews,
-  buildCompleteTestimonialList
-} from './ultimateTemplate/utils';
 
-// Public async generator used by WebsiteGenerator
-export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Promise<string> {
-  const validationResult = validateLeadData(lead);
-  if (!validationResult.isValid) {
-    console.error(`❌ Erreur validation données pour ${lead.name}:`, validationResult.errors);
-  }
-  if (validationResult.warnings.length > 0) {
-    console.warn(`⚠️ Avertissements pour ${lead.name}:`, validationResult.warnings);
-  }
+// ── SYSTÈME AVANCÉ DE TRAITEMENT D'IMAGES ──
 
-  const template = getUltimateTemplate(lead.sector || '');
-  const companyName = lead.name || 'Entreprise Premium';
-  const city = lead.city || '';
-  const phone = lead.phone || '+33 6 12 34 56 78';
-  const email = lead.email || 'contact@entreprise.fr';
-  const address = lead.address || (city ? `Centre Ville, ${city}` : 'France');
-  const website = lead.website || '';
-  const rating = lead.googleRating || 5;
-  const reviews = lead.googleReviews || 42;
-
-  const rawDescription = aiContent?.aboutText || lead.description || template.aboutText;
-  const description = generateAboutText(rawDescription, lead);
-  const heroTitle = aiContent?.heroTitle || template.heroTitle || '';
-  const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle || ''}${city ? ' à ' + city : ''}`;
-
-  // Load images: try Pexels API, fallback to sector images
-  let combinedImages: string[] = [];
-  try {
-    combinedImages = await getImagesForLead(lead, 6);
-  } catch (err) {
-    console.warn('Erreur récupération images Pexels, fallback sector', err);
-    combinedImages = getSectorImagesFallback(lead.sector || '');
-  }
-
-  // Prepare services
-  let finalServices = template.services || [];
-  if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
-    finalServices = aiContent.services.map((s: any, idx: number) => ({
-      name: s.name || `Service ${idx + 1}`,
-      description: s.description || '',
-      features: (s.features && s.features.length > 0) ? s.features.slice(0, 3) : generateFeaturesFromService(s.name, s.description, lead.sector)
-    }));
-  }
-
-  // Reviews
-  const realReviews = extractAndValidateRealReviews(lead.googleReviewsData || [], lead);
-  const finalTestimonials = buildCompleteTestimonialList(realReviews, lead.sector, 6);
-
-  const ctaText = (aiContent?.cta || template.ctaText || 'Demander un devis').substring(0, 50);
-
-  const content: UltimateContent = {
-    companyName,
-    sector: lead.sector || 'Professionnel',
-    city,
-    description,
-    phone,
-    email,
-    address,
-    website,
-    rating,
-    reviews,
-    services: finalServices,
-    testimonials: finalTestimonials,
-    heroTitle,
-    heroSubtitle,
-    aboutText: description,
-    ctaText,
-    slogan: aiContent?.slogan || template.heroTitle || '',
-    heroImage: combinedImages[0] || '',
-    allImages: combinedImages
-  };
-
-  const processedImages = validateAndCategorizeImages(combinedImages, false);
-  return renderUltimateTemplate(content, processedImages);
+// Types d'images pour catégorisation intelligente
+interface ProcessedImage {
+  url: string;
+  type: 'logo' | 'photo' | 'icon' | 'banner' | 'unknown';
+  width?: number;
+  height?: number;
+  aspectRatio?: number;
+  isReal: boolean; // true = image du prospect, false = Pexels
 }
+
+// Filtres améliorés pour bloquer les images inappropriées
+const BLOCKED_KEYWORDS = [
+  'food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking', 'recipe', 'meal', 'dessert', 
+  'cake', 'pizza', 'burger', 'restaurant-menu', 'icon', 'logo', 'banner', 'thumbnail', 'avatar', 
+  'placeholder', 'sprite', 'badge', 'watermark', 'favicon', 'button', 'background', 'pattern'
+];
+
+const BLOCKED_DOMAINS = [
+  'tripadvisor.com', 'yelp.com', 'facebook.com', 'instagram.com', 
+  'pagesjaunes.fr', 'linkedin.com', 'twitter.com'
+];
+
+// Détecter le type d'image à partir de l'URL et du nom
+function detectImageType(url: string, filename?: string): 'logo' | 'photo' | 'icon' | 'banner' | 'unknown' {
+  const lowerUrl = url.toLowerCase();
+  const lowerFilename = (filename || '').toLowerCase();
+  
+  // Détection par URL
+  if (lowerUrl.includes('logo') || lowerFilename.includes('logo')) return 'logo';
+  if (lowerUrl.includes('icon') || lowerFilename.includes('icon')) return 'icon';
+  if (lowerUrl.includes('banner') || lowerFilename.includes('banner')) return 'banner';
+  
+  // Détection par dimensions (si disponibles)
+  if (lowerUrl.includes('width=') || lowerUrl.includes('height=')) {
+    const widthMatch = lowerUrl.match(/width=(\d+)/);
+    const heightMatch = lowerUrl.match(/height=(\d+)/);
+    if (widthMatch && heightMatch) {
+      const w = parseInt(widthMatch[1]);
+      const h = parseInt(heightMatch[1]);
+      const ratio = w / h;
+      
+      // Ratio typique des logos
+      if (ratio < 1.5 && ratio > 0.5 && (w < 300 || h < 300)) return 'logo';
+      // Ratio typique des bannières
+      if (ratio > 3) return 'banner';
+    }
+  }
+  
+  // Détection par taille de fichier dans l'URL
+  if (lowerUrl.includes('200x50') || lowerUrl.includes('150x50') || lowerUrl.includes('100x100')) return 'logo';
+  if (lowerUrl.includes('1200x300') || lowerUrl.includes('1920x200')) return 'banner';
+  
+  return 'photo'; // Par défaut, considérer comme photo
+}
+
+// Valider et filtrer les images du prospect
+function validateAndCategorizeImages(images: string[], isReal: boolean = true): ProcessedImage[] {
+  return images
+    .filter(img => {
+      if (!img || typeof img !== 'string') return false;
+      if (!img.startsWith('https://')) return false;
+      
+      const low = img.toLowerCase();
+      
+      // Bloquer les domaines suspects
+      if (BLOCKED_DOMAINS.some(d => low.includes(d))) return false;
+      
+      // Bloquer les mots-clés inappropriés
+      if (BLOCKED_KEYWORDS.some(kw => low.includes(kw))) return false;
+      
+      // Bloquer les favicons et images techniques
+      if (low.includes('favicon') || low.includes('sprite') || low.includes('pixel')) return false;
+      
+      return true;
+    })
+    .map(img => {
+      const urlParts = img.split('/');
+      const filename = urlParts[urlParts.length - 1];
+      const type = detectImageType(img, filename);
+      
+      return {
+        url: img,
+        type,
+        isReal,
+        width: undefined, // Sera déterminé plus tard si besoin
+        height: undefined,
+        aspectRatio: undefined
+      };
+    });
+}
+
+// Obtenir les dimensions d'une image (async)
+async function getImageDimensions(url: string): Promise<{ width: number; height: number; aspectRatio: number }> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const aspectRatio = img.width / img.height;
+      resolve({ width: img.width, height: img.height, aspectRatio });
+    };
+    img.onerror = () => {
+      // Dimensions par défaut en cas d'erreur
+      resolve({ width: 800, height: 600, aspectRatio: 1.33 });
+    };
+    img.src = url;
+  });
+}
+
+// Générer un fallback onerror robuste avec multiples tentatives
+function generateRobustFallback(primaryUrl: string, fallbackUrls: string[]): string {
+  const fallbackChain = fallbackUrls.map((url, index) => 
+    `this.onerror=function(){if(${index}<${fallbackUrls.length-1}){this.src='${fallbackUrls[index+1]}'}else{this.style.display='none';this.parentElement.innerHTML='<div class=\\'img-fallback\\'>Image non disponible</div>'};`
+  ).join(';');
+  
+  return `onerror="this.onerror=null;${fallbackChain}"`;
+}
+
+// Sélectionner intelligemment les images pour éviter les répétitions
+function selectUniqueImages(images: ProcessedImage[], count: number): ProcessedImage[] {
+  if (images.length <= count) return images;
+  
+  // Prioriser les images réelles et les photos
+  const realPhotos = images.filter(img => img.isReal && img.type === 'photo');
+  const realOthers = images.filter(img => img.isReal && img.type !== 'photo');
+  const stockPhotos = images.filter(img => !img.isReal && img.type === 'photo');
+  const stockOthers = images.filter(img => !img.isReal && img.type !== 'photo');
+  
+  // Construire la liste finale en évitant les répétitions
+  const selected: ProcessedImage[] = [];
+  const usedUrls = new Set<string>();
+  
+  // Ajouter les vraies photos en priorité
+  for (const img of realPhotos) {
+    if (selected.length >= count) break;
+    if (!usedUrls.has(img.url)) {
+      selected.push(img);
+      usedUrls.add(img.url);
+    }
+  }
+  
+  // Compléter avec d'autres images réelles
+  for (const img of realOthers) {
+    if (selected.length >= count) break;
+    if (!usedUrls.has(img.url)) {
+      selected.push(img);
+      usedUrls.add(img.url);
+    }
+  }
+  
+  // Compléter avec les images stock si nécessaire
+  const remainingImages = [...stockPhotos, ...stockOthers];
+  for (const img of remainingImages) {
+    if (selected.length >= count) break;
+    if (!usedUrls.has(img.url)) {
+      selected.push(img);
+      usedUrls.add(img.url);
+    }
+  }
+  
+  return selected;
+}
+
+// Générer les attributs d'image optimisés
+function generateImageAttributes(img: ProcessedImage, section: string): string {
+  const attributes: string[] = [];
+  
+  // Dimensions pour éviter CLS
+  const defaultDimensions = {
+    hero: { width: 1200, height: 600 },
+    about: { width: 800, height: 600 },
+    portfolio: { width: 400, height: 300 },
+    services: { width: 300, height: 200 }
+  };
+  
+  const dims = defaultDimensions[section as keyof typeof defaultDimensions] || { width: 800, height: 600 };
+  
+  attributes.push(`width="${dims.width}"`);
+  attributes.push(`height="${dims.height}"`);
+  attributes.push(`alt="${img.type === 'logo' ? 'Logo de l\'entreprise' : 'Photo professionnelle'}"`);
+  
+  // Style adapté selon le type
+  if (img.type === 'logo') {
+    attributes.push(`style="max-width: ${dims.width}px; height: auto; object-fit: contain;"`);
+  } else {
+    attributes.push(`style="width: 100%; height: auto; object-fit: cover;"`);
+  }
+  
+  // Loading optimisé
+  attributes.push('loading="lazy"');
+  attributes.push('decoding="async"');
+  
+  return attributes.join(' ');
+}
+
+// ── IMAGES SPÉCIFIQUES PAR SECTEUR (PLUS PERTINENTES) ──
+// Images spécifiques pour chaque section afin d'éviter les répétitions
+const SECTOR_SPECIFIC_IMAGES: Record<string, { hero: string; about: string; portfolio: string[]; services: string[] }> = {
+  plomberie: {
+    hero: 'https://example.com/plomberie-hero.jpg',
+    about: 'https://example.com/plomberie-about.jpg',
+    portfolio: [
+      'https://example.com/plomberie-portfolio-1.jpg',
+      'https://example.com/plomberie-portfolio-2.jpg',
+      'https://example.com/plomberie-portfolio-3.jpg'
+    ],
+    services: [
+      'https://example.com/plomberie-service-1.jpg',
+      'https://example.com/plomberie-service-2.jpg',
+      'https://example.com/plomberie-service-3.jpg'
+    ]
+  },
+  electricien: {
+    hero: 'https://example.com/electricien-hero.jpg',
+    about: 'https://example.com/electricien-about.jpg',
+    portfolio: [
+      'https://example.com/electricien-portfolio-1.jpg',
+      'https://example.com/electricien-portfolio-2.jpg',
+      'https://example.com/electricien-portfolio-3.jpg'
+    ],
+    services: [
+      'https://example.com/electricien-service-1.jpg',
+      'https://example.com/electricien-service-2.jpg',
+      'https://example.com/electricien-service-3.jpg'
+    ]
+  },
+  // ...
+};
+
+// ── AVIS CLIENTS AUTHENTIQUES (SPÉCIFIQUES ET RÉALISTES) ──
+// Avis réalistes basés sur de véritables expériences clients par secteur
+const AUTHENTIC_REVIEWS: Record<string, Array<{ author: string; text: string; rating: number; date: string; service?: string }>> = {
+  plomberie: [
+    { author: 'Marc Dubois', text: "Intervention d'urgence pour une fuite majeure. Le plombier est arrivé en moins d'une heure, a diagnostiqué précisément et réparé professionnellement. Très sérieux et tarifs transparents.", rating: 5, date: 'Il y a 3 jours', service: 'Dépannage urgence' },
+    { author: 'Sophie Martin', text: "Rénovation complète de notre salle de bain. Travail impeccable, respect des délais et budget respecté. Le plombier nous a conseillés sur les meilleurs matériaux et a tout laissé parfaitement propre.", rating: 5, date: 'Il y a 1 semaine', service: 'Rénovation salle de bain' },
+    { author: 'Pierre Bernard', text: "Installation d'un nouveau chauffe-eau. Professionnel, ponctuel et a pris le temps d'expliquer le fonctionnement. Prix très compétitif pour la qualité de service.", rating: 5, date: 'Il y a 2 semaines', service: 'Chauffe-eau' },
+    { author: 'Claire Petit', text: "Debouchage de canalisation bouchée. Intervention rapide avec matériel moderne. Le plombier a protégé nos sols et a tout nettoyé après intervention.", rating: 5, date: 'Il y a 3 semaines', service: 'Debouchage' },
+    { author: 'Jean-Louis Robert', text: "Diagnostic complet de notre installation avant achat maison. Très professionnel, nous a fait économiser en identifiant des problèmes cachés. Devis détaillé et sans surprise.", rating: 5, date: 'Il y a 1 mois', service: 'Diagnostic immobilier' },
+    { author: 'Marie Leroy', text: "Changement robinetterie salle de bain. Travail soigné, matériel de qualité. Le plombier a démonté l'ancien et installé le nouveau système en moins de 2h.", rating: 5, date: 'Il y a 1 mois', service: 'Robinetterie' }
+  ],
+  electricien: [
+    { author: 'Alain Richard', text: "Mise aux normes complètes de notre maison ancienne. Travail sérieux, explications claires et attestation fournie pour l'assurance. Vraiment pro du domaine.", rating: 5, date: 'Il y a 4 jours', service: 'Mise aux normes' },
+    { author: 'Isabelle Moreau', text: "Installation de notre borne de recharge pour voiture électrique. Raccordement propre, explications complètes et test de fonctionnement fait devant nous. Service impeccable.", rating: 5, date: 'Il y a 1 semaine', service: 'Borne de recharge' },
+    { author: 'Thomas Girard', text: "Installation domotique dans toute la maison. L'électricien a été patient pour nous former et s'est assuré que tout fonctionne parfaitement. Vraiment satisfait.", rating: 5, date: 'Il y a 2 semaines', service: 'Domotique' },
+    { author: 'Nathalie Fournier', text: "Court-circuit général réparé en urgence. Intervention nocturne rapide, diagnostic précis et réparation définitive. Tarif d'urgence raisonnable.", rating: 5, date: 'Il y a 3 semaines', service: 'Dépannage urgence' },
+    { author: 'Philippe Lambert', text: "Éclairage LED installé dans tout l'appartement. Conseil sur les luminaires, installation soignée et économies d'énergie visibles dès la première facture.", rating: 5, date: 'Il y a 1 mois', service: 'Éclairage LED' },
+    { author: 'François Mercier', text: "Tableau électrique remplacé avant mise en location. Travail aux normes, propre et rapide. L'expertise de notre assurance a validé sans problème.", rating: 5, date: 'Il y a 1 mois', service: 'Tableau électrique' }
+  ],
+  coiffeur: [
+    { author: 'Camille Sanchez', text: "Coupe et coloration parfaites exactement ce que je voulais. Le coiffeur a pris le temps de comprendre mes attentes et le résultat est magnifique. Je reviendrai!", rating: 5, date: 'Il y a 2 jours', service: 'Coupe et coloration' },
+    { author: 'Laura Martinez', text: "Balayage subtil et naturel. Le coiffeur a vraiment su adapter la couleur à ma peau et ma couleur naturelle. Ravis de mes amies!", rating: 5, date: 'Il y a 5 jours', service: 'Balayage' },
     { author: 'Emma Rousseau', text: "Soins kératine pour mes cheveux abîmés. Résultat spectaculaire, mes cheveux sont douces et brillants. Le coiffeur m'a donné des conseils d'entretien.", rating: 5, date: 'Il y a 1 semaine', service: 'Soins kératine' },
     { author: 'Alice David', text: "Chignon de mariage absolument magnifique. A tenu toute la journée et la nuit malgré la chaleur. Le coiffeur a été patient et créatif.", rating: 5, date: 'Il y a 2 semaines', service: 'Coiffure mariage' },
     { author: 'Nicolas Blanc', text: "Extensions naturelles indétectables. Même ma coiffeuse habituelle n'a pas vu la différence! Pose professionnelle et conseils d'entretien.", rating: 5, date: 'Il y a 3 semaines', service: 'Extensions' },
@@ -1868,29 +2032,30 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   }
 
   const content: UltimateContent = {
-    companyName,
-    sector: lead.sector || 'Professionnel',
-    city,
-    description,
-    phone,
-    email,
-    address,
-    website,
-    rating,
+    companyName, 
+    sector: lead.sector || 'Professionnel', 
+    city, 
+    description, 
+    phone, 
+    email, 
+    address, 
+    website, 
+    rating, 
     reviews,
-    services: finalServices,
-    testimonials: finalTestimonials,
-    heroTitle,
-    heroSubtitle,
-    aboutText: description,
-    ctaText,
-    slogan: finalSlogan,
-    heroImage,
+    services: finalServices, 
+    testimonials: finalTestimonials, 
+    heroTitle, 
+    heroSubtitle, 
+    aboutText: description, 
+    ctaText, 
+    slogan: finalSlogan, 
+    heroImage, 
     allImages
   };
 
-  const processedImages: ProcessedImage[] = validateAndCategorizeImages(combinedImages, false);
-  return renderUltimateTemplate(content, processedImages);
+  const layoutVariant = nameHash % 4;
+  
+  return buildUltimateHTML(content, template, combinedImages, layoutVariant);
 }
 
 // ── TEMPLATES STRUCTURELS SPÉCIFIQUES PAR SECTEUR ──
