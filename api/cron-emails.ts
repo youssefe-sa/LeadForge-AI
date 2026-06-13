@@ -2,6 +2,14 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 
+const getBaseUrl = () => {
+  // Use localhost for development, production domain for production
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:5174';
+  }
+  return 'https://www.services-siteup.online';
+};
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
@@ -68,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // Injection des variables standardisées (Tunnel complet)
         const protocol = req.headers['x-forwarded-proto'] || 'https';
-        const host = req.headers.host || 'www.services-siteup.online';
+        const host = req.headers.host || new URL(getBaseUrl()).host;
         const baseUrl = `${protocol}://${host}/api/track`;
         const timestamp = Date.now();
 

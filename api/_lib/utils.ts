@@ -4,6 +4,14 @@ const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL ||
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+const getBaseUrl = () => {
+  // Use localhost for development, production domain for production
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:5174';
+  }
+  return 'https://www.services-siteup.online';
+};
+
 const LOGO_SVG = `<svg width="220" height="50" viewBox="0 0 280 60" xmlns="http://www.w3.org/2000/svg">
   <rect x="0" y="5" width="50" height="50" rx="14" fill="#D4500A" />
   <text x="25" y="41" font-family="Arial" font-weight="900" font-size="28" fill="white" text-anchor="middle">ST</text>
@@ -104,7 +112,7 @@ export async function generateAndSaveDevis(lead: any, price: string = '146'): Pr
   });
   if (uploadError) throw uploadError;
 
-  const publicUrl = `https://www.services-siteup.online/docs/${fileName}`;
+  const publicUrl = `${getBaseUrl()}/docs/${fileName}`;
   await supabase.from('leads').update({ devis_url: publicUrl }).eq('id', lead.id);
   return publicUrl;
 }
@@ -172,7 +180,7 @@ export async function generateAndSaveInvoice(lead: any, price: string = '146', t
   });
   if (uploadError) throw uploadError;
 
-  const publicUrl = `https://www.services-siteup.online/docs/${fileName}`;
+  const publicUrl = `${getBaseUrl()}/docs/${fileName}`;
   await supabase.from('leads').update({ invoice_url: publicUrl }).eq('id', lead.id);
   return publicUrl;
 }
