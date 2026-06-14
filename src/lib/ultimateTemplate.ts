@@ -1176,12 +1176,10 @@ function formatReviewDate(dateString: string): string {
   
   try {
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Récemment';
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (isNaN(diffDays)) return 'Récemment';
     if (diffDays === 0) return "Aujourd'hui";
     if (diffDays === 1) return "Hier";
     if (diffDays <= 7) return `Il y a ${diffDays} jours`;
@@ -1223,7 +1221,7 @@ function buildCompleteTestimonialList(realReviews: Array<any>, sector: string, t
   let completeList = [...realReviews];
   
   // Ajouter des avis sectoriels si nécessaire
-  while (completeList.length < targetCount && fallbackReviews.length > 0) {
+  while (completeList.length < targetCount) {
     const fallbackIndex = (completeList.length - realReviews.length) % fallbackReviews.length;
     const fallbackReview = fallbackReviews[fallbackIndex];
     
@@ -1232,9 +1230,6 @@ function buildCompleteTestimonialList(realReviews: Array<any>, sector: string, t
       isReal: false
     });
   }
-  
-  // Filtrer les avis invalides (text ou author manquants)
-  completeList = completeList.filter(r => r.text && r.text !== 'undefined' && r.author && r.author !== 'undefined');
   
   // Limiter au nombre cible
   return completeList.slice(0, targetCount);
@@ -3037,14 +3032,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         }
 
         /* MODIFIÉ: Section de base épurée */
-        section { position: relative; padding: 96px 5vw; }
-        @media (max-width: 768px) {
-            section { padding: 56px 20px; }
-        }
-
-        /* Sections classiques */
-        .section { max-width: 1200px; margin: 0 auto; width: 100%; }
-        .section-alt { max-width: 1200px; margin: 0 auto; width: 100%; }
+        section { position: relative; }
 
         /* MODIFIÉ: Fond alterné doux */
         .bg-alternate {
@@ -4050,7 +4038,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
             <div class="footer-col">
                 <h4>Liens Utiles</h4>
                 <ul>
-                    <li><a href="#about">À Propos</a></li>
+                    <li><a href="#process">Notre Démarche</a></li>
                     <li><a href="#testimonials">Avis Clients</a></li>
                     <li><a href="javascript:void(0)" onclick="openModal('modal-mentions')">Mentions Légales</a></li>
                     <li><a href="javascript:void(0)" onclick="openModal('modal-policy')">Confidentialité</a></li>
