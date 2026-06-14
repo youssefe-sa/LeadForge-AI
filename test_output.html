@@ -511,6 +511,35 @@
             margin: 0 auto;
         }
 
+        /* MODIFIÉ: Process Section (4 Démarches) */
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            position: relative;
+        }
+        .step-card {
+            padding: 1.75rem;
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.07);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        .step-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .step-number {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: rgba(var(--primary-rgb), 0.1);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
         /* MODIFIÉ: Services Grid & Cards */
         .grid-3 {
             display: grid;
@@ -728,6 +757,10 @@
                 gap: 1rem;
             }
             .valeurs-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .process-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
@@ -959,16 +992,33 @@
             }
         }
         
-        /* MODIFIÉ: Layout Variants — variant controls which sections render */
+        /* MODIFIÉ: Layout Variants */
+        .layout-variant-0 .section-process { display: block; }
         .layout-variant-0 .section-stats { display: block; }
-        .layout-variant-1 .section-stats { display: block; }
-        .layout-variant-2 .section-stats { display: none; }
-        .layout-variant-3 .section-stats { display: none; }
-
         .layout-variant-0 .section-assurances { display: block; }
+        .layout-variant-0 .hero-centered { display: flex; }
+        .layout-variant-0 .hero-split { display: none; }
+        
+        .layout-variant-1 .section-process { display: none; }
+        .layout-variant-1 .section-stats { display: block; }
         .layout-variant-1 .section-assurances { display: block; }
+        .layout-variant-1 .hero-centered { display: none; }
+        .layout-variant-1 .hero-split { display: grid; }
+        
+        .layout-variant-2 .section-process { display: block; }
+        .layout-variant-2 .section-stats { display: none; }
         .layout-variant-2 .section-assurances { display: none; }
+        .layout-variant-2 .hero-centered { display: flex; }
+        .layout-variant-2 .hero-split { display: none; }
+        
+        .layout-variant-3 .section-process { display: none; }
+        .layout-variant-3 .section-stats { display: none; }
         .layout-variant-3 .section-assurances { display: block; }
+        .layout-variant-3 .hero-centered { display: none; }
+        .layout-variant-3 .hero-split { display: grid; }
+        
+        .hero-split { display: none; }
+        .hero-centered { display: none; }
     </style>
 
     <style>
@@ -1256,8 +1306,29 @@
         </div>
     </nav>
 
-    
-    <!-- Hero Split (Variant 1 & 3) -->
+    <!-- MODIFIÉ: Hero Centered (Variant 0 & 2) -->
+    <section class="hero hero-centered" style="background-image: url('https://images.pexels.com/photos/774463/pexels-photo-774463.jpeg?auto=compress&cs=tinysrgb&w=1200'); --hero-overlay: rgba(0,0,0,0.6);">
+        <div class="hero-content">
+            <div class="eyebrow"><i data-lucide="zap" width="12"></i> Dépannage rapide garanti · Lyon</div>
+            <h1>Test Plomberie Express — <span>Excellence & Passion</span></h1>
+            <p>L'artisan du tuyau à votre service - De la fuite d'eau à la rénovation complète à Lyon</p>
+            <div class="hero-actions">
+                <a href="tel:+33612345678" class="btn-primary">
+                    <i data-lucide="phone" width="16"></i> Demandez un devis
+                </a>
+                <a href="#contact" class="btn-secondary">
+                    Demander un devis <i data-lucide="arrow-right" width="16"></i>
+                </a>
+            </div>
+            <div class="trust-badges">
+                <div class="trust-badge"><i data-lucide="star" fill="currentColor"></i><span>4.5/5 — 128 avis</span></div>
+                <div class="trust-badge"><i data-lucide="clock"></i><span>Disponible 7j/7</span></div>
+                <div class="trust-badge"><i data-lucide="shield-check"></i><span>Assuré et certifié</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODIFIÉ: Hero Split (Variant 1 & 3) -->
     <section class="hero hero-split" style="--hero-overlay: rgba(0,0,0,0.6);">
         <div class="hero-content">
             <div class="eyebrow"><i data-lucide="zap" width="12"></i> Dépannage rapide garanti · Lyon</div>
@@ -1280,7 +1351,6 @@
         <div class="hero-visual" style="background-image: url('https://images.pexels.com/photos/774463/pexels-photo-774463.jpeg?auto=compress&cs=tinysrgb&w=1200');">
         </div>
     </section>
-    
 
     <!-- MODIFIÉ: A Propos -->
     <section class="container bg-alternate" id="about">
@@ -1309,8 +1379,8 @@
     </section>
 
     <!-- Nos Garanties -->
-    <section class="container section-assurances" id="valeurs">
-        <div class="section-header reveal">
+    <section class="container" id="valeurs">
+        <div class="section-header reveal" style="position: relative; z-index: 1;">
             <h2>Nos garanties</h2>
             <p>Les engagements qui font la différence et votre tranquillité d'esprit.</p>
         </div>
@@ -1318,34 +1388,33 @@
             
             <div class="valeur-card reveal" style="transition-delay: 0ms">
                 <div class="valeur-icon"><i data-lucide="shield-check" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.15rem; margin-bottom: 0.5rem;">Garantie Décennale</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">Couvre vos travaux selon la législation en vigueur et notre engagement qualité.</p>
+                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.35rem; margin-bottom: 1rem;">Garantie Décennale</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Décennale.</p>
             </div>
             
             <div class="valeur-card reveal" style="transition-delay: 100ms">
                 <div class="valeur-icon"><i data-lucide="clock" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.15rem; margin-bottom: 0.5rem;">Intervention < 2h</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">Couvre vos travaux selon la législation en vigueur et notre engagement qualité.</p>
+                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.35rem; margin-bottom: 1rem;">Intervention < 2h</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Intervention < 2h.</p>
             </div>
             
             <div class="valeur-card reveal" style="transition-delay: 200ms">
                 <div class="valeur-icon"><i data-lucide="file-text" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.15rem; margin-bottom: 0.5rem;">Devis Gratuit</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">Couvre vos travaux selon la législation en vigueur et notre engagement qualité.</p>
+                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.35rem; margin-bottom: 1rem;">Devis Gratuit</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Devis Gratuit.</p>
             </div>
             
             <div class="valeur-card reveal" style="transition-delay: 300ms">
                 <div class="valeur-icon"><i data-lucide="check-square" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.15rem; margin-bottom: 0.5rem;">Artisan Qualifié</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">Couvre vos travaux selon la législation en vigueur et notre engagement qualité.</p>
+                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.35rem; margin-bottom: 1rem;">Artisan Qualifié</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Artisan Qualifié.</p>
             </div>
             
         </div>
     </section>
 
-    
-    <!-- Nos Chiffres Clés -->
-    <section class="container section-stats" style="padding: 48px 5vw;">
+    <!-- MODIFIÉ: Nos Chiffres Clés -->
+    <section class="container section-stats" style="padding-top: 2rem; padding-bottom: 2rem;">
         <div class="stats-banner reveal">
             <div class="stat-banner-item">
                 <h3>128+</h3>
@@ -1365,7 +1434,37 @@
             </div>
         </div>
     </section>
-    
+
+    <!-- MODIFIÉ: Process -->
+    <section class="container section-process" id="process">
+        <!-- Supprimé : anim-shape pour design plus propre -->
+        <div class="section-header reveal">
+            <h2>Notre démarche en 4 étapes</h2>
+            <p>Une méthodologie claire et transparente pour garantir le succès de votre projet.</p>
+        </div>
+        <div class="process-grid reveal">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Prise de contact</h3>
+                    <p>Nous étudions ensemble votre besoin et définissons les priorités.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Devis détaillé</h3>
+                    <p>Un chiffrage précis et transparent, sans aucun frais caché.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Intervention</h3>
+                    <p>Réalisation de la prestation par nos experts qualifiés.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Suivi qualité</h3>
+                    <p>Nous nous assurons de votre entière satisfaction après livraison.</p>
+                </div>
+        </div>
+    </section>
 
     <!-- SECTIONS DYNAMIQUES SPÉCIFIQUES AU SECTEUR -->
     
