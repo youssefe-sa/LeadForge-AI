@@ -837,10 +837,10 @@ function generateTemplateVariation(companyName: string, sector: string): Templat
 function applyTemplateVariation(html: string, variation: TemplateVariation): string {
   let modifiedHtml = html;
 
-  // Ajouter les classes CSS personnalisées
+  // Ajouter les classes CSS personnalisées au body (en préservant les classes existantes)
   modifiedHtml = modifiedHtml.replace(
-    /<body/g,
-    `<body class="template-${variation.id}" data-layout="${variation.layoutStyle}"`
+    /<body\s+class="([^"]*)"/,
+    (_, existingClass) => `<body class="template-${variation.id} ${existingClass}" data-layout="${variation.layoutStyle}"`
   );
 
   // Masquer les éléments spécifiés
@@ -2010,49 +2010,49 @@ interface SectorLayout {
 const SECTOR_LAYOUTS: Record<string, SectorLayout> = {
   // Restaurant : Menu + Galerie + Réservation
   restaurant: {
-    sections: ['header', 'hero', 'menu', 'about', 'gallery', 'testimonials', 'reservation', 'contact', 'footer'],
+    sections: ['header', 'hero', 'menu', 'gallery', 'testimonials', 'reservation', 'footer'],
     customComponents: ['menu-grid', 'gallery-masonry', 'reservation-form'],
     specialFeatures: ['carte-interactive', 'horaires-ouvertures', 'menu-pdf']
   },
   
   // Garage : Services + Marques + RDV
   garage: {
-    sections: ['header', 'hero', 'services', 'brands', 'about', 'testimonials', 'appointment', 'contact', 'footer'],
+    sections: ['header', 'hero', 'services', 'brands', 'testimonials', 'appointment', 'footer'],
     customComponents: ['brands-showcase', 'appointment-calendar', 'diagnostic-tool'],
     specialFeatures: ['marques-traitees', 'calendrier-rdv', 'diagnostic-en-ligne']
   },
   
   // Coiffeur : Services + Galerie + RDV
   coiffeur: {
-    sections: ['header', 'hero', 'services', 'gallery', 'about', 'testimonials', 'booking', 'contact', 'footer'],
+    sections: ['header', 'hero', 'services', 'gallery', 'testimonials', 'booking', 'footer'],
     customComponents: ['service-cards', 'gallery-instagram', 'booking-system'],
     specialFeatures: ['galerie-shampoing', 'prix-services', 'rdv-en-ligne']
   },
   
   // Plomberie : Services + Urgence + Devis
   plomberie: {
-    sections: ['header', 'hero', 'emergency', 'services', 'about', 'testimonials', 'quote', 'contact', 'footer'],
+    sections: ['header', 'hero', 'emergency', 'services', 'testimonials', 'quote', 'footer'],
     customComponents: ['emergency-banner', 'service-grid', 'quote-calculator'],
     specialFeatures: ['urgence-24h', 'devis-en-ligne', 'intervention-rapide']
   },
   
   // Électricien : Services + Certifications + Devis
   electricien: {
-    sections: ['header', 'hero', 'services', 'certifications', 'about', 'testimonials', 'quote', 'contact', 'footer'],
+    sections: ['header', 'hero', 'services', 'certifications', 'testimonials', 'quote', 'footer'],
     customComponents: ['certification-badges', 'service-categories', 'quote-form'],
     specialFeatures: ['normes-electriques', 'certifications', 'devis-gratuit']
   },
   
   // Nettoyage : Services + Tarifs + Devis
   nettoyage: {
-    sections: ['header', 'hero', 'services', 'pricing', 'about', 'testimonials', 'quote', 'contact', 'footer'],
+    sections: ['header', 'hero', 'services', 'pricing', 'testimonials', 'quote', 'footer'],
     customComponents: ['service-packages', 'pricing-table', 'quote-calculator'],
     specialFeatures: ['forfaits-nettoyage', 'tarifs-clairs', 'devis-personnalisé']
   },
   
   // Default : Structure standard
   default: {
-    sections: ['header', 'hero', 'services', 'about', 'testimonials', 'contact', 'footer'],
+    sections: ['header', 'hero', 'services', 'testimonials', 'footer'],
     customComponents: [],
     specialFeatures: []
   }
@@ -4122,41 +4122,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
 
     <!-- SECTIONS DYNAMIQUES SPÉCIFIQUES AU SECTEUR -->
     ${generateSections(content, template, allImages)}
-        </div>
-        
-        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 3rem;">
-            <div style="font-size: 3rem; font-weight: 800; color: var(--text-main); line-height: 1;">${rating}</div>
-            <div>
-                <div style="display: flex; color: #f59e0b; gap: 4px; margin-bottom: 4px;">
-                    <i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i>
-                </div>
-                <div style="color: var(--text-muted); font-weight: 500;">Basé sur ${reviews} avis Google</div>
-            </div>
-        </div>
-        
-        <div class="grid-3">
-            ${testimonials.map((t, i) => `
-            <div class="card testimonial-card glass reveal" style="transition-delay: ${(i%3) * 100}ms">
-                <div>
-                    <div class="stars" style="margin-bottom: 1rem;">
-                        ${Array(t.rating).fill('<i data-lucide="star" fill="currentColor"></i>').join('')}
-                    </div>
-                    <p style="color: var(--text-main); font-size: 1.125rem; font-weight: 500; font-style: italic; line-height: 1.6; 
-                      display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;">"${t.text}"</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 2rem; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1.5rem;">
-                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items:center; justify-content:center; font-weight: 700; color: white; font-size: 1.25rem;">
-                        ${t.author.charAt(0)}
-                    </div>
-                    <div>
-                        <div style="font-weight: 700; color: var(--text-main);">${t.author}</div>
-                        ${t.date ? `<div style="font-size: 0.875rem; color: var(--text-muted);">${t.date}</div>` : ''}
-                    </div>
-                </div>
-            </div>
-            `).join('')}
-        </div>
-    </section>
 
     <!-- Maps & Contact -->
     <section class="container bg-alternate" id="contact">
