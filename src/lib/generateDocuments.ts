@@ -1,13 +1,5 @@
 import { supabase } from './supabase';
 
-const getBaseUrl = () => {
-  // Use localhost for development, production domain for production
-  if (import.meta.env.DEV) {
-    return 'http://localhost:5174';
-  }
-  return 'https://www.services-siteup.online';
-};
-
 export interface Lead {
   id: string;
   name: string;
@@ -95,7 +87,7 @@ tr:nth-child(even) td { background: #fafafa; }
   </tbody>
 </table>
 <div class="footer">
-  Services SiteUp · ${new URL(getBaseUrl()).host} · Devis non contractuel sans signature écrite
+  Services SiteUp · services-siteup.online · Devis non contractuel sans signature écrite
 </div>
 </body>
 </html>`;
@@ -167,7 +159,7 @@ td { padding: 12px 16px; border-bottom: 1px solid #eee; font-size: 14px; }
   </tbody>
 </table>
 <div class="footer">
-  Services SiteUp · ${new URL(getBaseUrl()).host} · Merci de votre confiance
+  Services SiteUp · services-siteup.online · Merci de votre confiance
 </div>
 </body>
 </html>`;

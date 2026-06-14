@@ -1,13 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const getBaseUrl = () => {
-  // Use localhost for development, production domain for production
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:5174';
-  }
-  return 'https://services-siteup.online';
-};
-
 // Proxy sécurisé pour débloquer les erreurs CORS et protéger les clés d'API
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Autoriser uniquement les requêtes POST
@@ -43,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     case 'openrouter':
       apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
       providerHeaders['Authorization'] = `Bearer ${apiKey}`;
-      providerHeaders['HTTP-Referer'] = getBaseUrl();
+      providerHeaders['HTTP-Referer'] = 'https://services-siteup.online';
       providerHeaders['X-Title'] = 'LeadForge AI';
       break;
     default:

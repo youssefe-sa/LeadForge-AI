@@ -1,7 +1,7 @@
 // Pexels Images Service - Images professionnelles et fiables par secteur
 // Utilise l'API Pexels ou des URLs directes fiables
 
-const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_API_KEY || '';
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY || '';
 
 // URLs Pexels fiables et professionnelles par secteur
 // Ces URLs sont des liens directs vers des images vérifiées

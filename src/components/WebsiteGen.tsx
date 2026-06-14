@@ -9,14 +9,6 @@ const getCssVar = (name: string, fallback: string) => {
   return val || fallback;
 };
 
-const getBaseUrl = () => {
-  // Use localhost for development, production domain for production
-  if (import.meta.env.DEV) {
-    return 'http://localhost:5174';
-  }
-  return 'https://www.services-siteup.online';
-};
-
 // Simple contrast helper (WCAG >= 4.5:1)
 const contrastColor = (bg: string, fg: string) => {
   const luminance = (hex: string) => {
@@ -494,7 +486,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       const siteUrl = publicUrlData.publicUrl;
       console.log(`✅ Site hébergé avec succès: ${siteUrl}`);
       
-      const baseUrl = getBaseUrl();
+      const baseUrl = 'https://www.services-siteup.online';
       const cleanUrl = `${baseUrl}/api/sites/${lead.id}`;
       
       console.log(`🔧 Updating lead ${lead.id} in Supabase...`);
@@ -526,7 +518,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
         const siteUrl = publicUrlData.publicUrl;
         
         return emergencyHtml; // Retourner le code HTML de fallback
-        const baseUrl = getBaseUrl();
+        const baseUrl = 'https://www.services-siteup.online';
         const cleanUrl = `${baseUrl}/api/sites/${lead.id}`;
         
         await updateLead(lead.id, {
@@ -855,7 +847,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       await supabase.storage.from('websites').upload(fileName, html, { contentType: 'text/html', cacheControl: '3600', upsert: true });
       const { data: publicUrlData } = supabase.storage.from('websites').getPublicUrl(fileName);
       const siteUrl = publicUrlData.publicUrl;
-      const baseUrl = getBaseUrl();
+      const baseUrl = 'https://www.services-siteup.online';
       const cleanUrl = `${baseUrl}/api/sites/${previewLead.id}`;
       
       updateLead(previewLead.id, { 
@@ -1177,20 +1169,14 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
                 flex: 1, display: 'flex', justifyContent: 'center',
                 background: '#e5e7eb', padding: previewMode === 'mobile' ? '20px' : '0',
               }}>
-                {previewLead.siteUrl ? (
-                  <iframe
-                    src={previewLead.siteUrl}
-                    style={{
-                      border: 'none', width: previewMode === 'mobile' ? 390 : '100%', height: '100%', background: '#fff',
-                      ...(previewMode === 'mobile' ? { borderRadius: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' } : {}),
-                    }}
-                    title="Preview"
-                  />
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontSize: 14 }}>
-                    No URL available for preview
-                  </div>
-                )}
+                <iframe
+                  src={previewLead.siteUrl}
+                  style={{
+                    border: 'none', width: previewMode === 'mobile' ? 390 : '100%', height: '100%', background: '#fff',
+                    ...(previewMode === 'mobile' ? { borderRadius: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' } : {}),
+                  }}
+                  title="Preview"
+                />
               </div>
 
               {/* AI Editor Panel */}
