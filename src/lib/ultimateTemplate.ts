@@ -1,4 +1,4 @@
-// Thin coordinator for ultimate template rendering.
+﻿// Thin coordinator for ultimate template rendering.
 // This file keeps `generateUltimateSiteAsync` as the public entrypoint and
 // delegates rendering and helpers to the modular files under
 // `src/lib/ultimateTemplate/` (render, templates, utils).
@@ -20,10 +20,10 @@ import {
 export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Promise<string> {
   const validationResult = validateLeadData(lead);
   if (!validationResult.isValid) {
-    console.error(`? Erreur validation donn�es pour ${lead.name}:`, validationResult.errors);
+    console.error(`❌ Erreur validation données pour ${lead.name}:`, validationResult.errors);
   }
   if (validationResult.warnings.length > 0) {
-    console.warn(`?? Avertissements pour ${lead.name}:`, validationResult.warnings);
+    console.warn(`⚠️ Avertissements pour ${lead.name}:`, validationResult.warnings);
   }
 
   const template = getUltimateTemplate(lead.sector || '');
@@ -39,14 +39,14 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   const rawDescription = aiContent?.aboutText || lead.description || template.aboutText;
   const description = generateAboutText(rawDescription, lead);
   const heroTitle = aiContent?.heroTitle || template.heroTitle || '';
-  const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle || ''}${city ? ' � ' + city : ''}`;
+  const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle || ''}${city ? ' à ' + city : ''}`;
 
   // Load images: try Pexels API, fallback to sector images
   let combinedImages: string[] = [];
   try {
     combinedImages = await getImagesForLead(lead, 6);
   } catch (err) {
-    console.warn('Erreur r�cup�ration images Pexels, fallback sector', err);
+    console.warn('Erreur récupération images Pexels, fallback sector', err);
     combinedImages = getSectorImagesFallback(lead.sector || '');
   }
 
@@ -92,3 +92,4289 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   return renderUltimateTemplate(content, processedImages);
 }
 
+// ── SYSTÈME DE VALIDATION DES DONNÉES AVANT GÉNÉRATION ──
+
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  fixedData?: Partial<any>;
+}
+
+// Valider toutes les données critiques du prospect avant génération
+function validateLeadData(lead: any): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const fixedData: Partial<any> = {};
+
+  // Validation du nom de l'entreprise
+  if (!lead.name || lead.name.trim().length < 2) {
+    errors.push("Nom de l'entreprise invalide ou manquant");
+    fixedData.name = lead.name || "Entreprise";
+  }
+
+  // Validation du secteur
+  if (!lead.sector || lead.sector.trim().length < 2) {
+    errors.push("Secteur invalide ou manquant");
+    fixedData.sector = lead.sector || "Services";
+  }
+
+  // Validation du téléphone
+  if (!lead.phone || !isValidPhone(lead.phone)) {
+    warnings.push("Téléphone invalide ou manquant");
+    fixedData.phone = lead.phone || "+33 1 23 45 67 89";
+  }
+
+  // Validation de l'email
+  if (!lead.email || !isValidEmail(lead.email)) {
+    warnings.push("Email invalide ou manquant");
+    fixedData.email = lead.email || "contact@example.com";
+  }
+
+  // Validation de la ville
+  if (!lead.city || lead.city.trim().length < 2) {
+    warnings.push("Ville invalide ou manquante");
+    fixedData.city = lead.city || "Paris";
+  }
+
+  // Validation de l'adresse
+  if (!lead.address || lead.address.trim().length < 5) {
+    warnings.push("Adresse invalide ou manquante");
+    fixedData.address = lead.address || "Centre Ville";
+  }
+
+  // Validation du site web
+  if (lead.website && !isValidUrl(lead.website)) {
+    warnings.push("URL du site web invalide");
+    fixedData.website = "";
+  }
+
+  // Validation du rating
+  if (lead.googleRating && (lead.googleRating < 1 || lead.googleRating > 5)) {
+    warnings.push("Rating Google invalide, normalisé à 5");
+    fixedData.googleRating = 5;
+  }
+
+  // Validation du nombre d'avis
+  if (lead.googleReviews && (lead.googleReviews < 0 || lead.googleReviews > 10000)) {
+    warnings.push("Nombre d'avis Google invalide, normalisé à 42");
+    fixedData.googleReviews = 42;
+  }
+
+  // Appliquer les corrections
+  if (Object.keys(fixedData).length > 0) {
+    Object.assign(lead, fixedData);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+    fixedData
+  };
+}
+
+// Valider un numéro de téléphone
+function isValidPhone(phone: string): boolean {
+  if (!phone) return false;
+  const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+  return phoneRegex.test(phone.replace(/\s/g, ''));
+}
+
+// Valider un email
+function isValidEmail(email: string): boolean {
+  if (!email) return false;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Valider une URL
+function isValidUrl(url: string): boolean {
+  if (!url) return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ── SYSTÈME DE CACHE LOCAL POUR IMAGES PEXELS ──
+
+interface CachedImage {
+  url: string;
+  localPath: string;
+  timestamp: number;
+  expiresAt: number;
+  size: number;
+  format: string;
+}
+
+interface ImageCacheEntry {
+  [query: string]: CachedImage[];
+}
+
+// Cache local pour les images Pexels avec expiration de 7 jours
+class PexelsImageCache {
+  private cache: ImageCacheEntry = {};
+  private readonly CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 jours en ms
+  private readonly MAX_CACHE_SIZE = 100; // Maximum 100 images par query
+  
+  constructor() {
+    this.loadCacheFromStorage();
+    this.cleanupExpiredEntries();
+  }
+
+  // Charger le cache depuis localStorage
+  private loadCacheFromStorage(): void {
+    try {
+      const stored = localStorage.getItem('pexels-image-cache');
+      if (stored) {
+        this.cache = JSON.parse(stored);
+      }
+    } catch (error) {
+      console.warn('⚠️ Erreur chargement cache images:', error);
+      this.cache = {};
+    }
+  }
+
+  // Sauvegarder le cache dans localStorage
+  private saveCacheToStorage(): void {
+    try {
+      localStorage.setItem('pexels-image-cache', JSON.stringify(this.cache));
+    } catch (error) {
+      console.warn('⚠️ Erreur sauvegarde cache images:', error);
+    }
+  }
+
+  // Nettoyer les entrées expirées
+  private cleanupExpiredEntries(): void {
+    const now = Date.now();
+    let hasChanges = false;
+
+    Object.keys(this.cache).forEach(query => {
+      this.cache[query] = this.cache[query].filter(img => img.expiresAt > now);
+      if (this.cache[query].length === 0) {
+        delete this.cache[query];
+        hasChanges = true;
+      }
+    });
+
+    if (hasChanges) {
+      this.saveCacheToStorage();
+    }
+  }
+
+  // Vérifier si une image est en cache
+  public isImageCached(query: string, url: string): boolean {
+    const cached = this.cache[query];
+    if (!cached) return false;
+
+    const now = Date.now();
+    return cached.some(img => img.url === url && img.expiresAt > now);
+  }
+
+  // Récupérer une image depuis le cache
+  public getCachedImage(query: string, url: string): CachedImage | null {
+    const cached = this.cache[query];
+    if (!cached) return null;
+
+    const now = Date.now();
+    const image = cached.find(img => img.url === url && img.expiresAt > now);
+    return image || null;
+  }
+
+  // Ajouter une image au cache
+  public async cacheImage(query: string, url: string): Promise<CachedImage | null> {
+    try {
+      // Télécharger l'image
+      const response = await fetch(url);
+      if (!response.ok) return null;
+
+      const blob = await response.blob();
+      const reader = new FileReader();
+      
+      return new Promise((resolve) => {
+        reader.onload = () => {
+          const localPath = reader.result as string;
+          const timestamp = Date.now();
+          
+          const cachedImage: CachedImage = {
+            url,
+            localPath,
+            timestamp,
+            expiresAt: timestamp + this.CACHE_DURATION,
+            size: blob.size,
+            format: blob.type
+          };
+
+          // Ajouter au cache
+          if (!this.cache[query]) {
+            this.cache[query] = [];
+          }
+
+          // Limiter la taille du cache
+          if (this.cache[query].length >= this.MAX_CACHE_SIZE) {
+            this.cache[query] = this.cache[query].slice(-this.MAX_CACHE_SIZE + 1);
+          }
+
+          this.cache[query].push(cachedImage);
+          this.saveCacheToStorage();
+          
+          resolve(cachedImage);
+        };
+        
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.warn('⚠️ Erreur cache image:', error);
+      return null;
+    }
+  }
+
+  // Récupérer une image (avec cache)
+  public async getImage(query: string, url: string): Promise<string> {
+    // Vérifier si déjà en cache
+    if (this.isImageCached(query, url)) {
+      const cached = this.getCachedImage(query, url);
+      if (cached) {
+        return cached.localPath;
+      }
+    }
+
+    // Ajouter au cache et retourner
+    const cached = await this.cacheImage(query, url);
+    return cached ? cached.localPath : url;
+  }
+
+  // Précharger des images pour une query
+  public async preloadImages(query: string, urls: string[]): Promise<void> {
+    const promises = urls.map(url => this.getImage(query, url));
+    await Promise.allSettled(promises);
+  }
+
+  // Vider le cache
+  public clearCache(): void {
+    this.cache = {};
+    localStorage.removeItem('pexels-image-cache');
+  }
+
+  // Obtenir des statistiques du cache
+  public getCacheStats(): { totalEntries: number; totalSize: number; queries: string[] } {
+    let totalEntries = 0;
+    let totalSize = 0;
+    const queries = Object.keys(this.cache);
+
+    queries.forEach(query => {
+      this.cache[query].forEach(img => {
+        totalEntries++;
+        totalSize += img.size;
+      });
+    });
+
+    return {
+      totalEntries,
+      totalSize,
+      queries
+    };
+  }
+}
+
+// Instance globale du cache
+const pexelsCache = new PexelsImageCache();
+
+// ── FONCTIONS D'IMAGES PEXELS AVEC CACHE ──
+
+// Rechercher des images Pexels avec cache local
+async function searchPexelsImagesWithCache(query: string, count: number = 10): Promise<string[]> {
+  try {
+    // Construire la query Pexels
+    const searchQuery = `${query} professional business`;
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(searchQuery)}&per_page=${count}&orientation=horizontal`;
+    
+    // Clé API Pexels (à remplacer par la vraie clé)
+    const apiKey = process.env.PEXELS_API_KEY || 'YOUR_PEXELS_API_KEY';
+    
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': apiKey
+      }
+    });
+
+    if (!response.ok) {
+      console.warn(`⚠️ Erreur API Pexels: ${response.status}`);
+      return getFallbackImages(query, count);
+    }
+
+    const data = await response.json();
+    const imageUrls = data.photos.map((photo: any) => photo.src.large);
+
+    // Précharger les images dans le cache
+    await pexelsCache.preloadImages(searchQuery, imageUrls);
+
+    // Retourner les URLs cached
+    const cachedUrls = await Promise.all(
+      imageUrls.map((url: string) => pexelsCache.getImage(searchQuery, url))
+    );
+
+    return cachedUrls.filter(url => url && url !== '');
+  } catch (error) {
+    console.warn('⚠️ Erreur recherche Pexels:', error);
+    return getFallbackImages(query, count);
+  }
+}
+
+// Obtenir des images de fallback si Pexels échoue
+function getFallbackImages(query: string, count: number): string[] {
+  const fallbackImages = [
+    'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg',
+    'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
+    'https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg',
+    'https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg',
+    'https://images.pexels.com/photos/3184340/pexels-photo-3184340.jpeg',
+    'https://images.pexels.com/photos/3184341/pexels-photo-3184341.jpeg',
+    'https://images.pexels.com/photos/3184342/pexels-photo-3184342.jpeg',
+    'https://images.pexels.com/photos/3184343/pexels-photo-3184343.jpeg',
+    'https://images.pexels.com/photos/3184344/pexels-photo-3184344.jpeg',
+    'https://images.pexels.com/photos/3184345/pexels-photo-3184345.jpeg'
+  ];
+
+  return fallbackImages.slice(0, count);
+}
+
+// Optimiser les images pour le web (redimensionnement et compression)
+async function optimizeImageForWeb(imageUrl: string, maxWidth: number = 1200, quality: number = 85): Promise<string> {
+  try {
+    // Vérifier si l'image est déjà en cache optimisée
+    const cacheKey = `optimized_${maxWidth}_${quality}_${imageUrl}`;
+    if (pexelsCache.isImageCached(cacheKey, imageUrl)) {
+      const cached = pexelsCache.getCachedImage(cacheKey, imageUrl);
+      if (cached) {
+        return cached.localPath;
+      }
+    }
+
+    // Créer un canvas pour redimensionner
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    return new Promise((resolve, reject) => {
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          reject(new Error('Canvas context non disponible'));
+          return;
+        }
+
+        // Calculer les nouvelles dimensions
+        let { width, height } = img;
+        if (width > maxWidth) {
+          const ratio = maxWidth / width;
+          width = maxWidth;
+          height = height * ratio;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Dessiner l'image redimensionnée
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convertir en blob avec compression
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const reader = new FileReader();
+              reader.onload = () => {
+                const optimizedUrl = reader.result as string;
+                // Mettre en cache l'image optimisée
+                pexelsCache.cacheImage(cacheKey, imageUrl).then(() => {
+                  resolve(optimizedUrl);
+                });
+              };
+              reader.readAsDataURL(blob);
+            } else {
+              reject(new Error('Échec conversion blob'));
+            }
+          },
+          'image/jpeg',
+          quality / 100
+        );
+      };
+
+      img.onerror = () => reject(new Error('Échec chargement image'));
+      img.src = imageUrl;
+    });
+  } catch (error) {
+    console.warn('⚠️ Erreur optimisation image:', error);
+    return imageUrl;
+  }
+}
+
+// Créer un service worker pour le cache offline (optionnel)
+function createImageServiceWorker(): string {
+  return `
+    // Service Worker pour cache images LeadForge
+    const CACHE_NAME = 'leadforge-images-v1';
+    const urlsToCache = [];
+
+    self.addEventListener('install', event => {
+      event.waitUntil(
+        caches.open(CACHE_NAME)
+          .then(cache => cache.addAll(urlsToCache))
+      );
+    });
+
+    self.addEventListener('fetch', event => {
+      if (event.request.url.includes('pexels.com')) {
+        event.respondWith(
+          caches.match(event.request)
+            .then(response => {
+              return response || fetch(event.request);
+            })
+        );
+      }
+    });
+  `;
+}
+
+// ── SYSTÈME DE VARIATIONS DE TEMPLATE ANTI-IDENTIFICATION ──
+
+interface TemplateVariation {
+  id: string;
+  colorScheme: string;
+  layoutStyle: string;
+  componentOrder: string[];
+  customClasses: Record<string, string>;
+  hiddenElements: string[];
+  additionalFeatures: string[];
+}
+
+// Générer une variation unique de template basée sur l'entreprise et le secteur
+function generateTemplateVariation(companyName: string, sector: string): TemplateVariation {
+  // Hash unique basé sur le nom de l'entreprise et le secteur
+  const combinedString = `${companyName.toLowerCase()}${sector.toLowerCase()}`;
+  let hash = 0;
+  for (let i = 0; i < combinedString.length; i++) {
+    hash = ((hash << 5) - hash) + combinedString.charCodeAt(i);
+    hash |= 0;
+  }
+  hash = Math.abs(hash);
+
+  // Déterminer la variation (0-15 pour 16 variations uniques)
+  const variationIndex = hash % 16;
+  
+  // Palettes de couleurs alternatives
+  const colorSchemes = [
+    { primary: '#2563eb', secondary: '#7c3aed', accent: '#ec4899' }, // Bleu/Violet/Rose
+    { primary: '#059669', secondary: '#0891b2', accent: '#0d9488' }, // Vert/Cyan
+    { primary: '#dc2626', secondary: '#ea580c', accent: '#f59e0b' }, // Rouge/Orange
+    { primary: '#7c2d12', secondary: '#a16207', accent: '#ca8a04' }, // Marron/Or
+    { primary: '#4338ca', secondary: '#6366f1', accent: '#8b5cf6' }, // Indigo/Violet
+    { primary: '#0891b2', secondary: '#06b6d4', accent: '#0ea5e9' }, // Cyan/Bleu
+    { primary: '#be123c', secondary: '#db2777', accent: '#ec4899' }, // Rose
+    { primary: '#166534', secondary: '#15803d', accent: '#16a34a' }, // Vert forêt
+    { primary: '#9333ea', secondary: '#a855f7', accent: '#c084fc' }, // Violet
+    { primary: '#c2410c', secondary: '#dc2626', accent: '#ef4444' }, // Rouge feu
+    { primary: '#1e3a8a', secondary: '#1e40af', accent: '#2563eb' }, // Bleu marine
+    { primary: '#14532d', secondary: '#166534', accent: '#15803d' }, // Vert sapin
+    { primary: '#7f1d1d', secondary: '#991b1b', accent: '#b91c1c' }, // Bordeaux
+    { primary: '#134e4a', secondary: '#14b8a6', accent: '#10b981' }, // Teal
+    { primary: '#4c1d95', secondary: '#6d28d9', accent: '#7c3aed' }, // Violet foncé
+    { primary: '#0f766e', secondary: '#115e59', accent: '#134e4a' }  // Cyan foncé
+  ];
+
+  // Styles de layout
+  const layoutStyles = ['modern', 'classic', 'minimal', 'bold', 'elegant', 'tech', 'organic', 'corporate'];
+  
+  // Ordres de composants
+  const componentOrders = [
+    ['hero', 'about', 'services', 'testimonials', 'contact'],
+    ['hero', 'services', 'about', 'testimonials', 'contact'],
+    ['hero', 'testimonials', 'services', 'about', 'contact'],
+    ['hero', 'about', 'testimonials', 'services', 'contact'],
+    ['hero', 'services', 'testimonials', 'about', 'contact'],
+    ['hero', 'contact', 'services', 'about', 'testimonials'],
+    ['hero', 'testimonials', 'about', 'services', 'contact'],
+    ['hero', 'about', 'contact', 'services', 'testimonials']
+  ];
+
+  // Éléments à masquer aléatoirement
+  const possibleHiddenElements = ['stats-banner', 'process-section', 'guarantees', 'values', 'team', 'blog', 'newsletter'];
+  const hiddenElementsCount = hash % 3; // 0-2 éléments à masquer
+  const hiddenElements = [];
+  for (let i = 0; i < hiddenElementsCount; i++) {
+    const index = (hash + i * 7) % possibleHiddenElements.length;
+    hiddenElements.push(possibleHiddenElements[index]);
+  }
+
+  // Fonctionnalités additionnelles
+  const possibleFeatures = ['chat-widget', 'appointment-booking', 'quote-calculator', 'price-table', 'gallery', 'video-hero', 'testimonials-carousel', 'map-integration'];
+  const additionalFeaturesCount = (hash % 4) + 1; // 1-4 fonctionnalités
+  const additionalFeatures = [];
+  for (let i = 0; i < additionalFeaturesCount; i++) {
+    const index = (hash + i * 11) % possibleFeatures.length;
+    additionalFeatures.push(possibleFeatures[index]);
+  }
+
+  // Classes CSS personnalisées
+  const customClasses = {
+    hero: `hero-${layoutStyles[variationIndex % layoutStyles.length]}`,
+    navigation: `nav-${variationIndex % 4 === 0 ? 'sticky' : variationIndex % 4 === 1 ? 'fixed' : variationIndex % 4 === 2 ? 'hidden' : 'transparent'}`,
+    buttons: `btn-${variationIndex % 3 === 0 ? 'rounded' : variationIndex % 3 === 1 ? 'square' : 'pill'}`,
+    cards: `card-${variationIndex % 3 === 0 ? 'shadow' : variationIndex % 3 === 1 ? 'border' : 'elevated'}`,
+    animations: `anim-${variationIndex % 4 === 0 ? 'fade' : variationIndex % 4 === 1 ? 'slide' : variationIndex % 4 === 2 ? 'zoom' : 'none'}`
+  };
+
+  return {
+    id: `var-${variationIndex}`,
+    colorScheme: colorSchemes[variationIndex],
+    layoutStyle: layoutStyles[variationIndex % layoutStyles.length],
+    componentOrder: componentOrders[variationIndex % componentOrders.length],
+    customClasses,
+    hiddenElements,
+    additionalFeatures
+  };
+}
+
+// Appliquer les variations de template au HTML
+function applyTemplateVariation(html: string, variation: TemplateVariation): string {
+  let modifiedHtml = html;
+
+  // Ajouter les classes CSS personnalisées
+  modifiedHtml = modifiedHtml.replace(
+    /<body/g,
+    `<body class="template-${variation.id}" data-layout="${variation.layoutStyle}"`
+  );
+
+  // Masquer les éléments spécifiés
+  variation.hiddenElements.forEach(element => {
+    const regex = new RegExp(`<section[^>]*class="[^"]*\\b${element}\\b[^"]*"[^>]*>.*?<\\/section>`, 'gs');
+    modifiedHtml = modifiedHtml.replace(regex, '');
+  });
+
+  // Ajouter les fonctionnalités additionnelles
+  if (variation.additionalFeatures.includes('chat-widget')) {
+    modifiedHtml = modifiedHtml.replace(
+      '</body>',
+      `<div class="chat-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        <button style="background: ${variation.colorScheme.primary}; color: white; border: none; padding: 12px; border-radius: 50%; cursor: pointer;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </button>
+      </div></body>`
+    );
+  }
+
+  // Ajouter des classes CSS pour les variations + Mobile-First
+  const variationCSS = `
+    <style>
+      /* === STYLES DE BASE === */
+      .template-${variation.id} .hero-${variation.layoutStyle} { 
+        background: linear-gradient(135deg, ${variation.colorScheme.primary}22, ${variation.colorScheme.secondary}22);
+      }
+      .template-${variation.id} .${variation.customClasses.buttons} {
+        background: ${variation.colorScheme.primary};
+        border-radius: ${variation.customClasses.buttons.includes('rounded') ? '8px' : variation.customClasses.buttons.includes('pill') ? '50px' : '0'};
+      }
+      .template-${variation.id} .${variation.customClasses.cards} {
+        ${variation.customClasses.cards.includes('shadow') ? 'box-shadow: 0 10px 30px rgba(0,0,0,0.1);' : ''}
+        ${variation.customClasses.cards.includes('border') ? 'border: 2px solid ' + variation.colorScheme.primary : ''}
+        ${variation.customClasses.cards.includes('elevated') ? 'transform: translateY(-4px);' : ''}
+      }
+      .template-${variation.id} .${variation.customClasses.animations} {
+        ${variation.customClasses.animations.includes('fade') ? 'animation: fadeIn 0.6s ease-in;' : ''}
+        ${variation.customClasses.animations.includes('slide') ? 'animation: slideIn 0.6s ease-out;' : ''}
+        ${variation.customClasses.animations.includes('zoom') ? 'animation: zoomIn 0.6s ease-out;' : ''}
+      }
+      
+      /* === MOBILE-FIRST OPTIMIZATION === */
+      /* Base mobile styles (320px and up) */
+      * {
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-size: 16px;
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      
+      .container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 1rem;
+        margin: 0 auto;
+      }
+      
+      /* Hero Section Mobile */
+      .hero {
+        min-height: 60vh;
+        padding: 2rem 1rem;
+        text-align: center;
+      }
+      
+      .hero h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+      }
+      
+      .hero p {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .hero-image {
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      
+      /* Navigation Mobile */
+      .nav-mobile {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        padding: 1rem;
+      }
+      
+      .nav-desktop {
+        display: none;
+      }
+      
+      .mobile-menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+      
+      .mobile-menu {
+        display: none;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        padding: 1rem;
+      }
+      
+      .mobile-menu.active {
+        display: block;
+      }
+      
+      /* Cards Mobile */
+      .card {
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 8px;
+      }
+      
+      .service-card {
+        text-align: center;
+      }
+      
+      .testimonial-card {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      /* Buttons Mobile */
+      .btn-cta, .btn-primary, .btn-secondary {
+        width: 100%;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      /* Forms Mobile */
+      .form-control {
+        width: 100%;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+      
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      
+      /* Grid Mobile */
+      .grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+      
+      /* Contact Modal Mobile */
+      .contact-modal {
+        width: 95%;
+        max-width: 400px;
+        margin: 10vh auto;
+        padding: 2rem;
+      }
+      
+      /* Footer Mobile */
+      footer {
+        text-align: center;
+        padding: 2rem 1rem;
+      }
+      
+      .footer-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        text-align: left;
+      }
+      
+      /* Touch targets (minimum 48x48px) */
+      .touch-target {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 12px;
+      }
+      
+      /* Performance optimizations */
+      img {
+        max-width: 100%;
+        height: auto;
+        loading: lazy;
+      }
+      
+      /* Reduce motion for accessibility */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+      
+      /* Tablet styles (768px and up) */
+      @media (min-width: 768px) {
+        .container {
+          max-width: 768px;
+          padding: 0 2rem;
+        }
+        
+        .hero {
+          min-height: 70vh;
+          padding: 3rem 2rem;
+        }
+        
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+        
+        .nav-mobile {
+          display: none;
+        }
+        
+        .nav-desktop {
+          display: block;
+        }
+        
+        .grid-2 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .grid-3 {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .btn-cta, .btn-primary, .btn-secondary {
+          width: auto;
+        }
+      }
+      
+      /* Desktop styles (1024px and up) */
+      @media (min-width: 1024px) {
+        .container {
+          max-width: 1024px;
+        }
+        
+        .hero {
+          min-height: 80vh;
+          padding: 4rem 2rem;
+        }
+        
+        .hero h1 {
+          font-size: 3rem;
+        }
+        
+        .grid-4 {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        
+        .footer-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 2rem;
+        }
+      }
+      
+      /* Large desktop (1440px and up) */
+      @media (min-width: 1440px) {
+        .container {
+          max-width: 1440px;
+        }
+        
+        .hero h1 {
+          font-size: 3.5rem;
+        }
+      }
+      
+      /* Animations */
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+  `;
+
+  modifiedHtml = modifiedHtml.replace('</head>', `${variationCSS}</head>`);
+
+  return modifiedHtml;
+}
+
+// ── FONCTIONS AVANCÉES POUR LES VRAIS AVIS DU PROSPECT ──
+
+// Extraire et valider les vrais avis Google du prospect
+function extractAndValidateRealReviews(googleReviewsData: any[], lead: any): Array<{ author: string; text: string; rating: number; date: string; service?: string; isReal: boolean }> {
+  if (!googleReviewsData || googleReviewsData.length === 0) {
+    console.log(`⚠️ ${lead.name}: Aucun avis Google trouvé dans les données du prospect`);
+    return [];
+  }
+  
+  const validReviews = googleReviewsData
+    .filter(review => {
+      // Valider que l'avis a les champs requis
+      return review && 
+             review.text && 
+             review.text.trim().length > 10 && // Au moins 10 caractères
+             review.author && 
+             review.author.trim().length > 0 &&
+             (review.rating >= 1 && review.rating <= 5); // Rating valide
+    })
+    .map(review => ({
+      author: cleanAuthorName(review.author),
+      text: cleanReviewText(review.text),
+      rating: review.rating || 5,
+      date: formatReviewDate(review.date),
+      service: extractServiceFromReview(review.text, lead.sector),
+      isReal: true
+    }))
+    .sort((a, b) => {
+      // Prioriser les avis avec rating élevés et texte détaillé
+      const scoreA = (a.rating * 10) + (a.text.length / 50);
+      const scoreB = (b.rating * 10) + (b.text.length / 50);
+      return scoreB - scoreA;
+    });
+  
+  console.log(`✅ ${lead.name}: ${validReviews.length} avis validés sur ${googleReviewsData.length} avis bruts`);
+  return validReviews;
+}
+
+// Nettoyer le nom de l'auteur
+function cleanAuthorName(author: string): string {
+  if (!author) return 'Client';
+  
+  // Supprimer les caractères spéciaux et normaliser
+  return author
+    .replace(/[^a-zA-ZÀ-ÿ\s\-']/g, '')
+    .trim()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+    .substring(0, 30); // Limiter la longueur
+}
+
+// Nettoyer et formater le texte de l'avis
+function cleanReviewText(text: string): string {
+  if (!text) return "Service excellent";
+  
+  return text
+    .replace(/[^\w\sÀ-ÿ.,!?;:\-'"()\n]/g, '') // Garder caractères pertinents
+    .replace(/\s+/g, ' ') // Normaliser espaces
+    .trim()
+    .substring(0, 300) // Limiter la longueur
+    .replace(/(.{250}[^\s]*).*/, '$1...'); // Couper proprement si trop long
+}
+
+// Formater la date de l'avis
+function formatReviewDate(dateString: string): string {
+  if (!dateString) return 'Récemment';
+  
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return "Aujourd'hui";
+    if (diffDays === 1) return "Hier";
+    if (diffDays <= 7) return `Il y a ${diffDays} jours`;
+    if (diffDays <= 30) return `Il y a ${Math.floor(diffDays / 7)} semaine${Math.floor(diffDays / 7) > 1 ? 's' : ''}`;
+    if (diffDays <= 365) return `Il y a ${Math.floor(diffDays / 30)} mois`;
+    return `Il y a ${Math.floor(diffDays / 365)} an${Math.floor(diffDays / 365) > 1 ? 's' : ''}`;
+  } catch {
+    return 'Récemment';
+  }
+}
+
+// Extraire le service mentionné dans l'avis
+function extractServiceFromReview(text: string, sector: string): string {
+  const sectorKeywords: Record<string, string[]> = {
+    plomberie: ['fuite', 'chauffage', 'robinet', 'salle de bain', 'dépannage', 'installation'],
+    electricien: ['prise', 'lumière', 'tableau', 'chauffage', 'dysfonctionnement', 'installation'],
+    restaurant: ['plat', 'menu', 'service', 'ambiance', 'personnel', 'réservation'],
+    garage: ['voiture', 'entretien', 'réparation', 'diagnostic', 'contrôle', 'vidange'],
+    coiffeur: ['coupe', 'coiffure', 'coloration', ' brushing', 'service', 'rendez-vous'],
+    nettoyage: ['ménage', 'propreté', 'service', 'intervention', 'efficace', 'professionnel']
+  };
+  
+  const keywords = sectorKeywords[sector.toLowerCase()] || [];
+  
+  for (const keyword of keywords) {
+    if (text.toLowerCase().includes(keyword)) {
+      return keyword.charAt(0).toUpperCase() + keyword.slice(1);
+    }
+  }
+  
+  return 'Service général';
+}
+
+// Construire la liste complète des témoignages (vrais + fallbacks)
+function buildCompleteTestimonialList(realReviews: Array<any>, sector: string, targetCount: number): Array<{ author: string; text: string; rating: number; date: string; service?: string; isReal?: boolean }> {
+  const fallbackReviews = getAuthenticReviews(sector);
+  
+  // Commencer avec les vrais avis
+  let completeList = [...realReviews];
+  
+  // Ajouter des avis sectoriels si nécessaire
+  while (completeList.length < targetCount) {
+    const fallbackIndex = (completeList.length - realReviews.length) % fallbackReviews.length;
+    const fallbackReview = fallbackReviews[fallbackIndex];
+    
+    completeList.push({
+      ...fallbackReview,
+      isReal: false
+    });
+  }
+  
+  // Limiter au nombre cible
+  return completeList.slice(0, targetCount);
+}
+
+// Fonction pour obtenir les avis authentiques d'un secteur (inchangée)
+function getAuthenticReviews(sector: string): Array<{ author: string; text: string; rating: number; date: string; service?: string }> {
+  const normalizedSector = (sector || '').toLowerCase();
+  
+  // Chercher une correspondance exacte ou partielle
+  for (const [key, reviews] of Object.entries(AUTHENTIC_REVIEWS)) {
+    if (normalizedSector.includes(key) || key.includes(normalizedSector)) {
+      return reviews;
+    }
+  }
+  
+  // Fallback par défaut si aucun secteur trouvé
+  return AUTHENTIC_REVIEWS.default || [];
+}
+
+// Fonction pour générer le texte "about" dynamique avec l'expérience réelle
+function generateAboutText(templateText: string, lead: any): string {
+  let years = 'plusieurs';
+  
+  // Si on a une année de création, calculer les années d'expérience
+  if (lead.establishedYear && typeof lead.establishedYear === 'number') {
+    const currentYear = new Date().getFullYear();
+    const calculatedYears = currentYear - lead.establishedYear;
+    if (calculatedYears > 0 && calculatedYears < 100) {
+      years = calculatedYears.toString();
+    }
+  } 
+  // Fallback: extraire des années du texte du lead ou IA si disponible
+  else if (lead.description) {
+    const yearMatch = lead.description.match(/(\d+)\s*ans?\s*d['']exp[eé]rience/i);
+    if (yearMatch) {
+      years = yearMatch[1];
+    }
+  }
+  
+  // Remplacer "15 ans" par le nombre calculé
+  return templateText.replace(/depuis plus de 15 ans/gi, `depuis ${years} ans`)
+                     .replace(/15 ans d['']exp[eé]rience/gi, `${years} ans d'expérience`);
+}
+
+// Fonction pour générer des features cohérentes basées sur le service
+function generateFeaturesFromService(name: string, description: string, sector: string): string[] {
+  const serviceName = (name || '').toLowerCase();
+  const serviceDesc = (description || '').toLowerCase();
+  const normalizedSector = (sector || '').toLowerCase();
+  
+  // Features génériques de qualité
+  const defaultFeatures = ['Service professionnel', 'Intervention garantie', 'Devis gratuit'];
+  
+  // Dictionnaire de features par type de service
+  const featureDictionary: Record<string, string[]> = {
+    // Plomberie
+    'urgence': ['Disponible 24h/24', 'Intervention rapide', 'Déplacement inclus'],
+    'depannage': ['Réparation durable', 'Pièces garanties', 'Tarifs transparents'],
+    'installation': ['Pose certifiée', 'Conformité normes', 'Garantie décennale'],
+    'chauffage': ['Économies énergie', 'Installation propre', 'Entretien annuel'],
+    'sanitaire': ['Matériel qualité', 'Finitions soignées', 'Délai respecté'],
+    // Électricité
+    'mise aux normes': ['Conformité NFC 15-100', 'Certification Consuel', 'Sécurité garantie'],
+    'domotique': ['Configuration incluse', 'App smartphone', 'Support technique'],
+    'éclairage': ['Design moderne', 'LED économique', 'Installation discrète'],
+    // Coiffure
+    'coupe': ['Visagisme personnalisé', 'Conseil entretien', 'Produits adaptés'],
+    'coloration': ['Coloration végétale', 'Protection cheveux', 'Brillance longue durée'],
+    'barbier': ['Rasage précis', 'Soins barbe', 'Ambiance masculine'],
+    // Restaurant
+    'menu': ['Produits frais', 'Cuisine maison', 'Accord mets-vins'],
+    'livraison': ['Emballage qualité', 'Livraison rapide', 'Commande en ligne'],
+    // Garage
+    'moteur': ['Diagnostic précis', 'Réparation garantie', 'Pièces d\'origine'],
+    'pneus': ['Montage rapide', 'Géométrie 3D', 'Stockage hiver'],
+    'carrosserie': ['Peinture neuve', 'Débosselage sans peinture', 'Garantie vie'],
+    // Nettoyage
+    'ménage': ['Produits écologiques', 'Équipe formée', 'Intervention régulière'],
+    'vitres': ['Sans traces garanti', 'Accès difficile', 'Sécurité maximale'],
+    'désinfection': ['Produits certifiés', 'Zones sensibles', 'Certificat fourni'],
+    // Jardin
+    'taille': ['Forme parfaite', 'Évacuation déchets', 'Santé végétaux'],
+    'pelouse': ['Semence adaptée', 'Arrosage auto', 'Entretien minime'],
+    // Fitness
+    'coaching': ['Programme personnalisé', 'Suivi nutrition', 'Résultats mesurables'],
+    'musculation': ['Technique sécurisée', 'Progression adaptée', 'Sans blessure'],
+    // Médical
+    'consultation': ['À l\'écoute', 'Diagnostic précis', 'Disponibilité rapide'],
+    'kiné': ['Rééducation active', 'Appareillage moderne', 'Progrès rapides'],
+    // Juridique
+    'divorce': ['Discrétion totale', 'Médiation possible', 'Protection intérêts'],
+    'contrat': ['Rédaction précise', 'Clauses protectrices', 'Relecture gratuite'],
+  };
+  
+  // Chercher des correspondances dans le dictionnaire
+  for (const [keyword, features] of Object.entries(featureDictionary)) {
+    if (serviceName.includes(keyword) || serviceDesc.includes(keyword)) {
+      return features;
+    }
+  }
+  
+  // Fallback: extraire des mots-clés de la description
+  const keywords = serviceDesc.match(/\b(installation|réparation|remplacement|rénovation|entretien|dépannage|conseil|sur-mesure|professionnel|certifié|garanti|rapide|qualité|économique)\b/g);
+  if (keywords && keywords.length > 0) {
+    return keywords.slice(0, 3).map(k => k.charAt(0).toUpperCase() + k.slice(1) + ' garanti');
+  }
+  
+  return defaultFeatures;
+}
+
+export interface UltimateContent {
+  companyName: string;
+  sector: string;
+  city: string;
+  description: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  website?: string;
+  rating?: number;
+  reviews?: number;
+  services: Array<{ name: string; description: string; features: string[] }>;
+  testimonials: Array<{ author: string; text: string; rating: number; date?: string }>;
+  heroTitle: string;
+  heroSubtitle: string;
+  aboutText: string;
+  ctaText: string;
+  slogan: string;
+  heroImage: string;
+  allImages: string[];
+}
+
+const SECTOR_ULTIMATE_TEMPLATES = {
+  plomberie: {
+    primary: '#0f766e',
+    secondary: '#115e59',
+    accent: '#14b8a6',
+    background: '#f0fdfa',
+    services: [
+      { name: 'Dépannage 24h/24', description: 'Intervention d\'urgence sur toutes fuites et pannes', features: ['Disponible 7j/7', 'Arrivée sous 1h30', 'Sans surprise tarifaire'] },
+      { name: 'Installation Sanitaire', description: 'Pose et remplacement de vos appareils', features: ['Robinetterie', 'Éviers', 'WC', 'Douches'] },
+      { name: 'Chauffage & Chaudière', description: 'Installation et réparation chauffage', features: ['Chaudières gaz/fioul', 'Pompes à chaleur', 'Détartrage'] },
+      { name: 'Détection de Fuites', description: 'Localisation précise sans casse', features: ['Caméra thermique', 'Gaz traceur', 'Colmatage immédiat'] },
+      { name: 'Rénovation Salle de Bain', description: 'Création et rénovation complète', features: ['Devis gratuit', 'Aide au choix', 'Clé en main'] },
+      { name: 'Entretien Annuel', description: 'Maintenance préventive', features: ['Contrôle chauffage', 'Détartrage', 'Mise aux normes'] }
+    ],
+    guarantees: [
+      { title: 'Garantie Décennale', icon: 'shield-check' },
+      { title: 'Intervention < 2h', icon: 'clock' },
+      { title: 'Devis Gratuit', icon: 'file-text' },
+      { title: 'Artisan Qualifié', icon: 'check-square' }
+    ],
+    heroTitle: 'Artisan Plombier',
+    heroSubtitle: "L'artisan du tuyau à votre service - De la fuite d'eau à la rénovation complète",
+    aboutText: "Plombier chauffagiste depuis plus de 15 ans, je mets mon savoir-faire au service de vos installations. Artisan passionné, je garantis un travail soigné, des délais respectés et des tarifs transparents.",
+    ctaText: 'Demandez un devis'
+  },
+  electricien: {
+    primary: '#1e40af',
+    secondary: '#1e3a8a',
+    accent: '#2563eb',
+    background: '#f8fafc',
+    services: [
+      { name: 'Mise aux Normes', description: 'Remise à neuf de votre installation électrique', features: ['Norme NFC 15-100', 'Tableau électrique neuf', 'Mise à la terre'] },
+      { name: 'Dépannage Électrique', description: 'Pannes, court-circuits, disjonctions', features: ['Intervention rapide', 'Diagnostic complet', 'Réparation durable'] },
+      { name: 'Installation Complète', description: 'Construction ou rénovation électrique', features: ['Câblage complet', 'Points de lumière', 'Prises et inters'] },
+      { name: 'Domotique & Smart Home', description: 'Maison connectée et automatisée', features: ['Volets roulants', 'Éclairage auto', 'Thermostats'] },
+      { name: 'Éclairage LED', description: 'Solutions éclairage économiques', features: ['Spots encastrés', 'Suspensions design', 'Éclairage extérieur'] },
+      { name: 'Charging Véhicule', description: 'Installation bornes de recharge', features: ['Wallbox particulier', 'Borne entreprise', 'Certification IRVE'] }
+    ],
+    guarantees: [
+      { title: 'Consuel Certifié', icon: 'shield-check' },
+      { title: 'Garantie Décennale', icon: 'check-square' },
+      { title: 'Intervention < 2h', icon: 'clock' },
+      { title: 'Devis Gratuit', icon: 'file-text' }
+    ],
+    heroTitle: 'Électricien Agréé',
+    heroSubtitle: "Votre expert électricien pour des installations sûres et modernes",
+    aboutText: "Électricien certifié Consuel avec 15 ans d'expérience. Je sécurise votre habitat grâce à des installations conformes et durables. Artisan sérieux, intervention rapide et devis transparent.",
+    ctaText: 'Contactez-moi'
+  },
+  coiffeur: {
+    primary: '#6b21a8',
+    secondary: '#581c87',
+    accent: '#7c3aed',
+    background: '#f8fafc',
+    services: [
+      { name: 'Coupes & Styles', description: 'Coupe sur-mesure femme et homme', features: ['Visagisme personnalisé', 'Techniques actuelles', 'Conseil entretien'] },
+      { name: 'Barbier Traditionnel', description: 'Rasage et soins barbe', features: ['Rasage à l\'ancienne', 'Taille précise', 'Soins barbe'] },
+      { name: 'Coloration Expert', description: 'Balayages, ombrés et couleurs', features: ['Coloration végétale', 'Mèches sur mesure', 'Glitter color'] },
+      { name: 'Soins Capillaires', description: 'Traitements réparateurs', features: ['Botox capillaire', 'Kératine', 'Massage crânien'] },
+      { name: 'Extensions Volume', description: 'Rajouts longueur et épaisseur', features: ['Pose à froid', 'Tape-in', 'Entretien inclus'] },
+      { name: 'Chignons & Événements', description: 'Coiffures de cérémonie', features: ['Mariage', 'Sofreh aghd', 'Maquillage combo'] }
+    ],
+    guarantees: [
+      { title: 'Produits Bio', icon: 'leaf' },
+      { title: 'Stérilisation Outils', icon: 'sparkles' },
+      { title: 'Formation Continue', icon: 'scissors' },
+      { title: 'Satisfait ou Refait', icon: 'heart' }
+    ],
+    heroTitle: 'Coiffeur Visagiste',
+    heroSubtitle: "L'art de sublimer vos cheveux avec passion et expertise",
+    aboutText: "Coiffeur passionné depuis 15 ans, je crée des looks qui vous ressemblent. Spécialiste du visagisme et des techniques modernes, je veille à la santé de vos cheveux avec des produits naturels et de qualité.",
+    ctaText: 'Prendre rendez-vous'
+  },
+  restaurant: {
+    primary: '#c2410c',
+    secondary: '#9a3412',
+    accent: '#ea580c',
+    background: '#f8fafc',
+    services: [
+      { name: 'Cuisine Maison', description: 'Plats préparés sur place', features: ['Produits locaux', 'Recettes authentiques', 'Fait minute'] },
+      { name: 'Menu du Jour', description: 'Formule déjeuner économique', features: ['Entrée + Plat + Dessert', 'Produits frais', 'Cuisson minute'] },
+      { name: 'Spécialités', description: 'Nos plats signature', features: ['Recettes du terroir', 'Grillades', 'Poissons frais'] },
+      { name: 'Événements & Groupes', description: 'Repas de famille et séminaires', features: ['Menu groupe', 'Salle privative', 'Sur mesure'] },
+      { name: 'Service Traiteur', description: 'Livraison et à emporter', features: ['Plateaux repas', 'Buffets', 'Livraison pro'] },
+      { name: 'Boissons & Vins', description: 'Carte des vins et cocktails', features: ['Vins régionaux', 'Cocktails maison', 'Bières artisanales'] }
+    ],
+    heroTitle: 'Restaurant Traditionnel',
+    heroSubtitle: "Cuisine authentique et accueil chaleureux depuis 2009",
+    aboutText: "Chef passionné depuis 15 ans, je cuisine avec cœur des plats généreux et savoureux. Produits frais du marché, recettes authentiques et ambiance conviviale vous attendent dans notre établissement.",
+    ctaText: 'Réserver une table'
+  },
+  garage: {
+    primary: '#166534',
+    secondary: '#14532d',
+    accent: '#059669',
+    background: '#f8fafc',
+    services: [
+      { name: 'Mécanique Générale', description: 'Entretien et réparation toutes marques', features: ['Révisions constructeur', 'Courroies', 'Freins'] },
+      { name: 'Diagnostic Auto', description: 'Analyse électronique complète', features: ['Valise multimarque', 'Effacement défauts', 'Paramétrage'] },
+      { name: 'Pneumatiques', description: 'Montage, équilibrage, géométrie', features: ['Pneus toutes saisons', 'Pneus run-flat', 'Parallélisme'] },
+      { name: 'Climatisation', description: 'Recharge et réparation clim', features: ['Recharge gaz R134a', 'Détection fuites', 'Filtre habitacle'] },
+      { name: 'Carrosserie', description: 'Réparation et peinture', features: ['Débosselage', 'Peinture à la nuance', 'Polissage optique'] },
+      { name: 'Contrôle Technique', description: 'Préparation et contre-visite', features: ['Pré-contrôle', 'Réparations conformité', 'Accompagnement'] }
+    ],
+    guarantees: [
+      { title: 'Devis Gratuit', icon: 'file-text' },
+      { title: 'Garantie Pièces', icon: 'shield-check' },
+      { title: 'Intervention Rapide', icon: 'clock' },
+      { title: 'Véhicule de Courtoisie', icon: 'car' }
+    ],
+    heroTitle: 'Garage Automobile',
+    heroSubtitle: "Mécanicien passionné, votre véhicule entre de bonnes mains",
+    aboutText: "Mécanicien automobile depuis 15 ans, j'entretiens et répare toutes marques avec passion. Diagnostic précis, devis transparents et respect des délais. Votre sécurité routière est ma priorité.",
+    ctaText: 'Demandez un RDV'
+  },
+  nettoyage: {
+    primary: '#059669',
+    secondary: '#047857',
+    accent: '#10b981',
+    background: '#f0fdf4',
+    services: [
+      { name: 'Nettoyage de Bureaux', description: 'Entretien quotidien de vos locaux professionnels', features: ['Poussière, sols, vitres', 'Produits écolabels', 'Horaires flexibles'] },
+      { name: 'Nettoyage Vitres', description: 'Vitres intérieures et extérieures', features: ['Accès difficile', 'Sans traces garanti', 'Bâtiments R+10'] },
+      { name: 'Grand Nettoyage', description: 'Nettoyage en profondeur résidentiel', features: ['Cuisine dégraissée', 'Salle de bain désinfectée', 'Sol ciré'] },
+      { name: 'Désinfection', description: 'Traitement anti-bactérien et virucide', features: ['Certifié COVID', 'Produits bio', 'Rapport de traitement'] },
+      { name: 'Nettoyage Industriel', description: 'Entrepôts, usines, ateliers', features: ['Monobrosse industrielle', 'Aspirateur eau/poussière', 'Horaires de nuit'] },
+      { name: 'Remise en État', description: 'Après travaux ou déménagement', features: ['Évacuation gravats', 'Nettoyage fin', 'Livraison clé en main'] }
+    ],
+    guarantees: [
+      { title: 'Produits Écolabels', icon: 'leaf' },
+      { title: 'Personnel Formé', icon: 'users' },
+      { title: 'Intervention Fiable', icon: 'clock' },
+      { title: 'Assurance Responsabilité', icon: 'shield-check' }
+    ],
+    heroTitle: 'Société de Nettoyage',
+    heroSubtitle: "Propreté professionnelle et écologique pour vos espaces",
+    aboutText: "Entreprise de nettoyage depuis 15 ans, nos équipes formées interviennent avec rigueur et discrétion. Produits écolabels, matériel professionnel et engagement qualité pour des locaux toujours impeccables.",
+    ctaText: 'Demandez un devis'
+  },
+  jardin: {
+    primary: '#14532d',
+    secondary: '#166534',
+    accent: '#15803d',
+    background: '#f0fdf4',
+    services: [
+      { name: 'Création de Jardins', description: 'Aménagement paysager complet', features: ['Plan sur mesure', 'Plantations adaptées', 'Gazon en rouleaux'] },
+      { name: 'Tonte & Entretien', description: 'Pelouse et massifs entretenus', features: ['Tonte régulière', 'Taille haies', 'Désherbage manuel'] },
+      { name: 'Élagage & Abattage', description: 'Arbres et arbustes sécurisés', features: ['Élagage raisonné', 'Grimper pro', 'Broyage branches'] },
+      { name: 'Terrasses & Clôtures', description: 'Aménagement structure bois', features: ['Terrasse pin/ipé', 'Clôture occultation', 'Pergolas'] },
+      { name: 'Arrosage Automatique', description: 'Installation système arrosage', features: ['Goutte à goutte', 'Tuyères enterrées', 'Programmateur connecté'] },
+      { name: 'Potager & Verger', description: 'Création et entretien potager', features: ['Bacs surélevés', 'Compostage', 'Taille fruitiers'] }
+    ],
+    guarantees: [
+      { title: 'Plantes Garanties', icon: 'sprout' },
+      { title: 'Intervention Propre', icon: 'sparkles' },
+      { title: 'Conseils Saisonniers', icon: 'sun' },
+      { title: 'Paysagiste Qualifié', icon: 'tree-deciduous' }
+    ],
+    heroTitle: 'Jardinier Paysagiste',
+    heroSubtitle: "Création et entretien de jardins uniques et harmonieux",
+    aboutText: "Paysagiste passionné depuis 15 ans, je conçois et entretiens des espaces verts qui vivent au rythme des saisons. De la création paysagère à l'élagage expert, chaque geste est pensé pour la santé de vos plantes.",
+    ctaText: 'Demandez un devis'
+  },
+  fitness: {
+    primary: '#dc2626',
+    secondary: '#b91c1c',
+    accent: '#ef4444',
+    background: '#fef2f2',
+    services: [
+      { name: 'Coaching Personnel', description: 'Accompagnement individuel sur mesure', features: ['Bilan morpho', 'Programme adapté', 'Suivi hebdo'] },
+      { name: 'Cours Collectifs', description: 'Groupes dynamiques et motivants', features: ['HIIT', 'Yoga', 'Zumba', 'Musculation guidée'] },
+      { name: 'Musculation Libre', description: 'Espace haltères et machines', features: ['Poids libres', 'Machines guidées', 'Cage à squat'] },
+      { name: 'Cardio Zone', description: 'Équipements endurance modernes', features: ['Tapis connectés', 'Vélos elliptiques', 'Rameurs'] },
+      { name: 'Préparation Physique', description: 'Prépa compétition ou remise en forme', features: ['Tests perf', 'Plan nutrition', 'Récupération'] },
+      { name: 'Espace Bien-être', description: 'Détente après effort', features: ['Sauna', 'Douche jets', 'Casiers sécurisés'] }
+    ],
+    guarantees: [
+      { title: 'Coachs Diplômés', icon: 'award' },
+      { title: 'Matériel Neuf', icon: 'dumbbell' },
+      { title: 'Sans Engagement', icon: 'check-circle' },
+      { title: 'Accès 6h-23h', icon: 'clock' }
+    ],
+    heroTitle: 'Coach Sportif',
+    heroSubtitle: "Votre coach personnel pour atteindre vos objectifs fitness",
+    aboutText: "Coach sportif diplômé d'État avec 15 ans d'expérience. Que vous cherchiez à perdre du poids, gagner en muscle ou préparer une compétition, je vous accompagne avec des programmes personnalisés.",
+    ctaText: 'Essai offert'
+  },
+  medical: {
+    primary: '#1e40af',
+    secondary: '#1e3a8a',
+    accent: '#2563eb',
+    background: '#eff6ff',
+    services: [
+      { name: 'Médecine Générale', description: 'Consultations et suivi de santé', features: ['Bilan annuel', 'Vaccinations', 'Certificats'] },
+      { name: 'Kinésithérapie', description: 'Rééducation et réadaptation', features: ['Massages médicaux', 'Rééducation post-op', 'Posturologie'] },
+      { name: 'Ostéopathie', description: 'Soins sans médicaments', features: ['Bébés', 'Femmes enceintes', 'Sportifs'] },
+      { name: 'Infirmier à Domicile', description: 'Soins à votre domicile', features: ['Injections', 'Pansements', 'Prélèvements'] },
+      { name: 'Analyses Biologiques', description: 'Laboratoire sur place', features: ['Prise de sang', 'Tests rapides', 'Résultats 24h'] },
+      { name: 'Télémédecine', description: 'Consultation vidéo', features: ['Ordonnance électronique', '7j/7 disponible', 'Sans déplacement'] }
+    ],
+    guarantees: [
+      { title: 'Conventionné Secteur 1', icon: 'stethoscope' },
+      { title: '3ème Payant', icon: 'credit-card' },
+      { title: 'RDV sous 48h', icon: 'calendar' },
+      { title: 'Équipe Pluridisciplinaire', icon: 'users' }
+    ],
+    heroTitle: 'Cabinet Médical',
+    heroSubtitle: "Votre santé entre les mains de professionnels qualifiés",
+    aboutText: "Médecin généraliste depuis 15 ans, je vous accueille dans un cabinet moderne et chaleureux. Écoute, diagnostic précis et suivi personnalisé. Collaboration avec une équipe de spécialistes pour une prise en charge complète.",
+    ctaText: 'Prendre rendez-vous'
+  },
+  avocat: {
+    primary: '#1e3a8a',
+    secondary: '#172554',
+    accent: '#2563eb',
+    background: '#f8fafc',
+    services: [
+      { name: 'Droit Civil & Famille', description: 'Divorce, succession, bail', features: ['Divorce amiable/contentieux', 'Régime matrimonial', 'Garde alternée'] },
+      { name: 'Droit Pénal', description: 'Défense et assistance victimes', features: ['Garde à vue', 'Tribunal correctionnel', 'Victimes préjudice'] },
+      { name: 'Droit du Travail', description: 'Licenciement et contentieux', features: ['Rupture conventionnelle', 'Harcèlement', 'Prud\'hommes'] },
+      { name: 'Droit des Affaires', description: 'Conseil entreprises et particuliers', features: ['Création société', 'Contrats commerciaux', 'Recouvrement'] },
+      { name: 'Immobilier', description: 'Vente, achat, litiges', features: ['Promesse vente', 'Copropriété', 'Malfaisance construction'] },
+      { name: 'Droit Routier', description: 'Permis, accidents, infractions', features: ['Retrait permis', 'Excès vitesse', 'Défense pénale'] }
+    ],
+    guarantees: [
+      { title: 'Avocat au Barreau', icon: 'scale' },
+      { title: 'Consultation Privée', icon: 'shield' },
+      { title: 'Défense Déterminée', icon: 'sword' },
+      { title: 'Honoraires Transparent', icon: 'file-text' }
+    ],
+    heroTitle: 'Avocat à la Cour',
+    heroSubtitle: "Conseil juridique personnalisé et défense de vos droits",
+    aboutText: "Avocat inscrit au Barreau depuis 15 ans, je défends vos intérêts avec rigueur et détermination. Droit civil, pénal, travail ou affaires, chaque dossier mérite une stratégie sur mesure et une écoute attentive.",
+    ctaText: 'Prendre rendez-vous'
+  },
+  default: {
+    primary: '#1e293b',
+    secondary: '#334155',
+    accent: '#475569',
+    background: '#f8fafc',
+    services: [
+      { name: 'Prestation Sur Mesure', description: 'Services adaptés à vos besoins spécifiques', features: ['Étude personnalisée', 'Devis détaillé', 'Écoute attentive'] },
+      { name: 'Intervention Pro', description: 'Travail soigné et professionnel', features: ['Matériel adapté', 'Techniques actuelles', 'Respect des normes'] },
+      { name: 'Conseil Expert', description: 'Accompagnement et recommandations', features: ['Diagnostic complet', 'Solutions pertinentes', 'Suivi personnalisé'] },
+      { name: 'Service Rapide', description: 'Réactivité et respect des délais', features: ['Intervention rapide', 'Horaires flexibles', 'Urgences traitées'] },
+      { name: 'Garantie Qualité', description: 'Engagement résultat et satisfaction', features: ['Contrôle qualité', 'Corrections incluses', 'SAV réactif'] },
+      { name: 'Tarifs Transparents', description: 'Honoraires clairs et justifiés', features: ['Devis gratuit', 'Pas de surprise', 'Facilités paiement'] }
+    ],
+    heroTitle: 'Artisan Professionnel',
+    heroSubtitle: "Votre expert de confiance pour des prestations de qualité",
+    aboutText: "Artisan passionné depuis 15 ans, je mets mon savoir-faire et mon expertise à votre service. Chaque projet est unique et mérite une attention particulière. Qualité, transparence et satisfaction sont mes priorités.",
+    ctaText: 'Contactez-moi'
+  }
+};
+
+// ── IMAGES PAR SECTEUR ---
+// Utilise les images Pexels professionnelles du fichier pexelsImages.ts
+// Plus fiables et pertinentes que les anciennes images Unsplash génériques
+
+function getSectorImagesFallback(sector: string): string[] {
+  // Utiliser les images Pexels professionnelles du nouveau système
+  return getSectorImages(sector);
+}
+
+function getUltimateTemplate(sector: string) {
+  const normalizedSector = (sector || '').toLowerCase();
+  
+  // Vérifications spécifiques avec accents et variations pour tous les secteurs
+  if (normalizedSector.includes('nettoyag') || normalizedSector.includes('propreté') || normalizedSector.includes('ménage')) return SECTOR_ULTIMATE_TEMPLATES.nettoyage;
+  if (normalizedSector.includes('jardin') || normalizedSector.includes('paysag') || normalizedSector.includes('espaces verts')) return SECTOR_ULTIMATE_TEMPLATES.jardin;
+  if (normalizedSector.includes('coach') || normalizedSector.includes('sport') || normalizedSector.includes('fitness') || normalizedSector.includes('salle')) return SECTOR_ULTIMATE_TEMPLATES.fitness;
+  if (normalizedSector.includes('médec') || normalizedSector.includes('clinique') || normalizedSector.includes('dentiste') || normalizedSector.includes('santé')) return SECTOR_ULTIMATE_TEMPLATES.medical;
+  if (normalizedSector.includes('avocat') || normalizedSector.includes('notaire') || normalizedSector.includes('juridi') || normalizedSector.includes('droit')) return SECTOR_ULTIMATE_TEMPLATES.avocat;
+  if (normalizedSector.includes('électricien') || normalizedSector.includes('electricien') || normalizedSector.includes('electric')) return SECTOR_ULTIMATE_TEMPLATES.electricien;
+  if (normalizedSector.includes('plomb') || normalizedSector.includes('plomberie') || normalizedSector.includes('plombier') || normalizedSector.includes('chauffage') || normalizedSector.includes('clim')) return SECTOR_ULTIMATE_TEMPLATES.plomberie;
+  if (normalizedSector.includes('coiff') || normalizedSector.includes('barb') || normalizedSector.includes('salon')) return SECTOR_ULTIMATE_TEMPLATES.coiffeur;
+  if (normalizedSector.includes('restaurant') || normalizedSector.includes('cuisin') || normalizedSector.includes('traiteur')) return SECTOR_ULTIMATE_TEMPLATES.restaurant;
+  if (normalizedSector.includes('garage') || normalizedSector.includes('mécan') || normalizedSector.includes('auto') || normalizedSector.includes('carrosserie')) return SECTOR_ULTIMATE_TEMPLATES.garage;
+  
+  // Vérifications génériques avec toutes les clés disponibles
+  for (const [key, template] of Object.entries(SECTOR_ULTIMATE_TEMPLATES)) {
+    if (normalizedSector.includes(key)) return template;
+  }
+  
+  // Fallback pour variations spécifiques
+  if (normalizedSector.includes('climat') || normalizedSector.includes('frigo')) return SECTOR_ULTIMATE_TEMPLATES.plomberie;
+  if (normalizedSector.includes('beauté') || normalizedSector.includes('esthétique') || normalizedSector.includes('spa')) return SECTOR_ULTIMATE_TEMPLATES.coiffeur;
+  if (normalizedSector.includes('boulanger') || normalizedSector.includes('pâtissier')) return SECTOR_ULTIMATE_TEMPLATES.restaurant;
+  
+  return SECTOR_ULTIMATE_TEMPLATES.default;
+}
+
+// Nettoyeur de texte de logo selon les instructions (2 lettres, 2 mots sans les articles)
+function getLogoInfo(name: string, sector: string = 'default') {
+  if (!name) return { initials: "CO", text: "Company", word1: "Company", word2: "Pro" };
+  
+  const skip = ['le', 'la', 'les', 'de', 'du', 'des', "l'", "d'", 'à', 'a', 'et', '&', 'en', 'pour'];
+  let cleanName = name.replace(/['']/g, "' ");
+  const words = cleanName.split(/\s+/).filter(w => w.length > 0 && !skip.includes(w.toLowerCase()));
+  
+  let word1 = "";
+  let word2 = "";
+
+  // S'il n'y a qu'un seul mot (ex: "SEG" ou "BIQ-ELECTRICITE")
+  if (words.length === 1) {
+      // On met la première lettre en majuscule et le reste en minuscules pour faire plus joli
+      // "BIQ-ELECTRICITE" deviendra "Biq-electricite"
+      word1 = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
+      
+      const lowerWord1 = word1.toLowerCase();
+      const s = sector.toLowerCase();
+
+      // ANTI-RÉPÉTITION : On vérifie si le métier est DÉJÀ dans le nom
+      if (s.includes('elec') && !lowerWord1.includes('elec')) {
+          word2 = "Électricité";
+      } 
+      else if (s.includes('plomb') && !lowerWord1.includes('plomb')) {
+          word2 = "Plomberie";
+      } 
+      else if ((s.includes('garage') || s.includes('auto')) && !lowerWord1.includes('auto') && !lowerWord1.includes('garage')) {
+          word2 = "Automobile";
+      } 
+      else if (!lowerWord1.includes('service') && !lowerWord1.includes('pro')) {
+          // Si le mot n'est lié à rien de connu, on ajoute "Services"
+          // SAUF s'il y a déjà le mot "Service" ou "Pro" dedans
+          word2 = "Services";
+      } 
+      else {
+          // Si le métier est déjà dans le nom (ex: BIQ-ELECTRICITE), on n'ajoute RIEN !
+          word2 = "";
+      }
+  }// S'il y a plusieurs mots (ex: "Bazar Electricité")
+  else {
+      word1 = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
+      word2 = words.slice(1).join(' ').charAt(0).toUpperCase() + words.slice(1).join(' ').slice(1).toLowerCase();
+  }
+
+  // Les initiales pour le logo (2 premières lettres du nom propre)
+  const initials = (word1.substring(0, 2)).toUpperCase();
+  const text = name;
+  
+  return { initials, text, word1, word2 };
+}
+
+function getHeroBadge(sector: string): { icon: string; text: string } {
+  const s = (sector || '').toLowerCase();
+  
+  if (s.includes('plombber') || s.includes('plomb')) {
+    return { icon: 'zap', text: 'Dépannage rapide garanti' };
+  }
+  if (s.includes('électricien') || s.includes('electric')) {
+    return { icon: 'zap', text: 'Électricien certifié' };
+  }
+  if (s.includes('coiff') || s.includes('barb')) {
+    return { icon: 'scissors', text: 'Coiffeur professionnel' };
+  }
+  if (s.includes('restaurant') || s.includes('cuisin')) {
+    return { icon: 'chef-hat', text: 'Chef qualifié' };
+  }
+  if (s.includes('garage') || s.includes('mécan')) {
+    return { icon: 'wrench', text: 'Garage agréé' };
+  }
+  if (s.includes('nettoy') || s.includes('ménage')) {
+    return { icon: 'sparkles', text: 'Service nettoyage pro' };
+  }
+  if (s.includes('jardin') || s.includes('paysag')) {
+    return { icon: 'leaf', text: 'Jardinier expert' };
+  }
+  
+  return { icon: 'shield-check', text: 'Professionnel certifié' };
+}
+
+export function generateUltimateSite(lead: any, aiContent?: any): string {
+  // ── VALIDATION DES DONNÉES CRITIQUES AVANT GÉNÉRATION ──
+  const validationResult = validateLeadData(lead);
+  if (!validationResult.isValid) {
+    console.error(`❌ Erreur validation données pour ${lead.name}:`, validationResult.errors);
+  }
+  if (validationResult.warnings.length > 0) {
+    console.warn(`⚠️ Avertissements pour ${lead.name}:`, validationResult.warnings);
+  }
+
+  // Système unique avec variantes dynamiques pour TOUS les secteurs
+  const sector = (lead.sector || '').toLowerCase();
+  const template = getUltimateTemplate(lead.sector);
+  const companyName = lead.name || 'Entreprise Premium';
+  const city = lead.city || '';
+  const phone = lead.phone || '+33 6 12 34 56 78';
+  const email = lead.email || 'contact@entreprise.fr';
+  const address = lead.address || (city ? `Centre Ville, ${city}` : 'France');
+  const website = lead.website || '';
+  const rating = lead.googleRating || 5;
+  const reviews = lead.googleReviews || 42;
+  
+  const rawDescription = aiContent?.aboutText || lead.description || template.aboutText;
+  const description = generateAboutText(rawDescription, lead);
+  const heroTitle = aiContent?.heroTitle || template.heroTitle;
+  const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle}${city ? ' à ' + city : ''}`;
+  
+  // CTA avec limite augmentée à 50 caractères pour plus de personnalisation
+  let ctaText = aiContent?.cta || template.ctaText || "Demander un devis";
+  if (ctaText.length > 50) ctaText = ctaText.substring(0, 47) + '...';
+  
+  // Services avec fallback - Features IA générées dynamiquement si disponibles
+  let finalServices = template.services;
+  if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
+    finalServices = aiContent.services.map((s: any, idx: number) => {
+      let features = s.features;
+      if (!features || features.length === 0) {
+        features = generateFeaturesFromService(s.name, s.description, lead.sector);
+      }
+      return {
+        name: s.name || `Service ${idx+1}`,
+        description: s.description || '',
+        features: features.slice(0, 3)
+      };
+    });
+  }
+
+  // ── SYSTÈME AVANCÉ D'INTÉGRATION DES VRAIS AVIS DU PROSPECT ──
+  
+  // Étape 1: Extraire et valider les vrais avis Google du prospect
+  const realReviews = extractAndValidateRealReviews(lead.googleReviewsData || [], lead);
+  
+  // Étape 2: Compléter avec les avis sectoriels authentiques si nécessaire
+  const finalTestimonials = buildCompleteTestimonialList(realReviews, lead.sector, 6);
+  
+  console.log(`📊 ${companyName}: ${realReviews.length} vrais avis trouvés sur Google, ${finalTestimonials.length} avis totaux affichés`);
+
+  let nameHash = 0;
+  for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
+  const baseSlogan = aiContent?.slogan || "L'excellence à votre service";
+  const sloganVariations = [
+    baseSlogan,
+    "L'art de la perfection au quotidien",
+    "Solutions premium sur-mesure",
+    "Excellence & Passion",
+    "Votre partenaire de confiance"
+  ];
+  const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
+
+  // ── SYSTÈME AVANCÉ DE TRAITEMENT D'IMAGES ──
+  // Priorité 1: Images réelles du lead (Google Maps, site web) - filtrées et catégorisées
+  // Priorité 2: Images Pexels sectorielles professionnelles (fallback avec cache)
+  
+  // 1. Valider et catégoriser les images réelles du lead
+  const realImages = validateAndCategorizeImages([
+    ...(lead.images || []), 
+    ...(lead.websiteImages || [])
+  ], true);
+  
+  // 2. Récupérer les images sectorielles Pexels (fallback)
+  const sectorPexelsImages = getSectorImagesFallback(lead.sector);
+  const pexelsImages = validateAndCategorizeImages(sectorPexelsImages, false);
+  
+  // 3. Combiner en préservant les types
+  const allProcessedImage = [...realImages, ...pexelsImages];
+  
+  // 4. Sélectionner intelligemment les images uniques
+  const selectedImages = selectUniqueImages(allProcessedImage, 6);
+  
+  // 5. Prioriser une vraie photo pour le hero
+  const realPhotos = selectedImages.filter(img => img.isReal && img.type === 'photo');
+  const heroImage = realPhotos.length > 0 ? realPhotos[0].url : selectedImages[0].url;
+  
+  // 6. Générer la liste finale pour les autres sections
+  const allImages = selectedImages.slice(1, 6).map(img => img.url);
+  
+  // 7. Log détaillé pour debugging
+  console.log(`🖼️ ${lead.name}: ${realImages.length} images réelles (${realPhotos.length} photos) + ${pexelsImages.length} images Pexels`);
+  console.log(`📸 Hero: ${realPhotos.length > 0 ? 'VRAIE PHOTO' : 'PEXELS'} | Types:`, selectedImages.map(img => img.type));
+
+  const content: UltimateContent = {
+    companyName, 
+    sector: lead.sector || 'Professionnel', 
+    city, 
+    description, 
+    phone, 
+    email, 
+    address, 
+    website, 
+    rating, 
+    reviews,
+    services: finalServices, 
+    testimonials: finalTestimonials, 
+    heroTitle, 
+    heroSubtitle, 
+    aboutText: description, 
+    ctaText, 
+    slogan: finalSlogan, 
+    heroImage, 
+    allImages
+  };
+
+  // Layout variant basé sur le hash du nom (0-3) pour varier la structure du site
+  const layoutVariant = nameHash % 4;
+  
+  return buildUltimateHTML(content, template, allImages, layoutVariant);
+}
+
+/**
+ * Version ASYNC avec API Pexels dynamique + Supabase Storage
+ * PRIORITÉ 1: Images réelles du lead
+ * PRIORITÉ 2: Images API Pexels téléchargées dans Supabase Storage
+ */
+export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Promise<string> {
+  // ── VALIDATION DES DONNÉES CRITIQUES AVANT GÉNÉRATION ──
+  const validationResult = validateLeadData(lead);
+  if (!validationResult.isValid) {
+    console.error(`❌ Erreur validation données pour ${lead.name}:`, validationResult.errors);
+  }
+  if (validationResult.warnings.length > 0) {
+    console.warn(`⚠️ Avertissements pour ${lead.name}:`, validationResult.warnings);
+  }
+
+  // Système unique avec variantes dynamiques pour TOUS les secteurs
+  const sector = (lead.sector || '').toLowerCase();
+  const template = getUltimateTemplate(lead.sector);
+  const companyName = lead.name || 'Entreprise Premium';
+  const city = lead.city || '';
+  const phone = lead.phone || '+33 6 12 34 56 78';
+  const email = lead.email || 'contact@entreprise.fr';
+  const address = lead.address || (city ? `Centre Ville, ${city}` : 'France');
+  const website = lead.website || '';
+  const rating = lead.googleRating || 5;
+  const reviews = lead.googleReviews || 42;
+  
+  const rawDescription = aiContent?.aboutText || lead.description || template.aboutText;
+  const description = generateAboutText(rawDescription, lead);
+  const heroTitle = aiContent?.heroTitle || template.heroTitle;
+  const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle}${city ? ' à ' + city : ''}`;
+  
+  // Hash du nom pour variété
+  let nameHash = 0;
+  for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
+  
+  // Slogan variant
+  const baseSlogan = aiContent?.slogan || "L'excellence à votre service";
+  const sloganVariations = [
+    baseSlogan,
+    "L'art de la perfection au quotidien",
+    "Solutions premium sur-mesure",
+    "Excellence & Passion",
+    "Votre partenaire de confiance"
+  ];
+  const finalSlogan = sloganVariations[nameHash % sloganVariations.length];
+
+  // ── NOUVEAU SYSTÈME: API PEXELS + SUPABASE STORAGE ──
+  // Récupérer les images (réelles + API Pexels stockées)
+  let combinedImages: string[] = [];
+  try {
+    combinedImages = await getImagesForLead(lead, 6);
+    console.log(`✅ Images API Pexels chargées pour ${lead.name}: ${combinedImages.length} images`);
+  } catch (error) {
+    console.error('❌ Erreur chargement images API Pexels:', error);
+    // Fallback sur les images statiques
+    combinedImages = getSectorImagesFallback(lead.sector);
+  }
+  
+  // Hash robuste pour distribution unique
+  let imageHash = 0;
+  for (let i = 0; i < companyName.length; i++) {
+    imageHash = ((imageHash << 5) - imageHash) + companyName.charCodeAt(i);
+    imageHash |= 0;
+  }
+  imageHash = Math.abs(imageHash);
+  
+  const startIndex = imageHash % combinedImages.length;
+  const heroImage = combinedImages[startIndex];
+  
+  const allImages = [];
+  for (let i = 1; i <= 5; i++) {
+    const imageIndex = (startIndex + i) % combinedImages.length;
+    allImages.push(combinedImages[imageIndex]);
+  }
+
+  // Services avec fallback - Features IA générées dynamiquement si disponibles
+  let finalServices = template.services;
+  if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
+    finalServices = aiContent.services.map((s: any, idx: number) => {
+      // Si l'IA fournit des features, les utiliser; sinon générer des features cohérentes
+      let features = s.features;
+      if (!features || features.length === 0) {
+        features = generateFeaturesFromService(s.name, s.description, lead.sector);
+      }
+      return {
+        name: s.name || `Service ${idx+1}`,
+        description: s.description || '',
+        features: features.slice(0, 3) // Max 3 features
+      };
+    });
+  }
+
+  // ── SYSTÈME AVANCÉ D'INTÉGRATION DES VRAIS AVIS DU PROSPECT ──
+  
+  // Étape 1: Extraire et valider les vrais avis Google du prospect
+  const realReviews = extractAndValidateRealReviews(lead.googleReviewsData || [], lead);
+  
+  // Étape 2: Compléter avec les avis sectoriels authentiques si nécessaire
+  const finalTestimonials = buildCompleteTestimonialList(realReviews, lead.sector, 6);
+  
+  console.log(`📊 ${companyName}: ${realReviews.length} vrais avis trouvés sur Google, ${finalTestimonials.length} avis totaux affichés`);
+
+  // CTA - Accepte les textes plus longs (jusqu'à 50 caractères) pour plus de personnalisation
+  let ctaText = aiContent?.cta || template.ctaText || "Demander un devis";
+  if (ctaText.length > 50) {
+    // Tronquer intelligemment si trop long
+    ctaText = ctaText.substring(0, 47) + '...';
+  }
+
+  const content: UltimateContent = {
+    companyName,
+    sector: lead.sector || 'Professionnel',
+    city,
+    description,
+    phone,
+    email,
+    address,
+    website,
+    rating,
+    reviews,
+    services: finalServices,
+    testimonials: finalTestimonials,
+    heroTitle,
+    heroSubtitle,
+    aboutText: description,
+    ctaText,
+    slogan: finalSlogan,
+    heroImage,
+    allImages
+  };
+
+  const processedImages: ProcessedImage[] = validateAndCategorizeImages(combinedImages, false);
+  return renderUltimateTemplate(content, processedImages);
+}
+
+// ── TEMPLATES STRUCTURELS SPÉCIFIQUES PAR SECTEUR ──
+interface SectorLayout {
+  sections: string[];
+  customComponents?: string[];
+  specialFeatures?: string[];
+}
+
+const SECTOR_LAYOUTS: Record<string, SectorLayout> = {
+  // Restaurant : Menu + Galerie + Réservation
+  restaurant: {
+    sections: ['header', 'hero', 'menu', 'about', 'gallery', 'testimonials', 'reservation', 'contact', 'footer'],
+    customComponents: ['menu-grid', 'gallery-masonry', 'reservation-form'],
+    specialFeatures: ['carte-interactive', 'horaires-ouvertures', 'menu-pdf']
+  },
+  
+  // Garage : Services + Marques + RDV
+  garage: {
+    sections: ['header', 'hero', 'services', 'brands', 'about', 'testimonials', 'appointment', 'contact', 'footer'],
+    customComponents: ['brands-showcase', 'appointment-calendar', 'diagnostic-tool'],
+    specialFeatures: ['marques-traitees', 'calendrier-rdv', 'diagnostic-en-ligne']
+  },
+  
+  // Coiffeur : Services + Galerie + RDV
+  coiffeur: {
+    sections: ['header', 'hero', 'services', 'gallery', 'about', 'testimonials', 'booking', 'contact', 'footer'],
+    customComponents: ['service-cards', 'gallery-instagram', 'booking-system'],
+    specialFeatures: ['galerie-shampoing', 'prix-services', 'rdv-en-ligne']
+  },
+  
+  // Plomberie : Services + Urgence + Devis
+  plomberie: {
+    sections: ['header', 'hero', 'emergency', 'services', 'about', 'testimonials', 'quote', 'contact', 'footer'],
+    customComponents: ['emergency-banner', 'service-grid', 'quote-calculator'],
+    specialFeatures: ['urgence-24h', 'devis-en-ligne', 'intervention-rapide']
+  },
+  
+  // Électricien : Services + Certifications + Devis
+  electricien: {
+    sections: ['header', 'hero', 'services', 'certifications', 'about', 'testimonials', 'quote', 'contact', 'footer'],
+    customComponents: ['certification-badges', 'service-categories', 'quote-form'],
+    specialFeatures: ['normes-electriques', 'certifications', 'devis-gratuit']
+  },
+  
+  // Nettoyage : Services + Tarifs + Devis
+  nettoyage: {
+    sections: ['header', 'hero', 'services', 'pricing', 'about', 'testimonials', 'quote', 'contact', 'footer'],
+    customComponents: ['service-packages', 'pricing-table', 'quote-calculator'],
+    specialFeatures: ['forfaits-nettoyage', 'tarifs-clairs', 'devis-personnalisé']
+  },
+  
+  // Default : Structure standard
+  default: {
+    sections: ['header', 'hero', 'services', 'about', 'testimonials', 'contact', 'footer'],
+    customComponents: [],
+    specialFeatures: []
+  }
+};
+
+function getSectorLayout(sector: string): SectorLayout {
+  const normalizedSector = (sector || '').toLowerCase();
+  
+  // Recherche exacte ou partielle
+  for (const [key, layout] of Object.entries(SECTOR_LAYOUTS)) {
+    if (normalizedSector.includes(key) || key.includes(normalizedSector)) {
+      return layout;
+    }
+  }
+  
+  return SECTOR_LAYOUTS.default;
+}
+
+// ── COMPOSANTS SPÉCIFIQUES PAR SECTEUR ──
+
+// Restaurant : Menu interactif + Réservation
+function generateMenuSection(content: UltimateContent, template: any): string {
+  const { companyName, services, email } = content;
+  const cleanEmail = email || 'contact@example.com';
+  const formSubmitEndpoint = `https://formsubmit.co/${cleanEmail.replace(/[^a-zA-Z0-9@.]/g, '')}`;
+  
+  return `
+    <!-- MENU SECTION -->
+    <section id="menu" class="py-20 bg-gradient-to-br from-stone-50 to-white">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: ${template.primary}">
+            Notre Carte
+          </h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Découvrez nos créations culinaires préparées avec des produits frais et locaux
+          </p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          ${services.map((service, index) => `
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div class="h-48 bg-gradient-to-br from-${template.primary}/20 to-${template.accent}/20 flex items-center justify-center">
+                <div class="text-center">
+                  <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style="background-color: ${template.primary}">
+                    <i data-lucide="utensils" class="w-8 h-8 text-white"></i>
+                  </div>
+                  <h3 class="text-2xl font-bold" style="color: ${template.primary}">${service.name}</h3>
+                </div>
+              </div>
+              <div class="p-6">
+                <p class="text-gray-600 mb-4">${service.description}</p>
+                <div class="space-y-2">
+                  ${service.features.map(feature => `
+                    <div class="flex items-center text-sm text-gray-700">
+                      <i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>
+                      ${feature}
+                    </div>
+                  `).join('')}
+                </div>
+                <div class="mt-6">
+                  <span class="text-2xl font-bold" style="color: ${template.primary}">${15 + index * 5}€</span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="text-center mt-12">
+          <button class="px-8 py-4 rounded-full text-white font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105" style="background-color: ${template.primary}">
+            <i data-lucide="download" class="w-5 h-5 mr-2"></i>
+            Télécharger la carte complète
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- RESERVATION SECTION -->
+    <section id="reservation" class="py-20 bg-gradient-to-br from-orange-50 to-amber-50">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: ${template.primary}">
+            Réserver une Table
+          </h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Réservez votre table en quelques clics et recevez une confirmation immédiate
+          </p>
+        </div>
+        
+        <div class="max-w-2xl mx-auto">
+          <form class="bg-white rounded-2xl shadow-xl p-8" action="${formSubmitEndpoint}" method="POST" target="_blank">
+            <input type="text" name="_honey" style="display:none;">
+            <input type="hidden" name="_subject" value="Nouvelle réservation - ${companyName}">
+            <input type="hidden" name="_template" value="box">
+            <input type="hidden" name="type_demande" value="reservation">
+            <input type="hidden" name="restaurant" value="${companyName}">
+            
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet *</label>
+                <input type="text" name="name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Votre nom">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone *</label>
+                <input type="tel" name="phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Votre téléphone">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Date *</label>
+                <input type="date" name="date" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Heure *</label>
+                <input type="time" name="time" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de personnes *</label>
+                <select name="personnes" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                  <option value="">Choisir...</option>
+                  <option value="1">1 personne</option>
+                  <option value="2">2 personnes</option>
+                  <option value="3">3 personnes</option>
+                  <option value="4">4 personnes</option>
+                  <option value="5">5 personnes</option>
+                  <option value="6">6 personnes</option>
+                  <option value="7+">7+ personnes</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="votre@email.com">
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Préférences alimentaires</label>
+              <textarea name="preferences" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Allergies, régime végétarien, etc."></textarea>
+            </div>
+            
+            <button type="submit" class="w-full mt-6 px-8 py-4 rounded-full text-white font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105" style="background-color: ${template.primary}">
+              <i data-lucide="calendar" class="w-5 h-5 mr-2"></i>
+              Confirmer la réservation
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+// Garage : Marques traitées + RDV
+function generateBrandsSection(content: UltimateContent, template: any): string {
+  const { companyName, email } = content;
+  const cleanEmail = email || 'contact@example.com';
+  const formSubmitEndpoint = `https://formsubmit.co/${cleanEmail.replace(/[^a-zA-Z0-9@.]/g, '')}`;
+  
+  const brands = [
+    { name: "Renault", logo: "🚗" },
+    { name: "Peugeot", logo: "🚙" },
+    { name: "Citroën", logo: "🚐" },
+    { name: "Volkswagen", logo: "🏎️" },
+    { name: "BMW", logo: "🚘" },
+    { name: "Mercedes", logo: "🚛" }
+  ];
+  
+  return `
+    <!-- BRANDS SECTION -->
+    <section id="brands" class="py-20 bg-gray-50">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: ${template.primary}">
+            Marques Traitées
+          </h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Nous intervenons sur toutes les marques avec des pièces d'origine et des garanties constructeur
+          </p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+          ${brands.map(brand => `
+            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div class="text-4xl mb-4">${brand.logo}</div>
+              <h3 class="font-semibold text-gray-800">${brand.name}</h3>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+    
+    <!-- APPOINTMENT SECTION -->
+    <section id="appointment" class="py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: ${template.primary}">
+            Prendre Rendez-vous
+          </h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Réservez votre créneau horaire pour un diagnostic ou une intervention
+          </p>
+        </div>
+        
+        <div class="max-w-2xl mx-auto">
+          <form class="bg-white rounded-2xl shadow-xl p-8" action="${formSubmitEndpoint}" method="POST" target="_blank">
+            <input type="text" name="_honey" style="display:none;">
+            <input type="hidden" name="_subject" value="Nouveau RDV Garage - ${companyName}">
+            <input type="hidden" name="_template" value="box">
+            <input type="hidden" name="type_demande" value="rdv_garage">
+            <input type="hidden" name="garage" value="${companyName}">
+            
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet *</label>
+                <input type="text" name="name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Votre nom">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone *</label>
+                <input type="tel" name="phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Votre téléphone">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="votre@email.com">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Marque du véhicule *</label>
+                <select name="marque" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="">Choisir...</option>
+                  <option value="Renault">Renault</option>
+                  <option value="Peugeot">Peugeot</option>
+                  <option value="Citroën">Citroën</option>
+                  <option value="Volkswagen">Volkswagen</option>
+                  <option value="BMW">BMW</option>
+                  <option value="Mercedes">Mercedes</option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Modèle *</label>
+                <input type="text" name="modele" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: Clio, 208, Golf">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Année *</label>
+                <input type="number" name="annee" required min="1990" max="2024" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: 2018">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Date souhaitée *</label>
+                <input type="date" name="date" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Heure souhaitée *</label>
+                <input type="time" name="time" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Type d'intervention *</label>
+              <select name="type_intervention" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Choisir...</option>
+                <option value="diagnostic">Diagnostic</option>
+                <option value="entretien">Entretien</option>
+                <option value="reparation">Réparation</option>
+                <option value="controle_technique">Contrôle technique</option>
+                <option value="urgence">Urgence</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
+            
+            <div class="mt-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Description du problème</label>
+              <textarea name="description" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Décrivez le problème ou l'intervention souhaitée..."></textarea>
+            </div>
+            
+            <button type="submit" class="w-full mt-6 px-8 py-4 rounded-full text-white font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105" style="background-color: ${template.primary}">
+              <i data-lucide="wrench" class="w-5 h-5 mr-2"></i>
+              Confirmer le rendez-vous
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+// Coiffeur : Galerie Instagram
+function generateGallerySection(content: UltimateContent, template: any, allImages: string[]): string {
+  return `
+    <!-- GALLERY SECTION -->
+    <section id="gallery" class="py-20 bg-gradient-to-br from-purple-50 to-pink-50">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: ${template.primary}">
+            Nos Réalisations
+          </h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Inspirez-vous de nos dernières créations et tendances
+          </p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          ${allImages.slice(0, 8).map((img, index) => `
+            <div class="relative group overflow-hidden rounded-xl aspect-square">
+              <img src="${img}" alt="Réalisation ${index + 1}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" loading="lazy">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div class="absolute bottom-4 left-4 text-white">
+                  <p class="text-sm font-semibold">Style ${['Classique', 'Moderne', 'Tendance', 'Avant-gardiste'][index % 4]}</p>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="text-center mt-12">
+          <button class="px-8 py-4 rounded-full text-white font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105" style="background-color: ${template.primary}">
+            <i data-lucide="instagram" class="w-5 h-5 mr-2"></i>
+            Voir plus sur Instagram
+          </button>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+// Plomberie : Urgence 24h
+function generateEmergencySection(content: UltimateContent, template: any): string {
+  const { phone } = content;
+  
+  return `
+    <!-- EMERGENCY SECTION -->
+    <section id="emergency" class="py-20 bg-red-600 text-white">
+      <div class="container mx-auto px-6">
+        <div class="text-center">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-6">
+            <i data-lucide="alert-triangle" class="w-10 h-10"></i>
+          </div>
+          <h2 class="text-4xl md:text-5xl font-bold mb-4">
+            Urgence Plomberie
+          </h2>
+          <p class="text-xl mb-8 max-w-2xl mx-auto">
+            Fuite d'eau, panne de chauffage, obstruction ? Nous intervenons 24h/24 et 7j/7
+          </p>
+          
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
+            <div class="flex items-center justify-center mb-6">
+              <i data-lucide="phone" class="w-8 h-8 mr-3"></i>
+              <span class="text-3xl font-bold">${phone}</span>
+            </div>
+            <p class="text-lg mb-4">Intervention sous 1h30 garantie</p>
+            <button class="w-full px-8 py-4 bg-white text-red-600 rounded-full font-bold hover:bg-gray-100 transition-colors duration-300">
+              Appeler d'urgence
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+// Électricien : Certifications
+function generateCertificationsSection(content: UltimateContent, template: any): string {
+  const certifications = [
+    { name: "Qualifelec", desc: "Certification qualité électricité" },
+    { name: "Consuel", desc: "Attestation de conformité" },
+    { name: "RGE", desc: "Reconnu Garant de l'Environnement" },
+    { name: "Norme NFC 15-100", desc: "Mise aux normes électriques" }
+  ];
+  
+  return `
+    <!-- CERTIFICATIONS SECTION -->
+    <section id="certifications" class="py-20 bg-blue-50">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: ${template.primary}">
+            Nos Certifications
+          </h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Toutes nos interventions sont réalisées selon les normes en vigueur et certifiées
+          </p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          ${certifications.map(cert => `
+            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style="background-color: ${template.primary}">
+                <i data-lucide="award" class="w-8 h-8 text-white"></i>
+              </div>
+              <h3 class="font-bold text-lg mb-2" style="color: ${template.primary}">${cert.name}</h3>
+              <p class="text-gray-600 text-sm">${cert.desc}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+// Nettoyage : Tarifs
+function generatePricingSection(content: UltimateContent, template: any): string {
+  const packages = [
+    { name: "Forfait Standard", price: "89€", features: ["2 pièces", "Nettoyage complet", "Produits écologiques"] },
+    { name: "Forfait Confort", price: "149€", features: ["3-4 pièces", "Vitres comprises", "Débarrassage inclus"] },
+    { name: "Forfait Premium", price: "229€", features: ["5+ pièces", "Tout inclus", "Fréquence adaptable"] }
+  ];
+  
+  return `
+    <!-- PRICING SECTION -->
+    <section id="pricing" class="py-20 bg-gradient-to-br from-green-50 to-emerald-50">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: ${template.primary}">
+            Nos Tarifs
+          </h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Des formules adaptées à tous les besoins et tous les budgets
+          </p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          ${packages.map((pkg, index) => `
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${index === 1 ? 'ring-4 ring-' + template.primary + '/20' : ''}">
+              ${index === 1 ? `
+                <div class="text-center py-4" style="background-color: ${template.primary}">
+                  <span class="text-white font-semibold">PLUS POPULAIRE</span>
+                </div>
+              ` : ''}
+              <div class="p-8">
+                <h3 class="text-2xl font-bold mb-4">${pkg.name}</h3>
+                <div class="text-4xl font-bold mb-6" style="color: ${template.primary}">${pkg.price}</div>
+                <ul class="space-y-3 mb-8">
+                  ${pkg.features.map(feature => `
+                    <li class="flex items-center text-gray-700">
+                      <i data-lucide="check" class="w-5 h-5 mr-3 text-green-500"></i>
+                      ${feature}
+                    </li>
+                  `).join('')}
+                </ul>
+                <button class="w-full px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${index === 1 ? 'text-white' : 'border-2 border-' + template.primary + ' text-' + template.primary}" style="${index === 1 ? 'background-color: ' + template.primary : ''}">
+                  Choisir ce forfait
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+// ── GÉNÉRATION DYNAMIQUE DES SECTIONS SELON LE SECTEUR ──
+function generateSections(content: UltimateContent, template: any, allImages: string[]): string {
+  const sectorLayout = getSectorLayout(content.sector);
+  let sectionsHTML = '';
+  
+  // Générer chaque section selon le layout
+  sectorLayout.sections.forEach(sectionType => {
+    switch (sectionType) {
+      case 'menu':
+        sectionsHTML += generateMenuSection(content, template);
+        break;
+      case 'brands':
+        sectionsHTML += generateBrandsSection(content, template);
+        break;
+      case 'gallery':
+        sectionsHTML += generateGallerySection(content, template, allImages);
+        break;
+      case 'emergency':
+        sectionsHTML += generateEmergencySection(content, template);
+        break;
+      case 'certifications':
+        sectionsHTML += generateCertificationsSection(content, template);
+        break;
+      case 'pricing':
+        sectionsHTML += generatePricingSection(content, template);
+        break;
+      case 'services':
+        sectionsHTML += generateStandardServicesSection(content, template);
+        break;
+      case 'about':
+        sectionsHTML += generateStandardAboutSection(content, template);
+        break;
+      case 'testimonials':
+        sectionsHTML += generateStandardTestimonialsSection(content, template);
+        break;
+      case 'contact':
+        sectionsHTML += generateStandardContactSection(content, template);
+        break;
+      default:
+        // Sections standards si non spécifiques
+        break;
+    }
+  });
+  
+  return sectionsHTML;
+}
+
+// Sections standards (réutilisées par plusieurs secteurs)
+function generateStandardServicesSection(content: UltimateContent, template: any): string {
+  const { services } = content;
+  
+  return `
+    <!-- SERVICES SECTION -->
+    <section id="services" class="py-20 bg-gray-50">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: ${template.primary}">
+            Nos Services
+          </h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Des solutions professionnelles adaptées à vos besoins
+          </p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          ${services.map((service, index) => `
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div class="w-16 h-16 rounded-full flex items-center justify-center mb-6" style="background-color: ${template.primary}">
+                <i data-lucide="wrench" class="w-8 h-8 text-white"></i>
+              </div>
+              <h3 class="text-2xl font-bold mb-4" style="color: ${template.primary}">${service.name}</h3>
+              <p class="text-gray-600 mb-6">${service.description}</p>
+              <ul class="space-y-3">
+                ${service.features.map(feature => `
+                  <li class="flex items-center text-sm text-gray-700">
+                    <i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>
+                    ${feature}
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function generateStandardAboutSection(content: UltimateContent, template: any): string {
+  const { companyName, aboutText, city } = content;
+  
+  return `
+    <!-- ABOUT SECTION -->
+    <section id="about" class="py-20 bg-white">
+      <div class="container mx-auto px-6">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-4xl md:text-5xl font-bold mb-6" style="color: ${template.primary}">
+              À Propos de ${companyName}
+            </h2>
+            <div class="prose prose-lg text-gray-600 mb-8">
+              ${aboutText.split('\n').map(paragraph => `<p>${paragraph}</p>`).join('')}
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+              <div class="flex items-center">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" style="background-color: ${template.primary}">
+                  <i data-lucide="award" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                  <div class="font-semibold">Qualité Garantie</div>
+                  <div class="text-sm text-gray-600">Intervention professionnelle</div>
+                </div>
+              </div>
+              <div class="flex items-center">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" style="background-color: ${template.primary}">
+                  <i data-lucide="clock" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                  <div class="font-semibold">Réactivité</div>
+                  <div class="text-sm text-gray-600">Intervention rapide</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="aspect-square rounded-2xl overflow-hidden shadow-2xl">
+              <img src="https://images.unsplash.com/photo-1581094794329-cbf11b3f4354?w=800&q=80" alt="À propos" class="w-full h-full object-cover">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function generateStandardTestimonialsSection(content: UltimateContent, template: any): string {
+  const { testimonials, rating, reviews } = content;
+  
+  return `
+    <!-- TESTIMONIALS SECTION -->
+    <section id="testimonials" class="py-20 bg-gradient-to-br from-gray-50 to-white">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: ${template.primary}">
+            Témoignages Clients
+          </h2>
+          <div class="flex items-center justify-center mb-4">
+            ${Array(5).fill(0).map(() => `<i data-lucide="star" class="w-6 h-6 text-yellow-400 fill-current"></i>`).join('')}
+            <span class="ml-3 text-lg font-semibold">${rating}/5</span>
+          </div>
+          <p class="text-xl text-gray-600">${reviews} avis clients vérifiés</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          ${testimonials.map(testimonial => `
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300">
+              <div class="flex mb-4">
+                ${Array(testimonial.rating || 5).fill(0).map(() => `<i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>`).join('')}
+              </div>
+              <p class="text-gray-700 mb-6 italic">"${testimonial.text}"</p>
+              <div class="flex items-center">
+                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
+                  <i data-lucide="user" class="w-6 h-6 text-gray-600"></i>
+                </div>
+                <div>
+                  <div class="font-semibold">${testimonial.author}</div>
+                  <div class="text-sm text-gray-600">${testimonial.date || 'Récemment'}</div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function generateStandardContactSection(content: UltimateContent, template: any): string {
+  const { companyName, phone, email, address, city, ctaText } = content;
+  
+  // Générer un endpoint Formsubmit.co unique pour le prospect
+  const cleanEmail = email || 'contact@example.com';
+  const formSubmitEndpoint = `https://formsubmit.co/${cleanEmail.replace(/[^a-zA-Z0-9@.]/g, '')}`;
+  
+  return `
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4">
+            Contactez-nous
+          </h2>
+          <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+            Une question ? Un projet ? Notre équipe est à votre disposition
+          </p>
+        </div>
+        
+        <div class="grid lg:grid-cols-2 gap-12">
+          <div>
+            <form class="space-y-6" action="${formSubmitEndpoint}" method="POST" target="_blank">
+              <!-- Champ caché pour éviter le spam -->
+              <input type="text" name="_honey" style="display:none;">
+              <input type="hidden" name="_subject" value="Nouvelle demande de contact - ${companyName}">
+              <input type="hidden" name="_template" value="box">
+              <input type="hidden" name="_captcha" value="false">
+              
+              <div>
+                <label class="block text-sm font-medium mb-2">Nom complet *</label>
+                <input type="text" name="name" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/40 focus:outline-none transition-colors text-white placeholder-gray-400" placeholder="Votre nom">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Email *</label>
+                <input type="email" name="email" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/40 focus:outline-none transition-colors text-white placeholder-gray-400" placeholder="votre@email.com">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Téléphone</label>
+                <input type="tel" name="phone" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/40 focus:outline-none transition-colors text-white placeholder-gray-400" placeholder="Votre téléphone">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Message *</label>
+                <textarea name="message" rows="4" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/40 focus:outline-none transition-colors resize-none text-white placeholder-gray-400" placeholder="Décrivez votre projet..."></textarea>
+              </div>
+              
+              <!-- Informations du prospect incluses dans l'email -->
+              <input type="hidden" name="entreprise" value="${companyName}">
+              <input type="hidden" name="secteur" value="${content.sector}">
+              <input type="hidden" name="telephone_prospect" value="${phone}">
+              <input type="hidden" name="adresse" value="${address}, ${city}">
+              
+              <button type="submit" class="w-full px-8 py-4 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105" style="background-color: ${template.primary}">
+                <i data-lucide="send" class="w-5 h-5 mr-2"></i>
+                ${ctaText}
+              </button>
+              
+              <p class="text-center mt-4 text-sm text-gray-400">
+                <i data-lucide="shield-check" class="w-4 h-4 inline mr-1"></i>
+                Vos données sont protégées et ne seront jamais partagées
+              </p>
+            </form>
+          </div>
+          
+          <div class="space-y-8">
+            <div class="flex items-start">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" style="background-color: ${template.primary}">
+                <i data-lucide="phone" class="w-6 h-6 text-white"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-lg mb-1">Téléphone</div>
+                <div class="text-gray-300">${phone}</div>
+                <div class="text-sm text-gray-400">Réponse sous 2h</div>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" style="background-color: ${template.primary}">
+                <i data-lucide="mail" class="w-6 h-6 text-white"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-lg mb-1">Email</div>
+                <div class="text-gray-300">${email}</div>
+                <div class="text-sm text-gray-400">Contact direct</div>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" style="background-color: ${template.primary}">
+                <i data-lucide="map-pin" class="w-6 h-6 text-white"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-lg mb-1">Adresse</div>
+                <div class="text-gray-300">${address}</div>
+                <div class="text-gray-300">${city}</div>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" style="background-color: ${template.primary}">
+                <i data-lucide="clock" class="w-6 h-6 text-white"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-lg mb-1">Disponibilité</div>
+                <div class="text-gray-300">Lun-Ven: 9h-18h</div>
+                <div class="text-sm text-gray-400">Urgences 24h/24</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function buildUltimateHTML(content: UltimateContent, template: any, combinedImages: string[] = [], layoutVariant: number = 0): string {
+  const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
+  
+  // ── SÉLECTION DU LAYOUT SPÉCIFIQUE PAR SECTEUR ──
+  const sectorLayout = getSectorLayout(content.sector);
+  
+  // ── SYSTÈME DE VARIATIONS DE TEMPLATE ANTI-IDENTIFICATION ──
+  const templateVariation = generateTemplateVariation(companyName, content.sector);
+  
+  // ── SYSTÈME DE MASQUAGE TRACKING EN PRODUCTION ──
+  const isProduction = process.env.NODE_ENV === 'production' || true; // Toujours masquer en production
+  
+  // Script pour masquer tous les logs et tracking en production
+  const trackingMask = `
+    <script>
+      (function() {
+        // Masquer tous les logs en production
+        if (${isProduction}) {
+          const originalConsole = window.console;
+          window.console = {
+            log: function() {},
+            warn: function() {},
+            error: function() {},
+            info: function() {},
+            debug: function() {},
+            trace: function() {}
+          };
+          
+          // Masquer les analytics et tracking
+          if (typeof gtag !== 'undefined') {
+            window.gtag = function() {};
+          }
+          if (typeof ga !== 'undefined') {
+            window.ga = function() {};
+          }
+          if (typeof fbq !== 'undefined') {
+            window.fbq = function() {};
+          }
+          
+          // Masquer les erreurs non critiques
+          window.addEventListener('error', function(e) {
+            if (e.message.includes('Script error') || e.message.includes('Non-Error')) {
+              e.preventDefault();
+            }
+          });
+        }
+      })();
+    </script>
+  `;
+  
+  // Simplification du fallback d'images - pas de JS inline qui bloque
+  const imgErr = (fallbackSlot: number) => {
+    const fallbackUrl = getImg(fallbackSlot);
+    return `onerror="this.onerror=null;this.src='${fallbackUrl}'"`;
+  };
+  
+  // Utilisation stricte des couleurs de la charte par métier
+  const primaryColor = template.primary;
+  const secondaryColor = template.secondary;
+  const accentColor = template.accent;
+
+  // Convertir le HEX primaire en RGB pour les effets de fond
+  const hexToRgb = (hex: string) => {
+    let r = 0, g = 0, b = 0;
+    if (hex.length == 7) {
+      r = parseInt(hex.substring(1, 3), 16);
+      g = parseInt(hex.substring(3, 5), 16);
+      b = parseInt(hex.substring(5, 7), 16);
+    }
+    return `${r}, ${g}, ${b}`;
+  };
+  const primaryRgb = hexToRgb(template.primary);
+  
+  // Variation Logic (gardé pour les patterns et animations)
+  let nameHash = 0;
+  for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
+  const patternType = nameHash % 4;
+  const fontPair = nameHash % 3;
+  const animStyle = nameHash % 2;
+  const shapesType = nameHash % 3;
+
+  const logoInfo = getLogoInfo(companyName, content.sector);
+  const heroBadge = getHeroBadge(content.sector);
+  const cleanPhoneLink = phone ? phone.replace(/[^0-9+]/g, '') : '';
+  const mapQuery = encodeURIComponent(address + (content.city ? ', ' + content.city : ''));
+
+  // Génération dynamique du Favicon SVG
+  const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="${primaryColor}"/><text x="50%" y="50%" font-family="sans-serif" font-size="45" font-weight="bold" fill="white" dominant-baseline="central" text-anchor="middle">${logoInfo.initials}</text></svg>`;
+
+  // On l'encode pour pouvoir le mettre directement dans le href
+  const faviconDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(faviconSvg)}`;
+
+  // ── IMAGE DISTRIBUTION INTELLIGENTE PAR SLOT ──
+  // Chaque section a sa propre image, pas de rotation aveugle.
+  // Si une image réelle existe pour ce slot → on l'utilise.
+  // Sinon → fallback sectoriel neutre garanti.
+  const emergencyFallback = combinedImages[0] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80';
+  
+  // Hash du nom pour distribution UNIQUE des images par entreprise
+  let companyHash = 0;
+  for (let i = 0; i < companyName.length; i++) {
+    companyHash = ((companyHash << 5) - companyHash) + companyName.charCodeAt(i);
+    companyHash |= 0;
+  }
+  companyHash = Math.abs(companyHash);
+  
+  const getImg = (slot: number): string => {
+    // Calculer un index UNIQUE basé sur le hash du nom + le slot
+    // Ainsi "A.Leont" slot 1 ≠ "Sooo" slot 1 — images différentes garanties !
+    const uniqueIndex = (companyHash + slot) % (combinedImages.length || 1);
+    
+    // PRIORITÉ : image du pool combiné (réelles + Pexels) selon le hash
+    if (combinedImages && combinedImages.length > 0 && combinedImages[uniqueIndex]) {
+      const selectedImg = combinedImages[uniqueIndex];
+      if (selectedImg && selectedImg.startsWith('https://')) return selectedImg;
+    }
+    
+    // Fallback : rotation classique sur allImages
+    if (allImages && allImages[slot % allImages.length] && allImages[slot % allImages.length].startsWith('https://')) {
+      return allImages[slot % allImages.length];
+    }
+    
+    // Fallback ultime garanti
+    return emergencyFallback;
+  };
+
+  return `<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth" style="overflow-x: hidden;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/svg+xml" href="${faviconDataUrl}">
+    <title>${companyName} - ${content.sector} à ${city} | Services Professionnels</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="${companyName} - ${content.sector} professionnel à ${city}. ${heroSubtitle}. Contactez-nous au ${phone} pour vos projets.">
+    <meta name="keywords" content="${content.sector}, ${city}, ${companyName}, professionnel, services, intervention rapide, qualité">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="${website || '#'}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${website || '#'}">
+    <meta property="og:title" content="${companyName} - ${content.sector} à ${city}">
+    <meta property="og:description" content="${heroSubtitle}">
+    <meta property="og:image" content="${heroImage}">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="${website || '#'}">
+    <meta name="twitter:title" content="${companyName} - ${content.sector} à ${city}">
+    <meta name="twitter:description" content="${heroSubtitle}">
+    <meta name="twitter:image" content="${heroImage}">
+    
+    <!-- Google Fonts: Diverse Dynamic Pairings WITH LOCAL FALLBACK -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    ${fontPair === 0 ? `<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" onerror="this.onerror=null;this.href='data:text/css,@import url(https://cdn.jsdelivr.net/npm/@fontsource/outfit@5.0.13/outfit.css');@import url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/inter.css);'">` :
+      fontPair === 1 ? `<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" onerror="this.onerror=null;this.href='data:text/css,@import url(https://cdn.jsdelivr.net/npm/@fontsource/plus-jakarta-sans@5.1.0/plus-jakarta-sans.css');@import url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/inter.css);'">` :
+      `<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" onerror="this.onerror=null;this.href='data:text/css,@import url(https://cdn.jsdelivr.net/npm/@fontsource/lexend@5.0.4/lexend.css');@import url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/inter.css);'">`}
+    
+    <!-- Lucide Icons WITH LOCAL FALLBACK -->
+    <script src="https://unpkg.com/lucide@latest" onerror="this.onerror=null;this.src='data:text/javascript,/* Lucide Icons Fallback */ function createIcon(name){const svg={phone:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6.6-6.6A19.79 19.79 0 0 1 3 4.18 2 2 0 0 1 5 2.08v3a2 2 0 0 0 2.18 2c.28.04.54.1.82.14a2 2 0 0 1 1.82 1.82c.04.28.1.54.14.82A2 2 0 0 0 7.08 16H10a2 2 0 0 0 2-2.18 2 2 0 0 1-.14-.82 2 2 0 0 1-1.82-1.82c-.28-.04-.54-.1-.82-.14A2 2 0 0 0 7.08 12H4a2 2 0 0 1-2-2.18 2 2 0 0 1 .14-.82 2 2 0 0 1 1.82-1.82c.28-.04.54-.1.82-.14A2 2 0 0 0 5 8.92V5.92A2 2 0 0 1 7.18 4 19.79 19.79 0 0 1 15.81 1.07 19.5 19.5 0 0 1 22.41 7.67 19.79 19.79 0 0 1 23 16.92Z\\"/></svg>',mail:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><rect x=\\"2\\" y=\\"4\\" width=\\"20\\" height=\\"16\\" rx=\\"2\\"/><path d=\\"m22 7-10 5L2 7\\"/></svg>',map:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M21 10c0 7-9 13-9 13a9.75 9.75 0 0 1-6.74 2.74L3 8l3.74-1.5A9.75 9.75 0 0 1 12 3c7 0 9 6 9 13Z\\"/><path d=\\"M12 7v5l3 3\\"/></svg>',check:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M20 6L9 17l-5-5\\"/></svg>',star:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><polygon points=\\"12 2 15.09 8.26 22 9 17 14.14 19.18 21.02 12 17.77 4.82 21.02 7 14.14 2 9 8.91 8.26 12 2\\"/></svg>',user:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\\"/><circle cx=\\"12\\" cy=\\"7\\" r=\\"4\\"/></svg>',send:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"m22 2-7 20-10-9Z\\"/><path d=\\"M15 13 22 2l-7 7Z\\"/></svg>',calendar:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><rect x=\\"3\\" y=\\"4\\" width=\\"18\\" height=\\"18\\" rx=\\"2\\" ry=\\"2\\"/><line x1=\\"16\\" y1=\\"2\\" x2=\\"16\\" y2=\\"6\\"/><line x1=\\"8\\" y1=\\"2\\" x2=\\"8\\" y2=\\"6\\"/><line x1=\\"3\\" y1=\\"10\\" x2=\\"21\\" y2=\\"10\\"/></svg>',wrench:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z\\"/></svg>',utensils:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2\\"/><path d=\\"M7 2v20\\"/><path d=\\"M21 15V2v0a4 4 0 0 0-4 4h3.5Z\\"/><path d=\\"M3.5 18.5a4.5 4.5 0 0 1 0 9Z\\"/></svg>',download:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\\"/><polyline points=\\"7 10 12 15 17 10\\"/><line x1=\\"12\\" y1=\\"15\\" x2=\\"12\\" y2=\\"3\\"/></svg>',shield:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M20 12a8 8 0 0 0-16 0c0 5.4 3.6 9.9 8 12a8 8 0 0 0 8-12Z\\"/><path d=\\"M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0Z\\"/></svg>',clock:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><circle cx=\\"12\\" cy=\\"12\\" r=\\"10\\"/><polyline points=\\"12 6 12 12 16 14\\"/></svg>',award:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><circle cx=\\"12\\" cy=\\"8\\" r=\\"7\\"/><polyline points=\\"8.21 13.89 7 23 9 12 15 12 17 23 15.79 13.89\\"/></svg>',alert:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z\\"/><line x1=\\"12\\" y1=\\"9\\" x2=\\"12\\" y2=\\"13\\"/><line x1=\\"12\\" y1=\\"17\\" x2=\\"12.01\\" y2=\\"17\\"/></svg>',check:'<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"M20 6L9 17l-5-5\\"/></svg>'};return svg[name]||svg.star;};window.lucide=createIcon;document.querySelectorAll(\\"[data-lucide]\\").forEach(el=>{const name=el.getAttribute(\\"data-lucide\\");if(name){el.innerHTML=createIcon(name);}});'"></script>
+
+    <!-- TRACKING MASK SCRIPT -->
+    ${trackingMask}
+
+    <!-- Structured Data JSON-LD for LocalBusiness SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "${companyName}",
+        "description": "${heroSubtitle}",
+        "image": "${heroImage}",
+        "telephone": "${phone}",
+        "email": "${email}",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "${address}",
+            "addressLocality": "${city}",
+            "addressCountry": "FR"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "",
+            "longitude": ""
+        },
+        "openingHours": "Mo-Fr 09:00-18:00",
+        "priceRange": "$$",
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "${rating || 5}",
+            "reviewCount": "${reviews || 42}"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: ${primaryColor};
+            --secondary: ${secondaryColor};
+            --accent: ${accentColor};
+            --primary-rgb: ${primaryRgb};
+            
+            --bg-base: ${template.background};
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --font-head: ${fontPair === 0 ? "'Outfit'" : fontPair === 1 ? "'Plus Jakarta Sans'" : "'Lexend'"}, sans-serif;
+            
+            --glow: 0 10px 40px rgba(${primaryRgb}, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.7;
+            width: 100%;
+            max-width: 100vw;
+            min-width: 320px;
+        }
+        
+        * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        img, video, iframe {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .top-marquee {
+            width: 100%;
+            max-width: 100vw;
+            overflow: hidden;
+        }
+        
+        .marquee-content {
+            min-width: max-content;
+        }
+
+        h1, h2, h3, h4 { font-family: var(--font-head); }
+
+        /* Desktop specific - ensure mobile menu is hidden */
+        @media (min-width: 769px) {
+            .mobile-menu-toggle {
+                display: none !important;
+            }
+            .mobile-menu {
+                display: none !important;
+            }
+        }
+
+        /* ANIMATIONS PROFESSIONNELLES SUBTILES */
+        .reveal { 
+            opacity: 0; 
+            transform: translateY(30px); 
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .reveal-left { opacity: 0; transform: translateX(-30px); transition: all 0.8s ease-out; }
+        .reveal-left.active { opacity: 1; transform: translateX(0); }
+
+        .reveal-right { opacity: 0; transform: translateX(30px); transition: all 0.8s ease-out; }
+        .reveal-right.active { opacity: 1; transform: translateX(0); }
+
+        .stagger-item { opacity: 0; transform: translateY(15px); transition: 0.6s ease-out; }
+        .active .stagger-item { opacity: 1; transform: translateY(0); }
+
+        /* DYNAMIC PATTERN INJECTION - SUPPRIMÉ POUR DESIGN MODERNE */
+        .bg-pattern { display: none; }
+        .pattern-waves { display: none; }
+        .bg-grid { background-image: none !important; }
+
+        /* Top Marquee Defilant */
+        .top-marquee {
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 8px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            z-index: 100;
+            width: 100%;
+            max-width: 100vw;
+        }
+        .marquee-content {
+            display: inline-flex;
+            gap: 3rem;
+            animation: marquee 30s linear infinite;
+        }
+        .marquee-content:hover {
+            animation-play-state: paused;
+        }
+        .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Abstract Animated Light Background */
+        .pattern-waves {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            background: linear-gradient(135deg, transparent 40%, rgba(${primaryRgb}, 0.05) 50%, transparent 60%);
+            background-size: 200% 200%;
+            animation: waveFlow 15s linear infinite;
+            z-index: 0;
+        }
+        @keyframes waveFlow { 0% { background-position: 0% 0%; } 100% { background-position: 200% 200%; } }
+
+        section { position: relative; }
+        section::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0.03;
+            background-image: radial-gradient(var(--primary) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none; z-index: 0;
+        }
+
+        .bg-blobs {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            z-index: -1;
+            background: var(--bg-base);
+        }
+        .blob {
+            position: absolute;
+            filter: blur(100px);
+            opacity: 0.15;
+            animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+        }
+        .anim-shape {
+            position: absolute; opacity: 0.08; pointer-events: none; z-index: 0;
+            animation: floatShape 14s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+        }
+        @keyframes floatShape {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            100% { transform: translateY(-80px) rotate(180deg) scale(1.2); }
+        }
+        .bg-grid {
+            background-image: radial-gradient(rgba(${primaryRgb}, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .bg-alternate {
+            background-color: #f1f5f9; /* Un gris légèrement plus sombre pour un vrai contraste */
+            border-top: 1px solid rgba(0,0,0,0.05); /* Ligne de séparation subtile */
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .blob-1 {
+            background: var(--primary);
+            width: 45vw; height: 45vw;
+            top: -10vw; left: -10vw;
+        }
+        .blob-2 {
+            background: var(--secondary);
+            width: 35vw; height: 35vw;
+            bottom: -5vw; right: -5vw;
+            animation-delay: -10s;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(15vw, 15vh) scale(1.1); }
+        }
+
+        /* Modern Glassmorphism Components */
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.04);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 36px; /* Below marquee */
+            width: 100%;
+            z-index: 50;
+            padding: 1.5rem 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mobile-menu-toggle {
+            display: none;
+        }
+        nav.scrolled {
+            top: 0;
+            padding: 1rem 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            box-shadow: 0 8px 20px rgba(${primaryRgb}, 0.2);
+        }
+        .brand {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-call {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: white; border: 1px solid rgba(0,0,0,0.05);
+            color: var(--text-main); padding: 0.5rem 1.25rem; border-radius: 100px;
+            text-decoration: none; font-weight: 600; transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .btn-call:hover {
+            background: var(--primary); color: white;
+            box-shadow: var(--glow);
+        }
+
+        /* Stats Banner */
+        .stats-banner { padding: 4rem 2rem; background: var(--primary); color: white; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center; border-radius: 30px; margin: 0 auto; position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(var(--primary-rgb), 0.2); }
+        .stats-banner::after { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent); pointer-events:none;}
+        .stat-banner-item h3 { font-size: 3rem; font-weight: 800; font-family: 'Outfit'; margin-bottom: 0.5rem; line-height: 1; }
+        
+        /* Valeurs */
+        .valeurs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; }
+        .valeur-card { padding: 2.5rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; border-radius: 20px; background: white; border: 1px solid rgba(0,0,0,0.04); transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .valeur-card:hover { transform: translateY(-5px); box-shadow: var(--glow); }
+        .valeur-icon { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, rgba(${primaryRgb}, 0.15), rgba(${primaryRgb}, 0.05)); color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            padding: 10rem 2rem 4rem;
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            z-index: 10;
+        }
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; text-align: center; }
+            .hero .hero-image-col { display: none; }
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 100px;
+            background: white;
+            border: 1px solid rgba(${primaryRgb}, 0.2);
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 20px rgba(${primaryRgb}, 0.08);
+        }
+        .hero h1 {
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+        .hero h1 span {
+            color: var(--primary);
+            font-weight: 800;
+        }
+        .hero p {
+            font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 3.5rem;
+            font-weight: 400;
+        }
+        .btn-cta {
+            background: var(--primary);
+            color: #ffffff;
+            padding: 1rem 2.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            white-space: nowrap;        /* Interdit le retour à la ligne */
+            overflow: hidden;           /* Cache ce qui déborde au cas où */
+            text-overflow: ellipsis;    /* Met des "..." si c'est vraiment trop long sur un tout petit téléphone */
+            justify-content: center;
+        }
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            background: var(--secondary);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* Mobile Buttons */
+        @media (max-width: 768px) {
+            .btn-cta {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Container & Sections */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        .section-header h2 {
+            font-size: clamp(2.2rem, 4vw, 3rem);
+            margin-bottom: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -0.02em;
+        }
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Process Section (4 Démarches) */
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            position: relative;
+        }
+        .step-card {
+            padding: 2.5rem;
+            text-align: center;
+            background: white;
+            border-radius: 24px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: transform 0.3s;
+        }
+        .step-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .step-number {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: var(--bg-base);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.5rem;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+            border: 2px dashed var(--primary);
+        }
+        
+        /* Services Grid */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        .card {
+            padding: 3rem;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,1), transparent 40%);
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .card:hover::before { opacity: 1; }
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(${primaryRgb}, 0.15);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+        .card > * { position: relative; z-index: 1; }
+        
+        .card-icon {
+            width: 70px; height: 70px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(${primaryRgb}, 0.15), rgba(${primaryRgb}, 0.05));
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+        
+        .card h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 700; color: var(--text-main); }
+        .card p { color: var(--text-muted); margin-bottom: 2rem; flex-grow: 1; }
+        .feature-list { list-style: none; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1.5rem; }
+        .feature-list li { display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; font-size: 0.95rem; font-weight: 500; }
+        .feature-list i { color: var(--primary); width: 18px; height: 18px; }
+
+        /* Testimonials */
+        .testimonial-card {
+            padding: 3rem; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .stars { display: flex; gap: 0.25rem; color: #f59e0b; margin-bottom: 1.5rem; }
+        
+        /* Map & Contact Form */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
+        
+        .contact-form-side { padding: 4rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-control {
+            width: 100%; padding: 1rem 1.5rem; border-radius: 12px;
+            border: 1px solid #e2e8f0; background: #f8fafc;
+            font-family: 'Inter', sans-serif; font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(${primaryRgb}, 0.1); background: white; }
+        
+        .map-side iframe { width: 100%; height: 100%; min-height: 400px; border: none; filter: grayscale(10%) contrast(110%); }
+
+        /* Footer */
+        footer {
+            background: var(--text-main);
+            color: white;
+            padding: 5rem 2rem 2rem;
+            margin-top: 4rem;
+        }
+        .footer-grid {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 4rem;
+            margin-bottom: 4rem;
+        }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } }
+        
+        .footer-logo { font-size: 2rem; font-family: 'Outfit'; font-weight: 800; color: white; display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .footer-col h4 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; color: white; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.75rem; }
+        .footer-col ul li a { color: var(--text-light); text-decoration: none; transition: 0.3s; }
+        .footer-col ul li a:hover { color: white; padding-left: 5px; }
+        .footer-bottom { text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; color: var(--text-light); font-size: 0.9rem; }
+
+        /* Modal Styles */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background-color: #fff; margin: 3% auto; padding: 4rem; border-radius: 32px;
+            width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto; position: relative;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.3); border: 1px solid rgba(0,0,0,0.05);
+        }
+        .close-modal {
+            position: absolute; right: 2rem; top: 2rem; color: #000; font-size: 32px; font-weight: 300; cursor: pointer; transition: 0.3s;
+            width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f1f5f9;
+        }
+        .close-modal:hover { background: var(--primary); color: white; }
+        .modal h2 { margin-bottom: 2.5rem; font-family: 'Outfit'; font-weight: 800; color: var(--text-main); font-size: 2.5rem; letter-spacing: -1px; }
+        .modal h3 { margin-bottom: 1rem; margin-top: 2.5rem; font-family: 'Outfit'; font-weight: 700; color: var(--text-main); }
+        .modal p { margin-bottom: 1.5rem; line-height: 1.8; color: var(--text-muted); font-size: 1.05rem; }
+
+        /* Floating Widgets (Unified Style 2026) */
+        .float-widget {
+            position: fixed; right: 25px;
+            width: 50px; height: 50px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 1000; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none; border: none; cursor: pointer;
+        }
+        .float-widget:hover { transform: scale(1.1) translateY(-5px); }
+        .float-widget i, .float-widget svg { width: 24px; height: 24px; }
+
+        .float-phone { bottom: 30px; background: white; color: var(--primary); border: 2px solid var(--primary); }
+        .float-chatbot { bottom: 90px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .float-whatsapp { bottom: 150px; background: #25D366; color: white; }
+
+        .chat-window {
+            position: fixed; bottom: 85px; right: 85px;
+            width: 350px; height: 500px;
+            background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            z-index: 998; display: flex; flex-direction: column; overflow: hidden;
+            opacity: 0; pointer-events: none; transform: translateY(20px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .chat-window.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;
+            padding: 1.25rem; font-family: 'Outfit'; font-weight: 700; display: flex; align-items: center; gap: 10px;
+        }
+        .chat-body { flex: 1; padding: 1.5rem; overflow-y: auto; background: #f8fafc; }
+        .chat-msg { background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1rem; font-size: 0.95rem; }
+        .chat-input { padding: 1rem; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
+        .chat-input input { flex: 1; border: none; outline: none; background: #f1f5f9; padding: 0.75rem 1rem; border-radius: 100px; font-family: 'Inter'; }
+        
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            /* Hero Section Mobile - Fix padding to avoid overlap with marquee + navbar */
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 9rem 1.5rem 3rem;
+                text-align: center;
+            }
+            .hero .hero-image-col {
+                display: none;
+            }
+            .hero h1 {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+                text-align: center;
+            }
+            .hero h2 {
+                font-size: clamp(1rem, 4vw, 1.5rem);
+                text-align: center;
+            }
+            .hero p {
+                text-align: center;
+                font-size: 1rem;
+            }
+            .hero-badge {
+                margin: 0 auto 1.5rem;
+                font-size: 0.8rem;
+                padding: 0.4rem 1rem;
+            }
+            .hero-content > div[style*="display: flex"] {
+                justify-content: center;
+            }
+            
+            /* Container Mobile */
+            .container {
+                padding: 3rem 1.25rem;
+            }
+            .section-header h2 {
+                font-size: clamp(1.75rem, 5vw, 2.25rem);
+            }
+            .section-header p {
+                font-size: 0.95rem;
+            }
+            
+            /* Grid Mobile */
+            .grid-3 {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+            .valeurs-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+            .process-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+            
+            /* Cards Mobile */
+            .card {
+                padding: 1.5rem;
+            }
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 1rem;
+            }
+            .card h3 {
+                font-size: 1.15rem;
+            }
+            .card p {
+                font-size: 0.95rem;
+            }
+            
+            /* Stats Banner Mobile */
+            .stats-banner {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+                padding: 2rem 1.25rem;
+            }
+            .stat-banner-item h3 {
+                font-size: 2rem;
+            }
+            .stat-banner-item p {
+                font-size: 0.9rem;
+            }
+            
+            /* Contact Grid Mobile */
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .contact-form-side {
+                padding: 2rem 1.25rem;
+            }
+            .map-side iframe {
+                min-height: 250px;
+            }
+            
+            /* Footer Mobile */
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            footer {
+                padding: 3rem 1.25rem 2rem;
+            }
+            
+            /* Navigation Mobile */
+            nav {
+                top: 40px;
+                padding: 0.5rem 0;
+            }
+            .nav-container {
+                padding: 0 1rem;
+            }
+            .desktop-menu {
+                display: none !important;
+            }
+            .brand {
+                font-size: 1rem;
+            }
+            .logo-svg {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+                border-radius: 8px;
+            }
+            .btn-call {
+                display: none !important;
+            }
+            .mobile-menu-toggle {
+                display: block !important;
+            }
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                border-bottom: 1px solid rgba(0,0,0,0.05);
+                z-index: 100;
+            }
+            .mobile-menu.open {
+                display: block;
+            }
+            .mobile-menu-link {
+                display: block;
+                padding: 1rem;
+                text-decoration: none;
+                color: var(--text-main);
+                font-weight: 500;
+                border-bottom: 1px solid rgba(0,0,0,0.05);
+                transition: all 0.3s;
+            }
+            .mobile-menu-link:hover {
+                color: var(--primary);
+                padding-left: 1.5rem;
+            }
+            .mobile-menu-link:last-child {
+                border-bottom: none;
+            }
+            .mobile-call-link {
+                color: var(--primary);
+                font-weight: 700;
+            }
+            
+            /* Floating Widgets Mobile */
+            .float-widget {
+                width: 45px;
+                height: 45px;
+                right: 15px;
+            }
+            .float-phone {
+                bottom: 20px;
+            }
+            .float-chatbot {
+                bottom: 75px;
+            }
+            .float-whatsapp {
+                bottom: 130px;
+            }
+            
+            /* Chat Window Mobile */
+            .chat-window {
+                width: calc(100% - 30px);
+                height: 400px;
+                right: 15px;
+                bottom: 85px;
+            }
+            
+            /* Modal Mobile */
+            .modal-content {
+                width: 95%;
+                padding: 2rem 1.5rem;
+                margin: 5% auto;
+            }
+            .close-modal {
+                right: 1rem;
+                top: 1rem;
+                width: 36px;
+                height: 36px;
+                font-size: 24px;
+            }
+            .modal h2 {
+                font-size: 1.75rem;
+            }
+            
+            /* Top Marquee Mobile */
+            .top-marquee {
+                font-size: 0.7rem;
+                padding: 5px 0;
+            }
+            .marquee-content {
+                gap: 1.5rem;
+            }
+            
+            /* About Section Mobile */
+            [id="about"] [style*="grid-template-columns"] {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            [id="about"] img {
+                height: 280px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Extra Small Mobile */
+            .hero {
+                padding: 9rem 1rem 2rem;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero p {
+                font-size: 0.95rem;
+            }
+            .container {
+                padding: 3rem 1rem;
+            }
+            .stats-banner {
+                grid-template-columns: 1fr;
+                padding: 2.5rem 1rem;
+                gap: 2rem;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+            .btn-glow {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+            .float-widget {
+                width: 40px;
+                height: 40px;
+                right: 10px;
+            }
+            .float-phone {
+                bottom: 15px;
+            }
+            .float-chatbot {
+                bottom: 65px;
+            }
+            .float-whatsapp {
+                bottom: 115px;
+            }
+            .chat-window {
+                width: calc(100% - 20px);
+                height: 350px;
+                right: 10px;
+            }
+            .nav-container {
+                padding: 0 0.75rem;
+            }
+            .brand {
+                font-size: 0.9rem;
+            }
+            .logo-svg {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+                border-radius: 6px;
+            }
+            .btn-call {
+                display: none !important;
+            }
+        }
+        
+        /* === LAYOUT VARIANTS - Dynamic structure per company === */
+        .layout-variant-0 .section-process { display: block; }
+        .layout-variant-0 .section-stats { display: block; }
+        .layout-variant-0 .section-assurances { display: block; }
+        .layout-variant-0 .hero-centered { display: block; }
+        .layout-variant-0 .hero-split { display: none; }
+        
+        .layout-variant-1 .section-process { display: none; }
+        .layout-variant-1 .section-stats { display: block; }
+        .layout-variant-1 .section-assurances { display: block; }
+        .layout-variant-1 .hero-centered { display: none; }
+        .layout-variant-1 .hero-split { display: grid; grid-template-columns: 1fr 1fr; align-items: center; text-align: left; }
+        .layout-variant-1 .hero-split .hero-content { text-align: left; }
+        .layout-variant-1 .hero-split .hero-visual { display: block; }
+        
+        .layout-variant-2 .section-process { display: block; }
+        .layout-variant-2 .section-stats { display: none; }
+        .layout-variant-2 .section-assurances { display: none; }
+        .layout-variant-2 .hero-centered { display: block; }
+        .layout-variant-2 .hero-split { display: none; }
+        .layout-variant-2 .services-grid { grid-template-columns: repeat(2, 1fr); }
+        
+        .layout-variant-3 .section-process { display: none; }
+        .layout-variant-3 .section-stats { display: none; }
+        .layout-variant-3 .section-assurances { display: block; }
+        .layout-variant-3 .hero-centered { display: none; }
+        .layout-variant-3 .hero-split { display: grid; grid-template-columns: 1fr 1fr; align-items: center; text-align: left; }
+        .layout-variant-3 .hero-split .hero-content { text-align: left; }
+        .layout-variant-3 .hero-split .hero-visual { display: block; }
+        .layout-variant-3 .services-grid { grid-template-columns: 1fr; }
+        .layout-variant-3 .testimonial-grid { grid-template-columns: 1fr 1fr; }
+        
+        .hero-visual { display: none; }
+    </style>
+</head>
+<body class="layout-variant-${layoutVariant}">
+
+    <!-- Marquee Banner -->
+    <div class="top-marquee">
+        <div class="marquee-content">
+            <div class="marquee-item"><i data-lucide="clock" stroke-width="2.5" width="16"></i> Ouvert de 9h à 18h en semaine</div>
+            <div class="marquee-item"><i data-lucide="phone" stroke-width="2.5" width="16"></i> Intervention rapide: ${phone}</div>
+            <div class="marquee-item"><i data-lucide="mail" stroke-width="2.5" width="16"></i> Envoyez un message: ${email}</div>
+            <div class="marquee-item"><i data-lucide="map-pin" stroke-width="2.5" width="16"></i> Basé à: ${city || address}</div>
+            <!-- Duplication for infinite effect -->
+            <div class="marquee-item"><i data-lucide="clock" stroke-width="2.5" width="16"></i> Ouvert de 9h à 18h en semaine</div>
+            <div class="marquee-item"><i data-lucide="phone" stroke-width="2.5" width="16"></i> Intervention rapide: ${phone}</div>
+            <div class="marquee-item"><i data-lucide="mail" stroke-width="2.5" width="16"></i> Envoyez un message: ${email}</div>
+            <div class="marquee-item"><i data-lucide="map-pin" stroke-width="2.5" width="16"></i> Basé à: ${city || address}</div>
+        </div>
+    </div>
+
+    <div class="bg-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#" class="brand" style="text-decoration: none; display: flex; align-items: center; gap: 1rem;">
+                <div class="logo-svg">${logoInfo.initials}</div>
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <div style="font-weight: 800; font-family: 'Outfit'; color: var(--text-main); font-size: 1.5rem; line-height: 1.1;">${logoInfo.text}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">${slogan}</div>
+                </div>
+            </a>
+            <div style="display: flex; gap: 1.5rem; align-items: center;">
+                <div style="display: none; align-items: center; gap: 1.5rem; font-weight: 500;" class="desktop-menu">
+                    <a href="#about" style="text-decoration: none; color: var(--text-main);">À propos</a>
+                    <a href="#valeurs" style="text-decoration: none; color: var(--text-main);">Valeurs</a>
+                    <a href="#services" style="text-decoration: none; color: var(--text-main);">Services</a>
+                    <a href="#testimonials" style="text-decoration: none; color: var(--text-main);">Avis</a>
+                </div>
+                ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-call"><i data-lucide="phone" width="18"></i> Nous appeler</a>` : ''}
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" style="display: none; background: none; border: none; cursor: pointer; padding: 0.5rem;">
+                    <i data-lucide="menu" width="28" height="28" style="color: var(--text-main);"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="#about" class="mobile-menu-link">À propos</a>
+            <a href="#valeurs" class="mobile-menu-link">Valeurs</a>
+            <a href="#services" class="mobile-menu-link">Services</a>
+            <a href="#testimonials" class="mobile-menu-link">Avis</a>
+            <a href="#contact" class="mobile-menu-link">Contact</a>
+            ${phone ? `<a href="tel:${cleanPhoneLink}" class="mobile-menu-link mobile-call-link"><i data-lucide="phone" width="18" style="margin-right: 8px;"></i> ${phone}</a>` : ''}
+        </div>
+    </nav>
+
+    <!-- Hero Centered (Variant 0 & 2) -->
+    <section class="hero bg-grid hero-centered" style="text-align: center; padding: 140px 20px 100px;">
+        <div class="bg-pattern"></div>
+        <div class="hero-content reveal active" style="position: relative; z-index: 1; max-width: 800px; margin: 0 auto;">
+            <div class="hero-badge" style="display: inline-flex;"><i data-lucide="${heroBadge.icon}" width="18"></i> ${heroBadge.text}</div>
+            <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 0.5rem; line-height: 1.1; color: var(--text-main);">
+                ${logoInfo.word1} <span style="color: var(--primary);">${logoInfo.word2}</span>
+            </h1>
+            <h2 style="font-size: clamp(1.1rem, 2.5vw, 1.6rem); font-family: 'Outfit'; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem; opacity: 0.8;">${slogan}</h2>
+            <p style="margin-bottom: 2.5rem; font-size: 1.15rem; max-width: 600px; margin-left: auto; margin-right: auto;">${heroSubtitle}</p>
+            <button onclick="document.getElementById('contact-modal').style.display='block'; document.body.style.overflow='hidden';" class="btn-cta" style="border: none; margin: 0 auto; display: inline-flex;">
+                ${ctaText} <i data-lucide="arrow-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Hero Split (Variant 1 & 3) -->
+    <section class="hero bg-grid hero-split">
+        <div class="bg-pattern"></div>
+        <!-- Désactivé : animations géométriques pour design plus propre -->
+        <!-- <div class="pattern-waves"></div> -->
+        <div class="hero-content reveal active" style="position: relative; z-index: 1;">
+            <div class="hero-badge"><i data-lucide="${heroBadge.icon}" width="18"></i> ${heroBadge.text}</div>
+            <h1 style="text-align: left; font-size: clamp(3rem, 6vw, 5rem); margin-bottom: 0.5rem; line-height: 1.1; color: var(--text-main);">
+                ${logoInfo.word1} <span style="color: var(--primary);">${logoInfo.word2}</span>
+            </h1>
+            <h2 style="text-align: left; font-size: clamp(1.2rem, 3vw, 2rem); font-family: 'Outfit'; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem; opacity: 0.8;">${slogan}</h2>
+            <p style="text-align: left; margin-bottom: 2.5rem; font-size: 1.15rem;">${heroSubtitle}</p>
+            
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-bottom: 2rem; justify-content: flex-start; ${(rating || 0) === 0 && (reviews || 0) === 0 ? 'display: none;' : ''}">
+                <div style="display: flex; color: #f59e0b;">
+                    <i data-lucide="star" fill="currentColor"></i>
+                    <i data-lucide="star" fill="currentColor"></i>
+                    <i data-lucide="star" fill="currentColor"></i>
+                    <i data-lucide="star" fill="currentColor"></i>
+                    <i data-lucide="star" fill="currentColor" ${(rating || 0) < 5 ? 'opacity="0.5"' : ''}></i>
+                </div>
+                <div style="font-weight: 700; color: var(--text-main); font-size: 1.1rem;">${rating || 5}/5</div>
+                <div style="color: var(--text-muted); font-size: 0.9rem;">(Basé sur ${reviews || 42} avis certifiés)</div>
+            </div>
+
+            <div style="text-align: left;">
+                <button onclick="document.getElementById('contact-modal').style.display='block'; document.body.style.overflow='hidden';" class="btn-cta" style="border: none;">
+                    ${ctaText} <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        <div class="hero-image-col reveal reveal-left" style="position: relative; z-index: 1;">
+            <!-- Les éléments décoratifs (les mêmes que dans About) -->
+            <div style="position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; background: radial-gradient(var(--primary) 2px, transparent 2px); background-size: 10px 10px; z-index: 0; opacity: 0.2;"></div>
+            <div style="position: absolute; bottom: -20px; right: -20px; border: 4px solid var(--primary); width: 80%; height: 80%; border-radius: 30px; z-index: 0; opacity: 0.1;"></div>
+            
+            <div style="position: relative; border-radius: 30px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.1); z-index: 1; border: 8px solid white; background: white;">
+                <!-- NOTE IMPORTANTE: J'ai mis object-fit: contain; au cas où c'est un logo -->
+                <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" style="width: 100%; height: 450px; display: block; object-fit: cover;">
+            </div>
+        </div>
+    </section>
+
+    <!-- A Propos -->
+    <section class="container bg-alternate" id="about">
+        <div class="bg-pattern"></div>
+        <div class="section-header reveal">
+            <h2>Un professionnel de confiance à votre service</h2>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem; align-items: center; position: relative; z-index: 1;">
+            <div class="reveal reveal-left" style="position: relative;">
+                <!-- Decorative background elements -->
+                <div style="position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; background: radial-gradient(var(--primary) 2px, transparent 2px); background-size: 10px 10px; z-index: 0; opacity: 0.2;"></div>
+                <div style="position: absolute; bottom: -20px; right: -20px; border: 4px solid var(--primary); width: 80%; height: 80%; border-radius: 30px; z-index: 0; opacity: 0.1;"></div>
+                
+                <div style="position: relative; border-radius: 30px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.1); z-index: 1; border: 8px solid white;">
+                    <img src="${getImg(1)}" ${imgErr(1)} alt="${companyName}" style="width: 100%; height: 450px; object-fit: cover; display: block;">
+                </div>
+            </div>
+            <div class="reveal reveal-right">
+                <h2 style="font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; margin-bottom: 1.5rem; font-family: 'Outfit';">
+                    Qui sommes-nous ?
+                </h2>
+                <p style="color: var(--text-muted); font-size: 1.125rem; line-height: 1.8; margin-bottom: 2.5rem;">
+                    ${aboutText}
+                </p>
+                <ul style="list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: var(--primary);"></i> Expertise reconnue</li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: #10b981;"></i> Solutions sur-mesure</li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: #f59e0b;"></i> Accompagnement total</li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-main);"><i data-lucide="check-circle-2" style="color: #8b5cf6;"></i> Réactivité garantie</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nos Garanties -->
+    <section class="container" id="valeurs">
+        <div class="section-header reveal" style="position: relative; z-index: 1;">
+            <h2>Nos garanties</h2>
+            <p>Les engagements qui font la différence et votre tranquillité d'esprit.</p>
+        </div>
+        <div class="valeurs-grid">
+            ${template.guarantees.map((garantie: any, index: number) => `
+            <div class="valeur-card reveal" style="transition-delay: ${index * 100}ms">
+                <div class="valeur-icon"><i data-lucide="${garantie.icon}" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.35rem; margin-bottom: 1rem;">${garantie.title}</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Un engagement pris pour votre satisfaction et votre sécurité.</p>
+            </div>
+            `).join('')}
+        </div>
+    </section>
+
+    <!-- Nos Chiffres Clés -->
+    <section class="container section-stats" style="padding-top: 2rem; padding-bottom: 2rem;">
+        <div class="stats-banner reveal">
+            <div class="stat-banner-item">
+                <h3>${(reviews || 0) > 0 ? (reviews || 0) + '+' : '100%'}</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Avis Vérifiés</div>
+            </div>
+            <div class="stat-banner-item">
+                <h3>24/7</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Disponibilité</div>
+            </div>
+            <div class="stat-banner-item">
+                <h3>${rating}/5</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Note Google</div>
+            </div>
+            <div class="stat-banner-item">
+                <h3>100%</h3>
+                <div style="font-weight: 500; opacity: 0.9;">Satisfaction</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Garanties & Assurances -->
+    <section class="container bg-alternate section-assurances" id="garanties" style="background: rgba(255,255,255,0.4); backdrop-filter: blur(10px); margin: 3rem auto; border-radius: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);">
+        <div class="section-header reveal">
+            <h2>Garanties & Assurances</h2>
+            <p>Travaillez l'esprit serein grâce à nos couvertures complètes conformes à la législation.</p>
+        </div>
+        <div class="valeurs-grid">
+            ${(template.guarantees || [
+              { title: 'Garantie Décennale', icon: 'shield-check' },
+              { title: 'Assurance RC Pro', icon: 'briefcase' },
+              { title: 'Certification Qualité', icon: 'award' },
+              { title: 'Satisfaction Garantie', icon: 'heart' }
+            ]).map((g: any, i: number) => `
+            <div class="valeur-card reveal" style="border-top: 4px solid var(--primary); transition-delay: ${i * 100}ms; background: white;">
+                <div class="valeur-icon" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);"><i data-lucide="${g.icon}" width="32" height="32"></i></div>
+                <h3 style="font-family: 'Outfit'; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">${g.title}</h3>
+            </div>
+            `).join('')}
+        </div>
+    </section>
+
+    <!-- Process (4 Démarches) -->
+    <section class="container section-process" id="process">
+        <!-- Supprimé : anim-shape pour design plus propre -->
+        <div class="section-header reveal">
+            <h2>Notre démarche en 4 étapes</h2>
+            <p>Une méthodologie claire et transparente pour garantir le succès de votre projet.</p>
+        </div>
+        <div class="process-grid reveal">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; font-family: 'Outfit';">Prise de contact</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Nous étudions ensemble votre besoin et définissons les priorités.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; font-family: 'Outfit';">Devis détaillé</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Un chiffrage précis et transparent, sans aucun frais caché.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; font-family: 'Outfit';">Intervention</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Réalisation de la prestation par nos experts qualifiés.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; font-family: 'Outfit';">Suivi qualité</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Nous nous assurons de votre entière satisfaction après livraison.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTIONS DYNAMIQUES SPÉCIFIQUES AU SECTEUR -->
+    ${generateSections(content, template, allImages)}
+        </div>
+        
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 3rem;">
+            <div style="font-size: 3rem; font-weight: 800; color: var(--text-main); line-height: 1;">${rating}</div>
+            <div>
+                <div style="display: flex; color: #f59e0b; gap: 4px; margin-bottom: 4px;">
+                    <i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i><i data-lucide="star" fill="currentColor"></i>
+                </div>
+                <div style="color: var(--text-muted); font-weight: 500;">Basé sur ${reviews} avis Google</div>
+            </div>
+        </div>
+        
+        <div class="grid-3">
+            ${testimonials.map((t, i) => `
+            <div class="card testimonial-card glass reveal" style="transition-delay: ${(i%3) * 100}ms">
+                <div>
+                    <div class="stars" style="margin-bottom: 1rem;">
+                        ${Array(t.rating).fill('<i data-lucide="star" fill="currentColor"></i>').join('')}
+                    </div>
+                    <p style="color: var(--text-main); font-size: 1.125rem; font-weight: 500; font-style: italic; line-height: 1.6; 
+                      display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;">"${t.text}"</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 2rem; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1.5rem;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items:center; justify-content:center; font-weight: 700; color: white; font-size: 1.25rem;">
+                        ${t.author.charAt(0)}
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: var(--text-main);">${t.author}</div>
+                        ${t.date ? `<div style="font-size: 0.875rem; color: var(--text-muted);">${t.date}</div>` : ''}
+                    </div>
+                </div>
+            </div>
+            `).join('')}
+        </div>
+    </section>
+
+    <!-- Maps & Contact -->
+    <section class="container bg-alternate" id="contact">
+        <div class="section-header reveal">
+            <h2>Passez à l'action dès aujourd'hui</h2>
+            <p>Notre équipe est prête à intervenir. Contactez-nous pour un diagnostic rapide.</p>
+        </div>
+        <div class="contact-grid reveal">
+            <div class="map-side">
+                <iframe 
+                    src="https://maps.google.com/maps?q=${mapQuery}&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+                    allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+            <div class="contact-form-side">
+                <h3 style="font-size: 2rem; font-family: 'Outfit'; margin-bottom: 2rem;">Envoyez-nous un message</h3>
+                <form onsubmit="event.preventDefault(); alert('Message envoyé avec succès. Nous vous contacterons très vite !');">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Votre nom complet" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" placeholder="Votre adresse e-mail" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" class="form-control" placeholder="Votre téléphone" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="4" placeholder="Détaillez votre besoin..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-cta" style="width: 100%; justify-content: center;">
+                        <i data-lucide="send"></i> Envoyer la demande
+                    </button>
+                    <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-light);">
+                        Données protégées et confidentielles. Aucun spam.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal Contact Auto-Popup -->
+<div id="contact-modal" class="modal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px);">
+    <div style="background-color: white; margin: 10vh auto; padding: 3rem; border-radius: 24px; width: 90%; max-width: 500px; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.2);">
+        <span onclick="document.getElementById('contact-modal').style.display='none'; document.body.style.overflow='auto';" style="position: absolute; right: 1.5rem; top: 1.5rem; font-size: 1.5rem; cursor: pointer; color: #64748b; background: #f1f5f9; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</span>
+        
+        <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; text-align: center;">Demander une intervention</h3>
+        <p style="color: var(--text-muted); text-align: center; margin-bottom: 2rem; font-size: 0.95rem;">Laissez vos coordonnées, un expert vous rappelle immédiatement.</p>
+        
+        <form onsubmit="event.preventDefault(); alert('Demande envoyée ! Nous vous rappelons très vite.'); document.getElementById('contact-modal').style.display='none'; document.body.style.overflow='auto';">
+            <div style="margin-bottom: 1rem;">
+                <input type="text" placeholder="Votre nom" required style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; outline: none; font-family: 'Inter';">
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <input type="tel" placeholder="Votre numéro de téléphone" required style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; outline: none; font-family: 'Inter';">
+            </div>
+            <button type="submit" style="width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                <i data-lucide="phone-call" width="20"></i> Être rappelé(e)
+            </button>
+        </form>
+    </div>
+</div>
+
+    <!-- Professional Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-logo">
+                    <div class="logo-svg" style="box-shadow: none;">${logoInfo.initials}</div>
+                    ${logoInfo.text}
+                </div>
+                <p style="color: var(--text-light); margin-bottom: 2rem;">${aboutText.substring(0, 120)}...</p>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="#" style="color: white; opacity: 0.7; transition: 0.3s;"><i data-lucide="facebook"></i></a>
+                    <a href="#" style="color: white; opacity: 0.7; transition: 0.3s;"><i data-lucide="instagram"></i></a>
+                    <a href="#" style="color: white; opacity: 0.7; transition: 0.3s;"><i data-lucide="linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Nos Services</h4>
+                <ul>
+                    ${services.slice(0,4).map(s => `<li><a href="#services">${s.name}</a></li>`).join('')}
+                    <li><a href="#contact">Sur Devis</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Liens Utiles</h4>
+                <ul>
+                    <li><a href="#process">Notre Démarche</a></li>
+                    <li><a href="#testimonials">Avis Clients</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal('modal-mentions')">Mentions Légales</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal('modal-policy')">Confidentialité</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Info</h4>
+                <ul style="color: var(--text-light);">
+                    ${phone ? `<li style="display: flex; gap: 10px;"><i data-lucide="phone"></i> ${phone}</li>` : ''}
+                    ${email ? `<li style="display: flex; gap: 10px;"><i data-lucide="mail"></i> ${email}</li>` : ''}
+                    ${address ? `<li style="display: flex; gap: 10px;"><i data-lucide="map-pin"></i> ${address}</li>` : ''}
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; ${new Date().getFullYear()} ${companyName}. Tous droits réservés. Créé par Services-Siteup.</p>
+        </div>
+    </footer>
+
+    <!-- Floating Buttons (Aligned Vertical) -->
+    <a href="tel:${cleanPhoneLink}" class="float-widget float-phone" title="Appeler maintenant">
+        <i data-lucide="phone"></i>
+    </a>
+
+    <button id="chatbot-toggle" class="float-widget float-chatbot" title="Discuter avec notre IA">
+        <i data-lucide="message-circle"></i>
+    </button>
+
+    <a href="https://wa.me/${cleanPhoneLink}?text=Bonjour, je souhaite avoir plus d'informations." target="_blank" class="float-widget float-whatsapp" title="Discuter sur WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
+    </a>
+
+    <!-- Chatbot Window -->
+    <div class="chat-window" id="chat-window">
+        <div class="chat-header" style="background: var(--primary); color: white; padding: 1.25rem; font-family: 'Outfit'; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px rgba(34,197,94,0.5);"></div>
+                Service Client - ${logoInfo.word1}
+            </div>
+            <button onclick="document.getElementById('chat-window').classList.remove('open')" style="background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Fermer la discussion">
+                <i data-lucide="x" width="24"></i>
+            </button>
+        </div>
+        <div class="chat-body" id="chat-body" style="flex: 1; padding: 1.5rem; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 1rem;">
+            <div class="chat-msg" style="background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 0.95rem; align-self: flex-start; max-width: 85%;">
+                Bonjour ! Bienvenue chez ${logoInfo.text}. Comment puis-je vous aider aujourd'hui ?
+            </div>
+        </div>
+        <div class="chat-input" style="padding: 1rem; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px;">
+            <input type="text" id="chat-text" placeholder="Écrivez votre message..." style="flex: 1; border: 1px solid #e2e8f0; outline: none; background: #f8fafc; padding: 0.75rem 1rem; border-radius: 100px; font-family: 'Inter';">
+            <button onclick="sendMsg()" style="background: var(--primary); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i data-lucide="send" width="18"></i></button>
+        </div>
+    </div>
+
+    <div id="modal-mentions" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modal-mentions')">&times;</span>
+            <h2>Mentions Légales</h2>
+            <p>Le présent site est édité par l'entreprise <strong>${companyName}</strong>, située au <strong>${address}</strong>.</p>
+            <p>Directeur de la publication : Le Gérant de ${companyName}.</p>
+            <h3>2. Hébergement</h3>
+            <p>Le site est hébergé par Vercel Inc., dont le siège social est situé au 340 S Lemon Ave #4133 Walnut, CA 91789, USA.</p>
+            <h3>3. Propriété intellectuelle</h3>
+            <p>Tous les éléments du site (textes, logos, images, icônes) sont la propriété exclusive de ${companyName} ou de ses partenaires. Toute reproduction, représentation, modification ou adaptation totale ou partielle de tout ou partie du site est interdite.</p>
+            <h3>4. Contact</h3>
+            <p>Pour toute question ou demande d'information, vous pouvez nous contacter :</p>
+            <ul>
+                <li>Par téléphone au : <strong>${phone}</strong></li>
+                <li>Par e-mail à : <strong>${email}</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="modal-policy" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modal-policy')">&times;</span>
+            <h2>Politique de Confidentialité</h2>
+            <p>Chez <strong>${companyName}</strong>, nous accordons une importance capitale à la protection de vos données personnelles.</p>
+            <h3>1. Collecte des données</h3>
+            <p>Nous collectons les données que vous nous soumettez via nos formulaires de contact : Nom, Prénom, Numéro de téléphone et Adresse e-mail.</p>
+            <h3>2. Finalité du traitement</h3>
+            <p>Ces données sont uniquement utilisées pour répondre à vos demandes de renseignements, établir des devis personnalisés ou assurer le suivi de nos interventions.</p>
+            <h3>3. Conservation des données</h3>
+            <p>Les données sont conservées pendant une durée de 3 ans après notre dernier contact avec vous. Elles ne sont jamais cédées ou vendues à des tiers.</p>
+            <h3>4. Vos droits (RGPD)</h3>
+            <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles. Pour exercer ce droit, écrivez-nous à <strong>${email}</strong>.</p>
+            <h3>5. Cookies</h3>
+            <p>Notre site peut utiliser des cookies de confort pour améliorer votre expérience utilisateur. Vous pouvez les désactiver dans les paramètres de votre navigateur.</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if(window.scrollY > 40) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        // CSS Media query JS equivalent for desktop menu
+        if (window.innerWidth > 768) {
+            document.querySelector('.desktop-menu').style.display = 'flex';
+        }
+
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('open');
+            });
+            
+            // Close menu when clicking on a link
+            mobileMenu.querySelectorAll('.mobile-menu-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('open');
+                });
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    mobileMenu.classList.remove('open');
+                }
+            });
+        }
+
+        // Intersection Observer for Reveal Animations
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+        reveals.forEach(reveal => observer.observe(reveal));
+
+        // Hover Effect on Cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', \`\${x}px\`);
+                card.style.setProperty('--mouse-y', \`\${y}px\`);
+            });
+        });
+
+        // Chatbot Logic
+        const chatToggle = document.getElementById('chatbot-toggle');
+        const chatWindow = document.getElementById('chat-window');
+        const chatBody = document.getElementById('chat-body');
+        const chatText = document.getElementById('chat-text');
+
+        chatToggle.addEventListener('click', () => {
+            chatWindow.classList.toggle('open');
+        });
+
+        let chatStep = 0;
+
+        function sendMsg() {
+            const val = chatText.value.trim();
+            if(!val) return;
+            
+            // Message de l'utilisateur
+            const uMsg = document.createElement('div');
+            uMsg.style.cssText = 'background: var(--primary); color: white; padding: 1rem; border-radius: 12px; border-bottom-right-radius: 0; align-self: flex-end; max-width: 85%; font-size: 0.95rem;';
+            uMsg.textContent = val;
+            chatBody.appendChild(uMsg);
+            chatText.value = '';
+            chatBody.scrollTo(0, chatBody.scrollHeight);
+
+            // Simulation de réflexion (temps aléatoire entre 1s et 2s pour faire humain)
+            setTimeout(() => {
+                const bMsg = document.createElement('div');
+                bMsg.style.cssText = 'background: white; padding: 1rem; border-radius: 12px; border-bottom-left-radius: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 0.95rem; align-self: flex-start; max-width: 85%; line-height: 1.5;';
+                
+                const lowerVal = val.toLowerCase();
+                
+                if (chatStep === 0) {
+                    // Détection : Si c'est juste une salutation (mot court)
+                    if (lowerVal === 'bonjour' || lowerVal === 'salut' || lowerVal === 'bonsoir' || lowerVal === 'hello' || lowerVal === 'coucou') {
+                        bMsg.innerHTML = "Bonjour ! Comment puis-je vous aider concrètement avec votre besoin aujourd'hui ?";
+                        // On n'incrémente PAS le chatStep, on attend qu'il explique son problème
+                    } else {
+                        // S'il a expliqué son problème (ou répondu à la salutation)
+                        bMsg.innerHTML = "D'accord, je comprends. En tant que spécialiste <strong>${content.sector}</strong> sur <strong>${city || 'la région'}</strong>, nous traitons ce genre de demande tous les jours.<br><br>Est-ce qu'il s'agit d'une <strong>urgence</strong> ou d'une demande de <strong>devis sur rendez-vous</strong> ?";
+                        chatStep++;
+                    }
+                } 
+                else if (chatStep === 1) {
+                    bMsg.innerHTML = "C'est bien noté. Pour que le bon technicien puisse préparer votre dossier et vous rappeler immédiatement, <strong>quel est votre numéro de téléphone ?</strong>";
+                    chatStep++;
+                }
+                else if (chatStep === 2) {
+                    // Détection : On vérifie s'il y a au moins 9 chiffres dans sa réponse
+                    const numCount = (lowerVal.match(/[0-9]/g) || []).length;
+                    
+                    if (numCount >= 9) {
+                        bMsg.innerHTML = "Parfait ! J'ai transmis vos coordonnées à notre équipe. Un expert <strong>${logoInfo.word1}</strong> va vous appeler sur ce numéro d'ici quelques minutes. Merci pour votre confiance !";
+                        document.getElementById('chat-text').disabled = true;
+                        document.getElementById('chat-text').placeholder = "Conversation terminée.";
+                        chatStep++;
+                    } else {
+                        // S'il n'a pas mis de numéro valide
+                        bMsg.innerHTML = "Je n'ai pas bien reconnu le format de votre numéro. Pourriez-vous me l'écrire à nouveau (ex: 06 12 34 56 78) ?";
+                        // On n'incrémente PAS le chatStep, pour l'obliger à donner son numéro
+                    }
+                }
+                
+                chatBody.appendChild(bMsg);
+                chatBody.scrollTo(0, chatBody.scrollHeight);
+            }, 1000 + Math.random() * 1000); // Le temps de réponse varie un peu comme un vrai humain
+        }
+        chatText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
+
+        // Modal Management
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Auto-Popup au Scroll (50% de la page)
+        let popupTriggered = false; // Sécurité pour ne pas déclencher 100 fois
+
+        window.addEventListener('scroll', function() {
+            // Si le popup a déjà été vu dans cette session, on annule
+            if (sessionStorage.getItem('popupShown')) return;
+            if (popupTriggered) return;
+
+            // Calcul du pourcentage de scroll
+            const scrollPosition = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollPercentage = (scrollPosition / (documentHeight - windowHeight)) * 100;
+
+            // Si on dépasse 50% (milieu du site)
+            if (scrollPercentage > 50) {
+                popupTriggered = true; // On bloque les futurs déclenchements
+                
+                document.getElementById('contact-modal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                sessionStorage.setItem('popupShown', 'true');
+            }
+        });
+
+        // Fermer le modal en cliquant à l'extérieur
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('contact-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+</body>
+</html>`;
+
+  // Appliquer les variations de template anti-identification
+  const finalHTML = applyTemplateVariation(htmlContent, templateVariation);
+  
+  return finalHTML;
+}
