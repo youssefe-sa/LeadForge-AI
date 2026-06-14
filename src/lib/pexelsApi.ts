@@ -3,7 +3,8 @@
 
 import { supabase } from './supabase';
 
-// API key handled server‑side; removed from client
+const PEXELS_API_KEY = process.env.VITE_PEXELS_API_KEY || process.env.PEXELS_API_KEY || '';
+const PEXELS_API_URL = 'https://api.pexels.com/v1';
 
 // Mots-clés de recherche par secteur (en anglais pour Pexels)
 const SECTOR_SEARCH_QUERIES: Record<string, string[]> = {
@@ -55,14 +56,61 @@ interface PexelsSearchResponse {
  * Recherche des images sur l'API Pexels pour un secteur donné
  */
 export async function searchPexelsImages(sector: string, perPage: number = 10): Promise<string[]> {
-  // Proxy request to server‑side endpoint that injects the API key securely
-  const response = await fetch(`/api/pexels/search?sector=${encodeURIComponent(sector)}&perPage=${perPage}`);
-  if (!response.ok) {
-    console.warn('⚠️ Pexels proxy error', response.status);
+  if (!PEXELS_API_KEY) {
+    console.warn('⚠️ Clé API Pexels non configurée');
     return [];
   }
-  const data = await response.json();
-  return data.urls || [];
+
+  const normalizedSector = (sector || '').toLowerCase().trim();
+  
+  // Trouver les mots-clés appropriés
+  let searchQueries = SECTOR_SEARCH_QUERIES.default;
+  for (const [key, queries] of Object.entries(SECTOR_SEARCH_QUERIES)) {
+    if (normalizedSector.includes(key)) {
+      searchQueries = queries;
+      break;
+    }
+  }
+  
+  // Utiliser la première requête comme principale
+  const query = searchQueries[0];
+  
+  try {
+    const response = await fetch(
+      `${PEXELS_API_URL}/search?query=${encodeURIComponent(query)}&per_page=${perPage}&orientation=landscape`,
+      {
+        headers: {
+          'Authorization': PEXELS_API_KEY
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Pexels API error: ${response.status}`);
+    }
+    
+    const data: PexelsSearchResponse = await response.json();
+    
+    // Filtrer les images de nourriture
+    const filteredPhotos = data.photos.filter(photo => {
+      const alt = (photo.alt || '').toLowerCase();
+      const photographer = (photo.photographer || '').toLowerCase();
+      
+      // Vérifier si c'est une image de nourriture
+      const isFoodImage = BLOCKED_IMAGE_KEYWORDS.some(keyword => 
+        alt.includes(keyword) || photographer.includes(keyword)
+      );
+      
+      return !isFoodImage;
+    });
+    
+    // Retourner les URLs d'images de qualité moyenne (plus rapide à charger)
+    return filteredPhotos.map(photo => photo.src.large || photo.src.medium);
+    
+  } catch (error) {
+    console.error('❌ Erreur recherche Pexels:', error);
+    return [];
+  }
 }
 
 /**
