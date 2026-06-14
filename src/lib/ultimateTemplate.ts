@@ -3324,35 +3324,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
             margin: 0 auto;
         }
 
-        /* MODIFIÉ: Process Section (4 Démarches) */
-        .process-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            position: relative;
-        }
-        .step-card {
-            padding: 1.75rem;
-            text-align: center;
-            background: white;
-            border-radius: 16px;
-            position: relative;
-            border: 1px solid rgba(0,0,0,0.07);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        }
-        .step-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
-        .step-number {
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            background: rgba(var(--primary-rgb), 0.1);
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 1.1rem;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1rem;
-        }
-
         /* MODIFIÉ: Services Grid & Cards */
         .grid-3 {
             display: grid;
@@ -3570,10 +3541,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                 gap: 1rem;
             }
             .valeurs-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            .process-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
@@ -3805,33 +3772,16 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
             }
         }
         
-        /* MODIFIÉ: Layout Variants */
-        .layout-variant-0 .section-process { display: block; }
+        /* MODIFIÉ: Layout Variants — variant controls which sections render */
         .layout-variant-0 .section-stats { display: block; }
-        .layout-variant-0 .section-assurances { display: block; }
-        .layout-variant-0 .hero-centered { display: flex; }
-        .layout-variant-0 .hero-split { display: none; }
-        
-        .layout-variant-1 .section-process { display: none; }
         .layout-variant-1 .section-stats { display: block; }
-        .layout-variant-1 .section-assurances { display: block; }
-        .layout-variant-1 .hero-centered { display: none; }
-        .layout-variant-1 .hero-split { display: grid; }
-        
-        .layout-variant-2 .section-process { display: block; }
         .layout-variant-2 .section-stats { display: none; }
-        .layout-variant-2 .section-assurances { display: none; }
-        .layout-variant-2 .hero-centered { display: flex; }
-        .layout-variant-2 .hero-split { display: none; }
-        
-        .layout-variant-3 .section-process { display: none; }
         .layout-variant-3 .section-stats { display: none; }
+
+        .layout-variant-0 .section-assurances { display: block; }
+        .layout-variant-1 .section-assurances { display: block; }
+        .layout-variant-2 .section-assurances { display: none; }
         .layout-variant-3 .section-assurances { display: block; }
-        .layout-variant-3 .hero-centered { display: none; }
-        .layout-variant-3 .hero-split { display: grid; }
-        
-        .hero-split { display: none; }
-        .hero-centered { display: none; }
     </style>
 </head>
 <body class="layout-variant-${layoutVariant}">
@@ -3884,29 +3834,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         </div>
     </nav>
 
-    <!-- MODIFIÉ: Hero Centered (Variant 0 & 2) -->
-    <section class="hero hero-centered" style="background-image: url('${heroImage}'); --hero-overlay: ${heroOverlay};">
-        <div class="hero-content">
-            <div class="eyebrow"><i data-lucide="${heroBadge.icon}" width="12"></i> ${heroBadge.text} · ${city}</div>
-            <h1>${companyName} — <span>${slogan}</span></h1>
-            <p>${heroSubtitle}</p>
-            <div class="hero-actions">
-                <a href="tel:${cleanPhoneLink}" class="btn-primary">
-                    <i data-lucide="phone" width="16"></i> ${ctaText}
-                </a>
-                <a href="#contact" class="btn-secondary">
-                    Demander un devis <i data-lucide="arrow-right" width="16"></i>
-                </a>
-            </div>
-            <div class="trust-badges">
-                <div class="trust-badge"><i data-lucide="star" fill="currentColor"></i><span>${rating}/5 — ${reviews} avis</span></div>
-                <div class="trust-badge"><i data-lucide="clock"></i><span>Disponible 7j/7</span></div>
-                <div class="trust-badge"><i data-lucide="shield-check"></i><span>Assuré et certifié</span></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- MODIFIÉ: Hero Split (Variant 1 & 3) -->
+    ${layoutVariant === 1 || layoutVariant === 3 ? `
+    <!-- Hero Split (Variant 1 & 3) -->
     <section class="hero hero-split" style="--hero-overlay: ${heroOverlay};">
         <div class="hero-content">
             <div class="eyebrow"><i data-lucide="${heroBadge.icon}" width="12"></i> ${heroBadge.text} · ${city}</div>
@@ -3929,6 +3858,29 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         <div class="hero-visual" style="background-image: url('${heroImage}');">
         </div>
     </section>
+    ` : `
+    <!-- Hero Centered (Variant 0 & 2) -->
+    <section class="hero hero-centered" style="background-image: url('${heroImage}'); --hero-overlay: ${heroOverlay};">
+        <div class="hero-content">
+            <div class="eyebrow"><i data-lucide="${heroBadge.icon}" width="12"></i> ${heroBadge.text} · ${city}</div>
+            <h1>${companyName} — <span>${slogan}</span></h1>
+            <p>${heroSubtitle}</p>
+            <div class="hero-actions">
+                <a href="tel:${cleanPhoneLink}" class="btn-primary">
+                    <i data-lucide="phone" width="16"></i> ${ctaText}
+                </a>
+                <a href="#contact" class="btn-secondary">
+                    Demander un devis <i data-lucide="arrow-right" width="16"></i>
+                </a>
+            </div>
+            <div class="trust-badges">
+                <div class="trust-badge"><i data-lucide="star" fill="currentColor"></i><span>${rating}/5 — ${reviews} avis</span></div>
+                <div class="trust-badge"><i data-lucide="clock"></i><span>Disponible 7j/7</span></div>
+                <div class="trust-badge"><i data-lucide="shield-check"></i><span>Assuré et certifié</span></div>
+            </div>
+        </div>
+    </section>
+    `}
 
     <!-- MODIFIÉ: A Propos -->
     <section class="container bg-alternate" id="about">
@@ -3957,8 +3909,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     </section>
 
     <!-- Nos Garanties -->
-    <section class="container" id="valeurs">
-        <div class="section-header reveal" style="position: relative; z-index: 1;">
+    <section class="container section-assurances" id="valeurs">
+        <div class="section-header reveal">
             <h2>Nos garanties</h2>
             <p>Les engagements qui font la différence et votre tranquillité d'esprit.</p>
         </div>
@@ -3966,15 +3918,16 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
             ${template.guarantees.map((garantie: any, index: number) => `
             <div class="valeur-card reveal" style="transition-delay: ${index * 100}ms">
                 <div class="valeur-icon"><i data-lucide="${garantie.icon}" width="32" height="32"></i></div>
-                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.35rem; margin-bottom: 1rem;">${garantie.title}</h3>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">${garantie.title.replace(/^(Garantie|Assurance|Certification) /, '') || 'Garantie incluse'}.</p>
+                <h3 style="font-family: 'Plus Jakarta Sans'; font-size: 1.15rem; margin-bottom: 0.5rem;">${garantie.title}</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">Couvre vos travaux selon la législation en vigueur et notre engagement qualité.</p>
             </div>
             `).join('')}
         </div>
     </section>
 
-    <!-- MODIFIÉ: Nos Chiffres Clés -->
-    <section class="container section-stats" style="padding-top: 2rem; padding-bottom: 2rem;">
+    ${layoutVariant === 0 || layoutVariant === 1 ? `
+    <!-- Nos Chiffres Clés -->
+    <section class="container section-stats" style="padding: 48px 5vw;">
         <div class="stats-banner reveal">
             <div class="stat-banner-item">
                 <h3>${(reviews || 0) > 0 ? (reviews || 0) + '+' : '50+'}</h3>
@@ -3994,37 +3947,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
             </div>
         </div>
     </section>
-
-    <!-- MODIFIÉ: Process -->
-    <section class="container section-process" id="process">
-        <!-- Supprimé : anim-shape pour design plus propre -->
-        <div class="section-header reveal">
-            <h2>Notre démarche en 4 étapes</h2>
-            <p>Une méthodologie claire et transparente pour garantir le succès de votre projet.</p>
-        </div>
-        <div class="process-grid reveal">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <h3>Prise de contact</h3>
-                    <p>Nous étudions ensemble votre besoin et définissons les priorités.</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <h3>Devis détaillé</h3>
-                    <p>Un chiffrage précis et transparent, sans aucun frais caché.</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <h3>Intervention</h3>
-                    <p>Réalisation de la prestation par nos experts qualifiés.</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">4</div>
-                    <h3>Suivi qualité</h3>
-                    <p>Nous nous assurons de votre entière satisfaction après livraison.</p>
-                </div>
-        </div>
-    </section>
+    ` : ''}
 
     <!-- SECTIONS DYNAMIQUES SPÉCIFIQUES AU SECTEUR -->
     ${generateSections(content, template, allImages)}
