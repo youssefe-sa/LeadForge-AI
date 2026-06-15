@@ -1,6 +1,9 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, safeStr, proxyImg } from '../lib/supabase-store';
 import { generateUltimateSite, generateUltimateSiteAsync } from '../lib/ultimateTemplate';
+import { generatePremiumSite } from '../lib/premiumTemplate';
+import { generateUltraPremiumSite } from '../lib/ultraPremiumTemplate';
+import { generateExactSite } from '../lib/exactTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { supabase } from '../lib/supabase';
 
@@ -460,8 +463,8 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       // PRIORITÉ 1: Images réelles du lead
       // PRIORITÉ 2: API Pexels dynamique → Supabase Storage
       
-      updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
-      const html = await generateUltimateSiteAsync(lead, content);
+      updateProgress({ step: '🎨 Génération du site EXACT (design copié)...' });
+      const html = await generateExactSite(lead);
       console.log(`✅ HTML generated for ${lead.name}`);
       
       updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
@@ -509,7 +512,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
       
       try {
         console.log(`🔄 Using fallback template for ${lead.name}`);
-        const emergencyHtml = await generateUltimateSiteAsync(lead);
+        const emergencyHtml = await generateExactSite(lead);
         updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
         
         const fileName = `${lead.id}.html`;
@@ -541,7 +544,7 @@ Tout en français. Spécifique au secteur "${lead.sector || 'professionnel'}".`;
     }
     
     // Retour par défaut en cas d'erreur
-    return await generateUltimateSiteAsync(lead);
+    return await generateExactSite(lead);
   };
 
   // ── EMERGENCY TEMPLATE (100% FOOLPROOF) ──

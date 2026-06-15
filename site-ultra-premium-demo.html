@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plomberie Pro Paris - Plomberie à Paris</title>
+    <meta name="description" content="Plombier chauffagiste certifié RGE. Intervention rapide 24/7 sur Paris et Île-de-France.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --secondary: #06b6d4;
+            --accent: #38bdf8;
+            --accent2: #7dd3fc;
+            --background: #f0f9ff;
+            --surface: #ffffff;
+            --surface2: #e0f2fe;
+            --text: #0f172a;
+            --text-light: #475569;
+            --gradient: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #38bdf8 100%);
+            --gradient2: linear-gradient(45deg, #0ea5e9, #06b6d4, #38bdf8, #7dd3fc);
+            --glass: rgba(255, 255, 255, 0.85);
+            --glassDark: rgba(15, 23, 42, 0.9);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+            overflow-x: hidden;
+        }
+        
+        /* Animations globales */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Navigation Ultra-Premium */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+        
+        .nav-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1.25rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.03em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+        
+        .nav-link {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--gradient);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary);
+        }
+        
+        .nav-link:hover::before {
+            width: 100%;
+        }
+        
+        .nav-cta {
+            background: var(--gradient);
+            background-size: 200% 200%;
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: gradientMove 3s ease infinite;
+        }
+        
+        .nav-cta:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Hero Section Ultra-Premium */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, var(--background) 0%, var(--surface) 50%, var(--surface2) 100%);
+            overflow: hidden;
+            padding: 10rem 2rem 5rem;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 900px;
+            height: 900px;
+            background: var(--gradient);
+            border-radius: 50%;
+            opacity: 0.12;
+            filter: blur(120px);
+            animation: float 25s ease-in-out infinite;
+        }
+        
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -5%;
+            width: 700px;
+            height: 700px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.08;
+            filter: blur(100px);
+            animation: float 20s ease-in-out infinite reverse;
+        }
+        
+        .hero-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .hero-content {
+            max-width: 1200px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2.5rem;
+            border: 2px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        .hero-badge i {
+            font-size: 1.2rem;
+        }
+        
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 900;
+            line-height: 1.05;
+            margin-bottom: 2rem;
+            letter-spacing: -0.04em;
+            background: var(--gradient2);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientMove 5s ease infinite, fadeInUp 0.8s ease 0.2s both;
+        }
+        
+        .hero p {
+            font-size: 1.5rem;
+            font-weight: 400;
+            line-height: 1.8;
+            margin-bottom: 3rem;
+            color: var(--text-light);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+        
+        .hero-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease 0.5s both;
+        }
+        
+        .hero-rating .stars {
+            color: #fbbf24;
+            font-size: 1.5rem;
+            letter-spacing: 0.1rem;
+        }
+        
+        .hero-rating .rating-text {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--text);
+        }
+        
+        .hero-rating .reviews {
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .hero-cta-group {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+        
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--gradient);
+            background-size: 200% 200%;
+            color: white;
+            padding: 1.5rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            animation: gradientMove 3s ease infinite;
+        }
+        
+        .hero-cta:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-cta-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: white;
+            color: var(--primary);
+            padding: 1.5rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 2px solid var(--primary);
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hero-cta-secondary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Services Section Ultra-Premium */
+        .services {
+            padding: 10rem 2rem;
+            background: var(--surface);
+            position: relative;
+        }
+        
+        .section-header {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 6rem;
+        }
+        
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--background);
+            color: var(--primary);
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            border: 2px solid var(--primary);
+        }
+        
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 2rem;
+            letter-spacing: -0.03em;
+            color: var(--text);
+        }
+        
+        .section-header p {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+        
+        .services-grid {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2.5rem;
+        }
+        
+        .service-card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 28px;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.15);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .service-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .service-card:hover .service-image {
+            transform: scale(1.05);
+        }
+        
+        .service-content {
+            padding: 2.5rem;
+        }
+        
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--background);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.4s ease;
+        }
+        
+        .service-card:hover .service-icon {
+            background: var(--gradient);
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .service-card h3 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        
+        .service-card p {
+            color: var(--text-light);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+        
+        .service-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        .service-feature {
+            background: var(--background);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Portfolio Section */
+        .portfolio {
+            padding: 10rem 2rem;
+            background: var(--background);
+        }
+        
+        .portfolio-grid {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+        
+        .portfolio-item {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .portfolio-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+        }
+        
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .portfolio-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        .portfolio-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            padding: 2rem;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+        
+        .portfolio-item:hover .portfolio-overlay {
+            transform: translateY(0);
+        }
+        
+        .portfolio-category {
+            background: var(--gradient);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+        
+        .portfolio-item h3 {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .portfolio-item p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+        
+        /* Team Section */
+        .team {
+            padding: 10rem 2rem;
+            background: var(--surface);
+        }
+        
+        .team-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+        
+        .team-card {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            transition: all 0.4s ease;
+        }
+        
+        .team-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
+        }
+        
+        .team-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .team-content {
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .team-card h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        
+        .team-role {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .team-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        /* Certifications Section */
+        .certifications {
+            padding: 8rem 2rem;
+            background: var(--gradient);
+            color: white;
+        }
+        
+        .certifications-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .cert-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            padding: 2.5rem;
+            border-radius: 24px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+        }
+        
+        .cert-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-5px);
+        }
+        
+        .cert-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cert-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .cert-card p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* FAQ Section */
+        .faq {
+            padding: 10rem 2rem;
+            background: var(--background);
+        }
+        
+        .faq-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        .faq-question {
+            padding: 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+        
+        .faq-question i {
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+        
+        .faq-answer {
+            padding: 0 2rem 2rem;
+            color: var(--text-light);
+            line-height: 1.7;
+            display: none;
+        }
+        
+        .faq-item.active .faq-answer {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+        
+        /* Testimonials Section */
+        .testimonials {
+            padding: 10rem 2rem;
+            background: var(--surface);
+        }
+        
+        .testimonials-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .testimonial-card {
+            background: var(--background);
+            padding: 3rem;
+            border-radius: 28px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            transition: all 0.4s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .testimonial-stars {
+            color: #fbbf24;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.1rem;
+        }
+        
+        .testimonial-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text);
+            margin-bottom: 2rem;
+            font-style: italic;
+            font-weight: 500;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+        
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+        
+        .author-info h4 {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .author-info span {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        /* Contact Section */
+        .contact {
+            padding: 10rem 2rem;
+            background: var(--gradient);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .contact::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 800px;
+            height: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            filter: blur(100px);
+        }
+        
+        .contact-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .contact h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 2rem;
+            letter-spacing: -0.03em;
+        }
+        
+        .contact p {
+            font-size: 1.4rem;
+            opacity: 0.95;
+            margin-bottom: 4rem;
+            line-height: 1.7;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .contact-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.4s ease;
+        }
+        
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-6px);
+        }
+        
+        .contact-item-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .contact-item h3 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .contact-item a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.15rem;
+            transition: opacity 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .contact-item a:hover {
+            opacity: 0.8;
+        }
+        
+        .contact-cta {
+            display: inline-block;
+            background: white;
+            color: var(--primary);
+            padding: 1.75rem 4rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.2rem;
+            transition: all 0.4s ease;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        .contact-cta:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+        }
+        
+        /* Footer Ultra-Premium */
+        .footer {
+            background: var(--text);
+            color: white;
+            padding: 5rem 2rem 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+        
+        .footer-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section p {
+            opacity: 0.8;
+            line-height: 1.8;
+            margin-bottom: 1.25rem;
+            font-size: 1rem;
+        }
+        
+        .footer-section a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        
+        .footer-section a:hover {
+            opacity: 1;
+            transform: translateX(5px);
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .footer-social a {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-social a:hover {
+            background: var(--gradient);
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.75rem;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .mobile-menu-toggle span {
+            display: block;
+            width: 28px;
+            height: 3px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .services-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links, .nav-cta {
+                display: none;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            .nav-links.active {
+                display: flex;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 2.5rem;
+                gap: 1.5rem;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            }
+            
+            .hero {
+                padding: 8rem 1.5rem 4rem;
+            }
+            
+            .hero h1 {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+            }
+            
+            .hero-cta-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .services, .portfolio, .team, .certifications, .faq, .testimonials, .contact {
+                padding: 6rem 1.5rem;
+            }
+            
+            .services-grid, .portfolio-grid, .team-grid, .certifications-grid, .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo-container">
+                <div class="logo-icon">💧</div>
+                <div class="logo-text">Plomberie Pro Paris</div>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="nav-link">Accueil</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+                <li><a href="#team" class="nav-link">Équipe</a></li>
+                <li><a href="#testimonials" class="nav-link">Avis</a></li>
+                <li><a href="#faq" class="nav-link">FAQ</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <a href="#contact" class="nav-cta">Contactez-nous</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg"></div>
+        <div class="hero-pattern"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-star"></i>
+                L'excellence plomberie réinventée
+            </div>
+            <h1>Plomberie Pro Paris</h1>
+            <p>Plombier chauffagiste certifié RGE. Intervention rapide 24/7 sur Paris et Île-de-France. Innovation, qualité et satisfaction garantie.</p>
+            <div class="hero-rating">
+                <span class="stars">★★★★★</span>
+                <span class="rating-text">4.8/5</span>
+                <span class="reviews">(127 avis clients)</span>
+            </div>
+            <div class="hero-cta-group">
+                <a href="#contact" class="hero-cta">
+                    Contactez-nous
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#portfolio" class="hero-cta-secondary">
+                    <i class="fas fa-images"></i>
+                    Voir nos réalisations
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="section-header">
+            <div class="section-badge">
+                <i class="fas fa-cogs"></i>
+                Nos Services Premium
+            </div>
+            <h2>Des solutions d'exception</h2>
+            <p>Nous proposons une gamme complète de services haut de gamme adaptés à vos besoins les plus exigeants</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <img src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Dépannage Urgence" class="service-image">
+                <div class="service-content">
+                    <div class="service-icon">⚡</div>
+                    <h3>Dépannage Urgence 24/7</h3>
+                    <p>Intervention d'urgence sur toutes fuites et pannes</p>
+                    <div class="service-features">
+                        <span class="service-feature">Disponible 7j/7</span>
+                        <span class="service-feature">Arrivée sous 45min</span>
+                        <span class="service-feature">Sans surprise tarifaire</span>
+                        <span class="service-feature">Garantie intervention</span>
+                    </div>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Installation Sanitaire" class="service-image">
+                <div class="service-content">
+                    <div class="service-icon">🚿</div>
+                    <h3>Installation Sanitaire Premium</h3>
+                    <p>Pose et remplacement d'appareils haut de gamme</p>
+                    <div class="service-features">
+                        <span class="service-feature">Robinetterie design</span>
+                        <span class="service-feature">Éviers luxe</span>
+                        <span class="service-feature">WC japonais</span>
+                        <span class="service-feature">Douches spa</span>
+                    </div>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://images.pexels.com/photos/236603/pexels-photo-236603.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Chauffage" class="service-image">
+                <div class="service-content">
+                    <div class="service-icon">🌡️</div>
+                    <h3>Chauffage & Climatisation</h3>
+                    <p>Solutions thermiques modernes et écologiques</p>
+                    <div class="service-features">
+                        <span class="service-feature">Pompes à chaleur</span>
+                        <span class="service-feature">Chaudières condensation</span>
+                        <span class="service-feature">Clim réversible</span>
+                        <span class="service-feature">Thermostats connectés</span>
+                    </div>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://images.pexels.com/photos/5700164/pexels-photo-5700164.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Détection Fuites" class="service-image">
+                <div class="service-content">
+                    <div class="service-icon">🔍</div>
+                    <h3>Détection de Fuites High-Tech</h3>
+                    <p>Localisation précise sans casse par caméra thermique</p>
+                    <div class="service-features">
+                        <span class="service-feature">Caméra thermique</span>
+                        <span class="service-feature">Gaz traceur</span>
+                        <span class="service-feature">Acoustique</span>
+                        <span class="service-feature">Rapport détaillé</span>
+                    </div>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://images.pexels.com/photos/262513/pexels-photo-262513.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Rénovation" class="service-image">
+                <div class="service-content">
+                    <div class="service-icon">🛁</div>
+                    <h3>Rénovation Salle de Bain</h3>
+                    <p>Création sur mesure avec design personnalisé</p>
+                    <div class="service-features">
+                        <span class="service-feature">Design 3D</span>
+                        <span class="service-feature">Marbre naturel</span>
+                        <span class="service-feature">Éclairage LED</span>
+                        <span class="service-feature">Accessoires luxe</span>
+                    </div>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://images.pexels.com/photos/5638732/pexels-photo-5638732.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Plomberie Écologique" class="service-image">
+                <div class="service-content">
+                    <div class="service-icon">💧</div>
+                    <h3>Plomberie Écologique</h3>
+                    <p>Solutions durables et économies d'eau</p>
+                    <div class="service-features">
+                        <span class="service-feature">Récupération eau</span>
+                        <span class="service-feature">Filtration</span>
+                        <span class="service-feature">Pompe chaleur</span>
+                        <span class="service-feature">Certification RGE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section class="portfolio" id="portfolio">
+        <div class="section-header">
+            <div class="section-badge">
+                <i class="fas fa-briefcase"></i>
+                Portfolio
+            </div>
+            <h2>Nos réalisations</h2>
+            <p>Découvrez nos projets les plus remarquables et laissez-vous inspirer</p>
+        </div>
+        <div class="portfolio-grid">
+            <div class="portfolio-item">
+                <img src="https://images.pexels.com/photos/262513/pexels-photo-262513.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Rénovation Salle de Bain">
+                <div class="portfolio-overlay">
+                    <span class="portfolio-category">Rénovation</span>
+                    <h3>Rénovation Salle de Bain Haussmann</h3>
+                    <p>Transformation complète avec marbre italien et dorures</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <img src="https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Installation Spa">
+                <div class="portfolio-overlay">
+                    <span class="portfolio-category">Installation</span>
+                    <h3>Installation Spa Privatif</h3>
+                    <p>Spa jacuzzi avec système de massage intégré</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <img src="https://images.pexels.com/photos/5638732/pexels-photo-5638732.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Plomberie Écologique">
+                <div class="portfolio-overlay">
+                    <span class="portfolio-category">Écologie</span>
+                    <h3>Plomberie Écologique Villa</h3>
+                    <p>Système complet de récupération d'eau de pluie</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <img src="https://images.pexels.com/photos/209241/pexels-photo-209241.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Cuisine Design">
+                <div class="portfolio-overlay">
+                    <span class="portfolio-category">Design</span>
+                    <h3>Cuisine Design Premium</h3>
+                    <p>Ilot central avec évier design et robinetterie luxe</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team" id="team">
+        <div class="section-header">
+            <div class="section-badge">
+                <i class="fas fa-users"></i>
+                Notre Équipe
+            </div>
+            <h2>Des experts passionnés</h2>
+            <p>Rencontrez les talents qui font notre excellence</p>
+        </div>
+        <div class="team-grid">
+            <div class="team-card">
+                <img src="https://images.pexels.com/photos/5386754/pexels-photo-5386754.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Marc Dupont" class="team-image">
+                <div class="team-content">
+                    <h3>Marc Dupont</h3>
+                    <div class="team-role">Fondateur & Expert Plombier</div>
+                    <p>20 ans d'expérience, certifié RGE</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://images.pexels.com/photos/5439367/pexels-photo-5439367.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Sophie Martin" class="team-image">
+                <div class="team-content">
+                    <h3>Sophie Martin</h3>
+                    <div class="team-role">Spécialiste Chauffage</div>
+                    <p>Expert pompes à chaleur et chaudières</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://images.pexels.com/photos/5452296/pexels-photo-5452296.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Pierre Leroy" class="team-image">
+                <div class="team-content">
+                    <h3>Pierre Leroy</h3>
+                    <div class="team-role">Technicien Sanitaire</div>
+                    <p>Spécialiste installations haut de gamme</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://images.pexels.com/photos/5488676/pexels-photo-5488676.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Marie Dubois" class="team-image">
+                <div class="team-content">
+                    <h3>Marie Dubois</h3>
+                    <div class="team-role">Chef de Projet</div>
+                    <p>Coordination et gestion des travaux</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications Section -->
+    <section class="certifications" id="certifications">
+        <div class="section-header">
+            <div class="section-badge" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); color: white;">
+                <i class="fas fa-award"></i>
+                Certifications
+            </div>
+            <h2 style="color: white;">Nos garanties de qualité</h2>
+            <p style="color: rgba(255,255,255,0.9);">Des certifications reconnues pour votre tranquillité d'esprit</p>
+        </div>
+        <div class="certifications-grid">
+            <div class="cert-card">
+                <div class="cert-icon"><i class="fas fa-certificate"></i></div>
+                <h3>Certification RGE</h3>
+                <p>ADEME</p>
+                <p>2020</p>
+            </div>
+            <div class="cert-card">
+                <div class="cert-icon"><i class="fas fa-certificate"></i></div>
+                <h3>Qualibat RGE</h3>
+                <p>Qualibat</p>
+                <p>2019</p>
+            </div>
+            <div class="cert-card">
+                <div class="cert-icon"><i class="fas fa-certificate"></i></div>
+                <h3>Artisan Confirme</h3>
+                <p>Chambre des Métiers</p>
+                <p>2018</p>
+            </div>
+            <div class="cert-card">
+                <div class="cert-icon"><i class="fas fa-certificate"></i></div>
+                <h3>Garantie Décennale</h3>
+                <p>Assurance Pro</p>
+                <p>2015</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="section-header">
+            <div class="section-badge">
+                <i class="fas fa-question-circle"></i>
+                FAQ
+            </div>
+            <h2>Questions fréquentes</h2>
+            <p>Tout ce vous devez savoir sur nos services</p>
+        </div>
+        <div class="faq-grid">
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    Quels sont vos tarifs pour un dépannage ?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Nos tarifs commencent à 89€ pour un dépannage simple. Le devis est gratuit et nous intervenons sous 45 minutes en urgence.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    Êtes-vous disponible les week-ends ?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Oui, nous sommes disponibles 7j/7, 24h/24 pour les urgences. Les interventions week-end sont facturées au même tarif.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    Proposez-vous des devis gratuits ?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Absolument ! Tous nos devis sont gratuits et sans engagement. Nous nous déplaçons pour évaluer vos besoins.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    Quelles garanties offrez-vous ?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Nous offrons une garantie décennale sur les installations et une garantie de 2 ans sur les pièces.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="section-header">
+            <div class="section-badge">
+                <i class="fas fa-quote-left"></i>
+                Témoignages
+            </div>
+            <h2>Ce que disent nos clients</h2>
+            <p>L'excellence de nos services à travers les yeux de ceux qui nous font confiance</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Service exceptionnel du début à la fin. Professionnalisme et expertise remarquables. Intervention rapide à minuit pour une fuite majeure."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">M</div>
+                    <div class="author-info">
+                        <h4>Marc Dupont</h4>
+                        <span>Il y a 1 semaine</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Intervention rapide et efficace. Problème résolu avec des solutions durables. Installation complète de notre salle de bain impeccable."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">S</div>
+                    <div class="author-info">
+                        <h4>Sophie Martin</h4>
+                        <span>Il y a 2 semaines</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Qualité du travail irréprochable. Respect des délais et du budget. Dépannage chauffage en plein hiver, problème résolu en 1h."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">P</div>
+                    <div class="author-info">
+                        <h4>Pierre Leroy</h4>
+                        <span>Il y a 3 semaines</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Très professionnel et courtois. Tarifs transparents et travail soigné. Je recommande vivement pour tous vos besoins en plomberie."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">M</div>
+                    <div class="author-info">
+                        <h4>Marie Dubois</h4>
+                        <span>Il y a 4 semaines</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="contact-content">
+            <h2>Contactez-nous</h2>
+            <p>Une question ? Un projet ? Notre équipe est à votre écoute pour vous accompagner dans vos démarches</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-item-icon"><i class="fas fa-phone-alt"></i></div>
+                    <h3>Téléphone</h3>
+                    <a href="tel:0123456789">01 23 45 67 89</a>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-icon"><i class="fas fa-envelope"></i></div>
+                    <h3>Email</h3>
+                    <a href="mailto:contact@plomberiepro-paris.fr">contact@plomberiepro-paris.fr</a>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h3>Adresse</h3>
+                    <p>15 Rue de la Plomberie, 75001 Paris</p>
+                </div>
+            </div>
+            <a href="tel:0123456789" class="contact-cta">Appeler maintenant <i class="fas fa-phone-alt"></i></a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Plomberie Pro Paris</h3>
+                <p>Plombier chauffagiste d'excellence à Paris. Innovation, qualité et satisfaction garantie depuis plus de 15 ans.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Services</h3>
+                <a href="#services">Dépannage Urgence 24/7</a>
+                <a href="#services">Installation Sanitaire Premium</a>
+                <a href="#services">Chauffage & Climatisation</a>
+                <a href="#services">Détection de Fuites High-Tech</a>
+                <a href="#services">Rénovation Salle de Bain</a>
+            </div>
+            <div class="footer-section">
+                <h3>Navigation</h3>
+                <a href="#home">Accueil</a>
+                <a href="#services">Services</a>
+                <a href="#portfolio">Portfolio</a>
+                <a href="#team">Équipe</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <a href="tel:0123456789">01 23 45 67 89</a>
+                <a href="mailto:contact@plomberiepro-paris.fr">contact@plomberiepro-paris.fr</a>
+                <p>15 Rue de la Plomberie, 75001 Paris</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Plomberie Pro Paris. Tous droits réservés. Design Ultra-Premium 2026.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // FAQ toggle
+        function toggleFaq(element) {
+            element.classList.toggle('active');
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.pageYOffset > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Intersection Observer pour animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.service-card, .portfolio-item, .team-card, .cert-card, .faq-item, .testimonial-card, .contact-item').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(40px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+
+        // Parallax effect sur hero
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero-bg');
+            if (hero) {
+                hero.style.transform = 'translateY(' + scrolled * 0.3 + 'px)';
+            }
+        });
+    </script>
+</body>
+</html>
