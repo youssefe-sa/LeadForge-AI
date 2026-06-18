@@ -637,478 +637,222 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${companyName}">
     <meta name="twitter:description" content="${heroSubtitle}">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"LocalBusiness","name":"${companyName}","description":"${heroSubtitle}","image":"${heroImage}","telephone":"${phone}","email":"${email}","address":{"@type":"PostalAddress","streetAddress":"${address}","addressLocality":"${city}","addressCountry":"FR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"${rating || 5}","reviewCount":"${reviews || 42}"}}}
-    </script>
-
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"${companyName}","description":"${heroSubtitle}","image":"${heroImage}","telephone":"${phone}","email":"${email}","address":{"@type":"PostalAddress","streetAddress":"${address}","addressLocality":"${city}","addressCountry":"FR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"${rating || 5}","reviewCount":"${reviews || 42}"}}}</script>
     <style>
-        :root {
-            --primary: ${primaryColor};
-            --primary-rgb: ${primaryRgb};
-            --secondary: ${secondaryColor};
-            --accent: ${accentColor};
-            --bg: #fafaf9;
-            --surface: #ffffff;
-            --text: #18181b;
-            --text-secondary: #71717a;
-            --text-tertiary: #a1a1aa;
-            --border: #e4e4e7;
-            --border-light: #f4f4f5;
-        }
+        :root{--primary:${primaryColor};--primary-rgb:${primaryRgb};--secondary:${secondaryColor};--accent:${accentColor};--bg:#fafaf9;--surface:#fff;--text:#18181b;--text-s:#71717a;--text-t:#a1a1aa;--border:#e4e4e7;--border-l:#f4f4f5;--dark:#1a2744;--dark-rgb:26,39,68}
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+        h1,h2,h3,h4,h5{font-family:${headingFont},'DM Sans',sans-serif;line-height:1.2}
+        .container{max-width:1200px;margin:0 auto;padding:0 24px}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 0;transition:all .4s cubic-bezier(.4,0,.2,1)}
+        .navbar.scrolled{background:rgba(255,255,255,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 0;box-shadow:0 1px 20px rgba(0,0,0,.06)}
+        .navbar-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+        .navbar-brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
+        .navbar-logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px}
+        .navbar-name{font-weight:700;font-size:1.1rem}
+        .navbar-links{display:flex;align-items:center;gap:28px}
+        .navbar-links a{text-decoration:none;color:var(--text-s);font-size:.88rem;font-weight:500;transition:color .2s}
+        .navbar-links a:hover{color:var(--primary)}
+        .navbar-cta{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff!important;padding:10px 22px;border-radius:8px;font-weight:600;font-size:.88rem;transition:all .2s}
+        .navbar-cta:hover{opacity:.9;transform:translateY(-1px)}
+        .mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:8px}
+        .mobile-menu{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;box-shadow:0 10px 40px rgba(0,0,0,.08)}
+        .mobile-menu.open{display:block}
+        .mobile-menu a{display:block;padding:12px 0;text-decoration:none;color:var(--text);font-weight:500;border-bottom:1px solid var(--border-l)}
+        .mobile-menu a:last-child{border:none}
+        @media(max-width:768px){.navbar-links{display:none!important}.mobile-toggle{display:block}}
 
-        html { scroll-behavior: smooth; }
+        .hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;background:var(--dark)}
+        .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45}
+        .hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--dark-rgb),.85) 0%,rgba(var(--dark-rgb),.5) 50%,rgba(var(--dark-rgb),.7) 100%)}
+        .hero-inner{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:140px 24px 80px;width:100%;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:center}
+        .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:8px 18px;border-radius:100px;color:#fff;font-size:.8rem;font-weight:600;margin-bottom:20px;letter-spacing:.5px;text-transform:uppercase}
+        .hero h1{font-size:clamp(2.5rem,5.5vw,4rem);font-weight:800;color:#fff;margin-bottom:16px;letter-spacing:-.02em}
+        .hero h1 em{font-style:normal;color:var(--accent)}
+        .hero-sub{font-size:1.1rem;color:rgba(255,255,255,.75);max-width:520px;margin-bottom:32px;line-height:1.7}
+        .hero-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:36px}
+        .btn-pri{display:inline-flex;align-items:center;gap:10px;background:var(--primary);color:#fff;padding:15px 30px;border-radius:10px;text-decoration:none;font-weight:700;font-size:.95rem;transition:all .3s;border:none;cursor:pointer}
+        .btn-pri:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(var(--primary-rgb),.35)}
+        .btn-sec{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;padding:15px 30px;border-radius:10px;text-decoration:none;font-weight:600;font-size:.95rem;transition:all .3s}
+        .btn-sec:hover{background:rgba(255,255,255,.15)}
+        .hero-rating{display:flex;align-items:center;gap:10px}
+        .hero-stars{display:flex;gap:2px;color:#fbbf24}
+        .hero-rating-text{font-size:.85rem;color:rgba(255,255,255,.6)}
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            overflow-x: hidden;
-        }
+        .hero-card{background:rgba(255,255,255,.08);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:32px;color:#fff}
+        .hero-card-title{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.5);margin-bottom:20px}
+        .hero-hours{margin-bottom:24px}
+        .hero-hours-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.9rem}
+        .hero-hours-row:last-child{border:none}
+        .hero-hours-day{color:rgba(255,255,255,.7)}
+        .hero-hours-time{font-weight:600}
+        .hero-card .btn-pri{width:100%;justify-content:center;margin-top:16px}
+        .hero-card-note{text-align:center;font-size:.75rem;color:rgba(255,255,255,.4);margin-top:10px}
+        @media(max-width:900px){.hero-inner{grid-template-columns:1fr;padding:120px 20px 60px}.hero-card{display:none}.hero-actions{flex-direction:column;align-items:stretch}.btn-pri,.btn-sec{justify-content:center}}
 
-        h1, h2, h3, h4, h5 { font-family: ${headingFont}, 'DM Sans', sans-serif; line-height: 1.2; }
+        .trust-bar{background:#fff;border-bottom:1px solid var(--border);padding:20px 0}
+        .trust-inner{display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap}
+        .trust-item{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--text-s);font-weight:500}
+        .trust-item i{color:var(--primary)}
+        .trust-div{width:1px;height:24px;background:var(--border)}
+        @media(max-width:768px){.trust-inner{gap:16px}.trust-div{display:none}}
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .section{padding:100px 0}
+        .section-alt{background:#fff}
+        .section-dark{background:var(--dark);color:#fff;padding:100px 0}
+        .section-hdr{text-align:center;margin-bottom:64px}
+        .section-hdr h2{font-size:clamp(1.75rem,4vw,2.75rem);font-weight:800;margin-bottom:16px;letter-spacing:-.02em}
+        .section-hdr p{font-size:1.05rem;color:var(--text-s);max-width:560px;margin:0 auto}
+        .section-dark .section-hdr h2{color:#fff}
+        .section-dark .section-hdr p{color:rgba(255,255,255,.6)}
+        .section-label{display:inline-block;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--primary);margin-bottom:12px}
+        .section-dark .section-label{color:var(--accent)}
 
-        /* ── NAVBAR ── */
-        .navbar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            padding: 20px 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .navbar.scrolled {
-            background: rgba(255,255,255,0.92);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 0;
-        }
-        .navbar-inner {
-            max-width: 1200px; margin: 0 auto; padding: 0 24px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .navbar-brand {
-            display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text);
-        }
-        .navbar-logo {
-            width: 40px; height: 40px; border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 800; font-size: 14px; font-family: ${headingFont};
-        }
-        .navbar-name { font-weight: 700; font-size: 1.1rem; }
-        .navbar-links { display: flex; align-items: center; gap: 32px; }
-        .navbar-links a {
-            text-decoration: none; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;
-            transition: color 0.2s;
-        }
-        .navbar-links a:hover { color: var(--primary); }
-        .navbar-cta {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: var(--primary); color: white; padding: 10px 24px; border-radius: 8px;
-            text-decoration: none; font-weight: 600; font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-        .navbar-cta:hover { opacity: 0.9; transform: translateY(-1px); }
-        .mobile-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
-        .mobile-menu {
-            display: none; position: absolute; top: 100%; left: 0; right: 0;
-            background: white; border-bottom: 1px solid var(--border);
-            padding: 16px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-        }
-        .mobile-menu.open { display: block; }
-        .mobile-menu a {
-            display: block; padding: 12px 0; text-decoration: none; color: var(--text);
-            font-weight: 500; border-bottom: 1px solid var(--border-light);
-        }
-        .mobile-menu a:last-child { border: none; }
+        .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+        .about-img{border-radius:16px;overflow:hidden;position:relative}
+        .about-img img{width:100%;height:400px;object-fit:cover;display:block}
+        .about-badge{position:absolute;bottom:-16px;right:24px;background:var(--primary);color:#fff;padding:16px 24px;border-radius:12px;text-align:center;box-shadow:0 8px 24px rgba(var(--primary-rgb),.3)}
+        .about-badge-num{font-size:1.75rem;font-weight:800;line-height:1}
+        .about-badge-text{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-top:4px}
+        .about-text h2{font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;margin-bottom:16px}
+        .about-text>p{color:var(--text-s);margin-bottom:20px;font-size:1rem}
+        .about-checks{list-style:none;display:grid;gap:12px;margin-bottom:28px}
+        .about-checks li{display:flex;align-items:center;gap:10px;font-weight:500;font-size:.95rem}
+        .about-checks i{color:var(--primary);flex-shrink:0}
+        @media(max-width:768px){.about-grid{grid-template-columns:1fr;gap:40px}.about-img img{height:280px}}
 
-        @media (max-width: 768px) {
-            .navbar-links { display: none !important; }
-            .mobile-toggle { display: block; }
-        }
+        .stats{padding:60px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:32px;text-align:center;color:#fff}
+        .stat-num{font-size:3rem;font-weight:800;line-height:1;margin-bottom:8px;font-family:${headingFont}}
+        .stat-label{font-size:.8rem;text-transform:uppercase;letter-spacing:1.5px;opacity:.7;font-weight:600}
+        @media(max-width:768px){.stats{grid-template-columns:1fr 1fr;padding:40px 24px;gap:24px}}
 
-        /* ── HERO ── */
-        .hero {
-            position: relative; min-height: 100vh; display: flex; align-items: center;
-            overflow: hidden; background: #111;
-        }
-        .hero-bg {
-            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-            opacity: 0.55;
-        }
-        .hero-overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 100%);
-        }
-        .hero-content {
-            position: relative; z-index: 10; max-width: 1200px; margin: 0 auto; padding: 140px 24px 80px;
-            width: 100%;
-        }
-        .hero-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.12); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.18);
-            padding: 8px 20px; border-radius: 100px;
-            color: white; font-size: 0.85rem; font-weight: 600;
-            margin-bottom: 24px; letter-spacing: 0.5px;
-        }
-        .hero h1 {
-            font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; color: white;
-            margin-bottom: 20px; max-width: 700px; letter-spacing: -0.02em;
-        }
-        .hero h1 span { color: var(--accent); }
-        .hero p {
-            font-size: clamp(1rem, 2vw, 1.25rem); color: rgba(255,255,255,0.8);
-            max-width: 560px; margin-bottom: 36px; line-height: 1.7;
-        }
-        .hero-actions { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
-        .btn-primary {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: var(--primary); color: white; padding: 16px 32px; border-radius: 10px;
-            text-decoration: none; font-weight: 700; font-size: 1rem;
-            transition: all 0.3s; border: none; cursor: pointer;
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.35); }
-        .btn-outline {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.25);
-            color: white; padding: 16px 32px; border-radius: 10px;
-            text-decoration: none; font-weight: 600; font-size: 1rem;
-            transition: all 0.3s;
-        }
-        .btn-outline:hover { background: rgba(255,255,255,0.2); }
-        .hero-rating {
-            display: inline-flex; align-items: center; gap: 12px;
-            margin-top: 40px; color: white;
-        }
-        .hero-rating-stars { display: flex; gap: 2px; color: #fbbf24; }
-        .hero-rating-text { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+        .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+        .svc-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:32px 24px;transition:all .3s}
+        .svc-card:hover{border-color:var(--primary);box-shadow:0 8px 30px rgba(var(--primary-rgb),.08);transform:translateY(-4px)}
+        .svc-icon{width:48px;height:48px;border-radius:12px;background:rgba(var(--primary-rgb),.08);display:flex;align-items:center;justify-content:center;color:var(--primary);margin-bottom:16px}
+        .svc-card h3{font-size:1.1rem;font-weight:700;margin-bottom:6px}
+        .svc-card p{color:var(--text-s);font-size:.9rem;margin-bottom:14px}
+        .svc-link{display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-weight:600;font-size:.85rem;text-decoration:none;transition:gap .2s}
+        .svc-link:hover{gap:10px}
+        @media(max-width:768px){.svc-grid{grid-template-columns:1fr}}
 
-        @media (max-width: 768px) {
-            .hero { min-height: 85vh; }
-            .hero-content { padding: 120px 20px 60px; }
-            .hero-actions { flex-direction: column; align-items: stretch; }
-            .btn-primary, .btn-outline { justify-content: center; }
-        }
+        .why-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+        .why-text h2{font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;color:#fff;margin-bottom:16px}
+        .why-text>p{color:rgba(255,255,255,.6);margin-bottom:32px;font-size:1rem;line-height:1.7}
+        .why-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .why-stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px;text-align:center}
+        .why-stat-num{font-size:1.75rem;font-weight:800;color:var(--accent);line-height:1}
+        .why-stat-label{font-size:.75rem;color:rgba(255,255,255,.5);margin-top:6px;text-transform:uppercase;letter-spacing:1px}
+        .why-img{position:relative;border-radius:16px;overflow:hidden}
+        .why-img img{width:100%;height:400px;object-fit:cover;display:block}
+        .why-img-badge{position:absolute;bottom:20px;right:20px;background:var(--primary);color:#fff;padding:16px 24px;border-radius:12px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+        .why-img-badge-num{font-size:2rem;font-weight:800;line-height:1}
+        .why-img-badge-text{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-top:4px}
+        @media(max-width:768px){.why-grid{grid-template-columns:1fr;gap:40px}.why-img{order:-1}}
 
-        /* ── TRUST BAR ── */
-        .trust-bar {
-            background: white; border-bottom: 1px solid var(--border);
-            padding: 20px 0;
-        }
-        .trust-bar-inner {
-            display: flex; justify-content: center; align-items: center; gap: 48px; flex-wrap: wrap;
-        }
-        .trust-item {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 0.9rem; color: var(--text-secondary); font-weight: 500;
-        }
-        .trust-item i { color: var(--primary); }
-        .trust-divider { width: 1px; height: 24px; background: var(--border); }
+        .guar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+        .guar-card{text-align:center;padding:28px 16px;border-radius:14px;border:1px solid var(--border);background:#fff;transition:all .3s}
+        .guar-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+        .guar-icon{width:52px;height:52px;border-radius:50%;background:rgba(var(--primary-rgb),.08);display:flex;align-items:center;justify-content:center;color:var(--primary);margin:0 auto 14px}
+        .guar-card h3{font-size:.9rem;font-weight:700}
+        @media(max-width:768px){.guar-grid{grid-template-columns:1fr 1fr}}
 
-        @media (max-width: 768px) {
-            .trust-bar-inner { gap: 16px; }
-            .trust-divider { display: none; }
-        }
+        .gal-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:240px 240px;gap:10px}
+        .gal-item{border-radius:12px;overflow:hidden}
+        .gal-main{grid-row:1/-1}
+        .gal-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.25,1,.5,1)}
+        .gal-item:hover img{transform:scale(1.06)}
+        @media(max-width:768px){.gal-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto}.gal-main{grid-row:auto}.gal-item{aspect-ratio:4/3}}
+        @media(max-width:480px){.gal-grid{grid-template-columns:1fr}}
 
-        /* ── SECTIONS ── */
-        .section { padding: 100px 0; }
-        .section-alt { background: white; }
-        .section-header { text-align: center; margin-bottom: 64px; }
-        .section-header h2 {
-            font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 800; color: var(--text);
-            margin-bottom: 16px; letter-spacing: -0.02em;
-        }
-        .section-header p {
-            font-size: 1.1rem; color: var(--text-secondary); max-width: 560px; margin: 0 auto;
-        }
-        .section-label {
-            display: inline-block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 2px; color: var(--primary); margin-bottom: 12px;
-        }
+        .test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+        .test-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;transition:all .3s}
+        .test-card:hover{box-shadow:0 8px 30px rgba(0,0,0,.06)}
+        .test-stars{display:flex;gap:2px;color:#f59e0b;margin-bottom:14px}
+        .test-text{font-size:.95rem;color:var(--text);font-style:italic;line-height:1.7;margin-bottom:20px;flex-grow:1}
+        .test-author{display:flex;align-items:center;gap:12px;border-top:1px solid var(--border-l);padding-top:16px}
+        .test-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem}
+        .test-name{font-weight:700;font-size:.9rem}
+        .test-date{font-size:.75rem;color:var(--text-t)}
+        .test-google{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:32px;padding:16px 24px;border:1px solid var(--border);border-radius:12px;background:#fff;width:fit-content;margin-left:auto;margin-right:auto}
+        .test-google-star{color:#f59e0b}
+        @media(max-width:768px){.test-grid{grid-template-columns:1fr}}
 
-        /* ── ABOUT ── */
-        .about-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
-        }
-        .about-image {
-            border-radius: 16px; overflow: hidden; position: relative;
-        }
-        .about-image img {
-            width: 100%; height: 420px; object-fit: cover; display: block;
-        }
-        .about-text h2 {
-            font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 800; margin-bottom: 20px;
-        }
-        .about-text p { color: var(--text-secondary); margin-bottom: 24px; font-size: 1.05rem; }
-        .about-checks { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .about-checks li {
-            display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.95rem;
-        }
-        .about-checks i { color: var(--primary); flex-shrink: 0; }
+        .proc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;position:relative}
+        .proc-grid::before{content:'';position:absolute;top:32px;left:10%;right:10%;height:2px;background:var(--border)}
+        .proc-step{text-align:center;position:relative;z-index:1}
+        .proc-num{width:64px;height:64px;border-radius:50%;border:3px solid var(--primary);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.25rem;margin:0 auto 16px;background:var(--bg);font-family:${headingFont}}
+        .proc-step h3{font-size:.95rem;font-weight:700;margin-bottom:6px}
+        .proc-step p{font-size:.8rem;color:var(--text-s);line-height:1.5}
+        @media(max-width:768px){.proc-grid{grid-template-columns:repeat(3,1fr)}.proc-grid::before{display:none}}
 
-        @media (max-width: 768px) {
-            .about-grid { grid-template-columns: 1fr; gap: 40px; }
-            .about-image img { height: 280px; }
-        }
+        .cta-banner{background:linear-gradient(135deg,var(--primary),var(--secondary));padding:80px 0;text-align:center;color:#fff}
+        .cta-banner h2{font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:800;margin-bottom:16px}
+        .cta-banner p{font-size:1.05rem;opacity:.85;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto}
+        .btn-cta{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--primary);padding:16px 36px;border-radius:10px;text-decoration:none;font-weight:700;font-size:1rem;transition:all .3s}
+        .btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.2)}
 
-        /* ── STATS ── */
-        .stats {
-            background: var(--primary); padding: 60px 0;
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; text-align: center;
-            color: white;
-        }
-        .stat-item h3 { font-size: 2.5rem; font-weight: 800; margin-bottom: 4px; font-family: ${headingFont}; }
-        .stat-item p { font-size: 0.9rem; opacity: 0.8; font-weight: 500; }
+        .contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+        .contact-form{background:#fff;border:1px solid var(--border);border-radius:16px;padding:40px}
+        .contact-form h3{font-size:1.4rem;font-weight:800;margin-bottom:6px}
+        .contact-form>p{color:var(--text-s);margin-bottom:28px;font-size:.95rem}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .form-group{margin-bottom:16px}
+        .form-control{width:100%;padding:13px 16px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-family:'Inter',sans-serif;font-size:.9rem;transition:all .2s;outline:none}
+        .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(var(--primary-rgb),.1);background:#fff}
+        .form-label{display:block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-s);margin-bottom:6px}
+        .form-submit{width:100%;padding:14px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+        .form-submit:hover{opacity:.9}
+        .form-note{text-align:center;margin-top:10px;font-size:.75rem;color:var(--text-t)}
 
-        @media (max-width: 768px) {
-            .stats { grid-template-columns: 1fr 1fr; padding: 40px 24px; gap: 24px; }
-        }
+        .contact-sidebar{display:flex;flex-direction:column;gap:20px}
+        .contact-hours{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:28px}
+        .contact-hours h4{font-size:.85rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+        .hours-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-l);font-size:.88rem}
+        .hours-row:last-child{border:none}
+        .hours-day{color:var(--text-s)}
+        .hours-time{font-weight:600}
+        .contact-card{background:var(--dark);border-radius:16px;padding:28px;color:#fff}
+        .contact-card-item{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-size:.9rem;color:rgba(255,255,255,.7)}
+        .contact-card-item:last-child{margin-bottom:0}
+        .contact-card-item i{color:var(--accent)}
+        .contact-card-item a{color:inherit;text-decoration:none}
+        .contact-map{border-radius:16px;overflow:hidden;border:1px solid var(--border);min-height:250px}
+        .contact-map iframe{width:100%;height:100%;min-height:250px;border:none}
+        @media(max-width:768px){.contact-wrap{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
 
-        /* ── SERVICES ── */
-        .services-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
-        }
-        .service-card {
-            background: white; border: 1px solid var(--border); border-radius: 16px;
-            padding: 36px 28px; transition: all 0.3s;
-        }
-        .service-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.08);
-            transform: translateY(-4px);
-        }
-        .service-icon {
-            width: 52px; height: 52px; border-radius: 12px;
-            background: rgba(var(--primary-rgb), 0.08);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--primary); margin-bottom: 20px;
-        }
-        .service-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
-        .service-card p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 16px; }
-        .service-features { list-style: none; }
-        .service-features li {
-            display: flex; align-items: center; gap: 8px;
-            font-size: 0.85rem; color: var(--text-secondary); padding: 4px 0;
-        }
-        .service-features i { color: var(--primary); width: 16px; height: 16px; flex-shrink: 0; }
+        footer{background:var(--dark);color:#fff;padding:60px 0 28px}
+        .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:40px;margin-bottom:40px}
+        .footer-brand{font-size:1.2rem;font-weight:800;margin-bottom:10px}
+        .footer-desc{font-size:.88rem;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:16px}
+        .footer-social{display:flex;gap:10px}
+        .footer-social a{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;transition:background .2s}
+        .footer-social a:hover{background:rgba(255,255,255,.15)}
+        .footer-col h4{font-size:.8rem;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.4)}
+        .footer-col ul{list-style:none}
+        .footer-col li{margin-bottom:8px}
+        .footer-col a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.88rem;transition:color .2s}
+        .footer-col a:hover{color:#fff}
+        .footer-contact-item{display:flex;align-items:center;gap:10px;margin-bottom:10px;color:rgba(255,255,255,.6);font-size:.88rem}
+        .footer-contact-item i{color:var(--accent)}
+        .footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:20px;text-align:center;font-size:.8rem;color:rgba(255,255,255,.3)}
 
-        @media (max-width: 768px) {
-            .services-grid { grid-template-columns: 1fr; }
-        }
+        .float-urgent{position:fixed;bottom:24px;right:24px;z-index:90;display:inline-flex;align-items:center;gap:10px;background:var(--primary);color:#fff;padding:14px 24px;border-radius:100px;text-decoration:none;font-weight:700;font-size:.9rem;box-shadow:0 8px 30px rgba(var(--primary-rgb),.4);transition:all .3s;animation:pulse-urgent 2s infinite}
+        .float-urgent:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(var(--primary-rgb),.5)}
+        @keyframes pulse-urgent{0%,100%{box-shadow:0 8px 30px rgba(var(--primary-rgb),.4)}50%{box-shadow:0 8px 30px rgba(var(--primary-rgb),.6),0 0 0 8px rgba(var(--primary-rgb),.1)}}
 
-        /* ── GUARANTEES ── */
-        .guarantees-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
-        }
-        .guarantee-card {
-            text-align: center; padding: 32px 20px; border-radius: 16px;
-            background: white; border: 1px solid var(--border);
-            transition: all 0.3s;
-        }
-        .guarantee-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
-        .guarantee-icon {
-            width: 56px; height: 56px; border-radius: 50%;
-            background: rgba(var(--primary-rgb), 0.08);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--primary); margin: 0 auto 16px;
-        }
-        .guarantee-card h3 { font-size: 1rem; font-weight: 700; }
-
-        @media (max-width: 768px) {
-            .guarantees-grid { grid-template-columns: 1fr 1fr; }
-        }
-
-        /* ── GALLERY ── */
-        .gallery-grid {
-            display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 250px 250px; gap: 12px;
-        }
-        .gallery-item { border-radius: 12px; overflow: hidden; position: relative; }
-        .gallery-item-main { grid-row: 1 / -1; }
-        .gallery-item img {
-            width: 100%; height: 100%; object-fit: cover; display: block;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .gallery-item:hover img { transform: scale(1.06); }
-        @media (max-width: 768px) {
-            .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
-            .gallery-item-main { grid-row: auto; }
-            .gallery-item { aspect-ratio: 4/3; }
-        }
-        @media (max-width: 480px) {
-            .gallery-grid { grid-template-columns: 1fr; }
-        }
-
-        /* ── TESTIMONIALS ── */
-        .testimonials-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
-        }
-        .testimonial-card {
-            background: white; border: 1px solid var(--border); border-radius: 16px;
-            padding: 32px; display: flex; flex-direction: column; justify-content: space-between;
-            transition: all 0.3s;
-        }
-        .testimonial-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
-        .testimonial-stars { display: flex; gap: 2px; color: #f59e0b; margin-bottom: 16px; }
-        .testimonial-text {
-            font-size: 1rem; color: var(--text); font-style: italic; line-height: 1.7;
-            margin-bottom: 24px; flex-grow: 1;
-        }
-        .testimonial-author {
-            display: flex; align-items: center; gap: 12px;
-            border-top: 1px solid var(--border-light); padding-top: 20px;
-        }
-        .testimonial-avatar {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; font-size: 1.1rem;
-        }
-        .testimonial-name { font-weight: 700; font-size: 0.95rem; }
-        .testimonial-date { font-size: 0.8rem; color: var(--text-tertiary); }
-
-        @media (max-width: 768px) {
-            .testimonials-grid { grid-template-columns: 1fr; }
-        }
-
-        /* ── PROCESS ── */
-        .process-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
-            position: relative;
-        }
-        .process-step { text-align: center; position: relative; }
-        .step-number {
-            width: 56px; height: 56px; border-radius: 50%;
-            border: 2px solid var(--primary); color: var(--primary);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 1.2rem; margin: 0 auto 20px;
-            font-family: ${headingFont};
-        }
-        .process-step h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
-        .process-step p { font-size: 0.9rem; color: var(--text-secondary); }
-
-        @media (max-width: 768px) {
-            .process-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
-        }
-
-        /* ── CTA BANNER ── */
-        .cta-banner {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 80px 0; text-align: center; color: white;
-        }
-        .cta-banner h2 {
-            font-size: clamp(1.5rem, 3.5vw, 2.5rem); font-weight: 800; margin-bottom: 16px;
-        }
-        .cta-banner p { font-size: 1.1rem; opacity: 0.85; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
-        .cta-banner .btn-cta {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: white; color: var(--primary); padding: 16px 36px; border-radius: 10px;
-            text-decoration: none; font-weight: 700; font-size: 1rem;
-            transition: all 0.3s;
-        }
-        .cta-banner .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
-
-        /* ── CONTACT ── */
-        .contact-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 0;
-            border-radius: 16px; overflow: hidden; background: white;
-            border: 1px solid var(--border);
-        }
-        .contact-form-side { padding: 48px; }
-        .contact-form-side h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
-        .contact-form-side > p { color: var(--text-secondary); margin-bottom: 32px; }
-        .form-group { margin-bottom: 20px; }
-        .form-control {
-            width: 100%; padding: 14px 18px; border-radius: 10px;
-            border: 1px solid var(--border); background: var(--bg);
-            font-family: 'Inter', sans-serif; font-size: 0.95rem;
-            transition: all 0.2s; outline: none;
-        }
-        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1); background: white; }
-        .form-submit {
-            width: 100%; padding: 14px; border-radius: 10px; border: none;
-            background: var(--primary); color: white; font-weight: 700; font-size: 1rem;
-            cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .form-submit:hover { opacity: 0.9; }
-        .contact-info-side { background: var(--bg); padding: 48px; display: flex; flex-direction: column; gap: 24px; }
-        .contact-info-item { display: flex; align-items: flex-start; gap: 14px; }
-        .contact-info-icon {
-            width: 44px; height: 44px; border-radius: 10px;
-            background: rgba(var(--primary-rgb), 0.08);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--primary); flex-shrink: 0;
-        }
-        .contact-info-label { font-size: 0.8rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-        .contact-info-value { font-weight: 600; font-size: 0.95rem; margin-top: 2px; }
-        .contact-map { border-radius: 12px; overflow: hidden; flex-grow: 1; min-height: 200px; margin-top: auto; }
-        .contact-map iframe { width: 100%; height: 100%; min-height: 200px; border: none; }
-
-        @media (max-width: 768px) {
-            .contact-grid { grid-template-columns: 1fr; }
-            .contact-form-side, .contact-info-side { padding: 32px 24px; }
-        }
-
-        /* ── FOOTER ── */
-        footer {
-            background: var(--text); color: white; padding: 64px 0 32px;
-        }
-        .footer-grid {
-            display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 48px;
-            margin-bottom: 48px;
-        }
-        .footer-brand { font-size: 1.25rem; font-weight: 800; margin-bottom: 12px; font-family: ${headingFont}; }
-        .footer-desc { font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 20px; }
-        .footer-social { display: flex; gap: 12px; }
-        .footer-social a {
-            width: 36px; height: 36px; border-radius: 8px;
-            background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
-            color: white; text-decoration: none; transition: background 0.2s;
-        }
-        .footer-social a:hover { background: rgba(255,255,255,0.2); }
-        .footer-col h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .footer-col ul { list-style: none; }
-        .footer-col li { margin-bottom: 10px; }
-        .footer-col a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
-        .footer-col a:hover { color: white; }
-        .footer-contact-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: rgba(255,255,255,0.6); font-size: 0.9rem; }
-        .footer-contact-item i { color: var(--accent); }
-        .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px;
-            text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.4);
-        }
-
-        @media (max-width: 768px) {
-            .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
-        }
-        @media (max-width: 480px) {
-            .footer-grid { grid-template-columns: 1fr; }
-        }
-
-        /* ── SCROLL ANIMATIONS ── */
-        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-        .reveal-delay-1 { transition-delay: 0.1s; }
-        .reveal-delay-2 { transition-delay: 0.2s; }
-        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+        .reveal.active{opacity:1;transform:translateY(0)}
+        .reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}
     </style>
 </head>
 <body>
-
-    <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="navbar-inner">
             <a href="#" class="navbar-brand">
@@ -1118,362 +862,272 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
             <div class="navbar-links">
                 <a href="#about">À propos</a>
                 <a href="#services">Services</a>
+                <a href="#why">Pourquoi nous</a>
                 <a href="#testimonials">Avis</a>
                 <a href="#contact">Contact</a>
                 ${phone ? `<a href="tel:${cleanPhoneLink}" class="navbar-cta"><i data-lucide="phone" width="16"></i> ${phone}</a>` : ''}
             </div>
-            <button class="mobile-toggle" id="mobile-toggle" aria-label="Menu">
-                <i data-lucide="menu" width="24" height="24" style="color: var(--text);"></i>
-            </button>
+            <button class="mobile-toggle" id="mobile-toggle" aria-label="Menu"><i data-lucide="menu" width="24" height="24" style="color:var(--text)"></i></button>
         </div>
         <div class="mobile-menu" id="mobile-menu">
             <a href="#about">À propos</a>
             <a href="#services">Services</a>
+            <a href="#why">Pourquoi nous</a>
             <a href="#testimonials">Avis</a>
             <a href="#contact">Contact</a>
-            ${phone ? `<a href="tel:${cleanPhoneLink}" style="color: var(--primary); font-weight: 700;">${phone}</a>` : ''}
+            ${phone ? `<a href="tel:${cleanPhoneLink}" style="color:var(--primary);font-weight:700">${phone}</a>` : ''}
         </div>
     </nav>
 
-    <!-- Hero -->
     <section class="hero" id="hero">
         <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" class="hero-bg">
         <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <div class="hero-badge"><i data-lucide="${heroBadge.icon}" width="16"></i> ${heroBadge.text}</div>
-            <h1>${heroTitle}</h1>
-            <p>${heroSubtitle}</p>
-            <div class="hero-actions">
-                <a href="#contact" class="btn-primary">${ctaText} <i data-lucide="arrow-right" width="18"></i></a>
-                ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-outline"><i data-lucide="phone" width="18"></i> Nous appeler</a>` : ''}
-            </div>
-            <div class="hero-rating">
-                <div class="hero-rating-stars">
-                    <i data-lucide="star" fill="currentColor" width="18"></i>
-                    <i data-lucide="star" fill="currentColor" width="18"></i>
-                    <i data-lucide="star" fill="currentColor" width="18"></i>
-                    <i data-lucide="star" fill="currentColor" width="18"></i>
-                    <i data-lucide="star" fill="currentColor" width="18" ${(rating || 0) < 5 ? 'opacity="0.4"' : ''}></i>
+        <div class="hero-inner">
+            <div>
+                <div class="hero-badge"><i data-lucide="${heroBadge.icon}" width="14"></i> ${heroBadge.text}</div>
+                <h1>${heroTitle.replace(/\b(\w+)/g, (m: string, w: string, i: number) => i === 0 || i === 2 ? `<em>${w}</em>` : w)}</h1>
+                <p class="hero-sub">${heroSubtitle}</p>
+                <div class="hero-actions">
+                    <a href="#contact" class="btn-pri">${ctaText} <i data-lucide="arrow-right" width="18"></i></a>
+                    ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-sec"><i data-lucide="phone" width="18"></i> Appeler Maintenant</a>` : ''}
                 </div>
-                <span class="hero-rating-text">${rating}/5 — ${reviews} avis Google</span>
+                <div style="display:flex;gap:24px;flex-wrap:wrap">
+                    <div class="hero-rating"><div class="hero-stars">${Array(5).fill('<i data-lucide="star" fill="currentColor" width="16"></i>').join('')}</div><span class="hero-rating-text">${rating}/5 — ${reviews} avis Google</span></div>
+                </div>
+            </div>
+            <div class="hero-card">
+                <div class="hero-card-title">Horaires & Urgences</div>
+                <div class="hero-hours">
+                    <div class="hero-hours-row"><span class="hero-hours-day">Lun – Ven</span><span class="hero-hours-time">08h00 – 18h00</span></div>
+                    <div class="hero-hours-row"><span class="hero-hours-day">Samedi</span><span class="hero-hours-time">09h00 – 14h00</span></div>
+                    <div class="hero-hours-row"><span class="hero-hours-day">Dimanche</span><span class="hero-hours-time" style="color:var(--accent)">Urgences uniquement</span></div>
+                </div>
+                ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-pri"><i data-lucide="phone" width="16"></i> ${phone}</a>` : ''}
+                <div class="hero-card-note">Appel gratuit · Devis immédiat</div>
             </div>
         </div>
     </section>
 
-    <!-- Trust Bar -->
     <div class="trust-bar">
-        <div class="trust-bar-inner">
-            <div class="trust-item"><i data-lucide="star" fill="currentColor" width="16"></i> Note ${rating}/5 sur Google</div>
-            <div class="trust-divider"></div>
-            <div class="trust-item"><i data-lucide="shield-check" width="16"></i> Professionnel certifié</div>
-            <div class="trust-divider"></div>
-            <div class="trust-item"><i data-lucide="clock" width="16"></i> Intervention rapide</div>
-            <div class="trust-divider"></div>
-            <div class="trust-item"><i data-lucide="map-pin" width="16"></i> Basé à ${city || 'votre région'}</div>
+        <div class="trust-inner">
+            <div class="trust-item"><i data-lucide="badge-check" width="16"></i> Artisan Agréé</div>
+            <div class="trust-div"></div>
+            <div class="trust-item"><i data-lucide="zap" width="16"></i> Intervention Rapide</div>
+            <div class="trust-div"></div>
+            <div class="trust-item"><i data-lucide="file-text" width="16"></i> Devis Transparent</div>
+            <div class="trust-div"></div>
+            <div class="trust-item"><i data-lucide="shield-check" width="16"></i> Travaux Garantis</div>
         </div>
     </div>
 
-    <!-- About -->
-    <section class="section" id="about">
+    <section class="section" id="services">
         <div class="container">
-            <div class="about-grid">
-                <div class="about-image reveal">
-                    <img src="${getImg(1)}" ${imgErr(1)} alt="${companyName}">
-                </div>
-                <div class="about-text reveal">
-                    <span class="section-label">Qui sommes-nous</span>
-                    <h2>Un professionnel de confiance à votre service</h2>
-                    <p>${aboutText}</p>
-                    <ul class="about-checks">
-                        <li><i data-lucide="check-circle-2" width="18"></i> Expertise reconnue</li>
-                        <li><i data-lucide="check-circle-2" width="18"></i> Solutions sur-mesure</li>
-                        <li><i data-lucide="check-circle-2" width="18"></i> Devis gratuit</li>
-                        <li><i data-lucide="check-circle-2" width="18"></i> Réactivité garantie</li>
-                    </ul>
-                </div>
+            <div class="section-hdr reveal">
+                <span class="section-label">Ce que nous faisons</span>
+                <h2>Nos Prestations</h2>
+                <p>Des interventions professionnelles avec compétence et rigueur.</p>
             </div>
-        </div>
-    </section>
-
-    <!-- Stats -->
-    <div class="stats">
-        <div class="stat-item">
-            <h3>${reviews || '100+'}</h3>
-            <p>Avis Vérifiés</p>
-        </div>
-        <div class="stat-item">
-            <h3>${rating}/5</h3>
-            <p>Note Google</p>
-        </div>
-        <div class="stat-item">
-            <h3>15+</h3>
-            <p>Années d'Expérience</p>
-        </div>
-        <div class="stat-item">
-            <h3>100%</h3>
-            <p>Satisfaction Client</p>
-        </div>
-    </div>
-
-    <!-- Services -->
-    <section class="section section-alt" id="services">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">Nos services</span>
-                <h2>Des prestations de qualité</h2>
-                <p>Des interventions professionnelles réalisées dans le respect des normes et des délais.</p>
-            </div>
-            <div class="services-grid">
+            <div class="svc-grid">
                 ${services.map((s, i) => `
-                <div class="service-card reveal reveal-delay-${(i % 3) + 1}">
-                    <div class="service-icon"><i data-lucide="${['zap', 'wrench', 'home', 'shield-check', 'settings', 'check-circle'][i % 6]}" width="24"></i></div>
+                <div class="svc-card reveal reveal-d${(i % 3) + 1}">
+                    <div class="svc-icon"><i data-lucide="${['zap','wrench','home','shield-check','settings','check-circle'][i%6]}" width="22"></i></div>
                     <h3>${s.name}</h3>
                     <p>${s.description}</p>
-                    <ul class="service-features">
-                        ${s.features.map(f => `<li><i data-lucide="check" width="14"></i> ${f}</li>`).join('')}
+                    <a href="#contact" class="svc-link">En savoir plus <i data-lucide="arrow-right" width="14"></i></a>
+                </div>`).join('')}
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-alt" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-img reveal">
+                    <img src="${getImg(1)}" ${imgErr(1)} alt="${companyName}">
+                    <div class="about-badge"><div class="about-badge-num">15+</div><div class="about-badge-text">Ans d'expérience</div></div>
+                </div>
+                <div class="about-text reveal">
+                    <span class="section-label">À propos de nous</span>
+                    <h2>Artisan de Confiance au Cœur de ${city || 'votre région'}</h2>
+                    <p>${aboutText}</p>
+                    <ul class="about-checks">
+                        <li><i data-lucide="check-circle-2" width="18"></i> Intervention d'urgence 7j/7</li>
+                        <li><i data-lucide="check-circle-2" width="18"></i> Devis gratuit, sans engagement</li>
+                        <li><i data-lucide="check-circle-2" width="18"></i> Matériaux certifiés et garantis</li>
+                        <li><i data-lucide="check-circle-2" width="18"></i> Respect rigoureux des délais</li>
                     </ul>
-                </div>`).join('')}
-            </div>
-        </div>
-    </section>
-
-    <!-- Guarantees -->
-    <section class="section">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">Nos engagements</span>
-                <h2>Nos garanties</h2>
-                <p>Les engagements qui font la différence pour votre tranquillité d'esprit.</p>
-            </div>
-            <div class="guarantees-grid">
-                ${template.guarantees.map((g: any, i: number) => `
-                <div class="guarantee-card reveal reveal-delay-${(i % 4) + 1}">
-                    <div class="guarantee-icon"><i data-lucide="${g.icon}" width="24"></i></div>
-                    <h3>${g.title}</h3>
-                </div>`).join('')}
-            </div>
-        </div>
-    </section>
-
-    <!-- Gallery -->
-    <section class="section section-alt">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">Réalisations</span>
-                <h2>Nos dernières interventions</h2>
-                <p>Découvrez quelques-unes de nos réalisations récentes.</p>
-            </div>
-            <div class="gallery-grid reveal">
-                <div class="gallery-item gallery-item-main">
-                    <img src="${getImg(1)}" ${imgErr(1)} alt="Réalisation ${companyName}" loading="lazy">
-                </div>
-                <div class="gallery-item">
-                    <img src="${getImg(2)}" ${imgErr(2)} alt="Réalisation ${companyName}" loading="lazy">
-                </div>
-                <div class="gallery-item">
-                    <img src="${getImg(3)}" ${imgErr(3)} alt="Réalisation ${companyName}" loading="lazy">
-                </div>
-                <div class="gallery-item">
-                    <img src="${getImg(4)}" ${imgErr(4)} alt="Réalisation ${companyName}" loading="lazy">
-                </div>
-                <div class="gallery-item">
-                    <img src="${getImg(5)}" ${imgErr(5)} alt="Réalisation ${companyName}" loading="lazy">
+                    <a href="#contact" class="btn-pri">${ctaText} <i data-lucide="arrow-right" width="16"></i></a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials -->
-    <section class="section" id="testimonials">
+    <section class="section-dark" id="why">
         <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">Témoignages</span>
-                <h2>Ce que disent nos clients</h2>
-                <p>Des retours authentiques de clients satisfaits.</p>
-            </div>
-            <div class="testimonials-grid">
-                ${testimonials.map((t, i) => `
-                <div class="testimonial-card reveal reveal-delay-${(i % 3) + 1}">
-                    <div>
-                        <div class="testimonial-stars">${Array(t.rating).fill('<i data-lucide="star" fill="currentColor" width="16"></i>').join('')}</div>
-                        <p class="testimonial-text">"${t.text}"</p>
+            <div class="why-grid">
+                <div class="why-text reveal">
+                    <span class="section-label">Pourquoi nous choisir ?</span>
+                    <h2>La Différence d'un Vrai Professionnel</h2>
+                    <p>Nous ne nous contentons pas de réparer — nous conseillons, anticipons et garantissons. Notre approche professionnelle alliée à des équipements modernes permet d'offrir un service sans compromis.</p>
+                    <div class="why-stats">
+                        <div class="why-stat"><div class="why-stat-num">24h</div><div class="why-stat-label">Service urgence</div></div>
+                        <div class="why-stat"><div class="why-stat-num">100%</div><div class="why-stat-label">Devis honnêtes</div></div>
+                        <div class="why-stat"><div class="why-stat-num">NF</div><div class="why-stat-label">Normes respectées</div></div>
+                        <div class="why-stat"><div class="why-stat-num">0€</div><div class="why-stat-label">Frais de déplacement</div></div>
                     </div>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">${t.author.charAt(0)}</div>
-                        <div>
-                            <div class="testimonial-name">${t.author}</div>
-                            ${t.date ? `<div class="testimonial-date">${t.date}</div>` : ''}
-                        </div>
-                    </div>
-                </div>`).join('')}
+                </div>
+                <div class="why-img reveal">
+                    <img src="${getImg(2)}" ${imgErr(2)} alt="${companyName}">
+                    <div class="why-img-badge"><div class="why-img-badge-num">98%</div><div class="why-img-badge-text">Satisfaction Client</div></div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Process -->
+    <div class="stats" style="background:var(--primary)">
+        <div class="stat-item"><div class="stat-num">${reviews || '100+'}</div><div class="stat-label">Chantiers Réalisés</div></div>
+        <div class="stat-item"><div class="stat-num">15+</div><div class="stat-label">Ans d'Expérience</div></div>
+        <div class="stat-item"><div class="stat-num">98%</div><div class="stat-label">Clients Satisfaits</div></div>
+        <div class="stat-item"><div class="stat-num">30min</div><div class="stat-label">Délai d'Intervention</div></div>
+    </div>
+
     <section class="section section-alt" id="process">
         <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">Notre démarche</span>
-                <h2>Comment nous travaillons</h2>
-                <p>Un processus clair et transparent en 4 étapes.</p>
+            <div class="section-hdr reveal">
+                <span class="section-label">Comment ça marche</span>
+                <h2>Nos Démarches en 5 Étapes</h2>
+                <p>Un processus clair et transparent du premier contact à la livraison finale.</p>
             </div>
-            <div class="process-grid">
-                <div class="process-step reveal">
-                    <div class="step-number">1</div>
-                    <h3>Prise de contact</h3>
-                    <p>Nous étudions votre besoin et définissons les priorités ensemble.</p>
-                </div>
-                <div class="process-step reveal reveal-delay-1">
-                    <div class="step-number">2</div>
-                    <h3>Devis détaillé</h3>
-                    <p>Un chiffrage précis et transparent, sans aucun frais caché.</p>
-                </div>
-                <div class="process-step reveal reveal-delay-2">
-                    <div class="step-number">3</div>
-                    <h3>Réalisation</h3>
-                    <p>Intervention par nos experts qualifiés dans les délais convenus.</p>
-                </div>
-                <div class="process-step reveal reveal-delay-3">
-                    <div class="step-number">4</div>
-                    <h3>Suivi qualité</h3>
-                    <p>Nous nous assurons de votre entière satisfaction après livraison.</p>
-                </div>
+            <div class="proc-grid">
+                <div class="proc-step reveal"><div class="proc-num">01</div><h3>Contact</h3><p>Appelez-nous ou envoyez un message. Nous répondons sous 30 minutes.</p></div>
+                <div class="proc-step reveal reveal-d1"><div class="proc-num">02</div><h3>Diagnostic</h3><p>Déplacement gratuit, diagnostic précis et évaluation de l'intervention.</p></div>
+                <div class="proc-step reveal reveal-d2"><div class="proc-num">03</div><h3>Devis</h3><p>Devis détaillé, transparent et sans surprise, soumis pour approbation.</p></div>
+                <div class="proc-step reveal reveal-d2"><div class="proc-num">04</div><h3>Intervention</h3><p>Réalisation des travaux dans les règles de l'art, avec matériaux de qualité.</p></div>
+                <div class="proc-step reveal reveal-d3"><div class="proc-num">05</div><h3>Garantie</h3><p>Réception des travaux et suivi post-intervention avec garantie écrite.</p></div>
+            </div>
+            <div style="text-align:center;margin-top:40px"><a href="#contact" class="btn-pri">${ctaText} <i data-lucide="arrow-right" width="16"></i></a></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-hdr reveal">
+                <span class="section-label">Nos réalisations</span>
+                <h2>Galerie de Projets</h2>
+                <p>Découvrez quelques-unes de nos réalisations récentes — chaque projet reflète notre engagement pour la qualité.</p>
+            </div>
+            <div class="gal-grid reveal">
+                <div class="gal-item gal-main"><img src="${getImg(1)}" ${imgErr(1)} alt="Réalisation ${companyName}" loading="lazy"></div>
+                <div class="gal-item"><img src="${getImg(2)}" ${imgErr(2)} alt="Réalisation ${companyName}" loading="lazy"></div>
+                <div class="gal-item"><img src="${getImg(3)}" ${imgErr(3)} alt="Réalisation ${companyName}" loading="lazy"></div>
+                <div class="gal-item"><img src="${getImg(4)}" ${imgErr(4)} alt="Réalisation ${companyName}" loading="lazy"></div>
+                <div class="gal-item"><img src="${getImg(5)}" ${imgErr(5)} alt="Réalisation ${companyName}" loading="lazy"></div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Banner -->
+    <section class="section section-alt" id="testimonials">
+        <div class="container">
+            <div class="section-hdr reveal">
+                <span class="section-label">Avis Clients</span>
+                <h2>Ce que disent nos clients</h2>
+                <p>La satisfaction de nos clients est notre meilleure carte de visite.</p>
+            </div>
+            <div class="test-grid">
+                ${testimonials.slice(0,3).map((t,i) => `
+                <div class="test-card reveal reveal-d${i+1}">
+                    <div><div class="test-stars">${Array(t.rating).fill('<i data-lucide="star" fill="currentColor" width="15"></i>').join('')}</div><p class="test-text">"${t.text}"</p></div>
+                    <div class="test-author"><div class="test-avatar">${t.author.charAt(0)}</div><div><div class="test-name">${t.author}</div>${t.date?`<div class="test-date">${t.date}</div>`:''}</div></div>
+                </div>`).join('')}
+            </div>
+            <div class="test-google reveal"><i data-lucide="star" fill="#f59e0b" width="20" class="test-google-star"></i><div><strong>${rating}/5 sur Google</strong><div style="font-size:.8rem;color:var(--text-s)">Basé sur ${reviews} avis vérifiés</div></div></div>
+        </div>
+    </section>
+
     <section class="cta-banner">
         <div class="container reveal">
             <h2>Prêt à démarrer votre projet ?</h2>
-            <p>Contactez-nous dès maintenant pour un devis gratuit et personnalisé.</p>
+            <p>Contactez-nous dès maintenant pour un devis gratuit et sans engagement.</p>
             <a href="#contact" class="btn-cta">${ctaText} <i data-lucide="arrow-right" width="18"></i></a>
         </div>
     </section>
 
-    <!-- Contact -->
     <section class="section" id="contact">
         <div class="container">
-            <div class="contact-grid reveal">
-                <div class="contact-form-side">
-                    <h3>Envoyez-nous un message</h3>
+            <div class="section-hdr reveal">
+                <span class="section-label">Nous contacter</span>
+                <h2>Demandez votre Devis Gratuit</h2>
+                <p>Remplissez le formulaire ci-dessous ou appelez-nous directement. Réponse sous 30 minutes.</p>
+            </div>
+            <div class="contact-wrap reveal">
+                <div class="contact-form">
+                    <h3>Envoyez votre demande</h3>
                     <p>Nous vous répondrons dans les plus brefs délais.</p>
-                    <form onsubmit="event.preventDefault(); this.querySelector('button').textContent='Message envoyé ✓'; this.querySelector('button').style.background='#16a34a';">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Votre nom complet" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" class="form-control" placeholder="Votre adresse e-mail" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="tel" class="form-control" placeholder="Votre téléphone">
-                        </div>
-                        <div class="form-group">
-                            <textarea class="form-control" rows="4" placeholder="Décrivez votre besoin..." required></textarea>
-                        </div>
-                        <button type="submit" class="form-submit">
-                            <i data-lucide="send" width="18"></i> Envoyer la demande
-                        </button>
+                    <form onsubmit="event.preventDefault();this.querySelector('.form-submit').textContent='Message envoyé ✓';this.querySelector('.form-submit').style.background='#16a34a'">
+                        <div class="form-row"><div class="form-group"><label class="form-label">Nom complet *</label><input type="text" class="form-control" placeholder="Votre nom" required></div><div class="form-group"><label class="form-label">Téléphone *</label><input type="tel" class="form-control" placeholder="06 XX XX XX XX" required></div></div>
+                        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" placeholder="votre@email.com"></div>
+                        <div class="form-group"><label class="form-label">Décrivez votre besoin *</label><textarea class="form-control" rows="4" placeholder="Décrivez le problème ou les travaux souhaités..." required></textarea></div>
+                        <button type="submit" class="form-submit"><i data-lucide="send" width="16"></i> Envoyer ma Demande →</button>
+                        <p class="form-note">Réponse garantie sous 30 minutes · Devis gratuit & sans engagement</p>
                     </form>
                 </div>
-                <div class="contact-info-side">
-                    <div class="contact-info-item">
-                        <div class="contact-info-icon"><i data-lucide="phone" width="20"></i></div>
-                        <div>
-                            <div class="contact-info-label">Téléphone</div>
-                            <div class="contact-info-value"><a href="tel:${cleanPhoneLink}" style="color: inherit; text-decoration: none;">${phone}</a></div>
-                        </div>
+                <div class="contact-sidebar">
+                    <div class="contact-hours">
+                        <h4><i data-lucide="clock" width="16" style="color:var(--primary)"></i> Horaires d'Ouverture</h4>
+                        <div class="hours-row"><span class="hours-day">Lundi – Vendredi</span><span class="hours-time">08h00 – 18h00</span></div>
+                        <div class="hours-row"><span class="hours-day">Samedi</span><span class="hours-time">09h00 – 14h00</span></div>
+                        <div class="hours-row"><span class="hours-day">Dimanche</span><span class="hours-time" style="color:var(--accent)">Urgences uniquement</span></div>
                     </div>
-                    <div class="contact-info-item">
-                        <div class="contact-info-icon"><i data-lucide="mail" width="20"></i></div>
-                        <div>
-                            <div class="contact-info-label">Email</div>
-                            <div class="contact-info-value"><a href="mailto:${email}" style="color: inherit; text-decoration: none;">${email}</a></div>
-                        </div>
-                    </div>
-                    <div class="contact-info-item">
-                        <div class="contact-info-icon"><i data-lucide="map-pin" width="20"></i></div>
-                        <div>
-                            <div class="contact-info-label">Adresse</div>
-                            <div class="contact-info-value">${address}</div>
-                        </div>
-                    </div>
-                    <div class="contact-map">
-                        <iframe src="https://maps.google.com/maps?q=${mapQuery}&t=&z=14&ie=UTF8&iwloc=&output=embed" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <div class="contact-card">
+                        <div class="contact-card-item"><i data-lucide="phone" width="16"></i> ${phone ? `<a href="tel:${cleanPhoneLink}">${phone}</a>` : 'Non renseigné'}</div>
+                        <div class="contact-card-item"><i data-lucide="mail" width="16"></i> ${email ? `<a href="mailto:${email}">${email}</a>` : 'Non renseigné'}</div>
+                        <div class="contact-card-item"><i data-lucide="map-pin" width="16"></i> ${address}</div>
+                        ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-pri" style="margin-top:16px;width:100%;justify-content:center"><i data-lucide="phone" width="16"></i> Appel Urgent 24h/24</a>` : ''}
                     </div>
                 </div>
+            </div>
+            <div class="contact-map reveal" style="margin-top:32px">
+                <iframe src="https://maps.google.com/maps?q=${mapQuery}&t=&z=14&ie=UTF8&iwloc=&output=embed" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-grid">
                 <div>
                     <div class="footer-brand">${logoInfo.text}</div>
-                    <p class="footer-desc">${aboutText.substring(0, 140)}...</p>
+                    <p class="footer-desc">${aboutText.substring(0,120)}...</p>
                     <div class="footer-social">
                         <a href="#"><i data-lucide="facebook" width="16"></i></a>
                         <a href="#"><i data-lucide="instagram" width="16"></i></a>
                         <a href="#"><i data-lucide="linkedin" width="16"></i></a>
                     </div>
                 </div>
-                <div class="footer-col">
-                    <h4>Services</h4>
-                    <ul>
-                        ${services.slice(0, 4).map(s => `<li><a href="#services">${s.name}</a></li>`).join('')}
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Navigation</h4>
-                    <ul>
-                        <li><a href="#about">À propos</a></li>
-                        <li><a href="#testimonials">Avis clients</a></li>
-                        <li><a href="#process">Notre démarche</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Contact</h4>
-                    ${phone ? `<div class="footer-contact-item"><i data-lucide="phone" width="14"></i> ${phone}</div>` : ''}
-                    ${email ? `<div class="footer-contact-item"><i data-lucide="mail" width="14"></i> ${email}</div>` : ''}
-                    ${address ? `<div class="footer-contact-item"><i data-lucide="map-pin" width="14"></i> ${address}</div>` : ''}
+                <div class="footer-col"><h4>Services</h4><ul>${services.slice(0,5).map(s=>`<li><a href="#services">${s.name}</a></li>`).join('')}</ul></div>
+                <div class="footer-col"><h4>Navigation</h4><ul><li><a href="#about">À propos</a></li><li><a href="#why">Pourquoi nous</a></li><li><a href="#testimonials">Avis clients</a></li><li><a href="#contact">Contact</a></li></ul></div>
+                <div class="footer-col"><h4>Contact Rapide</h4>
+                    ${phone?`<div class="footer-contact-item"><i data-lucide="phone" width="14"></i> ${phone}</div>`:''}
+                    ${email?`<div class="footer-contact-item"><i data-lucide="mail" width="14"></i> ${email}</div>`:''}
+                    ${address?`<div class="footer-contact-item"><i data-lucide="map-pin" width="14"></i> ${address}</div>`:''}
+                    ${phone?`<a href="tel:${cleanPhoneLink}" class="btn-pri" style="margin-top:12px;padding:10px 20px;font-size:.85rem;width:fit-content">Appel Urgent 24h/24</a>`:''}
                 </div>
             </div>
-            <div class="footer-bottom">
-                &copy; ${new Date().getFullYear()} ${companyName}. Tous droits réservés. Propulsé par Services-Siteup.
-            </div>
+            <div class="footer-bottom">&copy; ${new Date().getFullYear()} ${companyName}. Tous droits réservés. Créé par Services-Siteup.</div>
         </div>
     </footer>
 
-    <!-- Scripts -->
+    ${phone ? `<a href="tel:${cleanPhoneLink}" class="float-urgent"><i data-lucide="phone" width="18"></i> Appel Urgent 24h/24</a>` : ''}
+
     <script>
         lucide.createIcons();
-
-        // Navbar scroll
-        window.addEventListener('scroll', () => {
-            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
-        });
-
-        // Mobile menu
-        const toggle = document.getElementById('mobile-toggle');
-        const menu = document.getElementById('mobile-menu');
-        toggle.addEventListener('click', () => menu.classList.toggle('open'));
-        menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.classList.remove('open')));
-        document.addEventListener('click', (e) => {
-            if (!menu.contains(e.target) && !toggle.contains(e.target)) menu.classList.remove('open');
-        });
-
-        // Scroll reveal
-        const reveals = document.querySelectorAll('.reveal');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) { entry.target.classList.add('active'); observer.unobserve(entry.target); }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-        reveals.forEach(el => observer.observe(el));
+        window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>40)});
+        const t=document.getElementById('mobile-toggle'),m=document.getElementById('mobile-menu');
+        t.addEventListener('click',()=>m.classList.toggle('open'));
+        m.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>m.classList.remove('open')));
+        document.addEventListener('click',e=>{if(!m.contains(e.target)&&!t.contains(e.target))m.classList.remove('open')});
+        const r=document.querySelectorAll('.reveal'),o=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('active');o.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+        r.forEach(el=>o.observe(el));
     </script>
 </body>
 </html>`;
