@@ -412,10 +412,16 @@ export function generateSectorSpecificHTML(sector: string, lead: any, enrichedDa
   return buildSectorHTML(sector, dynamicLayout, personalizedContent);
 }
 
+function capitalizeCity(city: string): string {
+  if (!city) return city;
+  return city.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+}
+
 function integrateEnrichedData(lead: any, enriched: EnrichedProspectData | undefined, sector: string) {
   // Intégrer les données d'enrichissement pour personnaliser le contenu
   return {
     ...lead,
+    city: capitalizeCity(lead.city || ''),
     enrichedServices: enriched?.services || [],
     specialties: enriched?.specialties || [],
     certifications: enriched?.certifications || [],

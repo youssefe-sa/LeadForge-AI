@@ -96,6 +96,19 @@ const SECTOR_MODERN_TEMPLATES = {
   }
 };
 
+function capitalizeCity(city: string): string {
+  if (!city) return city;
+  return city.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+}
+
+function isEnglishText(text: string): boolean {
+  if (!text) return false;
+  const englishIndicators = ['the ', 'was ', 'very ', 'good ', 'great ', 'excellent ', 'highly ', 'recommend', 'amazing', 'professional', 'quick ', 'fast ', 'efficient', 'friendly', 'helpful', 'courteous', 'reasonable', 'price', 'work ', 'service', 'job '];
+  const lowerText = text.toLowerCase();
+  const matches = englishIndicators.filter(word => lowerText.includes(word));
+  return matches.length >= 2;
+}
+
 function getModernTemplate(sector: string) {
   const normalizedSector = (sector || '').toLowerCase();
   
@@ -111,7 +124,7 @@ function getModernTemplate(sector: string) {
 export function generateModernSite(lead: any): string {
   const template = getModernTemplate(lead.sector);
   const companyName = lead.name || 'Entreprise';
-  const city = lead.city || '';
+  const city = capitalizeCity(lead.city || '');
   const phone = lead.phone || '';
   const email = lead.email || '';
   const address = lead.address || '';
@@ -124,11 +137,14 @@ export function generateModernSite(lead: any): string {
   }));
 
   // Témoignages
-  const testimonials = (lead.googleReviewsData || []).slice(0, 3).map((review: any) => ({
-    author: review.author || 'Client satisfait',
-    text: review.text || 'Excellent service, je recommande vivement !',
-    rating: review.rating || 5
-  }));
+  const testimonials = (lead.googleReviewsData || [])
+    .filter((review: any) => !isEnglishText(review.text))
+    .slice(0, 3)
+    .map((review: any) => ({
+      author: review.author || 'Client satisfait',
+      text: review.text || 'Excellent service, je recommande vivement !',
+      rating: review.rating || 5
+    }));
 
   const content: ModernContent = {
     companyName,

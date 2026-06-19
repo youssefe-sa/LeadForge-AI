@@ -445,6 +445,19 @@ function getLogoInfo(name: string, sector: string = 'default') {
   return { initials: word1.substring(0, 2).toUpperCase(), text: name, word1, word2 };
 }
 
+function capitalizeCity(city: string): string {
+  if (!city) return city;
+  return city.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+}
+
+function isEnglishText(text: string): boolean {
+  if (!text) return false;
+  const englishIndicators = ['the ', 'was ', 'very ', 'good ', 'great ', 'excellent ', 'highly ', 'recommend', 'amazing', 'professional', 'quick ', 'fast ', 'efficient', 'friendly', 'helpful', 'courteous', 'reasonable', 'price', 'work ', 'service', 'job '];
+  const lowerText = text.toLowerCase();
+  const matches = englishIndicators.filter(word => lowerText.includes(word));
+  return matches.length >= 2;
+}
+
 function getHeroBadge(sector: string): { icon: string; text: string } {
   const s = (sector || '').toLowerCase();
   if (s.includes('plomb')) return { icon: 'droplets', text: 'Dépannage rapide garanti' };
@@ -463,7 +476,7 @@ function getHeroBadge(sector: string): { icon: string; text: string } {
 export function generateUltimateSite(lead: any, aiContent?: any): string {
   const template = getUltimateTemplate(lead.sector);
   const companyName = lead.name || 'Entreprise Premium';
-  const city = lead.city || '';
+  const city = capitalizeCity(lead.city || '');
   const phone = lead.phone || '+33 6 12 34 56 78';
   const email = lead.email || 'contact@entreprise.fr';
   const address = lead.address || (city ? `Centre Ville, ${city}` : 'France');
@@ -484,10 +497,12 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
     });
   }
 
-  let testimonials = (lead.googleReviewsData || []).map((review: any) => ({
-    author: review.author || 'Client VIP', text: review.text || "Une prestation exceptionnelle.",
-    rating: review.rating || 5, date: review.date || 'Récemment'
-  }));
+  let testimonials = (lead.googleReviewsData || [])
+    .filter((review: any) => !isEnglishText(review.text))
+    .map((review: any) => ({
+      author: review.author || 'Client VIP', text: review.text || "Une prestation exceptionnelle.",
+      rating: review.rating || 5, date: review.date || 'Récemment'
+    }));
   const fallbackReviews = getSectorFallbackReviews(lead.sector);
   while (testimonials.length < 6) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 6);
@@ -497,8 +512,8 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const sloganVariations = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance"];
   const finalSlogan = aiContent?.slogan || sloganVariations[nameHash % sloganVariations.length];
 
-  const BLOCKED_KEYWORDS = ['food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking', 'recipe', 'meal', 'dessert', 'cake', 'pizza', 'burger', 'restaurant-menu'];
-  const BLOCKED_DOMAINS = ['tripadvisor.com', 'yelp.com', 'facebook.com', 'instagram.com', 'pagesjaunes.fr'];
+  const BLOCKED_KEYWORDS = ['food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking', 'recipe', 'meal', 'dessert', 'cake', 'pizza', 'burger', 'restaurant-menu', 'portrait', 'face', 'selfie', 'person', 'man ', 'woman ', 'people', 'crowd', 'group', 'logo', 'badge', 'stamp', 'seal', 'emblem', 'watermark', 'text-overlay', 'gradient-overlay'];
+  const BLOCKED_DOMAINS = ['tripadvisor.com', 'yelp.com', 'facebook.com', 'instagram.com', 'pagesjaunes.fr', 'google.com', 'gstatic.com', 'cloudfront.net'];
   const rawLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])].filter(img => {
     if (!img || typeof img !== 'string' || !img.startsWith('https://')) return false;
     const low = img.toLowerCase();
@@ -533,7 +548,7 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Promise<string> {
   const template = getUltimateTemplate(lead.sector);
   const companyName = lead.name || 'Entreprise Premium';
-  const city = lead.city || '';
+  const city = capitalizeCity(lead.city || '');
   const phone = lead.phone || '+33 6 12 34 56 78';
   const email = lead.email || 'contact@entreprise.fr';
   const address = lead.address || (city ? `Centre Ville, ${city}` : 'France');
@@ -571,10 +586,12 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
     });
   }
 
-  let testimonials = (lead.googleReviewsData || []).map((review: any) => ({
-    author: review.author || 'Client VIP', text: review.text || "Une prestation exceptionnelle.",
-    rating: review.rating || 5, date: review.date || 'Récemment'
-  }));
+  let testimonials = (lead.googleReviewsData || [])
+    .filter((review: any) => !isEnglishText(review.text))
+    .map((review: any) => ({
+      author: review.author || 'Client VIP', text: review.text || "Une prestation exceptionnelle.",
+      rating: review.rating || 5, date: review.date || 'Récemment'
+    }));
   const fallbackReviews = getSectorFallbackReviews(lead.sector);
   while (testimonials.length < 6) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 6);
@@ -928,13 +945,22 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                 <p>Des interventions professionnelles avec compétence et rigueur.</p>
             </div>
             <div class="svc-grid">
-                ${services.map((s, i) => `
+                ${services.map((s, i) => {
+                  const serviceIcons = [
+                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>',
+                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+                  ];
+                return `
                 <div class="svc-card reveal reveal-d${(i % 3) + 1}">
-                    <div class="svc-icon"><i data-lucide="${['zap','wrench','home','shield-check','settings','check-circle'][i%6]}" width="22"></i></div>
+                    <div class="svc-icon">${serviceIcons[i%6]}</div>
                     <h3>${s.name}</h3>
                     <p>${s.description}</p>
                     <a href="#contact" class="svc-link">En savoir plus <i data-lucide="arrow-right" width="14"></i></a>
-                </div>`).join('')}
+                </div>`}).join('')}
             </div>
         </div>
     </section>
@@ -1099,9 +1125,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                     <div class="footer-brand">${logoInfo.text}</div>
                     <p class="footer-desc">${aboutText.substring(0,120)}...</p>
                     <div class="footer-social">
-                        <a href="#"><i data-lucide="facebook" width="16"></i></a>
-                        <a href="#"><i data-lucide="instagram" width="16"></i></a>
-                        <a href="#"><i data-lucide="linkedin" width="16"></i></a>
+                        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+                        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+                        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
                     </div>
                 </div>
                 <div class="footer-col"><h4>Services</h4><ul>${services.slice(0,5).map(s=>`<li><a href="#services">${s.name}</a></li>`).join('')}</ul></div>
