@@ -507,16 +507,13 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   while (testimonials.length < 3) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 3);
 
-  const nameHashStr = companyName + (lead.city || '') + (lead.sector || '') + (lead.phone || '').slice(-4);
   let nameHash = 0;
-  for (let i = 0; i < nameHashStr.length; i++) { nameHash = ((nameHash << 5) - nameHash) + nameHashStr.charCodeAt(i); nameHash |= 0; }
-  nameHash = Math.abs(nameHash);
-  
-  const sloganVariations = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance", "La qualité avant tout", "Votre satisfaction, notre priorité", "Expertise et confiance"];
+  for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
+  const sloganVariations = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance"];
   const finalSlogan = aiContent?.slogan || sloganVariations[nameHash % sloganVariations.length];
 
-  const BLOCKED_KEYWORDS = ['food-plate', 'fruit-bowl', 'legume', 'carrot', 'salmon', 'kitchen-counter', 'cooking-utensil', 'recipe-book', 'meal-prep', 'dessert-plate', 'cake-slice', 'pizza-slice', 'burger-fries', 'restaurant-menu', 'portrait', 'face', 'selfie', 'person-standing', 'man-smiling', 'woman-smiling', 'people-group', 'crowd', 'logo', 'badge', 'stamp', 'seal', 'emblem', 'watermark', 'text-overlay', 'gradient-overlay', 'phone-number', 'tel:', 'numero'];
-  const BLOCKED_DOMAINS = ['tripadvisor.com', 'yelp.com', 'facebook.com', 'instagram.com', 'pagesjaunes.fr', 'google.com', 'gstatic.com', 'cloudfront.net', 'googleusercontent.com', 'maps.google', 'lh3.', 'ggpht.com', 'googleapis.com', 'wikimedia.org', 'wikipedia.org', 'booking.com', 'yellowpages'];
+  const BLOCKED_KEYWORDS = ['food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking', 'recipe', 'meal', 'dessert', 'cake', 'pizza', 'burger', 'restaurant-menu', 'portrait', 'face', 'selfie', 'person', 'man ', 'woman ', 'people', 'crowd', 'group', 'logo', 'badge', 'stamp', 'seal', 'emblem', 'watermark', 'text-overlay', 'gradient-overlay', 'phone number', 'tel:', 'numero'];
+  const BLOCKED_DOMAINS = ['tripadvisor.com', 'yelp.com', 'facebook.com', 'instagram.com', 'pagesjaunes.fr', 'google.com', 'gstatic.com', 'cloudfront.net', 'googleusercontent.com', 'maps.google', 'lh3.', 'ggpht.com', 'googleapis.com'];
 
   const sectorImages = getSectorImages(lead.sector);
   const heroImage = sectorImages[nameHash % sectorImages.length];
@@ -527,12 +524,12 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
     const low = img.toLowerCase();
     if (BLOCKED_KEYWORDS.some(kw => low.includes(kw))) return false;
     if (BLOCKED_DOMAINS.some(d => low.includes(d))) return false;
-    if (low.includes('favicon') || low.includes('sprite') || low.includes('pixel') || low.includes('icon')) return false;
+    if (low.includes('favicon') || low.includes('sprite') || low.includes('pixel')) return false;
     return true;
   }).slice(0, 3);
 
-  const combinedImages = [heroImage, ...sectorImages.filter(s => s !== heroImage).slice(0, 3), ...rawLeadImages];
-  const allImages = combinedImages.slice(0, 6);
+  const combinedImages = [heroImage, ...sectorImages.filter(s => s !== heroImage).slice(0, 2), ...rawLeadImages];
+  const allImages = combinedImages.slice(0, 5);
 
   const content: UltimateContent = {
     companyName, sector: lead.sector || 'Professionnel', city, description, phone, email, address,
@@ -559,12 +556,9 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   let ctaText = aiContent?.cta || template.ctaText || 'Demander un devis';
   if (ctaText.length > 50) ctaText = ctaText.substring(0, 47) + '...';
 
-  const nameHashStr = companyName + (lead.city || '') + (lead.sector || '') + (lead.phone || '').slice(-4);
   let nameHash = 0;
-  for (let i = 0; i < nameHashStr.length; i++) { nameHash = ((nameHash << 5) - nameHash) + nameHashStr.charCodeAt(i); nameHash |= 0; }
-  nameHash = Math.abs(nameHash);
-  
-  const sloganVariations = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance", "La qualité avant tout", "Votre satisfaction, notre priorité", "Expertise et confiance"];
+  for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
+  const sloganVariations = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance"];
   const finalSlogan = aiContent?.slogan || sloganVariations[nameHash % sloganVariations.length];
 
   const sectorImages = getSectorImages(lead.sector);
@@ -573,7 +567,7 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   let combinedImages: string[] = [];
   try {
     const raw = await getImagesForLead(lead, 6);
-    const BLOCKED = ['googleusercontent', 'maps.google', 'ggpht', 'favicon', 'sprite', 'pixel', 'logo', 'badge', 'watermark'];
+    const BLOCKED = ['googleusercontent', 'maps.google', 'ggpht', 'favicon', 'sprite', 'pixel', 'logo', 'badge'];
     combinedImages = raw.filter((img: string) => {
       if (!img || !img.startsWith('https://')) return false;
       if (img === heroImage) return false;
@@ -582,7 +576,7 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
     }).slice(0, 3);
   } catch {}
 
-  const allImages = [...sectorImages.filter(s => s !== heroImage).slice(0, 3), ...combinedImages].slice(0, 6);
+  const allImages = [...sectorImages.filter(s => s !== heroImage).slice(0, 2), ...combinedImages].slice(0, 5);
 
   let finalServices = template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
@@ -594,12 +588,14 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   }
 
   let testimonials = (lead.googleReviewsData || [])
-    .filter((review: any) => review.text && review.text.trim().length >= 10)
+    .filter((review: any) => !isEnglishText(review.text) && review.text && review.text.trim().length >= 25)
     .map((review: any) => ({
       author: review.author || 'Client', text: review.text.trim(),
-      rating: Math.min(5, Math.max(1, review.rating || 5)), date: review.date || 'Récemment'
+      rating: review.rating || 5, date: review.date || 'Récemment'
     }));
-  testimonials = testimonials.slice(0, 6);
+  const fallbackReviews = getSectorFallbackReviews(lead.sector);
+  while (testimonials.length < 3) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
+  testimonials = testimonials.slice(0, 3);
 
   const content: UltimateContent = {
     companyName, sector: lead.sector || 'Professionnel', city, description, phone, email, address,
@@ -618,6 +614,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
   const hexToRgb = (hex: string) => { let r = 0, g = 0, b = 0; if (hex.length === 7) { r = parseInt(hex.substring(1, 3), 16); g = parseInt(hex.substring(3, 5), 16); b = parseInt(hex.substring(5, 7), 16); } return `${r}, ${g}, ${b}`; };
   const primaryRgb = hexToRgb(primaryColor);
 
+  let nameHash = 0;
+  for (let i = 0; i < companyName.length; i++) nameHash += companyName.charCodeAt(i);
+
   const logoInfo = getLogoInfo(companyName, content.sector);
   const heroBadge = getHeroBadge(content.sector);
   const cleanPhoneLink = phone ? phone.replace(/[^0-9+]/g, '') : '';
@@ -626,9 +625,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
   const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="${primaryColor}"/><text x="50%" y="50%" font-family="sans-serif" font-size="45" font-weight="bold" fill="white" dominant-baseline="central" text-anchor="middle">${logoInfo.initials}</text></svg>`;
   const faviconDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(faviconSvg)}`;
 
-  const companyHash = (() => { let h = 0; const str = companyName + (content.city || '') + (content.sector || ''); for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; } return Math.abs(h); })();
-  const siteUniqueId = `site-${companyHash.toString(36).substring(0, 8)}`;
-  const emergencyFallback = 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1920&q=80';
+  const companyHash = (() => { let h = 0; for (let i = 0; i < companyName.length; i++) { h = ((h << 5) - h) + companyName.charCodeAt(i); h |= 0; } return Math.abs(h); })();
+  const emergencyFallback = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80';
   const allImgs = content.allImages || [];
   const getImg = (slot: number): string => {
     const uniqueIndex = (companyHash + slot) % (combinedImages.length || 1);
@@ -638,8 +636,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
   };
   const imgErr = (fallbackSlot: number) => `onerror="this.onerror=null;this.src='${getImg(fallbackSlot)}';this.style.opacity='0.8'"`;
 
-  const fontPair = companyHash % 8;
-  const headingFont = fontPair === 0 ? "'DM Sans'" : fontPair === 1 ? "'Plus Jakarta Sans'" : fontPair === 2 ? "'Playfair Display'" : fontPair === 3 ? "'Cormorant Garamond'" : fontPair === 4 ? "'Inter'" : fontPair === 5 ? "'Manrope'" : fontPair === 6 ? "'Outfit'" : "'Sora'";
+  const fontPair = nameHash % 4;
+  const headingFont = fontPair === 0 ? "'DM Sans'" : fontPair === 1 ? "'Plus Jakarta Sans'" : fontPair === 2 ? "'Playfair Display'" : "'Cormorant Garamond'";
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -660,11 +658,11 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     <meta name="twitter:description" content="${heroSubtitle}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"${companyName}","description":"${heroSubtitle}","image":"${heroImage}","telephone":"${phone}","email":"${email}","address":{"@type":"PostalAddress","streetAddress":"${address}","addressLocality":"${city}","addressCountry":"FR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"${rating || 5}","reviewCount":"${reviews || 42}"}}}</script>
     <style>
-        :root{--primary:${primaryColor};--primary-rgb:${primaryRgb};--secondary:${secondaryColor};--accent:${accentColor};--bg:#fafaf9;--surface:#fff;--text:#1a1a2e;--text-s:#555770;--text-t:#8b8da3;--border:#e8e8ef;--border-l:#f2f2f7;--dark:#1a2744;--dark-rgb:26,39,68;--site-id:"${siteUniqueId}"}
+        :root{--primary:${primaryColor};--primary-rgb:${primaryRgb};--secondary:${secondaryColor};--accent:${accentColor};--bg:#fafaf9;--surface:#fff;--text:#1a1a2e;--text-s:#555770;--text-t:#8b8da3;--border:#e8e8ef;--border-l:#f2f2f7;--dark:#1a2744;--dark-rgb:26,39,68}
         *{margin:0;padding:0;box-sizing:border-box}
         html{scroll-behavior:smooth;font-size:16px}
         body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
@@ -672,22 +670,19 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         h1,h2,h3,h4,h5{font-family:${headingFont},'DM Sans',sans-serif;line-height:1.25;font-weight:700;letter-spacing:-0.02em}
         .container{max-width:1200px;margin:0 auto;padding:0 24px}
 
-        .navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 0;transition:all .4s cubic-bezier(.4,0,.2,1);background:rgba(0,0,0,.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 0;transition:all .4s cubic-bezier(.4,0,.2,1)}
         .navbar.scrolled{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:10px 0;box-shadow:0 2px 30px rgba(0,0,0,.08)}
         .navbar-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
-        .navbar-brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit}
+        .navbar-brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--text)}
         .navbar-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;box-shadow:0 4px 15px rgba(var(--primary-rgb),.3);flex-shrink:0}
-        .navbar:not(.scrolled) .navbar-name{font-weight:700;font-size:1.15rem;color:#fff;white-space:nowrap}
-        .navbar.scrolled .navbar-name{font-weight:700;font-size:1.15rem;color:var(--text);white-space:nowrap}
+        .navbar-name{font-weight:700;font-size:1.15rem;color:var(--text);white-space:nowrap}
         .navbar-links{display:flex;align-items:center;gap:32px}
-        .navbar:not(.scrolled) .navbar-links a{text-decoration:none;color:rgba(255,255,255,.85);font-size:.9rem;font-weight:500;transition:color .25s;position:relative}
-        .navbar.scrolled .navbar-links a{text-decoration:none;color:var(--text-s);font-size:.9rem;font-weight:500;transition:color .25s;position:relative}
+        .navbar-links a{text-decoration:none;color:var(--text-s);font-size:.9rem;font-weight:500;transition:color .25s;position:relative}
         .navbar-links a:hover{color:var(--primary)}
         .navbar-cta{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff!important;padding:11px 24px;border-radius:10px;font-weight:600;font-size:.9rem;transition:all .25s;box-shadow:0 4px 15px rgba(var(--primary-rgb),.25)}
         .navbar-cta:hover{opacity:.92;transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--primary-rgb),.35)}
         .mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:8px;border-radius:8px;transition:background .2s}
-        .mobile-toggle:hover{background:rgba(0,0,0,.08)}
-        .navbar:not(.scrolled) .mobile-toggle i{color:#fff!important}
+        .mobile-toggle:hover{background:rgba(0,0,0,.05)}
         .mobile-menu{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;box-shadow:0 12px 40px rgba(0,0,0,.1)}
         .mobile-menu.open{display:block}
         .mobile-menu a{display:block;padding:14px 0;text-decoration:none;color:var(--text);font-weight:500;border-bottom:1px solid var(--border-l);font-size:.95rem}
@@ -695,19 +690,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         @media(max-width:768px){.navbar-links{display:none!important}.mobile-toggle{display:block}}
 
         .hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;background:var(--dark)}
-        .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .8s,transform 8s ease;transform:scale(1.05)}
-        .hero.loaded .hero-bg{transform:scale(1)}
-        .hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--dark-rgb),.75) 0%,rgba(var(--dark-rgb),.35) 50%,rgba(var(--dark-rgb),.65) 100%)}
-        /* Layout variant ${layoutVariant} - Unique per lead */
-        .hero-inner{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:140px 24px 80px;width:100%;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:center}
-        ${layoutVariant === 0 ? '.hero h1 em::after{content:"";position:absolute;bottom:4px;left:0;right:0;height:8px;background:rgba(var(--primary-rgb),.3);border-radius:4px;z-index:-1}' : 
-          layoutVariant === 1 ? '.hero h1{animation:fadeSlideUp 1s ease-out}.hero-sub{animation:fadeSlideUp 1s ease-out .2s both}.hero-actions{animation:fadeSlideUp 1s ease-out .4s both}' : 
-          layoutVariant === 2 ? '@keyframes glowPulse{0%,100%{text-shadow:0 0 20px rgba(var(--primary-rgb),.2)}50%{text-shadow:0 0 40px rgba(var(--primary-rgb),.4)}}.hero h1{animation:glowPulse 4s ease-in-out infinite}' : 
-          layoutVariant === 3 ? '.hero h1 em{background:linear-gradient(135deg,var(--accent),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}' : 
-          layoutVariant === 4 ? '@keyframes floatBadge{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}.hero-badge{animation:floatBadge 3s ease-in-out infinite}' :
-          layoutVariant === 5 ? '.hero h1{letter-spacing:-.04em}.hero h1 em{display:inline-block;border-bottom:3px solid var(--accent);padding-bottom:6px}' : ''
-        }
-        @keyframes fadeSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;transition:opacity .6s}
+        .hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--dark-rgb),.88) 0%,rgba(var(--dark-rgb),.55) 50%,rgba(var(--dark-rgb),.75) 100%)}
         .hero-inner{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:140px 24px 80px;width:100%;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:center}
         .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:8px 20px;border-radius:100px;color:#fff;font-size:.8rem;font-weight:600;margin-bottom:24px;letter-spacing:.8px;text-transform:uppercase;backdrop-filter:blur(10px)}
         .hero h1{font-size:clamp(2.5rem,5.5vw,4.2rem);font-weight:800;color:#fff;margin-bottom:20px;letter-spacing:-.03em;line-height:1.1}
@@ -925,8 +909,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         </div>
     </nav>
 
-    <section class="hero" id="hero" data-site="${siteUniqueId}">
-        <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" class="hero-bg" loading="eager">
+    <section class="hero" id="hero">
+        <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" class="hero-bg">
         <div class="hero-overlay"></div>
         <div class="hero-inner">
             <div>
@@ -1081,7 +1065,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         </div>
     </section>
 
-    ${testimonials.length > 0 ? `
     <section class="section section-alt" id="testimonials">
         <div class="container">
             <div class="section-hdr reveal">
@@ -1096,9 +1079,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                     <div class="test-author"><div class="test-avatar">${t.author.charAt(0)}</div><div><div class="test-name">${t.author}</div>${t.date?`<div class="test-date">${t.date}</div>`:''}</div></div>
                 </div>`).join('')}
             </div>
-            ${rating ? `<div class="test-google reveal"><i data-lucide="star" fill="#f59e0b" width="20" class="test-google-star"></i><div><strong>${rating}/5 sur Google</strong><div style="font-size:.8rem;color:var(--text-s)">Basé sur ${reviews} avis vérifiés</div></div></div>` : ''}
+            <div class="test-google reveal"><i data-lucide="star" fill="#f59e0b" width="20" class="test-google-star"></i><div><strong>${rating}/5 sur Google</strong><div style="font-size:.8rem;color:var(--text-s)">Basé sur ${reviews} avis vérifiés</div></div></div>
         </div>
-    </section>` : ''}
+    </section>
 
     <section class="cta-banner">
         <div class="container reveal">
@@ -1154,15 +1137,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                 <div>
                     <div class="footer-brand">${logoInfo.text}</div>
                     <p class="footer-desc">${aboutText.substring(0,120)}...</p>
-                    ${website ? `
-                    <div class="footer-social">
-                        <a href="${website}" target="_blank" rel="noopener" title="Site web"><i data-lucide="globe" width="16"></i></a>
-                        ${website.includes('facebook') ? `<a href="${website}" target="_blank" rel="noopener" title="Facebook"><i data-lucide="facebook" width="16"></i></a>` : ''}
-                        ${website.includes('instagram') ? `<a href="${website}" target="_blank" rel="noopener" title="Instagram"><i data-lucide="instagram" width="16"></i></a>` : ''}
-                    </div>` : ''}
                 </div>
                 <div class="footer-col"><h4>Services</h4><ul>${services.slice(0,5).map(s=>`<li><a href="#services">${s.name}</a></li>`).join('')}</ul></div>
-                <div class="footer-col"><h4>Navigation</h4><ul><li><a href="#about">À propos</a></li><li><a href="#why">Pourquoi nous</a></li><li><a href="#contact">Contact</a></li></ul></div>
+                <div class="footer-col"><h4>Navigation</h4><ul><li><a href="#about">À propos</a></li><li><a href="#why">Pourquoi nous</a></li><li><a href="#testimonials">Avis clients</a></li><li><a href="#contact">Contact</a></li></ul></div>
                 <div class="footer-col"><h4>Contact Rapide</h4>
                     ${phone?`<div class="footer-contact-item"><i data-lucide="phone" width="14"></i> ${phone}</div>`:''}
                     ${email?`<div class="footer-contact-item"><i data-lucide="mail" width="14"></i> ${email}</div>`:''}
@@ -1170,7 +1147,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                     ${phone?`<a href="tel:${cleanPhoneLink}" class="btn-pri" style="margin-top:12px;padding:10px 20px;font-size:.85rem;width:fit-content">Appel Urgent 24h/24</a>`:''}
                 </div>
             </div>
-            <div class="footer-bottom">&copy; ${new Date().getFullYear()} ${companyName}. Tous droits réservés.</div>
+            <div class="footer-bottom">&copy; ${new Date().getFullYear()} ${companyName}. Tous droits réservés. Créé par Services-Siteup.</div>
         </div>
     </footer>
 
@@ -1178,7 +1155,6 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
 
     <script>
         lucide.createIcons();
-        document.getElementById('hero')?.classList.add('loaded');
         window.addEventListener('scroll',()=>{const n=document.getElementById('navbar');if(n)n.classList.toggle('scrolled',window.scrollY>50)});
         const t=document.getElementById('mobile-toggle'),m=document.getElementById('mobile-menu');
         if(t&&m){t.addEventListener('click',()=>m.classList.toggle('open'));m.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>m.classList.remove('open')));document.addEventListener('click',e=>{if(!m.contains(e.target)&&!t.contains(e.target))m.classList.remove('open')})}
