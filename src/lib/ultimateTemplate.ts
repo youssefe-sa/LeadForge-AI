@@ -670,9 +670,13 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
   const faviconDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(faviconSvg)}`;
 
   const companyHash = (() => { let h = 0; for (let i = 0; i < companyName.length; i++) { h = ((h << 5) - h) + companyName.charCodeAt(i); h |= 0; } return Math.abs(h); })();
-  const emergencyFallback = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80';
+  const emergencyFallback = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80';
   const allImgs = content.allImages || [];
   const usedImages = new Set<string>();
+  
+  const heroSectorFallback = getSectorImages(content.sector);
+  const heroImgErr = `onerror="this.onerror=null;this.src='${heroSectorFallback[(companyHash + 1) % heroSectorFallback.length]}';this.style.opacity='0.7'"`;
+  
   const getImg = (slot: number): string => {
     const candidates = [...combinedImages, ...allImgs].filter(img => img && img.startsWith('https://') && !usedImages.has(img));
     if (candidates.length > 0) {
@@ -965,7 +969,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     </nav>
 
     <section class="hero" id="hero">
-        <img src="${heroImage}" ${imgErr(0)} alt="${companyName}" class="hero-bg">
+        <img src="${heroImage}" ${heroImgErr} alt="${companyName}" class="hero-bg">
         <div class="hero-overlay"></div>
         <div class="hero-inner">
             <div>
