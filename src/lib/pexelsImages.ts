@@ -1,7 +1,7 @@
-// Pexels Images Service - Images professionnelles et fiables par secteur
-// 20 images UNIQUES par secteur pour garantir la variété maximale
+// Pexels Images Service - Images professionnelles par secteur
+// Chaque secteur a 20 images UNIQUES et DIFFÉRENTES représentant réellement le métier
 
-const PEXELS_API_KEY = process.env.PEXELS_API_KEY || '';
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY || 'ghuDtWrRvhe2R5SLLHTtV8tOYvIbvtdAGIdTDz9zK6DZXvMw1xd8JaPK';
 
 export const SECTOR_PEXELS_IMAGES: Record<string, string[]> = {
   plomberie: [
@@ -267,10 +267,8 @@ export const SECTOR_SEARCH_QUERIES: Record<string, string[]> = {
 export function getSectorImages(sector: string): string[] {
   const normalizedSector = (sector || '').toLowerCase().trim();
   
-  // Log pour debugging
   console.log(`🔍 Recherche d'images pour le secteur: "${normalizedSector}"`);
   
-  // Chercher le secteur exact dans les clés
   for (const [key, images] of Object.entries(SECTOR_PEXELS_IMAGES)) {
     if (normalizedSector === key || normalizedSector.includes(key)) {
       console.log(`✅ Secteur trouvé: ${key}`);
@@ -278,61 +276,51 @@ export function getSectorImages(sector: string): string[] {
     }
   }
   
-  // Vérifications spécifiques - PLomberie (plombier, plomberie, plumbing)
   if (normalizedSector.includes('plomb') || normalizedSector.includes('plumber') || normalizedSector.includes('tuyau') || normalizedSector.includes('robinet')) {
     console.log(`✅ Secteur identifié: plomberie`);
     return SECTOR_PEXELS_IMAGES.plomberie;
   }
   
-  // Électricien (électricien, electricien, électricité)
   if (normalizedSector.includes('electri') || normalizedSector.includes('électri') || normalizedSector.includes('electrician') || normalizedSector.includes('cabl') || normalizedSector.includes('tableau')) {
     console.log(`✅ Secteur identifié: electricien`);
     return SECTOR_PEXELS_IMAGES.electricien;
   }
   
-  // Coiffeur (coiffeur, coiffeuse, salon, barbier)
   if (normalizedSector.includes('coiff') || normalizedSector.includes('hair') || normalizedSector.includes('barber') || normalizedSector.includes('salon') || normalizedSector.includes('coupe')) {
     console.log(`✅ Secteur identifié: coiffeur`);
     return SECTOR_PEXELS_IMAGES.coiffeur;
   }
   
-  // Restaurant
   if (normalizedSector.includes('restaurant') || normalizedSector.includes('chef') || normalizedSector.includes('traiteur') || normalizedSector.includes('cuisine') || normalizedSector.includes('boulanger') || normalizedSector.includes('pâtissier')) {
     console.log(`✅ Secteur identifié: restaurant`);
     return SECTOR_PEXELS_IMAGES.restaurant;
   }
   
-  // Garage / Mécanicien
   if (normalizedSector.includes('garage') || normalizedSector.includes('mecan') || normalizedSector.includes('mécan') || normalizedSector.includes('auto') || normalizedSector.includes('voiture') || normalizedSector.includes('carrossier')) {
     console.log(`✅ Secteur identifié: garage`);
     return SECTOR_PEXELS_IMAGES.garage;
   }
   
-  // Nettoyage
   if (normalizedSector.includes('nettoya') || normalizedSector.includes('clean') || normalizedSector.includes('ménage') || normalizedSector.includes('menage') || normalizedSector.includes('propre')) {
     console.log(`✅ Secteur identifié: nettoyage`);
     return SECTOR_PEXELS_IMAGES.nettoyage;
   }
   
-  // Jardin
   if (normalizedSector.includes('jardin') || normalizedSector.includes('garden') || normalizedSector.includes('paysag') || normalizedSector.includes('espace vert')) {
     console.log(`✅ Secteur identifié: jardin`);
     return SECTOR_PEXELS_IMAGES.jardin;
   }
   
-  // Fitness
   if (normalizedSector.includes('fitness') || normalizedSector.includes('gym') || normalizedSector.includes('sport') || normalizedSector.includes('coach') || normalizedSector.includes('muscu')) {
     console.log(`✅ Secteur identifié: fitness`);
     return SECTOR_PEXELS_IMAGES.fitness;
   }
   
-  // Médical
   if (normalizedSector.includes('medical') || normalizedSector.includes('médical') || normalizedSector.includes('doctor') || normalizedSector.includes('docteur') || normalizedSector.includes('sante') || normalizedSector.includes('santé') || normalizedSector.includes('médecin') || normalizedSector.includes('infirmier') || normalizedSector.includes('kiné') || normalizedSector.includes('dentiste')) {
     console.log(`✅ Secteur identifié: medical`);
     return SECTOR_PEXELS_IMAGES.medical;
   }
   
-  // Avocat / Juridique
   if (normalizedSector.includes('avocat') || normalizedSector.includes('lawyer') || normalizedSector.includes('law') || normalizedSector.includes('juridique') || normalizedSector.includes('notaire') || normalizedSector.includes('droit')) {
     console.log(`✅ Secteur identifié: avocat`);
     return SECTOR_PEXELS_IMAGES.avocat;
@@ -348,22 +336,33 @@ export function getSearchQuery(sector: string): string {
   
   for (const [key, queries] of Object.entries(SECTOR_SEARCH_QUERIES)) {
     if (normalizedSector.includes(key)) {
-      return queries[0]; // Retourner le premier mot-clé
+      return queries[0];
     }
   }
   
   return 'business';
 }
 
-// Fonction pour récupérer des images dynamiques depuis l'API Pexels (si API key disponible)
-export async function fetchPexelsImages(query: string, perPage: number = 10): Promise<string[]> {
+// Cache pour les images récupérées depuis l'API
+const imagesCache: Record<string, string[]> = {};
+
+// Fonction pour récupérer des images dynamiques depuis l'API Pexels
+export async function fetchPexelsImages(query: string, perPage: number = 20): Promise<string[]> {
+  const cacheKey = `${query}_${perPage}`;
+  
+  if (imagesCache[cacheKey]) {
+    console.log(`📦 Images en cache pour: ${query}`);
+    return imagesCache[cacheKey];
+  }
+  
   if (!PEXELS_API_KEY) {
-    // Retourner les images statiques si pas d'API key
+    console.log(`⚠️ Pas de clé API Pexels, utilisation des images statiques`);
     return SECTOR_PEXELS_IMAGES[query as keyof typeof SECTOR_PEXELS_IMAGES] || SECTOR_PEXELS_IMAGES.default;
   }
   
   try {
-    const response = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}`, {
+    console.log(`🌐 Récupération d'images depuis Pexels pour: ${query}`);
+    const response = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}&orientation=landscape`, {
       headers: {
         'Authorization': PEXELS_API_KEY
       }
@@ -374,9 +373,30 @@ export async function fetchPexelsImages(query: string, perPage: number = 10): Pr
     }
     
     const data = await response.json();
-    return data.photos.map((photo: any) => photo.src.large || photo.src.medium);
+    const images = data.photos.map((photo: any) => photo.src.large2x || photo.src.large || photo.src.medium);
+    
+    imagesCache[cacheKey] = images;
+    console.log(`✅ ${images.length} images récupérées pour: ${query}`);
+    
+    return images;
   } catch (error) {
-    console.error('Error fetching Pexels images:', error);
+    console.error('❌ Erreur récupération images Pexels:', error);
     return SECTOR_PEXELS_IMAGES[query as keyof typeof SECTOR_PEXELS_IMAGES] || SECTOR_PEXELS_IMAGES.default;
   }
+}
+
+// Fonction pour obtenir les images d'un secteur (avec API dynamique)
+export async function getSectorImagesAsync(sector: string): Promise<string[]> {
+  const normalizedSector = (sector || '').toLowerCase().trim();
+  
+  const searchQuery = getSearchQuery(sector);
+  const apiImages = await fetchPexelsImages(searchQuery, 20);
+  
+  if (apiImages && apiImages.length >= 5) {
+    console.log(`✅ Images API utilisées pour le secteur: ${sector}`);
+    return apiImages;
+  }
+  
+  console.log(`⚠️ Fallback vers images statiques pour: ${sector}`);
+  return getSectorImages(sector);
 }

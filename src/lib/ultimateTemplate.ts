@@ -1,7 +1,7 @@
 // ── PREMIUM LOCAL BUSINESS TEMPLATE ──
 // Design épuré, luxe, professionnel. Zero gimmicks, zero popups agressifs.
 
-import { getSectorImages } from './pexelsImages';
+import { getSectorImages, getSectorImagesAsync } from './pexelsImages';
 import { getImagesForLead } from './pexelsApi';
 
 // ── AVIS FALLBACK SECTORIELS ──
@@ -614,7 +614,7 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   const sloganVariations = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance"];
   const finalSlogan = aiContent?.slogan || sloganVariations[combinedHash % sloganVariations.length];
 
-  const sectorImages = getSectorImages(lead.sector);
+  const sectorImages = await getSectorImagesAsync(lead.sector);
   const heroImageIndex = ((combinedHash * 2654435761) >>> 0) % sectorImages.length;
   const heroImage = sectorImages[heroImageIndex];
 
