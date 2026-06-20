@@ -1,8 +1,9 @@
 // ── PREMIUM LOCAL BUSINESS TEMPLATE ──
 // Design épuré, luxe, professionnel. Zero gimmicks, zero popups agressifs.
 
-import { getSectorImages, getSectorImagesAsync } from './pexelsImages';
+import { getSectorImages, getSectorImagesAsync, getServiceImageQuery, fetchSectorImagesFromAPI } from './pexelsImages';
 import { getImagesForLead } from './pexelsApi';
+import { isImageBlocked, filterImages } from './imageFilters';
 
 // ── AVIS FALLBACK SECTORIELS ──
 const SECTOR_FALLBACK_REVIEWS: Record<string, Array<{ author: string; text: string; rating: number; date: string }>> = {
@@ -171,6 +172,7 @@ export interface UltimateContent {
   rating?: number;
   reviews?: number;
   services: Array<{ name: string; description: string; features: string[] }>;
+  serviceImages: string[];
   testimonials: Array<{ author: string; text: string; rating: number; date?: string }>;
   heroTitle: string;
   heroSubtitle: string;
@@ -549,19 +551,9 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const sloganVariations = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance"];
   const finalSlogan = aiContent?.slogan || sloganVariations[combinedHash % sloganVariations.length];
 
-  const BLOCKED_KEYWORDS = ['food', 'fruit', 'legume', 'carrot', 'salmon', 'kitchen', 'cooking', 'recipe', 'meal', 'dessert', 'cake', 'pizza', 'burger', 'restaurant-menu', 'portrait', 'face', 'selfie', 'person', 'man ', 'woman ', 'people', 'crowd', 'group', 'logo', 'badge', 'stamp', 'seal', 'emblem', 'watermark', 'text-overlay', 'gradient-overlay', 'phone number', 'tel:', 'numero'];
-  const BLOCKED_DOMAINS = ['tripadvisor.com', 'yelp.com', 'facebook.com', 'instagram.com', 'pagesjaunes.fr', 'google.com', 'gstatic.com', 'cloudfront.net', 'googleusercontent.com', 'maps.google', 'lh3.', 'ggpht.com', 'googleapis.com'];
-
   const sectorImages = getSectorImages(lead.sector);
 
-  const allLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])].filter((img: string) => {
-    if (!img || typeof img !== 'string' || !img.startsWith('https://')) return false;
-    const low = img.toLowerCase();
-    if (BLOCKED_KEYWORDS.some(kw => low.includes(kw))) return false;
-    if (BLOCKED_DOMAINS.some(d => low.includes(d))) return false;
-    if (low.includes('favicon') || low.includes('sprite') || low.includes('pixel')) return false;
-    return true;
-  });
+  const allLeadImages = filterImages([...(lead.images || []), ...(lead.websiteImages || [])]);
 
   let heroImage: string;
   if (allLeadImages.length > 0) {
@@ -575,10 +567,13 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const combinedImages = [heroImage, ...sectorImages.filter(s => s !== heroImage).slice(0, 2), ...rawLeadImages];
   const allImages = combinedImages.slice(0, 5);
 
+  // Images par service (pioche dans les images du secteur selon l'ordre des services)
+  const serviceImages = finalServices.map((_, i) => sectorImages[i % sectorImages.length]);
+
   const socialLinks = lead.socialLinks || {};
   const content: UltimateContent = {
     companyName, sector: lead.sector || 'Professionnel', city, description, phone, email, address,
-    website: lead.website || '', rating, reviews, services: finalServices, testimonials,
+    website: lead.website || '', rating, reviews, services: finalServices, serviceImages, testimonials,
     heroTitle, heroSubtitle, aboutText: description, ctaText, slogan: finalSlogan, heroImage, allImages,
     socialLinks
   };
@@ -622,15 +617,10 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
 
   const sectorImages = await getSectorImagesAsync(lead.sector);
 
-  const BLOCKED = ['googleusercontent', 'maps.google', 'ggpht', 'favicon', 'sprite', 'pixel', 'logo', 'badge'];
   let allLeadImages: string[] = [];
   try {
     const raw = await getImagesForLead(lead, 10);
-    allLeadImages = raw.filter((img: string) => {
-      if (!img || !img.startsWith('https://')) return false;
-      const low = img.toLowerCase();
-      return !BLOCKED.some(kw => low.includes(kw));
-    });
+    allLeadImages = filterImages(raw);
   } catch {}
 
   let heroImage: string;
@@ -679,10 +669,22 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   while (testimonials.length < 3) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 3);
 
+  // Récupérer une image Pexels dédiée pour chaque service
+  const serviceImages: string[] = [];
+  for (const service of finalServices) {
+    try {
+      const query = getServiceImageQuery(service.name);
+      const imgs = await fetchSectorImagesFromAPI(`${lead.sector} ${query}`);
+      serviceImages.push(imgs[0] || sectorImages[serviceImages.length % sectorImages.length]);
+    } catch {
+      serviceImages.push(sectorImages[serviceImages.length % sectorImages.length]);
+    }
+  }
+
   const socialLinks = lead.socialLinks || {};
   const content: UltimateContent = {
     companyName, sector: lead.sector || 'Professionnel', city, description, phone, email, address,
-    website: lead.website || '', rating, reviews, services: finalServices, testimonials,
+    website: lead.website || '', rating, reviews, services: finalServices, serviceImages, testimonials,
     heroTitle, heroSubtitle, aboutText: description, ctaText, slogan: finalSlogan, heroImage, allImages,
     socialLinks
   };
@@ -691,7 +693,7 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
 }
 
 function buildUltimateHTML(content: UltimateContent, template: any, combinedImages: string[] = [], layoutVariant: number = 0): string {
-  const { companyName, heroTitle, heroSubtitle, aboutText, services, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
+  const { companyName, heroTitle, heroSubtitle, aboutText, services, serviceImages, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages } = content;
   const primaryColor = template.primary;
   const secondaryColor = template.secondary;
   const accentColor = template.accent;
@@ -863,11 +865,14 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         @media(max-width:768px){.stats{grid-template-columns:1fr 1fr;padding:44px 24px;gap:28px}}
 
         .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
-        .svc-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:36px 28px;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+        .svc-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:0;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
         .svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--primary);transform:scaleX(0);transition:transform .35s;transform-origin:left}
         .svc-card:hover{border-color:var(--primary);box-shadow:0 12px 40px rgba(var(--primary-rgb),.1);transform:translateY(-6px)}
         .svc-card:hover::before{transform:scaleX(1)}
-        .svc-icon{width:52px;height:52px;border-radius:14px;background:rgba(var(--primary-rgb),.08);display:flex;align-items:center;justify-content:center;color:var(--primary);margin-bottom:18px}
+        .svc-card-img{width:100%;height:180px;object-fit:cover;display:block;transition:transform .5s}
+        .svc-card:hover .svc-card-img{transform:scale(1.05)}
+        .svc-card-body{padding:28px}
+        .svc-icon{width:48px;height:48px;border-radius:12px;background:rgba(var(--primary-rgb),.08);display:flex;align-items:center;justify-content:center;color:var(--primary);margin-bottom:14px}
         .svc-card h3{font-size:1.12rem;font-weight:700;margin-bottom:8px}
         .svc-card p{color:var(--text-s);font-size:.92rem;margin-bottom:16px;line-height:1.6}
         .svc-link{display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-weight:600;font-size:.88rem;text-decoration:none;transition:gap .25s}
@@ -1078,10 +1083,13 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                   ];
                 return `
                 <div class="svc-card reveal reveal-d${(i % 3) + 1}">
-                    <div class="svc-icon">${serviceIcons[i%6]}</div>
-                    <h3>${s.name}</h3>
-                    <p>${s.description}</p>
-                    <a href="#contact" class="svc-link">En savoir plus <i data-lucide="arrow-right" width="14"></i></a>
+                    <img src="${serviceImages[i] || heroImage}" class="svc-card-img" alt="${s.name}" loading="lazy">
+                    <div class="svc-card-body">
+                        <div class="svc-icon">${serviceIcons[i%6]}</div>
+                        <h3>${s.name}</h3>
+                        <p>${s.description}</p>
+                        <a href="#contact" class="svc-link">En savoir plus <i data-lucide="arrow-right" width="14"></i></a>
+                    </div>
                 </div>`}).join('')}
             </div>
         </div>
@@ -1165,11 +1173,11 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                 <p>Découvrez quelques-unes de nos réalisations récentes — chaque projet reflète notre engagement pour la qualité.</p>
             </div>
             <div class="gal-grid reveal">
-                <div class="gal-item gal-main"><img src="${getImg(1)}" ${imgErr(1)} alt="Réalisation ${companyName}" loading="lazy"></div>
-                <div class="gal-item"><img src="${getImg(2)}" ${imgErr(2)} alt="Réalisation ${companyName}" loading="lazy"></div>
-                <div class="gal-item"><img src="${getImg(3)}" ${imgErr(3)} alt="Réalisation ${companyName}" loading="lazy"></div>
-                <div class="gal-item"><img src="${getImg(4)}" ${imgErr(4)} alt="Réalisation ${companyName}" loading="lazy"></div>
-                <div class="gal-item"><img src="${getImg(5)}" ${imgErr(5)} alt="Réalisation ${companyName}" loading="lazy"></div>
+                <div class="gal-item gal-main"><img src="${serviceImages[0] || getImg(1)}" ${imgErr(1)} alt="${services[0]?.name || companyName}" loading="lazy"></div>
+                <div class="gal-item"><img src="${serviceImages[1] || getImg(2)}" ${imgErr(2)} alt="${services[1]?.name || companyName}" loading="lazy"></div>
+                <div class="gal-item"><img src="${serviceImages[2] || getImg(3)}" ${imgErr(3)} alt="${services[2]?.name || companyName}" loading="lazy"></div>
+                <div class="gal-item"><img src="${serviceImages[3] || getImg(4)}" ${imgErr(4)} alt="${services[3]?.name || companyName}" loading="lazy"></div>
+                <div class="gal-item"><img src="${serviceImages[4] || getImg(5)}" ${imgErr(5)} alt="${services[4]?.name || companyName}" loading="lazy"></div>
             </div>
         </div>
     </section>

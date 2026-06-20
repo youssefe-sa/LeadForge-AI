@@ -2,6 +2,7 @@
 // Télécharge les images dans Supabase Storage pour persistance
 
 import { supabase } from './supabase';
+import { isImageBlocked, BLOCKED_KEYWORDS, BLOCKED_DOMAINS } from './imageFilters';
 
 const PEXELS_API_KEY = process.env.VITE_PEXELS_API_KEY || process.env.PEXELS_API_KEY || '';
 const PEXELS_API_URL = 'https://api.pexels.com/v1';
@@ -20,26 +21,6 @@ const SECTOR_SEARCH_QUERIES: Record<string, string[]> = {
   avocat: ['lawyer office', 'legal professional', 'attorney working', 'law firm', 'legal consultation'],
   default: ['professional working', 'business service', 'artisan working', 'trade professional', 'service worker']
 };
-
-// Mots-clés à éviter pour filtrer les images de nourriture
-const BLOCKED_IMAGE_KEYWORDS = [
-  'food', 'fruit', 'vegetable', 'carrot', 'salmon', 'pizza', 'burger', 
-  'dessert', 'cake', 'meal', 'cooking', 'recipe', 'kitchen', 'dining',
-  'restaurant food', 'gourmet', 'cuisine', 'plate', 'dish', 'snack',
-  'breakfast', 'lunch', 'dinner', 'brunch', 'appetizer'
-];
-
-// Mots-clés à éviter de manière très stricte pour les images récupérées du lead (profils, logos, designs, etc.)
-const BLOCKED_LEAD_IMAGE_KEYWORDS = [
-  'logo', 'badge', 'icon', 'favicon', 'sprite', 'pixel', 'avatar', 'profile', 
-  'map', 'marker', 'banner', 'sign', 'button', 'menu', 'advertisement', 'promo',
-  'flyer', 'poster', 'facebook', 'instagram', 'twitter', 'linkedin', 'yelp', 
-  'tripadvisor', 'pagesjaunes', 'google', 'gstatic', 'cloudfront', 'lh3.', 
-  'googleusercontent', 'ggpht', 'googleapis', 'food', 'fruit', 'vegetable', 
-  'carrot', 'salmon', 'pizza', 'burger', 'dessert', 'cake', 'meal', 'dish',
-  'portrait', 'selfie', 'face', 'person', 'man', 'woman', 'people', 'team',
-  'client', 'owner', 'staff', 'pose', 'headshot', 'photo-de-profil'
-];
 
 interface PexelsPhoto {
   id: number;
@@ -103,17 +84,10 @@ export async function searchPexelsImages(sector: string, perPage: number = 10): 
     
     const data: PexelsSearchResponse = await response.json();
     
-    // Filtrer les images de nourriture
+    // Filtrer les images avec la blocklist unifiée
     const filteredPhotos = data.photos.filter(photo => {
       const alt = (photo.alt || '').toLowerCase();
-      const photographer = (photo.photographer || '').toLowerCase();
-      
-      // Vérifier si c'est une image de nourriture
-      const isFoodImage = BLOCKED_IMAGE_KEYWORDS.some(keyword => 
-        alt.includes(keyword) || photographer.includes(keyword)
-      );
-      
-      return !isFoodImage;
+      return !isImageBlocked(photo.src.large || photo.src.medium, alt);
     });
     
     // Retourner les URLs d'images de qualité moyenne (plus rapide à charger)
@@ -194,15 +168,12 @@ export async function getImagesForLead(
   const leadId = lead.id;
   const sector = lead.sector || 'default';
   
-  // 1. Récupérer les images réelles du lead (filtrées avec le blocklist strict)
+  // 1. Récupérer les images réelles du lead (filtrées avec la blocklist unifiée)
   const rawLeadImages = [...(lead.images || []), ...(lead.websiteImages || [])]
     .filter(img => {
       if (!img || typeof img !== 'string') return false;
       if (!img.startsWith('https://')) return false;
-      const low = img.toLowerCase();
-      // Bloquer les images du blocklist strict pour le lead (logos, selfies, etc.)
-      if (BLOCKED_LEAD_IMAGE_KEYWORDS.some(kw => low.includes(kw))) return false;
-      return true;
+      return !isImageBlocked(img);
     });
   
   console.log(`🖼️ ${leadId}: ${rawLeadImages.length} images réelles trouvées`);

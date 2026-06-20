@@ -3,6 +3,7 @@
 // ============================================================
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { leadsService, configService, templatesService, campaignsService, Database, supabase } from './supabase';
+import { isImageBlocked } from './imageFilters';
 import { apiErrorState, detectApiError } from './api-error-state';
 
 // --- SAFE HELPERS (defined once, used everywhere) ---
@@ -1989,7 +1990,7 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
     }
   }
 
-  // 2. Images du site web
+  // 2. Images du site web (filtrées avec la blocklist unifiée)
   if (lead.website) {
     try {
       const domain = lead.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
@@ -2001,16 +2002,12 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
           if (img && typeof img === 'object') {
             const imgObj = img as Record<string, unknown>;
             const url = safeStr(imgObj.imageUrl || imgObj.thumbnailUrl);
+            const title = safeStr(imgObj.title || '');
             
-            if (url && url.startsWith('http') && !result.websiteImages.includes(url)) {
-              // Éviter les logos et les images trop petites
-              const isNotLogo = !url.toLowerCase().includes('logo');
-              const isGoodSize = true; // On pourrait vérifier la taille si disponible
-              
-              if (isNotLogo && isGoodSize) {
-                result.websiteImages.push(url);
-              }
-            }
+            if (!url || !url.startsWith('http') || result.websiteImages.includes(url)) continue;
+            if (isImageBlocked(url, title)) continue;
+
+            result.websiteImages.push(url);
           }
         }
         console.log(`✅ Found ${result.websiteImages.length} website images`);
@@ -2021,6 +2018,7 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
   }
 
   // 3. Images professionnelles — spécifiques au business d'abord, secteur ensuite
+  //    FILTRÉ: blocklist unifiée + vérification dimension (min 400px large)
   if (result.websiteImages.length < 6) {
     try {
       const professionalQueries = [
@@ -2037,11 +2035,30 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
             if (img && typeof img === 'object') {
               const imgObj = img as Record<string, unknown>;
               const url = safeStr(imgObj.imageUrl || imgObj.thumbnailUrl);
-              
-              if (url && url.startsWith('http') && !result.websiteImages.includes(url)) {
-                result.websiteImages.push(url);
-                if (result.websiteImages.length >= 12) break;
+              const title = safeStr(imgObj.title || '');
+              const source = safeStr(imgObj.source || '');
+
+              if (!url || !url.startsWith('http')) continue;
+              if (result.websiteImages.includes(url)) continue;
+
+              // Filtrer avec la blocklist unifiée (URL + titre + source)
+              if (isImageBlocked(url, title)) continue;
+              if (isImageBlocked(source)) continue;
+
+              // Vérifier la dimension minimale (≥400px de large)
+              const width = typeof imgObj.width === 'number' ? imgObj.width : 0;
+              const height = typeof imgObj.height === 'number' ? imgObj.height : 0;
+              if (width > 0 && width < 400) continue;
+              if (height > 0 && height < 300) continue;
+
+              // Rejeter les images trop allongées ou trop écrasées (ratio > 3:1)
+              if (width > 0 && height > 0) {
+                const ratio = width / height;
+                if (ratio > 3 || ratio < 0.33) continue;
               }
+
+              result.websiteImages.push(url);
+              if (result.websiteImages.length >= 12) break;
             }
           }
         }
