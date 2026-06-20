@@ -249,18 +249,19 @@ export const SECTOR_PEXELS_IMAGES: Record<string, string[]> = {
 };
 
 // Mots-clés de recherche par secteur pour l'API Pexels
+// Requêtes spécifiques pour obtenir des images représentatives
 export const SECTOR_SEARCH_QUERIES: Record<string, string[]> = {
-  plomberie: ['plumber', 'plumbing', 'sink', 'bathroom', 'faucet', 'pipes', 'water', 'repair'],
-  electricien: ['electrician', 'electrical', 'light bulb', 'wiring', 'outlet', 'power', 'cable', 'lighting'],
-  coiffeur: ['hairdresser', 'barber', 'hair salon', 'haircut', 'hairstyle', 'hair styling', 'salon'],
-  restaurant: ['restaurant', 'chef', 'cooking', 'food', 'kitchen', 'dining', 'gourmet', 'cuisine'],
-  garage: ['mechanic', 'car repair', 'auto shop', 'garage', 'car service', 'automotive', 'tires'],
-  nettoyage: ['cleaning', 'cleaner', 'vacuum', 'mop', 'disinfection', 'sanitizing', 'housekeeping'],
-  jardin: ['gardener', 'garden', 'lawn', 'landscaping', 'plants', 'pruning', 'gardening tools'],
-  fitness: ['gym', 'fitness', 'personal trainer', 'workout', 'weights', 'exercise', 'training'],
-  medical: ['doctor', 'medical', 'clinic', 'healthcare', 'hospital', 'nurse', 'stethoscope'],
-  avocat: ['lawyer', 'law', 'attorney', 'legal', 'court', 'gavel', 'justice', 'contract'],
-  default: ['business', 'professional', 'office', 'corporate', 'meeting', 'team', 'success']
+  plomberie: ['plumbing tools wrench pipes', 'bathroom renovation modern', 'water faucet repair', 'plumber working pipes', 'kitchen sink installation'],
+  electricien: ['electrician working wires', 'electrical panel installation', 'lighting installation professional', 'electrician tools', 'electrical wiring modern'],
+  coiffeur: ['hair salon interior modern', 'hairdresser cutting hair', 'barber shop professional', 'hair styling tools', 'beauty salon equipment'],
+  restaurant: ['restaurant kitchen professional', 'chef cooking gourmet', 'fine dining restaurant interior', 'restaurant tables setup', 'gourmet food presentation'],
+  garage: ['auto mechanic working car', 'car repair garage', 'automotive workshop tools', 'mechanic fixing engine', 'car maintenance professional'],
+  nettoyage: ['professional cleaning service', 'office cleaning team', 'commercial cleaning equipment', 'housekeeping service professional', 'industrial cleaning'],
+  jardin: ['landscaping professional work', 'garden maintenance tools', 'lawn mowing professional', 'garden design plants', 'outdoor landscaping'],
+  fitness: ['gym equipment modern', 'personal training session', 'fitness center interior', 'workout equipment professional', 'sports training facility'],
+  medical: ['doctor consultation clinic', 'medical equipment stethoscope', 'healthcare professional', 'clinic interior modern', 'medical examination'],
+  avocat: ['law office professional', 'legal documents signing', 'courtroom justice', 'lawyer desk books', 'legal consultation meeting'],
+  default: ['professional office workspace', 'business meeting team', 'corporate office modern', 'professional service', 'business success']
 };
 
 // Fonction pour obtenir les images d'un secteur
@@ -340,7 +341,47 @@ export function getSearchQuery(sector: string): string {
     }
   }
   
-  return 'business';
+  if (normalizedSector.includes('plomb') || normalizedSector.includes('plumber') || normalizedSector.includes('tuyau') || normalizedSector.includes('robinet')) {
+    return SECTOR_SEARCH_QUERIES.plomberie[0];
+  }
+  
+  if (normalizedSector.includes('electri') || normalizedSector.includes('électri') || normalizedSector.includes('electrician') || normalizedSector.includes('cabl') || normalizedSector.includes('tableau')) {
+    return SECTOR_SEARCH_QUERIES.electricien[0];
+  }
+  
+  if (normalizedSector.includes('coiff') || normalizedSector.includes('hair') || normalizedSector.includes('barber') || normalizedSector.includes('salon') || normalizedSector.includes('coupe')) {
+    return SECTOR_SEARCH_QUERIES.coiffeur[0];
+  }
+  
+  if (normalizedSector.includes('restaurant') || normalizedSector.includes('chef') || normalizedSector.includes('traiteur') || normalizedSector.includes('cuisine') || normalizedSector.includes('boulanger') || normalizedSector.includes('pâtissier')) {
+    return SECTOR_SEARCH_QUERIES.restaurant[0];
+  }
+  
+  if (normalizedSector.includes('garage') || normalizedSector.includes('mecan') || normalizedSector.includes('mécan') || normalizedSector.includes('auto') || normalizedSector.includes('voiture') || normalizedSector.includes('carrossier')) {
+    return SECTOR_SEARCH_QUERIES.garage[0];
+  }
+  
+  if (normalizedSector.includes('nettoya') || normalizedSector.includes('clean') || normalizedSector.includes('ménage') || normalizedSector.includes('menage') || normalizedSector.includes('propre')) {
+    return SECTOR_SEARCH_QUERIES.nettoyage[0];
+  }
+  
+  if (normalizedSector.includes('jardin') || normalizedSector.includes('garden') || normalizedSector.includes('paysag') || normalizedSector.includes('espace vert')) {
+    return SECTOR_SEARCH_QUERIES.jardin[0];
+  }
+  
+  if (normalizedSector.includes('fitness') || normalizedSector.includes('gym') || normalizedSector.includes('sport') || normalizedSector.includes('coach') || normalizedSector.includes('muscu')) {
+    return SECTOR_SEARCH_QUERIES.fitness[0];
+  }
+  
+  if (normalizedSector.includes('medical') || normalizedSector.includes('médical') || normalizedSector.includes('doctor') || normalizedSector.includes('docteur') || normalizedSector.includes('sante') || normalizedSector.includes('santé') || normalizedSector.includes('médecin') || normalizedSector.includes('infirmier') || normalizedSector.includes('kiné') || normalizedSector.includes('dentiste')) {
+    return SECTOR_SEARCH_QUERIES.medical[0];
+  }
+  
+  if (normalizedSector.includes('avocat') || normalizedSector.includes('lawyer') || normalizedSector.includes('law') || normalizedSector.includes('juridique') || normalizedSector.includes('notaire') || normalizedSector.includes('droit')) {
+    return SECTOR_SEARCH_QUERIES.avocat[0];
+  }
+  
+  return 'professional service business';
 }
 
 // Cache pour les images récupérées depuis l'API
@@ -362,7 +403,7 @@ export async function fetchPexelsImages(query: string, perPage: number = 20): Pr
   
   try {
     console.log(`🌐 Récupération d'images depuis Pexels pour: ${query}`);
-    const response = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}&orientation=landscape`, {
+    const response = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}&orientation=landscape&size=large`, {
       headers: {
         'Authorization': PEXELS_API_KEY
       }
@@ -385,15 +426,36 @@ export async function fetchPexelsImages(query: string, perPage: number = 20): Pr
   }
 }
 
+// Fonction pour récupérer plusieurs requêtes et combiner les résultats
+export async function fetchMultiplePexelsImages(queries: string[], perQuery: number = 5): Promise<string[]> {
+  const allImages: string[] = [];
+  
+  for (const query of queries.slice(0, 3)) {
+    try {
+      const images = await fetchPexelsImages(query, perQuery);
+      allImages.push(...images.slice(0, perQuery));
+    } catch (error) {
+      console.error(`Erreur pour la requête "${query}":`, error);
+    }
+  }
+  
+  return allImages;
+}
+
 // Fonction pour obtenir les images d'un secteur (avec API dynamique)
 export async function getSectorImagesAsync(sector: string): Promise<string[]> {
   const normalizedSector = (sector || '').toLowerCase().trim();
   
-  const searchQuery = getSearchQuery(sector);
-  const apiImages = await fetchPexelsImages(searchQuery, 20);
+  const queries = SECTOR_SEARCH_QUERIES[normalizedSector as keyof typeof SECTOR_SEARCH_QUERIES] || 
+                  SECTOR_SEARCH_QUERIES.default;
+  
+  console.log(`🔍 Récupération d'images pour le secteur: ${sector}`);
+  console.log(`📋 Requêtes utilisées: ${queries.join(', ')}`);
+  
+  const apiImages = await fetchMultiplePexelsImages(queries, 7);
   
   if (apiImages && apiImages.length >= 5) {
-    console.log(`✅ Images API utilisées pour le secteur: ${sector}`);
+    console.log(`✅ ${apiImages.length} images API utilisées pour le secteur: ${sector}`);
     return apiImages;
   }
   
