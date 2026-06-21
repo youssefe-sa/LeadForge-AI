@@ -440,6 +440,92 @@ function getUltimateTemplate(sector: string) {
   return SECTOR_ULTIMATE_TEMPLATES.default;
 }
 
+function getProcessSteps(sector: string): Array<{ title: string; desc: string }> {
+  const s = (sector || '').toLowerCase();
+  if (s.includes('restaurant') || s.includes('cuisin') || s.includes('traiteur') || s.includes('boulanger') || s.includes('pâtissier'))
+    return [
+      { title: 'Réservation', desc: 'Réservez votre table en ligne ou par téléphone.' },
+      { title: 'Accueil', desc: 'Un cadre chaleureux et un service attentionné vous attendent.' },
+      { title: 'Dégustation', desc: 'Savourez nos plats préparés avec des produits frais et de saison.' },
+      { title: 'Service', desc: 'Notre équipe veille à votre confort tout au long du repas.' },
+      { title: 'Satisfait', desc: 'Un moment culinaire dont vous aurez envie de revenir.' }
+    ];
+  if (s.includes('coiff') || s.includes('barb') || s.includes('salon') || s.includes('beauté') || s.includes('esthétique'))
+    return [
+      { title: 'RDV', desc: 'Prenez rendez-vous en ligne quand ça vous convient.' },
+      { title: 'Consultation', desc: 'Un diagnostic capillaire personnalisé et des conseils sur-mesure.' },
+      { title: 'Coiffage', desc: 'Laissez faire notre expertise pour un résultat à votre image.' },
+      { title: 'Conseils', desc: 'Des recommandations pour entretenir votre style au quotidien.' },
+      { title: 'Résultat', desc: 'Un look qui vous ressemble, pour briller à chaque occasion.' }
+    ];
+  if (s.includes('garage') || s.includes('mécan') || s.includes('auto') || s.includes('carrosserie'))
+    return [
+      { title: 'RDV', desc: 'Planifiez votre passage selon votre emploi du temps.' },
+      { title: 'Diagnostic', desc: 'Un contrôle complet de votre véhicule avec équipement moderne.' },
+      { title: 'Devis', desc: 'Une estimation claire et détaillée avant toute intervention.' },
+      { title: 'Réparation', desc: 'Un travail soigné par des techniciens qualifiés et certifiés.' },
+      { title: 'Livraison', desc: 'Votre véhicule vous est restitué impeccable, prêt à rouler.' }
+    ];
+  if (s.includes('avocat') || s.includes('notaire') || s.includes('juridi') || s.includes('droit'))
+    return [
+      { title: 'Contact', desc: 'Exposez-nous votre situation lors d\'un premier échange.' },
+      { title: 'Consultation', desc: 'Une analyse approfondie de votre dossier et de vos options.' },
+      { title: 'Stratégie', desc: 'Une ligne de conduite claire, adaptée à vos objectifs.' },
+      { title: 'Action', desc: 'Nous défendons vos intérêts avec rigueur et détermination.' },
+      { title: 'Suivi', desc: 'Un accompagnement continu jusqu\'à la résolution de votre dossier.' }
+    ];
+  if (s.includes('médec') || s.includes('clinique') || s.includes('dentiste') || s.includes('santé') || s.includes('kiné'))
+    return [
+      { title: 'RDV', desc: 'Prenez rendez-vous en quelques clics.' },
+      { title: 'Consultation', desc: 'Un examen attentif et un diagnostic personnalisé.' },
+      { title: 'Traitement', desc: 'Un plan de soins adapté à votre situation.' },
+      { title: 'Suivi', desc: 'Un accompagnement régulier pour votre bien-être.' },
+      { title: 'Résultat', desc: 'Retrouvez une meilleure qualité de vie.' }
+    ];
+  if (s.includes('fitness') || s.includes('sport') || s.includes('coach') || s.includes('gym') || s.includes('salle'))
+    return [
+      { title: 'Bilan', desc: 'Un assessment complet de votre condition physique.' },
+      { title: 'Programme', desc: 'Un plan d\'entraînement sur mesure adapté à vos objectifs.' },
+      { title: 'Entraînement', desc: 'Des séances encadrées par nos coaches diplômés.' },
+      { title: 'Suivi', desc: 'Un suivi régulier pour mesurer vos progrès.' },
+      { title: 'Objectif', desc: 'Atteignez vos objectifs et dépassez vos limites.' }
+    ];
+  if (s.includes('nettoyag') || s.includes('propreté') || s.includes('ménage'))
+    return [
+      { title: 'Devis', desc: 'Un chiffrage précis adapté à vos besoins.' },
+      { title: 'Planification', desc: 'Un planning flexible qui s\'adapte à vos contraintes.' },
+      { title: 'Intervention', desc: 'Nos équipes formées interviennent avec rigueur.' },
+      { title: 'Contrôle', desc: 'Un contrôle qualité systématique après chaque passage.' },
+      { title: 'Régulier', desc: 'Un entretien maintenu pour des espaces toujours impeccables.' }
+    ];
+  if (s.includes('jardin') || s.includes('paysag') || s.includes('espace vert'))
+    return [
+      { title: 'Visite', desc: 'Un rendez-vous sur site pour analyser votre espace.' },
+      { title: 'Conception', desc: 'Un projet paysager personnalisé avec plans et visualisation.' },
+      { title: 'Réalisation', desc: 'La mise en œuvre par notre équipe de jardiniers qualifiés.' },
+      { title: 'Entretien', desc: 'Un suivi saisonnier pour maintenir la beauté de votre jardin.' },
+      { title: 'Évolution', desc: 'Des ajustements au fil des saisons et de vos envies.' }
+    ];
+  return [
+    { title: 'Contact', desc: 'Échangez avec nous pour nous exposer votre besoin.' },
+    { title: 'Analyse', desc: 'Nous étudions votre demande et identifions la meilleure solution.' },
+    { title: 'Proposition', desc: 'Recevez une offre claire, adaptée à votre budget et vos attentes.' },
+    { title: 'Réalisation', desc: 'Notre équipe intervient avec soin et professionnalisme.' },
+    { title: 'Suivi', desc: 'Nous assurons un suivi qualité pour votre entière satisfaction.' }
+  ];
+}
+
+function getGalleryDesc(sector: string): string {
+  const s = (sector || '').toLowerCase();
+  if (s.includes('restaurant') || s.includes('cuisin') || s.includes('boulanger')) return 'L\'ambiance, la cuisine et les moments qui font notre identité.';
+  if (s.includes('coiff') || s.includes('barb') || s.includes('salon') || s.includes('beauté')) return 'Un aperçu de notre espace, nos créations et notre univers.';
+  if (s.includes('garage') || s.includes('mécan') || s.includes('auto')) return 'Notre atelier, nos équipements et les véhicules que nous prenons en charge.';
+  if (s.includes('jardin') || s.includes('paysag')) return 'Nos jardins réalisés, avant/après et les projets qui nous ressemblent.';
+  if (s.includes('fitness') || s.includes('sport') || s.includes('gym')) return 'Notre salle, nos équipements et l\'énergie qui nous anime.';
+  if (s.includes('nettoyag') || s.includes('propreté')) return 'Nos interventions, nos résultats et la propreté que nous garantissons.';
+  return 'Quelques moments qui reflètent notre univers et notre engagement.';
+}
+
 function getLogoInfo(name: string, sector: string = 'default') {
   if (!name) return { initials: 'CO', text: 'Company', word1: 'Company', word2: 'Pro' };
   const skip = ['le', 'la', 'les', 'de', 'du', 'des', "l'", "d'", 'à', 'a', 'et', '&', 'en', 'pour'];
@@ -823,7 +909,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .navbar-brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--text);transition:color .3s}
         .navbar:not(.scrolled) .navbar-brand{color:#fff}
         .navbar-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;box-shadow:0 4px 15px rgba(var(--primary-rgb),.3);flex-shrink:0}
-        .navbar-name{font-weight:700;font-size:1.15rem;color:var(--text);white-space:nowrap;transition:color .3s}
+        .navbar-name{font-weight:700;font-size:1.15rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;transition:color .3s}
         .navbar:not(.scrolled) .navbar-name{color:#fff}
         .navbar-links{display:flex;align-items:center;gap:32px}
         .navbar-links a{text-decoration:none;color:var(--text-s);font-size:.9rem;font-weight:500;transition:color .25s;position:relative}
@@ -890,7 +976,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
         .about-img{border-radius:20px;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.12)}
         .about-img img{width:100%;height:420px;object-fit:cover;display:block}
-        .about-badge{position:absolute;bottom:-20px;right:28px;background:var(--primary);color:#fff;padding:20px 28px;border-radius:16px;text-align:center;box-shadow:0 12px 32px rgba(var(--primary-rgb),.35)}
+        .about-badge{position:absolute;bottom:24px;right:24px;background:var(--primary);color:#fff;padding:20px 28px;border-radius:16px;text-align:center;box-shadow:0 12px 32px rgba(var(--primary-rgb),.35)}
         .about-badge-num{font-size:2rem;font-weight:800;line-height:1}
         .about-badge-text{font-size:.72rem;text-transform:uppercase;letter-spacing:1.2px;opacity:.85;margin-top:4px}
         .about-text h2{font-size:clamp(1.55rem,3vw,2.3rem);font-weight:800;margin-bottom:18px;letter-spacing:-.02em}
@@ -903,6 +989,12 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .stats{padding:64px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:36px;text-align:center;color:#fff}
         .stat-num{font-size:3.2rem;font-weight:800;line-height:1;margin-bottom:10px;font-family:${headingFont}}
         .stat-label{font-size:.82rem;text-transform:uppercase;letter-spacing:1.8px;opacity:.7;font-weight:600}
+        .stat-item{animation:countUp .6s ease forwards;opacity:0}
+        .stat-item:nth-child(1){animation-delay:.1s}
+        .stat-item:nth-child(2){animation-delay:.2s}
+        .stat-item:nth-child(3){animation-delay:.3s}
+        .stat-item:nth-child(4){animation-delay:.4s}
+        @keyframes countUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         @media(max-width:768px){.stats{grid-template-columns:1fr 1fr;padding:44px 24px;gap:28px}}
 
         .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
@@ -1013,7 +1105,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
 
         footer{background:var(--dark);color:#fff;padding:70px 0 32px}
         .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:44px;margin-bottom:44px}
-        .footer-brand{font-size:1.25rem;font-weight:800;margin-bottom:12px}
+        .footer-brand{font-size:1.25rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+        .footer-brand-logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--primary));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0}
+        .footer-brand-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
         .footer-desc{font-size:.9rem;color:rgba(255,255,255,.5);line-height:1.8;margin-bottom:20px}
         .footer-social{display:flex;gap:12px}
         .footer-social a{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;transition:all .25s}
@@ -1034,7 +1128,19 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .reveal{opacity:0;transform:translateY(35px);transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1)}
         .reveal.active{opacity:1;transform:translateY(0)}
         .reveal-d1{transition-delay:.12s}.reveal-d2{transition-delay:.24s}.reveal-d3{transition-delay:.36s}
-        @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+        @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.stat-item{animation:none;opacity:1}}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+        .hero-badge{animation:float 3s ease-in-out infinite}
+        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        .cta-banner{background-size:200% 100%}
+        .privacy-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;justify-content:center;align-items:center;padding:24px}
+        .privacy-overlay.open{display:flex}
+        .privacy-modal{background:#fff;border-radius:20px;max-width:700px;width:100%;max-height:80vh;overflow-y:auto;padding:40px;position:relative}
+        .privacy-modal h2{font-size:1.5rem;margin-bottom:20px;color:var(--text)}
+        .privacy-modal h3{font-size:1.1rem;margin:20px 0 10px;color:var(--text)}
+        .privacy-modal p{color:var(--text-s);font-size:.92rem;line-height:1.8;margin-bottom:12px}
+        .privacy-close{position:absolute;top:16px;right:16px;background:var(--bg);border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--text-s);transition:all .2s}
+        .privacy-close:hover{background:var(--border);color:var(--text)}
     </style>
 </head>
 <body>
@@ -1193,11 +1299,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                 <p>Du premier contact à la réalisation, nous vous accompagnons à chaque étape.</p>
             </div>
             <div class="proc-grid">
-                <div class="proc-step reveal"><div class="proc-num">01</div><h3>Contact</h3><p>Échangez avec nous pour nous exposer votre besoin.</p></div>
-                <div class="proc-step reveal reveal-d1"><div class="proc-num">02</div><h3>Analyse</h3><p>Nous étudions votre demande et identifions la meilleure solution.</p></div>
-                <div class="proc-step reveal reveal-d2"><div class="proc-num">03</div><h3>Proposition</h3><p>Recevez une offre claire, adaptée à votre budget et vos attentes.</p></div>
-                <div class="proc-step reveal reveal-d2"><div class="proc-num">04</div><h3>Réalisation</h3><p>Notre équipe intervient avec soin et professionnalisme.</p></div>
-                <div class="proc-step reveal reveal-d3"><div class="proc-num">05</div><h3>Suivi</h3><p>Nous assurons un suivi qualité pour votre entière satisfaction.</p></div>
+                ${getProcessSteps(content.sector).map((step, i) => `
+                <div class="proc-step reveal reveal-d${Math.min(i, 3)}"><div class="proc-num">0${i + 1}</div><h3>${step.title}</h3><p>${step.desc}</p></div>
+                `).join('')}
             </div>
             <div style="text-align:center;margin-top:40px"><a href="#contact" class="btn-pri">${ctaText} <i data-lucide="arrow-right" width="16"></i></a></div>
         </div>
@@ -1208,7 +1312,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
             <div class="section-hdr reveal">
                 <span class="section-label">Découvrir</span>
                 <h2>${content.galleryTitle || 'Nos Réalisations'}</h2>
-                <p>${content.galleryTitle === 'Notre Espace' ? 'Plongez dans l\'univers de ' + companyName + '.' : content.galleryTitle === 'Ambiance' ? 'L\'ambiance qui fait la différence.' : 'Quelques coups de projecteur sur ce que nous proposons.'}</p>
+                <p>${getGalleryDesc(content.sector)}</p>
             </div>
             <div class="gal-grid reveal">
                 <div class="gal-item gal-main"><img src="${galleryImages[0] || serviceImages[0] || heroImage}" ${imgErr(1)} alt="${services[0]?.name || companyName}" loading="lazy"></div>
@@ -1228,8 +1332,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                 <p>La satisfaction de nos clients est notre meilleure carte de visite.</p>
             </div>
             <div class="test-grid">
-                ${testimonials.slice(0,3).map((t,i) => `
-                <div class="test-card reveal reveal-d${i+1}">
+                ${testimonials.slice(0,6).map((t,i) => `
+                <div class="test-card reveal reveal-d${(i % 3) + 1}">
                     <div><div class="test-stars">${Array(t.rating).fill('<i data-lucide="star" fill="currentColor" width="15"></i>').join('')}</div><p class="test-text">"${t.text}"</p></div>
                     <div class="test-author"><div class="test-avatar">${t.author.charAt(0)}</div><div><div class="test-name">${t.author}</div>${t.date?`<div class="test-date">${t.date}</div>`:''}</div></div>
                 </div>`).join('')}
@@ -1290,7 +1394,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         <div class="container">
             <div class="footer-grid">
                 <div>
-                    <div class="footer-brand">${logoInfo.text}</div>
+                    <div class="footer-brand"><div class="footer-brand-logo">${logoInfo.initials}</div><span class="footer-brand-text">${logoInfo.text}</span></div>
                     <p class="footer-desc">${aboutText.substring(0,120)}...</p>
                     ${content.socialLinks && Object.values(content.socialLinks).some(v => v) ? `
                     <div class="footer-social">
@@ -1303,7 +1407,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                     </div>` : ''}
                 </div>
                 <div class="footer-col"><h4>Services</h4><ul>${services.slice(0,5).map(s=>`<li><a href="#services">${s.name}</a></li>`).join('')}</ul></div>
-                <div class="footer-col"><h4>Navigation</h4><ul><li><a href="#about">À propos</a></li><li><a href="#why">Pourquoi nous</a></li><li><a href="#testimonials">Avis clients</a></li><li><a href="#contact">Contact</a></li></ul></div>
+                <div class="footer-col"><h4>Navigation</h4><ul><li><a href="#about">À propos</a></li><li><a href="#why">Pourquoi nous</a></li><li><a href="#testimonials">Avis clients</a></li><li><a href="#contact">Contact</a></li><li><a href="#" onclick="event.preventDefault();document.getElementById('privacy-modal').classList.add('open')">Politique de confidentialité</a></li></ul></div>
                 <div class="footer-col"><h4>Contact</h4>
                     ${phone?`<div class="footer-contact-item"><i data-lucide="phone" width="14"></i> ${phone}</div>`:''}
                     ${email?`<div class="footer-contact-item"><i data-lucide="mail" width="14"></i> ${email}</div>`:''}
@@ -1316,6 +1420,50 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     </footer>
 
     ${phone ? `<a href="tel:${cleanPhoneLink}" class="float-urgent"><i data-lucide="phone" width="18"></i> Nous Appeler</a>` : ''}
+
+    <div class="privacy-overlay" id="privacy-modal">
+        <div class="privacy-modal">
+            <button class="privacy-close" onclick="document.getElementById('privacy-modal').classList.remove('open')">&times;</button>
+            <h2>Politique de Confidentialité</h2>
+            <p><strong>${companyName}</strong> s'engage à protéger la vie privée de ses visiteurs et clients. La présente politique de confidentialité décrit comment nous collectons, utilisons et protégeons vos données personnelles.</p>
+            
+            <h3>1. Données collectées</h3>
+            <p>Lors de votre navigation sur notre site ou de votre prise de contact, nous pouvons être amenés à collecter les informations suivantes : nom, prénom, adresse e-mail, numéro de téléphone, adresse postale, ainsi que toute autre information que vous nous transmettez volontairement via nos formulaires de contact.</p>
+            <p>Nous collectons également des données de navigation de manière anonyme : pages visitées, durée de la visite, type de navigateur, système d'exploitation, et adresse IP (anonymisée). Ces données nous aident à améliorer continuellement la qualité de nos services et de notre site internet.</p>
+            
+            <h3>2. Utilisation des données</h3>
+            <p>Les données personnelles collectées sont exclusivement utilisées pour les finalités suivantes :</p>
+            <p>• Répondre à vos demandes de contact et de devis<br>• Vous fournir les services et prestations demandés<br>• Améliorer votre expérience utilisateur sur notre site<br>• Vous informer de nos actualités, offres et événements (avec votre consentement préalable)<br>• Assurer le suivi de la relation client et la gestion de vos demandes<br>• Respecter nos obligations légales et réglementaires</p>
+            
+            <h3>3. Base légale du traitement</h3>
+            <p>Le traitement de vos données repose sur plusieurs bases légales : votre consentement explicite pour les communications commerciales, l'exécution d'un contrat ou de mesures précontractuelles pour la fourniture de nos services, et notre intérêt légitime pour l'amélioration de nos services et la prévention de la fraude.</p>
+            
+            <h3>4. Durée de conservation</h3>
+            <p>Vos données personnelles sont conservées pendant une durée de 3 ans à compter du dernier contact ou de la dernière prestation. Les données relatives aux facturations sont conservées pendant 10 ans conformément aux obligations comptables en vigueur. À l'expiration de ces délais, vos données sont supprimées ou anonymisées de manière irréversible.</p>
+            
+            <h3>5. Partage des données</h3>
+            <p>Nous ne vendons, ne louons et ne partageons jamais vos données personnelles avec des tiers à des fins commerciales. Vos données peuvent être transmises à nos sous-traitants habilités uniquement dans le cadre de l'exécution de nos services (hébergeur du site, outil de gestion de la relation client). Chacun de nos partenaires est soumis à des obligations strictes de confidentialité.</p>
+            
+            <h3>6. Cookies et traceurs</h3>
+            <p>Notre site utilise des cookies strictement nécessaires à son bon fonctionnement. Ces cookies ne collectent aucune donnée personnelle et sont requis pour assurer la sécurité et la navigation sur le site. Nous n'utilisons pas de cookies publicitaires ou de traceurs de pistage sans votre consentement préalable. Vous pouvez gérer vos préférences en matière de cookies directement depuis les paramètres de votre navigateur.</p>
+            
+            <h3>7. Vos droits</h3>
+            <p>Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés, vous disposez des droits suivants :</p>
+            <p>• <strong>Droit d'accès</strong> : obtenir une copie de l'ensemble de vos données personnelles<br>• <strong>Droit de rectification</strong> : corriger les données inexactes ou incomplètes<br>• <strong>Droit à l'effacement</strong> : demander la suppression de vos données personnelles<br>• <strong>Droit à la limitation</strong> : demander la limitation du traitement de vos données<br>• <strong>Droit à la portabilité</strong> : recevoir vos données dans un format structuré et couramment utilisé<br>• <strong>Droit d'opposition</strong> : vous opposer au traitement de vos données à des fins de prospection commerciale</p>
+            <p>Pour exercer l'un de ces droits, contactez-nous par e-mail à ${email || 'contact@example.com'} ou par courrier à ${address || 'notre adresse'}. Nous nous engageons à répondre dans un délai maximum de 30 jours.</p>
+            
+            <h3>8. Sécurité des données</h3>
+            <p>Nous mettons en œuvre toutes les mesures techniques et organisationnelles nécessaires pour protéger vos données contre tout accès non autorisé, perte, altération ou divulgation. Ces mesures comprennent le chiffrement des données sensibles, le contrôle d'accès strict, la surveillance régulière de nos systèmes et la formation de notre personnel aux bonnes pratiques de sécurité informatique.</p>
+            
+            <h3>9. Modification de la politique</h3>
+            <p>Nous nous réservons le droit de modifier la présente politique de confidentialité à tout moment afin de l'adapter aux évolutions de notre activité ou aux exigences légales. La date de dernière mise à jour est indiquée en bas de cette page. Nous vous encourageons à consulter régulièrement cette page pour prendre connaissance des éventuelles modifications.</p>
+            
+            <h3>10. Contact</h3>
+            <p>Pour toute question relative à la protection de vos données personnelles, vous pouvez nous contacter à l'adresse ${email || 'contact@example.com'} ou par courrier à ${address || 'notre adresse'}. Si vous estimez que le traitement de vos données n'est pas conforme à la réglementation en vigueur, vous avez le droit d'introduire une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) — www.cnil.fr.</p>
+            
+            <p style="margin-top:24px;font-size:.82rem;color:var(--text-t)">Dernière mise à jour : ${new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+        </div>
+    </div>
 
     <script>
         lucide.createIcons();
