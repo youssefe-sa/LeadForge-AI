@@ -4,8 +4,6 @@
 // ============================================================
 
 import { ApiConfig } from './supabase-store';
-import { apiErrorState, detectApiError } from './api-error-state';
-import { eventBus, LeadForgeEvents } from './events';
 
 export interface ApiTestResult {
   service: string;
@@ -42,12 +40,7 @@ async function testSerperApi(config: ApiConfig): Promise<ApiTestResult> {
 
     const errorText = await response.text();
     
-    // Détecter les erreurs spécifiques
     if (errorText.includes('Not enough credits')) {
-      const error = { status: 400, message: 'Not enough credits' };
-      const apiError = detectApiError(error, 'serper');
-      if (apiError) apiErrorState.recordError(apiError);
-      
       return { 
         service: 'serper', 
         status: 'error', 
@@ -71,7 +64,7 @@ async function testSerperApi(config: ApiConfig): Promise<ApiTestResult> {
   }
 }
 
-// Test generic LLM provider via /api/llm proxy
+// Config des endpoints LLM
 const LLM_ENDPOINTS: Record<string, { url: string; model: string; needsProxy: boolean }> = {
   groq:      { url: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.1-8b-instant', needsProxy: false },
   nvidia:    { url: '/api/llm', model: 'meta/llama-3.1-8b-instruct', needsProxy: true },
@@ -79,6 +72,7 @@ const LLM_ENDPOINTS: Record<string, { url: string; model: string; needsProxy: bo
   openrouter: { url: '/api/llm', model: 'meta-llama/llama-3.1-8b-instruct:free', needsProxy: true },
 };
 
+// Test read-only d'un provider LLM — ne modifie PAS l'état global des erreurs
 async function testLlmProvider(provider: string, apiKey: string): Promise<ApiTestResult> {
   if (!apiKey) {
     return { service: provider, status: 'error', message: `Clé API ${provider} non configurée` };
@@ -118,13 +112,12 @@ async function testLlmProvider(provider: string, apiKey: string): Promise<ApiTes
       return { service: provider, status: 'ok', message: `API ${provider} fonctionnelle${hasContent ? '' : ' (réponse vide)'}` };
     }
 
-    const errorData = await response.json().catch(() => ({}));
-    const errorMessage = errorData.error?.message || '';
+    // 404 = proxy non déployé, pas une erreur du provider lui-même
+    if (response.status === 404) {
+      return { service: provider, status: 'error', message: `Proxy /api/llm non disponible (404)`, statusCode: 404 };
+    }
 
-    if (response.status === 429 || errorMessage.includes('Rate limit')) {
-      const error = { status: 429, message: errorMessage };
-      const apiError = detectApiError(error, provider);
-      if (apiError) apiErrorState.recordError(apiError);
+    if (response.status === 429) {
       return { service: provider, status: 'error', message: `Rate limit ${provider} atteint`, statusCode: 429 };
     }
 
@@ -140,8 +133,6 @@ async function testGmailSmtp(config: ApiConfig): Promise<ApiTestResult> {
     return { service: 'gmailSmtp', status: 'error', message: 'Configuration SMTP Gmail incomplète' };
   }
 
-  // On ne teste pas réellement l'envoi d'email pour éviter les spams
-  // On vérifie juste que les credentials sont présents
   return { 
     service: 'gmailSmtp', 
     status: 'ok', 
@@ -149,7 +140,7 @@ async function testGmailSmtp(config: ApiConfig): Promise<ApiTestResult> {
   };
 }
 
-// Test toutes les APIs
+// Test toutes les APIs — read-only, ne déclenche PAS d'arrêt d'agents
 export async function testAllApis(config: ApiConfig): Promise<ApiTestReport> {
   const results: ApiTestResult[] = [];
 
@@ -157,12 +148,11 @@ export async function testAllApis(config: ApiConfig): Promise<ApiTestReport> {
   console.log(`🔧 API Testing: Default LLM is ${defaultLlm}`);
 
   // Tester Serper + le LLM par défaut en parallèle
-  const serperResult = await testSerperApi(config);
-  results.push(serperResult);
-
-  // Tester le provider LLM par défaut (obligatoire)
-  const defaultLlmResult = await testLlmProvider(defaultLlm, config[`${defaultLlm}Key` as keyof ApiConfig] as string || '');
-  results.push(defaultLlmResult);
+  const [serperResult, defaultLlmResult] = await Promise.all([
+    testSerperApi(config),
+    testLlmProvider(defaultLlm, config[`${defaultLlm}Key` as keyof ApiConfig] as string || ''),
+  ]);
+  results.push(serperResult, defaultLlmResult);
 
   // Tester les autres providers configurés en parallèle
   const otherProviders = ['groq', 'nvidia', 'gemini', 'openrouter'].filter(p => p !== defaultLlm);
@@ -181,14 +171,10 @@ export async function testAllApis(config: ApiConfig): Promise<ApiTestReport> {
   const hasWorkingLlm = defaultLlmResult.status === 'ok';
   const canProceed = hasWorkingSerper && hasWorkingLlm;
 
-  results
-    .filter(r => r.status === 'error')
-    .forEach(r => {
-      eventBus.emit(LeadForgeEvents.API_ERROR, {
-        type: 'api_error', service: r.service, message: r.message,
-        statusCode: r.statusCode, timestamp: Date.now(),
-      });
-    });
+  if (!canProceed) {
+    const failing = results.filter(r => r.status === 'error').map(r => `❌ ${r.service}: ${r.message}`).join('\n');
+    console.warn(`⚠️ Tests API échoués:\n${failing}`);
+  }
 
   return { success: canProceed, results, canProceed };
 }
