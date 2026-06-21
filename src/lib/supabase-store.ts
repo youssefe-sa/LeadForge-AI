@@ -1996,7 +1996,8 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
       const domain = lead.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
       console.log(`🌐 Searching website images for domain: ${domain}`);
       
-      const imgResult = await serperFetch(serperKey, 'images', { q: `site:${domain}`, num: 12 });
+      const domainName = domain.replace(/^www\./, '').split('.')[0];
+      const imgResult = await serperFetch(serperKey, 'images', { q: `${lead.name} ${domainName}`, gl: 'fr', hl: 'fr', num: 12 });
       if (imgResult && Array.isArray(imgResult.images)) {
         for (const img of imgResult.images) {
           if (img && typeof img === 'object') {
@@ -2006,6 +2007,10 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
             
             if (!url || !url.startsWith('http') || result.websiteImages.includes(url)) continue;
             if (isImageBlocked(url, title)) continue;
+
+            const imgUrl = url.toLowerCase();
+            const matchesDomain = domain.split('.')[0].length > 3 && imgUrl.includes(domain.split('.')[0]);
+            if (!matchesDomain) continue;
 
             result.websiteImages.push(url);
           }
