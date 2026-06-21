@@ -65,3 +65,35 @@ export function filterImages(urls: string[], altTexts?: string[]): string[] {
     return !isImageBlocked(url, alt);
   });
 }
+
+/**
+ * Extrait la dimension d'une URL d'image Unsplash/Pexels (width/height).
+ * Retourne null si non extraction possible.
+ */
+export function getImageDimensions(url: string): { width: number; height: number } | null {
+  const match = url.match(/(\d+)x(\d+)/);
+  if (match) return { width: parseInt(match[1]), height: parseInt(match[2]) };
+
+  const wMatch = url.match(/[?&]w=(\d+)/);
+  if (wMatch) return { width: parseInt(wMatch[1]), height: 0 };
+
+  return null;
+}
+
+/**
+ * Vérifie si une image est paysage (ratio > minRatio).
+ * Exclut les logos carrés, badges, avatars.
+ */
+export function isLandscapeImage(url: string, minRatio: number = 1.3): boolean {
+  const dims = getImageDimensions(url);
+  if (!dims || dims.height === 0) return true;
+  return dims.width / dims.height >= minRatio;
+}
+
+/**
+ * Filtre les images pour ne garder que les paysages (ratio > minRatio).
+ * Utilisé pour le hero et les images principales.
+ */
+export function filterLandscapeImages(urls: string[], minRatio: number = 1.3): string[] {
+  return urls.filter(url => isLandscapeImage(url, minRatio));
+}

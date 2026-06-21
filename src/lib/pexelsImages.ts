@@ -284,54 +284,68 @@ export function getSectorImages(sector: string): string[] {
 }
 
 // ── SERVICE → IMAGE MAPPING ──
-// Pour chaque nom de service, une requête Pexels dédiée
+// Couvre TOUTES les variantes orthographiques réelles de template.services
 const SERVICE_IMAGE_QUERIES: Record<string, string> = {
-  // Plomberie
+  // === PLomberie ===
   'dépannage 24h/24': 'emergency plumber repair',
   'depannage 24h/24': 'emergency plumber repair',
   'installation sanitaire': 'bathroom sink installation',
   'chauffage': 'heating boiler repair',
   'chauffage & chaudière': 'heating boiler repair',
+  'chauffage & chaudiere': 'heating boiler repair',
   'détection de fuites': 'water leak detection',
   'detection de fuites': 'water leak detection',
   'rénovation salle de bain': 'bathroom renovation modern',
   'renovation salle de bain': 'bathroom renovation modern',
   'entretien annuel': 'boiler maintenance service',
-  // Électricien
+
+  // === Électricien ===
   'mise aux normes': 'electrical panel wiring',
+  'mise aux normes electrique': 'electrical panel wiring',
   'dépannage électrique': 'electrician fixing circuit',
   'depannage electrique': 'electrician fixing circuit',
   'installation complète': 'electrical installation home',
   'installation complete': 'electrical installation home',
+  'domotique & smart home': 'smart home automation',
   'domotique': 'smart home automation',
   'éclairage led': 'led lighting installation',
   'eclairage led': 'led lighting installation',
   'bornes de recharge': 'electric car charging station',
-  // Coiffeur
+
+  // === Coiffeur ===
   'coupes & styles': 'hairdresser cutting hair',
+  'coupes': 'hairdresser cutting hair',
   'barbier traditionnel': 'barber shop shaving',
+  'barbier': 'barber shop shaving',
   'coloration expert': 'hair color salon treatment',
+  'coloration': 'hair color salon treatment',
   'soins capillaires': 'hair treatment salon',
   'extensions volume': 'hair extensions salon',
   'chignons & événements': 'bridal hair styling',
-  // Restaurant
+  'chignons & evenements': 'bridal hair styling',
+  'chignons': 'bridal hair styling',
+
+  // === Restaurant ===
   'cuisine maison': 'restaurant kitchen chef cooking',
   'menu du jour': 'restaurant lunch menu',
   'spécialités': 'gourmet food plating',
-  'evenements & groupes': 'restaurant event private dining',
+  'specialites': 'gourmet food plating',
   'événements & groupes': 'restaurant event private dining',
+  'evenements & groupes': 'restaurant event private dining',
   'service traiteur': 'catering service professional',
   'boissons & vins': 'wine cellar restaurant',
-  // Garage
+
+  // === Garage ===
   'mécanique générale': 'car mechanic repair engine',
-  'mécanique generale': 'car mechanic repair engine',
+  'mecanique generale': 'car mechanic repair engine',
   'diagnostic auto': 'car diagnostic computer',
   'pneumatiques': 'car tire change garage',
   'climatisation': 'car air conditioning repair',
   'carrosserie': 'car body repair paint',
   'contrôle technique': 'car inspection garage',
   'controle technique': 'car inspection garage',
-  // Nettoyage
+
+  // === Nettoyage ===
   'nettoyage de bureaux': 'office cleaning professional',
   'nettoyage vitres': 'window cleaning professional',
   'grand nettoyage': 'deep cleaning service',
@@ -339,33 +353,50 @@ const SERVICE_IMAGE_QUERIES: Record<string, string> = {
   'desinfection': 'disinfection professional service',
   'nettoyage industriel': 'industrial cleaning factory',
   'remise en état': 'post construction cleaning',
-  // Jardin
+  'remise en etat': 'post construction cleaning',
+
+  // === Jardin ===
   'création de jardins': 'garden landscape design',
   'creation de jardins': 'garden landscape design',
   'tonte & entretien': 'lawn mowing garden',
   'élagage & abattage': 'tree pruning cutting',
   'elagage & abattage': 'tree pruning cutting',
-  'terrasses & cloutures': 'wooden deck patio',
+  'terrasses & clôtures': 'wooden deck patio fence',
+  'terrasses & cloutures': 'wooden deck patio fence',
+  'terrasses': 'wooden deck patio',
+  'clôtures': 'garden fence installation',
+  'cloutures': 'garden fence installation',
   'arrosage automatique': 'automatic sprinkler garden',
   'potager & verger': 'vegetable garden raised beds',
-  // Fitness
+
+  // === Fitness ===
   'coaching personnel': 'personal trainer gym session',
   'cours collectifs': 'group fitness class gym',
   'musculation libre': 'gym free weights area',
   'cardio zone': 'gym cardio equipment treadmills',
   'préparation physique': 'sports training professional',
+  'preparation physique': 'sports training professional',
   'espace bien-être': 'gym sauna wellness area',
-  // Médical
+  'espace bien etre': 'gym sauna wellness area',
+
+  // === Médical ===
   'médecine générale': 'doctor consultation office',
-  'kinesithérapie': 'physiotherapy rehabilitation',
+  'medecine generale': 'doctor consultation office',
   'kinésithérapie': 'physiotherapy rehabilitation',
+  'kinesitherapie': 'physiotherapy rehabilitation',
   'ostéopathie': 'osteopathy treatment clinic',
+  'osteopathie': 'osteopathy treatment clinic',
   'infirmier à domicile': 'nurse home care visit',
+  'infirmier a domicile': 'nurse home care visit',
   'analyses biologiques': 'laboratory blood test',
   'télémédecine': 'telemedicine video consultation',
-  // Avocat
+  'telemdecine': 'telemedicine video consultation',
+
+  // === Avocat ===
   'droit civil & famille': 'lawyer family law office',
+  'droit civil et famille': 'lawyer family law office',
   'droit pénal': 'courtroom criminal defense',
+  'droit penal': 'courtroom criminal defense',
   'droit du travail': 'employment lawyer office',
   'droit des affaires': 'business lawyer meeting',
   'immobilier': 'real estate lawyer contract',

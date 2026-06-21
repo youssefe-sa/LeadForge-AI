@@ -3,7 +3,7 @@
 
 import { getSectorImages, getSectorImagesAsync, getServiceImageQuery, fetchSectorImagesFromAPI } from './pexelsImages';
 import { getImagesForLead } from './pexelsApi';
-import { isImageBlocked, filterImages } from './imageFilters';
+import { isImageBlocked, filterImages, filterLandscapeImages } from './imageFilters';
 
 // ── AVIS FALLBACK SECTORIELS ──
 const SECTOR_FALLBACK_REVIEWS: Record<string, Array<{ author: string; text: string; rating: number; date: string }>> = {
@@ -554,9 +554,12 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const sectorImages = getSectorImages(lead.sector);
 
   const allLeadImages = filterImages([...(lead.images || []), ...(lead.websiteImages || [])]);
+  const landscapeLeadImages = filterLandscapeImages(allLeadImages);
 
   let heroImage: string;
-  if (allLeadImages.length > 0) {
+  if (landscapeLeadImages.length > 0) {
+    heroImage = landscapeLeadImages[((combinedHash * 2654435761) >>> 0) % landscapeLeadImages.length];
+  } else if (allLeadImages.length > 0) {
     heroImage = allLeadImages[((combinedHash * 2654435761) >>> 0) % allLeadImages.length];
   } else {
     heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
@@ -567,8 +570,20 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const combinedImages = [heroImage, ...sectorImages.filter(s => s !== heroImage).slice(0, 2), ...rawLeadImages];
   const allImages = combinedImages.slice(0, 5);
 
-  // Images par service (pioche dans les images du secteur selon l'ordre des services)
-  const serviceImages = finalServices.map((_, i) => sectorImages[i % sectorImages.length]);
+  // Images par service — dédupliquées, fallback alterné si doublon
+  const serviceImages: string[] = [];
+  const usedServiceImages = new Set<string>([heroImage]);
+  for (let i = 0; i < finalServices.length; i++) {
+    const candidate = sectorImages[i % sectorImages.length];
+    if (!usedServiceImages.has(candidate)) {
+      serviceImages.push(candidate);
+      usedServiceImages.add(candidate);
+    } else {
+      const alt = sectorImages.find(img => !usedServiceImages.has(img)) || candidate;
+      serviceImages.push(alt);
+      usedServiceImages.add(alt);
+    }
+  }
 
   const socialLinks = lead.socialLinks || {};
   const content: UltimateContent = {
@@ -622,9 +637,12 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
     const raw = await getImagesForLead(lead, 10);
     allLeadImages = filterImages(raw);
   } catch {}
+  const landscapeLeadImages = filterLandscapeImages(allLeadImages);
 
   let heroImage: string;
-  if (allLeadImages.length > 0) {
+  if (landscapeLeadImages.length > 0) {
+    heroImage = landscapeLeadImages[((combinedHash * 2654435761) >>> 0) % landscapeLeadImages.length];
+  } else if (allLeadImages.length > 0) {
     heroImage = allLeadImages[((combinedHash * 2654435761) >>> 0) % allLeadImages.length];
   } else {
     heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
@@ -669,15 +687,21 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   while (testimonials.length < 3) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 3);
 
-  // Récupérer une image Pexels dédiée pour chaque service
+  // Récupérer une image Pexels dédiée pour chaque service — dédupliquée
   const serviceImages: string[] = [];
+  const usedServiceImages = new Set<string>([heroImage]);
   for (const service of finalServices) {
     try {
       const query = getServiceImageQuery(service.name);
       const imgs = await fetchSectorImagesFromAPI(`${lead.sector} ${query}`);
-      serviceImages.push(imgs[0] || sectorImages[serviceImages.length % sectorImages.length]);
+      let picked = imgs.find(img => !usedServiceImages.has(img));
+      if (!picked) picked = sectorImages.find(img => !usedServiceImages.has(img)) || heroImage;
+      serviceImages.push(picked);
+      usedServiceImages.add(picked);
     } catch {
-      serviceImages.push(sectorImages[serviceImages.length % sectorImages.length]);
+      const fallback = sectorImages.find(img => !usedServiceImages.has(img)) || heroImage;
+      serviceImages.push(fallback);
+      usedServiceImages.add(fallback);
     }
   }
 
