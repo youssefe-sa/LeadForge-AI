@@ -3,7 +3,7 @@
 
 import { getSectorImages, getSectorImagesAsync, getServiceImageQuery, fetchSectorImagesFromAPI } from './pexelsImages';
 import { getImagesForLead } from './pexelsApi';
-import { isImageBlocked, filterImages, filterLandscapeImages } from './imageFilters';
+import { isImageBlocked, filterImages, isStockImage } from './imageFilters';
 
 // ── AVIS FALLBACK SECTORIELS ──
 const SECTOR_FALLBACK_REVIEWS: Record<string, Array<{ author: string; text: string; rating: number; date: string }>> = {
@@ -553,22 +553,12 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
 
   const sectorImages = getSectorImages(lead.sector);
 
-  const allLeadImages = filterImages([...(lead.images || []), ...(lead.websiteImages || [])]);
-  const landscapeLeadImages = filterLandscapeImages(allLeadImages);
+  // Hero/À propos/Galerie : uniquement des images Pexels/Unsplash (légales, fiables)
+  // Les images scrapées du lead ne servent JAMAIS pour ces emplacements critiques
+  const heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
 
-  let heroImage: string;
-  if (landscapeLeadImages.length > 0) {
-    heroImage = landscapeLeadImages[((combinedHash * 2654435761) >>> 0) % landscapeLeadImages.length];
-  } else if (allLeadImages.length > 0) {
-    heroImage = allLeadImages[((combinedHash * 2654435761) >>> 0) % allLeadImages.length];
-  } else {
-    heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
-  }
-
-  const rawLeadImages = allLeadImages.filter(img => img !== heroImage).slice(0, 3);
-
-  const combinedImages = [heroImage, ...sectorImages.filter(s => s !== heroImage).slice(0, 2), ...rawLeadImages];
-  const allImages = combinedImages.slice(0, 5);
+  const combinedImages = sectorImages.filter(s => s !== heroImage).slice(0, 4);
+  const allImages = [heroImage, ...combinedImages].slice(0, 5);
 
   // Images par service — dédupliquées, fallback alterné si doublon
   const serviceImages: string[] = [];
@@ -632,25 +622,10 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
 
   const sectorImages = await getSectorImagesAsync(lead.sector);
 
-  let allLeadImages: string[] = [];
-  try {
-    const raw = await getImagesForLead(lead, 10);
-    allLeadImages = filterImages(raw);
-  } catch {}
-  const landscapeLeadImages = filterLandscapeImages(allLeadImages);
+  // Hero/À propos/Galerie : uniquement des images Pexels/Unsplash (légales, fiables)
+  const heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
 
-  let heroImage: string;
-  if (landscapeLeadImages.length > 0) {
-    heroImage = landscapeLeadImages[((combinedHash * 2654435761) >>> 0) % landscapeLeadImages.length];
-  } else if (allLeadImages.length > 0) {
-    heroImage = allLeadImages[((combinedHash * 2654435761) >>> 0) % allLeadImages.length];
-  } else {
-    heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
-  }
-
-  const rawLeadImages = allLeadImages.filter(img => img !== heroImage).slice(0, 3);
-
-  const allImages = [...sectorImages.filter(s => s !== heroImage).slice(0, 2), ...rawLeadImages].slice(0, 5);
+  const allImages = sectorImages.filter(s => s !== heroImage).slice(0, 4);
 
   let finalServices = template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
