@@ -93,13 +93,12 @@ export class IntelligentLayoutGenerator {
   private config: ApiConfig;
 
   constructor(config?: ApiConfig) {
-    // Utiliser la configuration existante ou une configuration par défaut
     this.config = config || {
       groqKey: process.env.GROQ_API_KEY || '',
       geminiKey: process.env.GEMINI_API_KEY || '',
       nvidiaKey: process.env.NVIDIA_API_KEY || '',
       openrouterKey: process.env.OPENROUTER_API_KEY || '',
-      defaultLlm: 'groq',
+      defaultLlm: (process.env.DEFAULT_LLM || 'groq') as ApiConfig['defaultLlm'],
       serperKey: process.env.SERPER_API_KEY || '',
       unsplashKey: process.env.UNSPLASH_API_KEY || '',
       pexelsKey: process.env.PEXELS_API_KEY || '',

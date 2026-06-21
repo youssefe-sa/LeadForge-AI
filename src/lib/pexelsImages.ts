@@ -1,7 +1,7 @@
 // Pexels Images Service — Images professionnelles par secteur
 // 20 images UNIQUES par secteur, récupérées via l'API Pexels
 
-const PEXELS_API_KEY = process.env.VITE_PEXELS_API_KEY || process.env.PEXELS_API_KEY || 'ghuDtWrRvhe2R5SLLHTtV8tOYvIbvtdAGIdTDz9zK6DZXvMw1xd8JaPK';
+const PEXELS_API_KEY = process.env.VITE_PEXELS_API_KEY || process.env.PEXELS_API_KEY || '';
 
 // Requêtes Pexels spécifiques par secteur (5 requêtes × 4 images = 20 images uniques)
 const SECTOR_PEXEL_QUERIES: Record<string, string[]> = {

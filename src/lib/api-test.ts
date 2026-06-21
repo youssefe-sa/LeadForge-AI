@@ -71,59 +71,66 @@ async function testSerperApi(config: ApiConfig): Promise<ApiTestResult> {
   }
 }
 
-// Test Groq API
-async function testGroqApi(config: ApiConfig): Promise<ApiTestResult> {
-  if (!config.groqKey) {
-    return { service: 'groq', status: 'error', message: 'Clé API Groq non configurée' };
+// Test generic LLM provider via /api/llm proxy
+const LLM_ENDPOINTS: Record<string, { url: string; model: string; needsProxy: boolean }> = {
+  groq:      { url: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.1-8b-instant', needsProxy: false },
+  nvidia:    { url: '/api/llm', model: 'meta/llama-3.1-8b-instruct', needsProxy: true },
+  gemini:    { url: '/api/llm', model: 'gemini-2.0-flash-lite', needsProxy: true },
+  openrouter: { url: '/api/llm', model: 'meta-llama/llama-3.1-8b-instruct:free', needsProxy: true },
+};
+
+async function testLlmProvider(provider: string, apiKey: string): Promise<ApiTestResult> {
+  if (!apiKey) {
+    return { service: provider, status: 'error', message: `Clé API ${provider} non configurée` };
+  }
+
+  const endpoint = LLM_ENDPOINTS[provider];
+  if (!endpoint) {
+    return { service: provider, status: 'error', message: `Provider ${provider} inconnu` };
   }
 
   try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${config.groqKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: [{ role: 'user', content: 'Hi' }],
-        max_tokens: 10,
-      }),
-    });
+    const fetchOptions: RequestInit = endpoint.needsProxy
+      ? {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            provider,
+            apiKey,
+            body: { model: endpoint.model, messages: [{ role: 'user', content: 'Hi' }], max_tokens: 10 },
+          }),
+        }
+      : {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: endpoint.model,
+            messages: [{ role: 'user', content: 'Hi' }],
+            max_tokens: 10,
+          }),
+        };
+
+    const response = await fetch(endpoint.url, fetchOptions);
 
     if (response.ok) {
-      return { service: 'groq', status: 'ok', message: 'API Groq fonctionnelle' };
+      const data = await response.json().catch(() => ({}));
+      const hasContent = !!data.choices?.[0]?.message?.content;
+      return { service: provider, status: 'ok', message: `API ${provider} fonctionnelle${hasContent ? '' : ' (réponse vide)'}` };
     }
 
     const errorData = await response.json().catch(() => ({}));
     const errorMessage = errorData.error?.message || '';
-    
-    // Détecter rate limit
+
     if (response.status === 429 || errorMessage.includes('Rate limit')) {
       const error = { status: 429, message: errorMessage };
-      const apiError = detectApiError(error, 'groq');
+      const apiError = detectApiError(error, provider);
       if (apiError) apiErrorState.recordError(apiError);
-      
-      return { 
-        service: 'groq', 
-        status: 'error', 
-        message: 'Rate limit Groq atteint - Attendez quelques secondes',
-        statusCode: 429 
-      };
+      return { service: provider, status: 'error', message: `Rate limit ${provider} atteint`, statusCode: 429 };
     }
 
-    return { 
-      service: 'groq', 
-      status: 'error', 
-      message: `Erreur API Groq: ${response.status}`,
-      statusCode: response.status 
-    };
+    return { service: provider, status: 'error', message: `Erreur API ${provider}: ${response.status}`, statusCode: response.status };
   } catch (error) {
-    return { 
-      service: 'groq', 
-      status: 'error', 
-      message: `Erreur réseau: ${(error as Error).message}` 
-    };
+    return { service: provider, status: 'error', message: `Erreur réseau ${provider}: ${(error as Error).message}` };
   }
 }
 
@@ -146,50 +153,44 @@ async function testGmailSmtp(config: ApiConfig): Promise<ApiTestResult> {
 export async function testAllApis(config: ApiConfig): Promise<ApiTestReport> {
   const results: ApiTestResult[] = [];
 
-  // Ne tester que les services nécessaires selon le LLM principal
   const defaultLlm = config.defaultLlm || 'groq';
-  const shouldTestGroq = defaultLlm === 'groq' || (!config.nvidiaKey && !config.geminiKey && !config.openrouterKey);
+  console.log(`🔧 API Testing: Default LLM is ${defaultLlm}`);
 
-  console.log(`🔧 API Testing: Default LLM is ${defaultLlm}, testing Groq: ${shouldTestGroq}`);
+  // Tester Serper + le LLM par défaut en parallèle
+  const serperResult = await testSerperApi(config);
+  results.push(serperResult);
 
-  // Tester chaque API
-  const tests = [
-    testSerperApi(config),
-    shouldTestGroq ? testGroqApi(config) : Promise.resolve({ status: 'skipped' as const, service: 'groq', message: 'Groq not needed - using ' + defaultLlm })
-  ];
+  // Tester le provider LLM par défaut (obligatoire)
+  const defaultLlmResult = await testLlmProvider(defaultLlm, config[`${defaultLlm}Key` as keyof ApiConfig] as string || '');
+  results.push(defaultLlmResult);
 
-  const [serperResult, groqResult] = await Promise.all(tests);
-  results.push(serperResult, groqResult);
+  // Tester les autres providers configurés en parallèle
+  const otherProviders = ['groq', 'nvidia', 'gemini', 'openrouter'].filter(p => p !== defaultLlm);
+  const otherTests = otherProviders
+    .map(p => ({ key: config[`${p}Key` as keyof ApiConfig] as string || '', provider: p }))
+    .filter(t => t.key)
+    .map(t => testLlmProvider(t.provider, t.key));
+  const otherResults = await Promise.all(otherTests);
+  results.push(...otherResults);
 
-  // Toujours tester Gmail SMTP
+  // Gmail SMTP
   const gmailResult = await testGmailSmtp(config);
   results.push(gmailResult);
 
-  // Vérifier si on peut procéder
-  // On nécessite au moins Serper et un LLM fonctionnel
   const hasWorkingSerper = serperResult.status === 'ok';
-  const hasWorkingLlm = groqResult.status === 'ok' || !shouldTestGroq; // Si on ne teste pas Groq, on suppose qu'on a un autre LLM
-
+  const hasWorkingLlm = defaultLlmResult.status === 'ok';
   const canProceed = hasWorkingSerper && hasWorkingLlm;
 
-  // Émettre des événements pour les erreurs (uniquement pour les vraies erreurs)
   results
     .filter(r => r.status === 'error')
     .forEach(r => {
       eventBus.emit(LeadForgeEvents.API_ERROR, {
-        type: 'api_error',
-        service: r.service,
-        message: r.message,
-        statusCode: r.statusCode,
-        timestamp: Date.now(),
+        type: 'api_error', service: r.service, message: r.message,
+        statusCode: r.statusCode, timestamp: Date.now(),
       });
     });
 
-  return {
-    success: canProceed,
-    results,
-    canProceed,
-  };
+  return { success: canProceed, results, canProceed };
 }
 
 // Fonction pour afficher les résultats de test dans l'UI
