@@ -37,6 +37,9 @@ export const BLOCKED_DOMAINS: string[] = [
 
 const STOCK_IMAGE_DOMAINS = ['images.pexels.com', 'images.unsplash.com', 'pexels.com', 'unsplash.com'];
 
+// IDs Pexels spécifiquement bloqués (contenu inapproprié ou non pertinent)
+const BLOCKED_PEXELS_IDS = ['16552851'];
+
 export function isImageBlocked(url: string, altText?: string): boolean {
   if (!url || typeof url !== 'string') return true;
   const lowUrl = url.toLowerCase();
@@ -44,6 +47,8 @@ export function isImageBlocked(url: string, altText?: string): boolean {
   if (BLOCKED_DOMAINS.some(d => lowUrl.includes(d))) return true;
   if (BLOCKED_KEYWORDS.some(kw => lowUrl.includes(kw))) return true;
   if (lowAlt && BLOCKED_KEYWORDS.some(kw => lowAlt.includes(kw))) return true;
+  // Bloquer les IDs Pexels spécifiques
+  if (BLOCKED_PEXELS_IDS.some(id => lowUrl.includes(`/photos/${id}/`) || lowUrl.includes(`photo-${id}`))) return true;
   return false;
 }
 
