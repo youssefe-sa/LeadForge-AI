@@ -1006,6 +1006,10 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                 {currentSalesTemplates.length} templates
               </span>
             </h4>
+              <div style={{ display: 'flex', gap: 4, background: C.bg, borderRadius: 8, padding: 2 }}>
+                <button onClick={() => setEmailLang('fr')} style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: emailLang === 'fr' ? 700 : 400, border: 'none', cursor: 'pointer', background: emailLang === 'fr' ? C.green : 'transparent', color: emailLang === 'fr' ? '#fff' : C.tx2 }}>🇫🇷 FR</button>
+                <button onClick={() => setEmailLang('en')} style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: emailLang === 'en' ? 700 : 400, border: 'none', cursor: 'pointer', background: emailLang === 'en' ? C.green : 'transparent', color: emailLang === 'en' ? '#fff' : C.tx2 }}>🇬🇧 EN</button>
+              </div>
             </div>
             <div style={{ 
               fontSize: 10, 

@@ -441,8 +441,81 @@ function getUltimateTemplate(sector: string) {
   return SECTOR_ULTIMATE_TEMPLATES.default;
 }
 
-function getProcessSteps(sector: string): Array<{ title: string; desc: string }> {
+function getProcessSteps(sector: string, lang: 'fr' | 'en' = 'fr'): Array<{ title: string; desc: string }> {
   const s = (sector || '').toLowerCase();
+  if (lang === 'en') {
+    if (s.includes('restaurant') || s.includes('cuisin') || s.includes('traiteur') || s.includes('boulanger') || s.includes('pâtissier'))
+      return [
+        { title: 'Reservation', desc: 'Book your table online or by phone.' },
+        { title: 'Welcome', desc: 'A warm setting and attentive service await you.' },
+        { title: 'Dining', desc: 'Savor our dishes prepared with fresh, seasonal ingredients.' },
+        { title: 'Service', desc: 'Our team ensures your comfort throughout your meal.' },
+        { title: 'Satisfaction', desc: 'A culinary experience you\'ll want to return to.' }
+      ];
+    if (s.includes('coiff') || s.includes('barb') || s.includes('salon') || s.includes('beauté') || s.includes('esthétique'))
+      return [
+        { title: 'Booking', desc: 'Schedule your appointment online at your convenience.' },
+        { title: 'Consultation', desc: 'A personalized hair diagnosis and tailored advice.' },
+        { title: 'Styling', desc: 'Let our expertise create a look that suits you.' },
+        { title: 'Advice', desc: 'Recommendations to maintain your style every day.' },
+        { title: 'Result', desc: 'A look that\'s uniquely yours, for every occasion.' }
+      ];
+    if (s.includes('garage') || s.includes('mécan') || s.includes('auto') || s.includes('carrosserie'))
+      return [
+        { title: 'Booking', desc: 'Schedule your visit around your timetable.' },
+        { title: 'Diagnosis', desc: 'A complete vehicle check with modern equipment.' },
+        { title: 'Quote', desc: 'A clear, detailed estimate before any work.' },
+        { title: 'Repair', desc: 'Quality work by qualified, certified technicians.' },
+        { title: 'Delivery', desc: 'Your vehicle returned spotless, ready to drive.' }
+      ];
+    if (s.includes('avocat') || s.includes('notaire') || s.includes('juridi') || s.includes('droit'))
+      return [
+        { title: 'Contact', desc: 'Tell us about your situation in an initial exchange.' },
+        { title: 'Consultation', desc: 'A thorough analysis of your case and options.' },
+        { title: 'Strategy', desc: 'A clear course of action, tailored to your goals.' },
+        { title: 'Action', desc: 'We defend your interests with rigor and determination.' },
+        { title: 'Follow-up', desc: 'Ongoing support until your case is resolved.' }
+      ];
+    if (s.includes('médec') || s.includes('clinique') || s.includes('dentiste') || s.includes('santé') || s.includes('kiné'))
+      return [
+        { title: 'Appointment', desc: 'Book your visit in just a few clicks.' },
+        { title: 'Consultation', desc: 'A careful examination and personalized diagnosis.' },
+        { title: 'Treatment', desc: 'A care plan tailored to your situation.' },
+        { title: 'Follow-up', desc: 'Regular monitoring for your well-being.' },
+        { title: 'Results', desc: 'Rediscover a better quality of life.' }
+      ];
+    if (s.includes('fitness') || s.includes('sport') || s.includes('coach') || s.includes('gym') || s.includes('salle'))
+      return [
+        { title: 'Assessment', desc: 'A complete fitness evaluation.' },
+        { title: 'Program', desc: 'A personalized training plan for your goals.' },
+        { title: 'Training', desc: 'Sessions led by our certified coaches.' },
+        { title: 'Tracking', desc: 'Regular follow-up to measure your progress.' },
+        { title: 'Goals', desc: 'Reach your goals and push your limits.' }
+      ];
+    if (s.includes('nettoyag') || s.includes('propreté') || s.includes('ménage'))
+      return [
+        { title: 'Quote', desc: 'An accurate estimate tailored to your needs.' },
+        { title: 'Planning', desc: 'A flexible schedule that fits your constraints.' },
+        { title: 'Service', desc: 'Our trained teams work with precision.' },
+        { title: 'Quality Check', desc: 'Systematic quality control after every visit.' },
+        { title: 'Maintenance', desc: 'Ongoing upkeep for consistently pristine spaces.' }
+      ];
+    if (s.includes('jardin') || s.includes('paysag') || s.includes('espace vert'))
+      return [
+        { title: 'Visit', desc: 'An on-site meeting to assess your space.' },
+        { title: 'Design', desc: 'A customized landscape project with plans and visuals.' },
+        { title: 'Creation', desc: 'Implementation by our team of qualified gardeners.' },
+        { title: 'Maintenance', desc: 'Seasonal upkeep to preserve your garden\'s beauty.' },
+        { title: 'Evolution', desc: 'Adjustments through the seasons and your preferences.' }
+      ];
+    return [
+      { title: 'Contact', desc: 'Reach out to share your needs with us.' },
+      { title: 'Analysis', desc: 'We study your request and identify the best solution.' },
+      { title: 'Proposal', desc: 'Receive a clear offer, tailored to your budget.' },
+      { title: 'Delivery', desc: 'Our team works with care and professionalism.' },
+      { title: 'Follow-up', desc: 'We ensure quality follow-up for your satisfaction.' }
+    ];
+  }
   if (s.includes('restaurant') || s.includes('cuisin') || s.includes('traiteur') || s.includes('boulanger') || s.includes('pâtissier'))
     return [
       { title: 'Réservation', desc: 'Réservez votre table en ligne ou par téléphone.' },
@@ -514,6 +587,63 @@ function getProcessSteps(sector: string): Array<{ title: string; desc: string }>
     { title: 'Réalisation', desc: 'Notre équipe intervient avec soin et professionnalisme.' },
     { title: 'Suivi', desc: 'Nous assurons un suivi qualité pour votre entière satisfaction.' }
   ];
+}
+
+function getPrivacyContent(lang: 'fr' | 'en', companyName: string, email: string, address: string): string {
+  if (lang === 'en') {
+    return `
+            <p><strong>${companyName}</strong> is committed to protecting the privacy of its visitors and customers. This privacy policy describes how we collect, use, and protect your personal data.</p>
+            <h3>1. Data Collected</h3>
+            <p>When you browse our website or contact us, we may collect the following information: name, first name, email address, phone number, postal address, and any other information you voluntarily provide through our contact forms.</p>
+            <p>We also collect anonymous browsing data: pages visited, visit duration, browser type, operating system, and IP address (anonymized). This data helps us continuously improve the quality of our services and website.</p>
+            <h3>2. Use of Data</h3>
+            <p>Personal data collected is exclusively used for the following purposes:</p>
+            <p>• Respond to your contact and quote requests<br>• Provide the requested services and offerings<br>• Improve your user experience on our website<br>• Inform you of our news, offers, and events (with your prior consent)<br>• Manage customer relationships and your requests<br>• Comply with our legal and regulatory obligations</p>
+            <h3>3. Legal Basis for Processing</h3>
+            <p>Data processing is based on several legal grounds: your explicit consent for commercial communications, the execution of a contract or pre-contractual measures for service delivery, and our legitimate interest in improving our services and preventing fraud.</p>
+            <h3>4. Data Retention</h3>
+            <p>Your personal data is retained for 3 years from the last contact or service. Billing data is retained for 10 years in accordance with current accounting obligations. After these periods, your data is deleted or irreversibly anonymized.</p>
+            <h3>5. Data Sharing</h3>
+            <p>We never sell, rent, or share your personal data with third parties for commercial purposes. Your data may be shared with authorized subcontractors solely for service delivery (website hosting, CRM tools). All partners are subject to strict confidentiality obligations.</p>
+            <h3>6. Cookies and Trackers</h3>
+            <p>Our website uses strictly necessary cookies for its proper functioning. These cookies do not collect personal data and are required to ensure security and navigation. We do not use advertising cookies or tracking without your prior consent. You can manage your cookie preferences directly in your browser settings.</p>
+            <h3>7. Your Rights</h3>
+            <p>Under GDPR and applicable data protection laws, you have the following rights:</p>
+            <p>• <strong>Right of Access</strong>: obtain a copy of all your personal data<br>• <strong>Right to Rectification</strong>: correct inaccurate or incomplete data<br>• <strong>Right to Erasure</strong>: request deletion of your personal data<br>• <strong>Right to Restriction</strong>: request limitation of data processing<br>• <strong>Right to Data Portability</strong>: receive your data in a structured, commonly used format<br>• <strong>Right to Object</strong>: object to the processing of your data for direct marketing</p>
+            <p>To exercise any of these rights, contact us at ${email || 'contact@example.com'} or by mail at ${address || 'our address'}. We commit to responding within 30 days.</p>
+            <h3>8. Data Security</h3>
+            <p>We implement all necessary technical and organizational measures to protect your data against unauthorized access, loss, alteration, or disclosure. These measures include encrypting sensitive data, strict access control, regular system monitoring, and staff training on IT security best practices.</p>
+            <h3>9. Policy Updates</h3>
+            <p>We reserve the right to modify this privacy policy at any time to adapt to changes in our business or legal requirements. The last update date is indicated at the bottom of this page. We encourage you to regularly check this page for any changes.</p>
+            <h3>10. Contact</h3>
+            <p>For any questions regarding the protection of your personal data, you can contact us at ${email || 'contact@example.com'} or by mail at ${address || 'our address'}. If you believe your data is not being processed in compliance with applicable regulations, you have the right to file a complaint with the relevant data protection authority.</p>`;
+  }
+  return `
+            <p><strong>${companyName}</strong> s'engage à protéger la vie privée de ses visiteurs et clients. La présente politique de confidentialité décrit comment nous collectons, utilisons et protégeons vos données personnelles.</p>
+            <h3>1. Données collectées</h3>
+            <p>Lors de votre navigation sur notre site ou de votre prise de contact, nous pouvons être amenés à collecter les informations suivantes : nom, prénom, adresse e-mail, numéro de téléphone, adresse postale, ainsi que toute autre information que vous nous transmettez volontairement via nos formulaires de contact.</p>
+            <p>Nous collectons également des données de navigation de manière anonyme : pages visitées, durée de la visite, type de navigateur, système d'exploitation, et adresse IP (anonymisée). Ces données nous aident à améliorer continuellement la qualité de nos services et de notre site internet.</p>
+            <h3>2. Utilisation des données</h3>
+            <p>Les données personnelles collectées sont exclusivement utilisées pour les finalités suivantes :</p>
+            <p>• Répondre à vos demandes de contact et de devis<br>• Vous fournir les services et prestations demandés<br>• Améliorer votre expérience utilisateur sur notre site<br>• Vous informer de nos actualités, offres et événements (avec votre consentement préalable)<br>• Assurer le suivi de la relation client et la gestion de vos demandes<br>• Respecter nos obligations légales et réglementaires</p>
+            <h3>3. Base légale du traitement</h3>
+            <p>Le traitement de vos données repose sur plusieurs bases légales : votre consentement explicite pour les communications commerciales, l'exécution d'un contrat ou de mesures précontractuelles pour la fourniture de nos services, et notre intérêt légitime pour l'amélioration de nos services et la prévention de la fraude.</p>
+            <h3>4. Durée de conservation</h3>
+            <p>Vos données personnelles sont conservées pendant une durée de 3 ans à compter du dernier contact ou de la dernière prestation. Les données relatives aux facturations sont conservées pendant 10 ans conformément aux obligations comptables en vigueur. À l'expiration de ces délais, vos données sont supprimées ou anonymisées de manière irréversible.</p>
+            <h3>5. Partage des données</h3>
+            <p>Nous ne vendons, ne louons et ne partageons jamais vos données personnelles avec des tiers à des fins commerciales. Vos données peuvent être transmises à nos sous-traitants habilités uniquement dans le cadre de l'exécution de nos services (hébergeur du site, outil de gestion de la relation client). Chacun de nos partenaires est soumis à des obligations strictes de confidentialité.</p>
+            <h3>6. Cookies et traceurs</h3>
+            <p>Notre site utilise des cookies strictement nécessaires à son bon fonctionnement. Ces cookies ne collectent aucune donnée personnelle et sont requis pour assurer la sécurité et la navigation sur le site. Nous n'utilisons pas de cookies publicitaires ou de traceurs de pistage sans votre consentement préalable. Vous pouvez gérer vos préférences en matière de cookies directement depuis les paramètres de votre navigateur.</p>
+            <h3>7. Vos droits</h3>
+            <p>Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés, vous disposez des droits suivants :</p>
+            <p>• <strong>Droit d'accès</strong> : obtenir une copie de l'ensemble de vos données personnelles<br>• <strong>Droit de rectification</strong> : corriger les données inexactes ou incomplètes<br>• <strong>Droit à l'effacement</strong> : demander la suppression de vos données personnelles<br>• <strong>Droit à la limitation</strong> : demander la limitation du traitement de vos données<br>• <strong>Droit à la portabilité</strong> : recevoir vos données dans un format structuré et couramment utilisé<br>• <strong>Droit d'opposition</strong> : vous opposer au traitement de vos données à des fins de prospection commerciale</p>
+            <p>Pour exercer l'un de ces droits, contactez-nous par e-mail à ${email || 'contact@example.com'} ou par courrier à ${address || 'notre adresse'}. Nous nous engageons à répondre dans un délai maximum de 30 jours.</p>
+            <h3>8. Sécurité des données</h3>
+            <p>Nous mettons en œuvre toutes les mesures techniques et organisationnelles nécessaires pour protéger vos données contre tout accès non autorisé, perte, altération ou divulgation. Ces mesures comprennent le chiffrement des données sensibles, le contrôle d'accès strict, la surveillance régulière de nos systèmes et la formation de notre personnel aux bonnes pratiques de sécurité informatique.</p>
+            <h3>9. Modification de la politique</h3>
+            <p>Nous nous réservons le droit de modifier la présente politique de confidentialité à tout moment afin de l'adapter aux évolutions de notre activité ou aux exigences légales. La date de dernière mise à jour est indiquée en bas de cette page. Nous vous encourageons à consulter régulièrement cette page pour prendre connaissance des éventuelles modifications.</p>
+            <h3>10. Contact</h3>
+            <p>Pour toute question relative à la protection de vos données personnelles, vous pouvez nous contacter à l'adresse ${email || 'contact@example.com'} ou par courrier à ${address || 'notre adresse'}. Si vous estimez que le traitement de vos données n'est pas conforme à la réglementation en vigueur, vous avez le droit d'introduire une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) — www.cnil.fr.</p>`;
 }
 
 function getGalleryDesc(sector: string): string {
@@ -1492,7 +1622,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                 <p>${ui.procDesc}</p>
             </div>
             <div class="proc-grid">
-                ${getProcessSteps(content.sector).map((step, i) => `
+                ${getProcessSteps(content.sector, lang).map((step, i) => `
                 <div class="proc-step reveal reveal-d${Math.min(i, 3)}"><div class="proc-num">0${i + 1}</div><h3>${step.title}</h3><p>${step.desc}</p></div>
                 `).join('')}
             </div>
@@ -1602,7 +1732,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                         ${content.socialLinks.tiktok ? `<a href="${content.socialLinks.tiktok}" target="_blank" rel="noopener" aria-label="TikTok"><i data-lucide="music" width="18"></i></a>` : ''}
                     </div>` : ''}
                 </div>
-                <div class="footer-col"><h4>Services</h4><ul>${services.slice(0,5).map(s=>`<li><a href="#services">${s.name}</a></li>`).join('')}</ul></div>
+                <div class="footer-col"><h4>${ui.navServices}</h4><ul>${services.slice(0,5).map(s=>`<li><a href="#services">${s.name}</a></li>`).join('')}</ul></div>
                 <div class="footer-col"><h4>${ui.footerNav}</h4><ul><li><a href="#about">${ui.navAbout}</a></li><li><a href="#why">${ui.navWhy}</a></li><li><a href="#testimonials">${ui.navAvis}</a></li><li><a href="#contact">${ui.navContact}</a></li><li><a href="#" onclick="event.preventDefault();document.getElementById('privacy-modal').classList.add('open')">${ui.footerPrivacy}</a></li></ul></div>
                 <div class="footer-col"><h4>${ui.footerContact}</h4>
                     ${phone?`<div class="footer-contact-item"><i data-lucide="phone" width="14"></i> ${phone}</div>`:''}
@@ -1621,43 +1751,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         <div class="privacy-modal">
             <button class="privacy-close" onclick="document.getElementById('privacy-modal').classList.remove('open')">&times;</button>
             <h2>${ui.privacyTitle}</h2>
-            <p><strong>${companyName}</strong> s'engage à protéger la vie privée de ses visiteurs et clients. La présente politique de confidentialité décrit comment nous collectons, utilisons et protégeons vos données personnelles.</p>
+            ${getPrivacyContent(lang, companyName, email || '', address || '')}
             
-            <h3>1. Données collectées</h3>
-            <p>Lors de votre navigation sur notre site ou de votre prise de contact, nous pouvons être amenés à collecter les informations suivantes : nom, prénom, adresse e-mail, numéro de téléphone, adresse postale, ainsi que toute autre information que vous nous transmettez volontairement via nos formulaires de contact.</p>
-            <p>Nous collectons également des données de navigation de manière anonyme : pages visitées, durée de la visite, type de navigateur, système d'exploitation, et adresse IP (anonymisée). Ces données nous aident à améliorer continuellement la qualité de nos services et de notre site internet.</p>
-            
-            <h3>2. Utilisation des données</h3>
-            <p>Les données personnelles collectées sont exclusivement utilisées pour les finalités suivantes :</p>
-            <p>• Répondre à vos demandes de contact et de devis<br>• Vous fournir les services et prestations demandés<br>• Améliorer votre expérience utilisateur sur notre site<br>• Vous informer de nos actualités, offres et événements (avec votre consentement préalable)<br>• Assurer le suivi de la relation client et la gestion de vos demandes<br>• Respecter nos obligations légales et réglementaires</p>
-            
-            <h3>3. Base légale du traitement</h3>
-            <p>Le traitement de vos données repose sur plusieurs bases légales : votre consentement explicite pour les communications commerciales, l'exécution d'un contrat ou de mesures précontractuelles pour la fourniture de nos services, et notre intérêt légitime pour l'amélioration de nos services et la prévention de la fraude.</p>
-            
-            <h3>4. Durée de conservation</h3>
-            <p>Vos données personnelles sont conservées pendant une durée de 3 ans à compter du dernier contact ou de la dernière prestation. Les données relatives aux facturations sont conservées pendant 10 ans conformément aux obligations comptables en vigueur. À l'expiration de ces délais, vos données sont supprimées ou anonymisées de manière irréversible.</p>
-            
-            <h3>5. Partage des données</h3>
-            <p>Nous ne vendons, ne louons et ne partageons jamais vos données personnelles avec des tiers à des fins commerciales. Vos données peuvent être transmises à nos sous-traitants habilités uniquement dans le cadre de l'exécution de nos services (hébergeur du site, outil de gestion de la relation client). Chacun de nos partenaires est soumis à des obligations strictes de confidentialité.</p>
-            
-            <h3>6. Cookies et traceurs</h3>
-            <p>Notre site utilise des cookies strictement nécessaires à son bon fonctionnement. Ces cookies ne collectent aucune donnée personnelle et sont requis pour assurer la sécurité et la navigation sur le site. Nous n'utilisons pas de cookies publicitaires ou de traceurs de pistage sans votre consentement préalable. Vous pouvez gérer vos préférences en matière de cookies directement depuis les paramètres de votre navigateur.</p>
-            
-            <h3>7. Vos droits</h3>
-            <p>Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés, vous disposez des droits suivants :</p>
-            <p>• <strong>Droit d'accès</strong> : obtenir une copie de l'ensemble de vos données personnelles<br>• <strong>Droit de rectification</strong> : corriger les données inexactes ou incomplètes<br>• <strong>Droit à l'effacement</strong> : demander la suppression de vos données personnelles<br>• <strong>Droit à la limitation</strong> : demander la limitation du traitement de vos données<br>• <strong>Droit à la portabilité</strong> : recevoir vos données dans un format structuré et couramment utilisé<br>• <strong>Droit d'opposition</strong> : vous opposer au traitement de vos données à des fins de prospection commerciale</p>
-            <p>Pour exercer l'un de ces droits, contactez-nous par e-mail à ${email || 'contact@example.com'} ou par courrier à ${address || 'notre adresse'}. Nous nous engageons à répondre dans un délai maximum de 30 jours.</p>
-            
-            <h3>8. Sécurité des données</h3>
-            <p>Nous mettons en œuvre toutes les mesures techniques et organisationnelles nécessaires pour protéger vos données contre tout accès non autorisé, perte, altération ou divulgation. Ces mesures comprennent le chiffrement des données sensibles, le contrôle d'accès strict, la surveillance régulière de nos systèmes et la formation de notre personnel aux bonnes pratiques de sécurité informatique.</p>
-            
-            <h3>9. Modification de la politique</h3>
-            <p>Nous nous réservons le droit de modifier la présente politique de confidentialité à tout moment afin de l'adapter aux évolutions de notre activité ou aux exigences légales. La date de dernière mise à jour est indiquée en bas de cette page. Nous vous encourageons à consulter régulièrement cette page pour prendre connaissance des éventuelles modifications.</p>
-            
-            <h3>10. Contact</h3>
-            <p>Pour toute question relative à la protection de vos données personnelles, vous pouvez nous contacter à l'adresse ${email || 'contact@example.com'} ou par courrier à ${address || 'notre adresse'}. Si vous estimez que le traitement de vos données n'est pas conforme à la réglementation en vigueur, vous avez le droit d'introduire une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) — www.cnil.fr.</p>
-            
-            <p style="margin-top:24px;font-size:.82rem;color:var(--text-t)">Dernière mise à jour : ${new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p style="margin-top:24px;font-size:.82rem;color:var(--text-t)">${lang === 'en' ? 'Last updated' : 'Dernière mise à jour'} : ${new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
     </div>
 
