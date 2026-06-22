@@ -757,6 +757,84 @@ const UI = {
   }
 } as const;
 
+function getGuarantees(sector: string, lang: 'fr' | 'en' = 'fr'): Array<{ title: string; icon: string }> {
+  const s = (sector || '').toLowerCase();
+  const g: Record<string, Array<{ title: string; icon: string; titleEn: string }>> = {
+    plomberie: [
+      { title: 'Garantie Décennale', icon: 'shield-check', titleEn: '10-Year Warranty' },
+      { title: 'Intervention < 2h', icon: 'clock', titleEn: 'Response < 2h' },
+      { title: 'Devis Gratuit', icon: 'file-text', titleEn: 'Free Quote' },
+      { title: 'Artisan Qualifié', icon: 'badge-check', titleEn: 'Certified Pro' }
+    ],
+    electricien: [
+      { title: 'Consuel Certifié', icon: 'shield-check', titleEn: 'Consuel Certified' },
+      { title: 'Garantie Décennale', icon: 'badge-check', titleEn: '10-Year Warranty' },
+      { title: 'Intervention < 2h', icon: 'clock', titleEn: 'Response < 2h' },
+      { title: 'Devis Gratuit', icon: 'file-text', titleEn: 'Free Quote' }
+    ],
+    coiffeur: [
+      { title: 'Produits Bio', icon: 'leaf', titleEn: 'Organic Products' },
+      { title: 'Stérilisation Outils', icon: 'sparkles', titleEn: 'Sterilized Tools' },
+      { title: 'Formation Continue', icon: 'scissors', titleEn: 'Ongoing Training' },
+      { title: 'Satisfait ou Refait', icon: 'heart', titleEn: 'Satisfaction Guaranteed' }
+    ],
+    restaurant: [
+      { title: 'Produits Frais', icon: 'leaf', titleEn: 'Fresh Ingredients' },
+      { title: 'Service Rapide', icon: 'clock', titleEn: 'Fast Service' },
+      { title: 'Avis 4.8/5', icon: 'star', titleEn: '4.8/5 Rating' },
+      { title: 'Parking Gratuit', icon: 'car', titleEn: 'Free Parking' }
+    ],
+    garage: [
+      { title: 'Devis Gratuit', icon: 'file-text', titleEn: 'Free Quote' },
+      { title: 'Garantie Pièces', icon: 'shield-check', titleEn: 'Parts Warranty' },
+      { title: 'Équipe Qualifiée', icon: 'clock', titleEn: 'Qualified Team' },
+      { title: 'Véhicule de Courtoisie', icon: 'car', titleEn: 'Courtesy Vehicle' }
+    ],
+    nettoyage: [
+      { title: 'Produits Écolabels', icon: 'leaf', titleEn: 'Eco-Friendly Products' },
+      { title: 'Personnel Formé', icon: 'users', titleEn: 'Trained Staff' },
+      { title: 'Intervention Fiable', icon: 'clock', titleEn: 'Reliable Service' },
+      { title: 'Assurance RC Pro', icon: 'shield-check', titleEn: 'Professional Insurance' }
+    ],
+    jardin: [
+      { title: 'Plantes Garanties', icon: 'sprout', titleEn: 'Plants Guaranteed' },
+      { title: 'Intervention Propre', icon: 'sparkles', titleEn: 'Clean Work' },
+      { title: 'Conseils Saisonniers', icon: 'sun', titleEn: 'Seasonal Advice' },
+      { title: 'Paysagiste Qualifié', icon: 'tree-deciduous', titleEn: 'Qualified Landscaper' }
+    ],
+    fitness: [
+      { title: 'Coachs Diplômés', icon: 'award', titleEn: 'Certified Coaches' },
+      { title: 'Matériel Neuf', icon: 'dumbbell', titleEn: 'New Equipment' },
+      { title: 'Sans Engagement', icon: 'badge-check', titleEn: 'No Commitment' },
+      { title: 'Accès 6h-23h', icon: 'clock', titleEn: 'Open 6AM-11PM' }
+    ],
+    medical: [
+      { title: 'Conventionné', icon: 'stethoscope', titleEn: 'Insurance Accepted' },
+      { title: '3ème Payant', icon: 'credit-card', titleEn: 'Direct Billing' },
+      { title: 'RDV sous 48h', icon: 'calendar', titleEn: '48h Appointment' },
+      { title: 'Équipe Pluridisciplinaire', icon: 'users', titleEn: 'Multidisciplinary Team' }
+    ],
+    avocat: [
+      { title: 'Avocat au Barreau', icon: 'scale', titleEn: 'Bar Certified' },
+      { title: 'Consultation Privée', icon: 'shield', titleEn: 'Private Consultation' },
+      { title: 'Défense Déterminée', icon: 'sword', titleEn: 'Determined Defense' },
+      { title: 'Honoraires Transparent', icon: 'file-text', titleEn: 'Transparent Fees' }
+    ],
+    default: [
+      { title: 'Équipe Qualifiée', icon: 'badge-check', titleEn: 'Qualified Team' },
+      { title: 'Devis Clair', icon: 'file-text', titleEn: 'Clear Quote' },
+      { title: 'Réactivité', icon: 'clock', titleEn: 'Responsiveness' },
+      { title: 'Satisfaction Client', icon: 'heart', titleEn: 'Client Satisfaction' }
+    ]
+  };
+
+  let matched = g.default;
+  for (const [key, val] of Object.entries(g)) {
+    if (key !== 'default' && s.includes(key)) { matched = val; break; }
+  }
+  return matched.map(item => ({ title: lang === 'en' ? item.titleEn : item.title, icon: item.icon }));
+}
+
 function getHeroBadge(sector: string): { icon: string; text: string } {
   const s = (sector || '').toLowerCase();
   if (s.includes('plomb')) return { icon: 'droplets', text: 'Dépannage rapide garanti' };
@@ -1460,7 +1538,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
             ${rating ? `<div class="info-bar-item"><i data-lucide="star" width="14" fill="currentColor"></i> ${rating}/5 sur Google (${reviews} avis)</div>` : ''}
         </div>
     </div>
-    <a href="#hero" class="skip-link">Aller au contenu principal</a>
+    <a href="#hero" class="skip-link">${lang === 'en' ? 'Skip to main content' : 'Aller au contenu principal'}</a>
     <nav class="navbar" id="navbar">
         <div class="navbar-inner">
             <a href="#" class="navbar-brand">
@@ -1519,9 +1597,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     <main id="main-content">
     <div class="trust-bar">
         <div class="trust-inner">
-            ${template.guarantees.map((g: { title: string; icon: string }, i: number) => `
+            ${getGuarantees(content.sector, lang).map((g: { title: string; icon: string }, i: number) => `
             <div class="trust-item"><i data-lucide="${g.icon}" width="16"></i> ${g.title}</div>
-            ${i < template.guarantees.length - 1 ? '<div class="trust-div"></div>' : ''}
+            ${i < 3 ? '<div class="trust-div"></div>' : ''}
             `).join('')}
         </div>
     </div>
@@ -1566,17 +1644,17 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
             <div class="about-grid">
                 <div class="about-img reveal">
                     <img src="${getImg(1)}" ${imgErr(1)} alt="${companyName}">
-                    <div class="about-badge"><div class="about-badge-num">15+</div><div class="about-badge-text">Ans d'expérience</div></div>
+                    <div class="about-badge"><div class="about-badge-num">15+</div><div class="about-badge-text">${ui.aboutBadge}</div></div>
                 </div>
                 <div class="about-text reveal">
                     <span class="section-label">${aboutTitle || ui.aboutLabel}</span>
                     <h2>${content.aboutTitle || template.heroTitle} — ${city || companyName}</h2>
                     <p>${aboutText}</p>
                     <ul class="about-checks">
-                        <li><i data-lucide="check-circle-2" width="18"></i> ${template.guarantees[0]?.title || (lang === 'en' ? 'Quality Service' : 'Qualité professionnelle')}</li>
-                        <li><i data-lucide="check-circle-2" width="18"></i> ${template.guarantees[1]?.title || (lang === 'en' ? 'Here for You' : 'À votre écoute')}</li>
-                        <li><i data-lucide="check-circle-2" width="18"></i> ${template.guarantees[2]?.title || (lang === 'en' ? 'Satisfaction Guaranteed' : 'Satisfaction garantie')}</li>
-                        <li><i data-lucide="check-circle-2" width="18"></i> ${template.guarantees[3]?.title || (lang === 'en' ? 'Trusted Service' : 'Service de confiance')}</li>
+                        <li><i data-lucide="check-circle-2" width="18"></i> ${getGuarantees(content.sector, lang)[0]?.title || (lang === 'en' ? 'Quality Service' : 'Qualité professionnelle')}</li>
+                        <li><i data-lucide="check-circle-2" width="18"></i> ${getGuarantees(content.sector, lang)[1]?.title || (lang === 'en' ? 'Here for You' : 'À votre écoute')}</li>
+                        <li><i data-lucide="check-circle-2" width="18"></i> ${getGuarantees(content.sector, lang)[2]?.title || (lang === 'en' ? 'Satisfaction Guaranteed' : 'Satisfaction garantie')}</li>
+                        <li><i data-lucide="check-circle-2" width="18"></i> ${getGuarantees(content.sector, lang)[3]?.title || (lang === 'en' ? 'Trusted Service' : 'Service de confiance')}</li>
                     </ul>
                     <a href="#contact" class="btn-pri">${ctaText} <i data-lucide="arrow-right" width="16"></i></a>
                 </div>
@@ -1600,7 +1678,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                 </div>
                 <div class="why-img reveal">
                     <img src="${getImg(2)}" ${imgErr(2)} alt="${companyName}">
-                    <div class="why-img-badge"><div class="why-img-badge-num">98%</div><div class="why-img-badge-text">Satisfaction Client</div></div>
+                    <div class="why-img-badge"><div class="why-img-badge-num">98%</div><div class="why-img-badge-text">${ui.whySatisfaction}</div></div>
                 </div>
             </div>
         </div>

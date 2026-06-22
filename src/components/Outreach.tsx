@@ -211,15 +211,26 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
     // UNIFICATION : On donne la priorité aux templates de la BASE DE DONNÉES
-    const leadLang = detectLanguage(lead);
-    const allTemplates = [...templates, ...getLocalizedSalesTemplates(leadLang), ...getLocalizedReminderTemplates(leadLang)];
+    const allTemplates = [...templates, ...currentSalesTemplates, ...currentReminderTemplates];
     const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
     
     const base = personalizeTemplateContent(template, lead, apiConfig);
 
     if (hasLLM) {
       try {
-        const prompt = `Personnalise cet email de prospection B2B. Garde le même format HTML et tous les liens intacts (landing, devis, paiement). Réponds UNIQUEMENT en JSON.
+        const isEn = emailLang === 'en';
+        const prompt = isEn
+          ? `Personalize this B2B prospecting email. Keep the same HTML format and all links intact (landing, quote, payment). Reply ONLY in JSON.
+Lead: ${lead.name}, ${lead.sector || 'unknown sector'}, ${lead.city || 'unknown city'}
+Template: ${template.name}
+
+Base email:
+Subject: ${base.subject}
+Body: ${base.body}
+
+JSON: {"subject": "personalized subject", "body": "personalized body with links unchanged"}`
+
+          : `Personnalise cet email de prospection B2B. Garde le même format HTML et tous les liens intacts (landing, devis, paiement). Réponds UNIQUEMENT en JSON.
 Lead: ${lead.name}, ${lead.sector || 'secteur inconnu'}, ${lead.city || 'ville inconnue'}
 Template: ${template.name}
 
@@ -229,7 +240,7 @@ Corps: ${base.body}
 
 JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les liens inchangés"}`;
 
-        const response = await callLLM(apiConfig, prompt, 'Tu personnalises des emails de prospection pro. Tu ne modifies JAMAIS les balises HTML ou les liens href. Réponds en JSON.');
+        const response = await callLLM(apiConfig, prompt, isEn ? 'You personalize B2B prospecting emails. NEVER modify HTML tags or href links. Reply in JSON.' : 'Tu personnalises des emails de prospection pro. Tu ne modifies JAMAIS les balises HTML ou les liens href. Réponds en JSON.');
         if (response) {
           try {
             const cleaned = response.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
@@ -253,8 +264,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     if (!lead.email) { alert("Ce lead n'a pas d'email"); return; }
 
     // UNIFICATION : On cherche d'abord dans les templates de la DB (prop templates)
-    const leadLang = detectLanguage(lead);
-    const allTemplates = [...templates, ...getLocalizedSalesTemplates(leadLang), ...getLocalizedReminderTemplates(leadLang)];
+    const allTemplates = [...templates, ...currentSalesTemplates, ...currentReminderTemplates];
     const template = allTemplates.find(t => t.id === templateId);
     if (!template) return;
 
