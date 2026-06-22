@@ -392,18 +392,10 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
         updatedAt: new Date().toISOString()
       });
 
-      const queries = [
-        `${keyword} ${location}`,
-        `${keyword} proche de ${location}`,
-        `${keyword} ${location} avis`,
-      ];
-
       const allLeads: any[] = [];
       const seenNames = new Set<string>();
 
-      for (const query of queries) {
-        console.log('Query:', query);
-        
+      const fetchPlaces = async (query: string, num: number) => {
         const response = await fetch('https://google.serper.dev/places', {
           method: 'POST',
           headers: {
@@ -414,27 +406,44 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
             q: query,
             gl: 'fr',
             hl: 'fr',
-            num: 20
+            num
           })
         });
-
-        console.log('Status de la réponse:', response.status, response.statusText);
-        
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Erreur HTTP:', response.status, errorText);
-          continue;
+          throw new Error(`Erreur API Serper: ${response.status} - ${errorText}`);
         }
-
         const data = await response.json();
-        console.log('Résultats Serper.dev bruts pour query:', query, data.places?.length || 0);
-        
         if (!data.places || !Array.isArray(data.places)) {
-          console.error('Format de réponse invalide:', data);
-          continue;
+          throw new Error('Format de réponse invalide');
         }
+        return data.places;
+      };
+
+      // Requête principale avec le max de résultats
+      console.log('Requête principale...');
+      const mainResults = await fetchPlaces(`${keyword} ${location}`, 20);
+      console.log('Résultats principaux:', mainResults.length);
+      
+      for (const result of mainResults) {
+        const name = (result.title || result.name || '').toLowerCase().trim();
+        const addr = (result.address || '').toLowerCase().trim();
+        const key = `${name}|${addr}`;
+        if (!seenNames.has(key) && name) {
+          seenNames.add(key);
+          allLeads.push(convertToLead(result));
+        }
+      }
+
+      // Requête supplémentaire pour enrichir les résultats
+      try {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('Requête supplémentaire...');
+        const extraResults = await fetchPlaces(`${keyword} proche de ${location}`, 20);
+        console.log('Résultats supplémentaires:', extraResults.length);
         
-        for (const result of data.places) {
+        for (const result of extraResults) {
           const name = (result.title || result.name || '').toLowerCase().trim();
           const addr = (result.address || '').toLowerCase().trim();
           const key = `${name}|${addr}`;
@@ -443,12 +452,11 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
             allLeads.push(convertToLead(result));
           }
         }
-
-        await new Promise(resolve => setTimeout(resolve, 300));
+      } catch (extraError) {
+        console.warn('Requête supplémentaire échouée, on garde les résultats principaux:', extraError);
       }
 
       console.log(`${allLeads.length} entreprises uniques trouvées via Serper.dev`);
-      console.log('Leads générés:', allLeads);
       return allLeads;
       
     } catch (error) {
