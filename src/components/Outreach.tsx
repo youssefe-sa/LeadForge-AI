@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Lead, ApiConfig, EmailTemplate, callLLM, useScheduledEmails, ScheduledEmail } from '../lib/supabase-store';
 import { supabase } from '../lib/supabase';
-import { salesTemplates, reminderTemplates, getTemplateById } from '../templates/outreach-templates-final';
+import { salesTemplates, reminderTemplates, salesTemplatesEn, reminderTemplatesEn, getTemplateById, getLocalizedSalesTemplates, getLocalizedReminderTemplates, getLocalizedTemplateById, getLocalizedAllTemplates } from '../templates/outreach-templates-final';
+import { detectLanguage } from '../lib/ultimateTemplate';
 
 const C = {
   bg: '#F7F6F2', surface: '#FFFFFF', surface2: '#F2F1EC',
@@ -43,6 +44,10 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const [logs, setLogs] = useState<string[]>([]);
   const [previewEmail, setPreviewEmail] = useState<{ lead: Lead; subject: string; body: string } | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState(salesTemplates[0]?.id || '');
+  const [emailLang, setEmailLang] = useState<'fr' | 'en'>('fr');
+
+  const currentSalesTemplates = emailLang === 'en' ? salesTemplatesEn : salesTemplates;
+  const currentReminderTemplates = emailLang === 'en' ? reminderTemplatesEn : reminderTemplates;
 
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [testEmailSending, setTestEmailSending] = useState(false);
@@ -206,7 +211,8 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
 
   const generateEmailContent = async (lead: Lead): Promise<{ subject: string; body: string }> => {
     // UNIFICATION : On donne la priorité aux templates de la BASE DE DONNÉES
-    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+    const leadLang = detectLanguage(lead);
+    const allTemplates = [...templates, ...getLocalizedSalesTemplates(leadLang), ...getLocalizedReminderTemplates(leadLang)];
     const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
     
     const base = personalizeTemplateContent(template, lead, apiConfig);
@@ -247,7 +253,8 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     if (!lead.email) { alert("Ce lead n'a pas d'email"); return; }
 
     // UNIFICATION : On cherche d'abord dans les templates de la DB (prop templates)
-    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+    const leadLang = detectLanguage(lead);
+    const allTemplates = [...templates, ...getLocalizedSalesTemplates(leadLang), ...getLocalizedReminderTemplates(leadLang)];
     const template = allTemplates.find(t => t.id === templateId);
     if (!template) return;
 
@@ -433,7 +440,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
     setLogs(prev => [...prev, `Envoi d'email test à ${testEmail}...`]);
 
     try {
-      const allTemplates = [...salesTemplates, ...reminderTemplates];
+      const allTemplates = [...currentSalesTemplates, ...currentReminderTemplates];
       const template = allTemplates.find((t: EmailTemplate) => t.id === selectedTemplate) || allTemplates[0];
       const testLead: Lead = {
         id: 'test', name: 'Test Prospect', email: testEmail,
@@ -527,7 +534,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
   // Fonctions pour le moteur de recherche de variables
   const scanAllVariables = () => {
     // Scanner tous les templates pour extraire toutes les variables
-    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+    const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates, ...salesTemplatesEn, ...reminderTemplatesEn];
     const allVars = new Set<string>();
     
     allTemplates.forEach(template => {
@@ -576,7 +583,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
   // Scanner les variables au montage du composant
   useEffect(() => {
     scanAllVariables();
-  }, [templates, salesTemplates, reminderTemplates]);
+  }, [templates, salesTemplates, reminderTemplates, salesTemplatesEn, reminderTemplatesEn]);
 
   // Fonctions pour l'édition de template
   const startEditingTemplate = (template: any) => {
@@ -976,15 +983,16 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
             alignItems: 'center', 
             marginBottom: 16 
           }}>
-            <h4 style={{ 
-              fontSize: 16, 
-              fontWeight: 600, 
-              margin: 0, 
-              color: C.green,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8
-            }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <h4 style={{ 
+                fontSize: 16, 
+                fontWeight: 600, 
+                margin: 0, 
+                color: C.green,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}>
               <span>💰</span>
               Templates de VENTE
               <span style={{ 
@@ -995,9 +1003,10 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                 borderRadius: 12,
                 fontWeight: 400
               }}>
-                {salesTemplates.length} templates
+                {currentSalesTemplates.length} templates
               </span>
             </h4>
+            </div>
             <div style={{ 
               fontSize: 10, 
               color: C.tx3, 
@@ -1015,7 +1024,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
             overflowX: 'auto',
             padding: '4px 0'
           }}>
-            {salesTemplates.map(t => (
+            {currentSalesTemplates.map(t => (
               <button key={t.id} onClick={() => setSelectedTemplate(t.id)} style={{
                 padding: '10px 14px',
                 borderRadius: 8,
@@ -1085,7 +1094,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
                 borderRadius: 12,
                 fontWeight: 400
               }}>
-                {reminderTemplates.length} templates
+                {currentReminderTemplates.length} templates
               </span>
             </h4>
             <div style={{ 
@@ -1105,7 +1114,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
             overflowX: 'auto',
             padding: '4px 0'
           }}>
-            {reminderTemplates.map(t => (
+            {currentReminderTemplates.map(t => (
               <button key={t.id} onClick={() => setSelectedTemplate(t.id)} style={{
                 padding: '10px 14px',
                 borderRadius: 8,
@@ -1150,7 +1159,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
 
         {/* Éditeur de template professionnel */}
         {(() => {
-          const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+          const allTemplates = [...templates, ...currentSalesTemplates, ...currentReminderTemplates];
           const selected = allTemplates.find(t => t.id === selectedTemplate);
           if (!selected) return null;
           
@@ -2456,7 +2465,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
 
       {/* HTML Email Preview Modal */}
       {showEmailPreview && (() => {
-        const allTemplates = [...templates, ...salesTemplates, ...reminderTemplates];
+        const allTemplates = [...templates, ...currentSalesTemplates, ...currentReminderTemplates];
         const selected = allTemplates.find(t => t.id === selectedTemplate);
         if (!selected || !selected.htmlContent) return null;
 

@@ -255,3 +255,258 @@ export function getTemplateById(id: string): EmailTemplate | undefined {
 }
 
 export const allTemplates = [...salesTemplates, ...reminderTemplates];
+
+// ── ENGLISH TEMPLATES ──
+
+const HEADER_HTML_EN = `
+  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 25px;">
+    ${LOGO_SVG}
+    <div>
+      <div style="font-family: Arial; font-weight: bold; font-size: 20px; color: #1a202c;">Services-Siteup</div>
+      <div style="font-size: 11px; color: #718096; font-style: italic;">Elevate your online presence with excellence</div>
+    </div>
+  </div>
+`;
+
+export const salesTemplatesEn: EmailTemplate[] = [
+  {
+    id: 'step-1-start',
+    name: '1. Website Presentation',
+    category: 'sale',
+    subject: '🎁 A surprise for {{companyName}}: Your new website is ready',
+    variables: ['firstName', 'companyName', 'websiteLink', 'startProjectLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 10px; background: #ffffff;">
+  ${HEADER_HTML_EN}
+  <p>Hi <strong>{{firstName}}</strong>,</p>
+  <p style="font-size: 15px;">I've taken the initiative to create a <strong>complete professional website</strong> for <strong>{{companyName}}</strong>.</p>
+  <p style="font-size: 14px;">The goal is simple: help you <strong>generate more local clients through an optimized and professional online presence</strong>.</p>
+  <div style="text-align: center; margin: 25px 0;">
+    <a href="{{websiteLink}}" style="background: #D4500A; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block;">VIEW YOUR WEBSITE →</a>
+  </div>
+  <p style="text-align: center; font-size: 13px; color: #718096; margin-top: -10px;">⏱️ 30 seconds is enough to see its commercial potential</p>
+  <p style="margin-top: 25px;">This website is designed to:</p>
+  <ul style="padding-left: 18px; font-size: 14px; line-height: 1.6;">
+    <li>📞 Generate more client calls automatically</li>
+    <li>📱 Be perfectly optimized for mobile (local client priority)</li>
+    <li>💬 Integrate WhatsApp, contact form and intelligent chatbot</li>
+    <li>🚀 Be visible on Google with optimized local SEO</li>
+  </ul>
+  <p style="margin-top: 20px; font-size: 14px;">Today, a business's online presence has become a decisive factor in customer trust and decision-making.</p>
+  <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 14px;">
+    <strong>💰 Project activation:</strong><br><br>
+    • $46 to get started<br>
+    • $100 at final delivery<br><br>
+    ✔ Hosting + domain included (1 year)<br>
+    ✔ Support and maintenance included<br>
+  </div>
+  <p style="margin-top: 25px; font-size: 15px;">If you'd like to activate this website for your business, simply confirm.</p>
+  <div style="text-align: center; margin-top: 15px;">
+    <a href="{{startProjectLink}}" style="background: #1a202c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;">CONFIRM AND ACTIVATE →</a>
+  </div>
+  <p style="text-align:center; font-size:13px; color:#718096; margin-top:10px;">👉 By clicking, you officially start the creation of your website, and you'll immediately receive a detailed quote along with the payment link to activate the project.</p>
+  <p style="margin-top: 20px; font-size: 13px; color: #4a5568;">If you have any questions or need clarification, simply reply to this email. We'll respond within 2 hours.</p>
+  <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 20px; font-size: 13px; color: #4a5568;">Best regards,<br>Digital Consultant | Services-Siteup</p>
+</div>`,
+    textContent: "Email 1"
+  },
+  {
+    id: 'step-2-devis',
+    name: '2. Quote & Payment',
+    category: 'sale',
+    subject: '📄 Confirmation & Official Quote - {{companyName}}',
+    variables: ['firstName', 'companyName', 'devisLink', 'paymentLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+  ${HEADER_HTML_EN}
+  <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">CONFIRMATION & OFFICIAL QUOTE</h2>
+  <p>Hi <strong>{{firstName}}</strong>,</p>
+  <p style="font-size: 14px;">Following your interest, we've prepared a complete solution for <strong>{{companyName}}</strong>.</p>
+  <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px;">
+    <tr style="background: #f8fafc;"><td style="padding: 10px; border: 1px solid #edf2f7;">🌐 <b>Professional Website</b></td><td style="padding: 10px; border: 1px solid #edf2f7;">Custom design, mobile responsive, chatbot</td></tr>
+    <tr><td style="padding: 10px; border: 1px solid #edf2f7;">🚀 <b>Performance</b></td><td style="padding: 10px; border: 1px solid #edf2f7;">Google local SEO, optimized speed, SSL security</td></tr>
+    <tr style="background: #f8fafc;"><td style="padding: 10px; border: 1px solid #edf2f7;">📞 <b>Client Conversion</b></td><td style="padding: 10px; border: 1px solid #edf2f7;">WhatsApp integrated + contact form + direct calls</td></tr>
+    <tr><td style="padding: 10px; border: 1px solid #edf2f7;">🏆 <b>Guarantees</b></td><td style="padding: 10px; border: 1px solid #edf2f7;">Satisfaction guaranteed within 15 days</td></tr>
+  </table>
+  <div style="background: #fffaf0; padding: 20px; border: 1px solid #fbd38d; border-radius: 8px;">
+    <p style="margin: 0; font-weight: bold;">💰 Total investment: $146</p>
+    <p style="margin-top: 10px; font-size: 13px;">✔ $46 today to start creation<br>✔ $100 at final delivery</p>
+  </div>
+  <div style="text-align: center; margin: 25px 0;">
+    <a href="{{devisLink}}" style="color: #D4500A; text-decoration: underline; font-weight: bold; margin-right: 20px;">📄 View quote</a>
+    <a href="{{paymentLink}}" style="background: #28a745; color: white; padding: 14px 22px; text-decoration: none; border-radius: 6px; font-weight: bold;">💳 PAY $46 & GET STARTED</a>
+  </div>
+  <p style="margin-top: 25px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Best regards,<br>Digital Consultant | Services-Siteup</p>
+</div>`,
+    textContent: "Email 2"
+  },
+  {
+    id: 'step-3-depot',
+    name: '3. Deposit Confirmation',
+    category: 'sale',
+    subject: '✅ Deposit confirmed - {{companyName}}',
+    variables: ['firstName', 'companyName', 'invoiceLink', 'deliveryDate'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+  ${HEADER_HTML_EN}
+  <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">DEPOSIT CONFIRMATION</h2>
+  <p>Hi <strong>{{firstName}}</strong>,</p>
+  <p style="font-size: 14px;">We confirm that your deposit of <strong>$46</strong> has been received.</p>
+  <p style="font-size: 14px;">Your project for <strong>{{companyName}}</strong> is now officially <strong>in production</strong>.</p>
+  <div style="background: #f0fff4; padding: 15px; border: 1px solid #c6f6d5; border-radius: 6px; color: #22543d; margin-top: 15px;">
+    <strong>📦 Project Status:</strong><br><br>✔ Analysis completed<br>✔ Creation in progress<br>✔ Website optimization in preparation
+  </div>
+  <div style="background: #f7fafc; padding: 15px; border-radius: 6px; margin-top: 15px;">
+    <strong>📅 Expected delivery:</strong> <b>{{deliveryDate}}</b><br><br>Your website will be delivered with all optimizations and features ready to use.
+  </div>
+  <div style="margin-top: 25px; text-align: center;">
+    <a href="{{invoiceLink}}" style="background: #f8fafc; color: #1a202c; padding: 10px 20px; border: 1px solid #edf2f7; text-decoration: none; border-radius: 6px; font-size: 13px;">📄 Deposit invoice (PDF)</a>
+  </div>
+  <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Best regards,<br>Digital Consultant | Services-Siteup</p>
+</div>`,
+    textContent: "Email 3"
+  },
+  {
+    id: 'step-4-paiement',
+    name: '4. Final Payment',
+    category: 'sale',
+    subject: '🎉 Your {{companyName}} website is ready!',
+    variables: ['firstName', 'companyName', 'websiteLink', 'finalPaymentLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+  ${HEADER_HTML_EN}
+  <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">WEBSITE FINALIZATION</h2>
+  <p>Hi <strong>{{firstName}}</strong>,</p>
+  <p style="font-size: 14px;">Great news 🎉 your website for <strong>{{companyName}}</strong> is now fully ready.</p>
+  <p style="font-size: 14px;">👉 You can view it here: <a href="{{websiteLink}}" style="color: #D4500A; font-weight: bold;">See the final result</a></p>
+  <ul style="font-size: 14px; padding-left: 18px; line-height: 1.6;">
+    <li>📞 Generate client calls automatically</li>
+    <li>📱 Convert your mobile visitors</li>
+    <li>🚀 Be visible on Google locally</li>
+    <li>💬 Receive requests via WhatsApp and contact form</li>
+  </ul>
+  <div style="background: #fffaf0; padding: 18px; border: 1px solid #fbd38d; border-radius: 8px; margin-top: 15px;">
+    <strong>💰 Remaining balance:</strong> $100
+  </div>
+  <div style="text-align: center; margin: 30px 0;">
+    <a href="{{finalPaymentLink}}" style="background: #28a745; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">💰 PAY BALANCE & ACTIVATE</a>
+  </div>
+  <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Best regards,<br>Digital Consultant | Services-Siteup</p>
+</div>`,
+    textContent: "Email 4"
+  },
+  {
+    id: 'step-5-confirmation',
+    name: '5. Final Confirmation',
+    category: 'sale',
+    subject: '✅ Payment received! {{companyName}} is activated',
+    variables: ['firstName', 'companyName', 'finalInvoiceLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+  ${HEADER_HTML_EN}
+  <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">FINAL PROJECT CONFIRMATION</h2>
+  <p>Hi <strong>{{firstName}}</strong>,</p>
+  <p style="font-size: 14px;">We confirm that the balance payment of <strong>$100</strong> has been received.</p>
+  <p style="font-size: 14px;">Your project for <strong>{{companyName}}</strong> is now <strong>100% finalized and activated</strong>.</p>
+  <div style="text-align: center; margin: 30px 0;">
+    <a href="{{finalInvoiceLink}}" style="background: #f8fafc; color: #1a202c; padding: 10px 20px; border: 1px solid #edf2f7; text-decoration: none; border-radius: 6px; font-size: 13px;">📄 Final invoice (PDF)</a>
+  </div>
+  <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Best regards,<br>Digital Consultant | Services-Siteup</p>
+</div>`,
+    textContent: "Email 5"
+  },
+  {
+    id: 'step-6-livraison',
+    name: '6. Admin Access',
+    category: 'sale',
+    subject: '🔐 Your Admin Access - {{companyName}}',
+    variables: ['firstName', 'companyName', 'adminLink', 'adminUsername', 'adminPassword', 'documentationLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7;">
+  ${HEADER_HTML_EN}
+  <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">WEBSITE ACCESS</h2>
+  <div style="background: #f8fafc; padding: 20px; border-radius: 8px; font-family: monospace; font-size: 13px;">
+    <strong>🔐 Login credentials:</strong><br><br>
+    <strong>Admin URL:</strong> <a href="{{adminLink}}" style="color: #D4500A;">{{adminLink}}</a><br><br>
+    <strong>Username:</strong> {{adminUsername}}<br>
+    <strong>Password:</strong> {{adminPassword}}
+  </div>
+  <div style="text-align: center; margin-top: 20px;">
+    <a href="{{documentationLink}}" style="color: #1a202c; font-weight: bold; text-decoration: underline;">📚 Access full documentation</a>
+  </div>
+  <p style="margin-top: 35px; border-top: 1px solid #edf2f7; padding-top: 15px; font-size: 13px; color: #4a5568;">Best regards,<br>Digital Consultant | Services-Siteup</p>
+</div>`,
+    textContent: "Email 6"
+  }
+];
+
+export const reminderTemplatesEn: EmailTemplate[] = [
+  {
+    id: 'reminder1_after_email1',
+    name: 'Reminder 1 - After Email 1',
+    category: 'reminder',
+    subject: 'Follow-up: Your website for {{companyName}}',
+    variables: ['firstName', 'companyName', 'websiteLink', 'startProjectLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 8px; background: #ffffff;">
+  ${HEADER_HTML_EN}
+  <p>Hi <strong>{{firstName}}</strong>,</p>
+  <p style="font-size: 14px;">I'm reaching out again regarding the website we've prepared for <strong>{{companyName}}</strong>.</p>
+  <div style="text-align: center; margin: 30px 0;">
+    <a href="{{websiteLink}}" style="background: #1a202c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">🔍 VIEW YOUR WEBSITE</a>
+  </div>
+  <div style="text-align: center; margin: 25px 0;">
+    <a href="{{startProjectLink}}" style="background: #D4500A; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">🚀 CONFIRM AND ACTIVATE</a>
+  </div>
+  <p style="margin-top: 40px; border-top: 1px solid #edf2f7; padding-top: 20px; font-size: 13px; color: #4a5568;">Best regards,<br>Digital Consultant | Services-Siteup</p>
+</div>`,
+    textContent: "Reminder 1"
+  },
+  {
+    id: 'reminder2_after_devis',
+    name: 'Reminder 2 - Quote Follow-up',
+    category: 'reminder',
+    subject: 'Last step for {{companyName}}',
+    variables: ['firstName', 'companyName', 'devisLink', 'paymentLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 8px; background: #ffffff;">
+  ${HEADER_HTML_EN}
+  <p>Hi <strong>{{firstName}}</strong>,</p>
+  <p style="font-size: 14px;">The quote and your website version for <strong>{{companyName}}</strong> are still available.</p>
+  <div style="text-align: center; margin: 25px 0;"><a href="{{devisLink}}" style="color: #D4500A; text-decoration: underline; font-weight: bold;">📄 View quote</a></div>
+  <div style="text-align: center; margin: 30px 0;"><a href="{{paymentLink}}" style="background: #28a745; color: white; padding: 16px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">💳 PAY $46 & GET STARTED</a></div>
+  <p style="margin-top: 40px; border-top: 1px solid #edf2f7; padding-top: 20px; font-size: 13px; color: #4a5568;">Best regards,<br>Digital Consultant | Services-Siteup</p>
+</div>`,
+    textContent: "Reminder 2"
+  },
+  {
+    id: 'reminder3_final_payment',
+    name: 'Reminder 3 - Final Balance',
+    category: 'reminder',
+    subject: '⚡ Urgent activation: Your {{companyName}} website',
+    variables: ['firstName', 'companyName', 'websiteLink', 'finalPaymentLink'],
+    htmlContent: `<div style="font-family: -apple-system, sans-serif; color: #1a202c; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 8px; background: #ffffff;">
+  ${HEADER_HTML_EN}
+  <h2 style="font-size: 18px; border-bottom: 2px solid #D4500A; padding-bottom: 10px;">FINAL STEP — ACTIVATION</h2>
+  <p>Hi {{firstName}}, your website is ready and awaiting final activation.</p>
+  <div style="text-align: center; margin: 30px 0;"><a href="{{finalPaymentLink}}" style="background: #e53e3e; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">⚡ ACTIVATE MY WEBSITE NOW</a></div>
+  <p style="margin-top: 40px; border-top: 1px solid #edf2f7; padding-top: 20px; font-size: 13px; color: #4a5568;">Best regards,<br>Digital Consultant | Services-Siteup</p>
+</div>`,
+    textContent: "Reminder 3"
+  }
+];
+
+// ── LOCALIZATION FUNCTIONS ──
+
+export function getLocalizedSalesTemplates(lang: 'fr' | 'en' = 'fr'): EmailTemplate[] {
+  return lang === 'en' ? salesTemplatesEn : salesTemplates;
+}
+
+export function getLocalizedReminderTemplates(lang: 'fr' | 'en' = 'fr'): EmailTemplate[] {
+  return lang === 'en' ? reminderTemplatesEn : reminderTemplates;
+}
+
+export function getLocalizedTemplateById(id: string, lang: 'fr' | 'en' = 'fr'): EmailTemplate | undefined {
+  const all = lang === 'en'
+    ? [...salesTemplatesEn, ...reminderTemplatesEn]
+    : [...salesTemplates, ...reminderTemplates];
+  return all.find(template => template.id === id);
+}
+
+export function getLocalizedAllTemplates(lang: 'fr' | 'en' = 'fr'): EmailTemplate[] {
+  return lang === 'en'
+    ? [...salesTemplatesEn, ...reminderTemplatesEn]
+    : [...salesTemplates, ...reminderTemplates];
+}
