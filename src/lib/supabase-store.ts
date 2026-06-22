@@ -2114,12 +2114,14 @@ export async function searchPexels(key: string, query: string): Promise<string[]
   if (!key) return [];
   try {
     const page = Math.floor(Math.random() * 3) + 1;
-    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=6&page=${page}`, {
+    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=6&page=${page}&safesearch=true`, {
       headers: { 'Authorization': key },
     });
     if (res.ok) {
       const data = await res.json();
-      return (data.photos || []).map((p: { src: { medium: string } }) => safeStr(p?.src?.medium)).filter(Boolean);
+      return (data.photos || [])
+        .filter((p: { alt?: string; src: { medium: string } }) => !isImageBlocked(safeStr(p?.src?.medium), p?.alt))
+        .map((p: { src: { medium: string } }) => safeStr(p?.src?.medium)).filter(Boolean);
     }
   } catch { /* ignore */ }
   return [];

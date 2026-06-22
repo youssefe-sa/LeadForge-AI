@@ -15,6 +15,15 @@ export const BLOCKED_KEYWORDS: string[] = [
   'phone number', 'tel:', 'numero',
   'favicon', 'sprite', 'pixel',
   'map', 'marker',
+  // NSFW / nude filtering
+  'nude', 'naked', 'bare', 'topless', 'underwear', 'lingerie', 'bikini',
+  'swimsuit', 'swimwear', 'sensual', 'erotic', 'intimate', 'bedroom',
+  'cleavage', 'skin ', 'body ', 'torso', 'chest', 'breast',
+  'striptease', 'burlesque', 'exotic',
+  'sexy', 'hot girl', 'hot guy', 'attractive',
+  'yoga pants', 'tight', 'revealing',
+  'massage', 'spa treatment', 'wellness ritual',
+  'sunset silhouette', 'beach body',
 ];
 
 export const BLOCKED_DOMAINS: string[] = [

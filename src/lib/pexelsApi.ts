@@ -70,7 +70,7 @@ export async function searchPexelsImages(sector: string, perPage: number = 10): 
   
   try {
     const response = await fetch(
-      `${PEXELS_API_URL}/search?query=${encodeURIComponent(query)}&per_page=${perPage}&orientation=landscape`,
+      `${PEXELS_API_URL}/search?query=${encodeURIComponent(query)}&per_page=${perPage}&orientation=landscape&safesearch=true`,
       {
         headers: {
           'Authorization': PEXELS_API_KEY

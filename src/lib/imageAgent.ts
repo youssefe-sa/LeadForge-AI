@@ -67,11 +67,17 @@ async function fetchPexelsImages(
   count: number = 4
 ): Promise<string[]> {
   try {
-    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape`;
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape&safesearch=true`;
     const res = await fetch(url, { headers: { Authorization: apiKey } });
     if (!res.ok) return [];
     const data = await res.json();
+    const { isImageBlocked } = await import('./imageFilters');
     return (data.photos || [])
+      .filter((photo: any) => {
+        const url = photo?.src?.large2x || photo?.src?.large || photo?.src?.original || '';
+        const alt = photo?.alt || '';
+        return url && !isImageBlocked(url, alt);
+      })
       .map((photo: any) => photo?.src?.large2x || photo?.src?.large || photo?.src?.original || '')
       .filter(Boolean)
       .slice(0, count);

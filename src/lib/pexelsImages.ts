@@ -99,13 +99,19 @@ async function fetchPexelsSearch(query: string, count: number = 4): Promise<stri
 
   try {
     const response = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape&size=medium`,
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape&size=medium&safesearch=true`,
       { headers: { Authorization: PEXELS_API_KEY } }
     );
     if (!response.ok) return [];
 
     const data = await response.json();
+    const { isImageBlocked } = await import('./imageFilters');
     return (data.photos || [])
+      .filter((p: any) => {
+        const url = p?.src?.large2x || p?.src?.large || p?.src?.medium || '';
+        const alt = p?.alt || '';
+        return url && !isImageBlocked(url, alt);
+      })
       .map((p: any) => p?.src?.large2x || p?.src?.large || p?.src?.medium || '')
       .filter(Boolean);
   } catch {
@@ -133,13 +139,19 @@ export async function fetchServiceImages(query: string, count: number = 4): Prom
 
   try {
     const response = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape&size=medium`,
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape&size=medium&safesearch=true`,
       { headers: { Authorization: PEXELS_API_KEY } }
     );
     if (!response.ok) return [];
 
     const data = await response.json();
+    const { isImageBlocked } = await import('./imageFilters');
     const images = (data.photos || [])
+      .filter((p: any) => {
+        const url = p?.src?.large2x || p?.src?.large || p?.src?.medium || '';
+        const alt = p?.alt || '';
+        return url && !isImageBlocked(url, alt);
+      })
       .map((p: any) => p?.src?.large2x || p?.src?.large || p?.src?.medium || '')
       .filter(Boolean);
 
