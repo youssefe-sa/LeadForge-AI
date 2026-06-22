@@ -1192,6 +1192,45 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .info-bar-item a:hover{color:#fff}
         @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
         @media(max-width:768px){.info-bar{font-size:.75rem}.info-bar-item{padding:0 18px;gap:5px}}
+
+        .chatbot-float{position:fixed;bottom:28px;right:28px;z-index:91;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+        @media(max-width:768px){.chatbot-float{bottom:20px;right:20px}}
+        .chatbot-btn{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 35px rgba(var(--primary-rgb),.4);transition:all .3s;animation:pulse-chat 2.5s infinite;position:relative}
+        .chatbot-btn:hover{transform:scale(1.08);box-shadow:0 12px 45px rgba(var(--primary-rgb),.5)}
+        @keyframes pulse-chat{0%,100%{box-shadow:0 8px 35px rgba(var(--primary-rgb),.4)}50%{box-shadow:0 8px 35px rgba(var(--primary-rgb),.6),0 0 0 10px rgba(var(--primary-rgb),.1)}}
+        .chatbot-btn svg{width:26px;height:26px;transition:transform .3s}
+        .chatbot-btn.open svg{transform:rotate(90deg)}
+        .chatbot-badge{position:absolute;top:-4px;right:-4px;width:20px;height:20px;background:#ef4444;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;animation:chatBadge 2s ease infinite}
+        @keyframes chatBadge{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+        .chatbot-window{display:none;width:380px;max-height:520px;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.18);overflow:hidden;flex-direction:column;border:1px solid var(--border)}
+        .chatbot-window.open{display:flex}
+        @media(max-width:480px){.chatbot-window{width:calc(100vw - 40px);max-height:70vh}}
+        .chatbot-header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:18px 20px;display:flex;align-items:center;gap:14px}
+        .chatbot-header-avatar{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .chatbot-header-info h4{font-size:.95rem;font-weight:700;margin-bottom:2px}
+        .chatbot-header-info p{font-size:.72rem;opacity:.75;display:flex;align-items:center;gap:5px}
+        .chatbot-header-info .online-dot{width:7px;height:7px;background:#4ade80;border-radius:50%;display:inline-block}
+        .chatbot-header-close{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+        .chatbot-header-close:hover{background:rgba(255,255,255,.3)}
+        .chatbot-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;max-height:320px;background:#f9fafb}
+        .chatbot-msg{max-width:85%;padding:12px 16px;border-radius:16px;font-size:.88rem;line-height:1.6;animation:msgIn .3s ease}
+        @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .chatbot-msg.bot{background:#fff;color:var(--text);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+        .chatbot-msg.user{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+        .chatbot-msg.bot a{color:var(--primary);font-weight:600;text-decoration:underline}
+        .chatbot-typing{display:flex;gap:4px;padding:12px 16px;align-self:flex-start}
+        .chatbot-typing span{width:8px;height:8px;border-radius:50%;background:var(--text-t);animation:typingDot 1.4s ease infinite}
+        .chatbot-typing span:nth-child(2){animation-delay:.2s}
+        .chatbot-typing span:nth-child(3){animation-delay:.4s}
+        @keyframes typingDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+        .chatbot-quick{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-top:1px solid var(--border-l);background:#fff}
+        .chatbot-quick button{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:8px 14px;font-size:.78rem;color:var(--text-s);cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit}
+        .chatbot-quick button:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+        .chatbot-input{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border-l);background:#fff}
+        .chatbot-input input{flex:1;border:1px solid var(--border);border-radius:24px;padding:10px 16px;font-size:.88rem;outline:none;font-family:inherit;transition:border .2s}
+        .chatbot-input input:focus{border-color:var(--primary)}
+        .chatbot-input button{width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+        .chatbot-input button:hover{opacity:.85;transform:scale(1.05)}
     </style>
 </head>
 <body>
@@ -1488,6 +1527,177 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     </footer>
 
     ${phone ? `<a href="tel:${cleanPhoneLink}" class="float-urgent"><i data-lucide="phone" width="18"></i> Nous Appeler</a>` : ''}
+
+    <div class="chatbot-float">
+        <div class="chatbot-window" id="chatbot-window">
+            <div class="chatbot-header">
+                <div class="chatbot-header-avatar"><i data-lucide="message-circle" width="22"></i></div>
+                <div class="chatbot-header-info">
+                    <h4>${companyName}</h4>
+                    <p><span class="online-dot"></span> En ligne — répond en quelques instants</p>
+                </div>
+                <button class="chatbot-header-close" id="chatbot-close" aria-label="Fermer"><i data-lucide="x" width="18"></i></button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="chatbot-msg bot">Bonjour ! 👋 Je suis l'assistant de <strong>${companyName}</strong>. Comment puis-je vous aider aujourd'hui ?</div>
+            </div>
+            <div class="chatbot-quick" id="chatbot-quick">
+                <button data-msg="Quels sont vos horaires ?">🕐 Horaires</button>
+                <button data-msg="Quels services proposez-vous ?">✨ Services</button>
+                <button data-msg="Comment vous contacter ?">📞 Contact</button>
+                <button data-msg="Où êtes-vous situés ?">📍 Adresse</button>
+                <button data-msg="Combien coûte vos prestations ?">💰 Tarifs</button>
+                <button data-msg="Je souhaite prendre rendez-vous">📅 RDV</button>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input" placeholder="Écrivez votre message..." aria-label="Message">
+                <button id="chatbot-send" aria-label="Envoyer"><i data-lucide="send" width="16"></i></button>
+            </div>
+        </div>
+        <button class="chatbot-btn" id="chatbot-toggle" aria-label="Ouvrir le chat">
+            <i data-lucide="message-circle" width="26"></i>
+            <div class="chatbot-badge" id="chatbot-badge">1</div>
+        </button>
+    </div>
+
+    <script>
+        (function(){
+            const btn=document.getElementById('chatbot-toggle');
+            const win=document.getElementById('chatbot-window');
+            const msgs=document.getElementById('chatbot-messages');
+            const input=document.getElementById('chatbot-input');
+            const sendBtn=document.getElementById('chatbot-send');
+            const closeBtn=document.getElementById('chatbot-close');
+            const badge=document.getElementById('chatbot-badge');
+            const quickBtns=document.getElementById('chatbot-quick');
+            if(!btn||!win)return;
+
+            const phone='${phone || ''}';
+            const email='${email || ''}';
+            const address='${address || ''}';
+            const city='${city || ''}';
+            const name='${companyName}';
+            const sector='${content.sector || ''}';
+            const rating='${rating || ''}';
+            const reviews='${reviews || ''}';
+
+            const services=[${services.map((s: {name:string}) => `"${s.name.replace(/"/g, '\\"')}"`).join(',')}];
+
+            let isOpen=false;
+            let hasGreeted=false;
+
+            btn.addEventListener('click',()=>{
+                isOpen=!isOpen;
+                win.classList.toggle('open',isOpen);
+                btn.classList.toggle('open',isOpen);
+                if(isOpen){badge.style.display='none';input.focus();if(!hasGreeted){hasGreeted=true;setTimeout(()=>addBotMsg(greet()),600)}}
+            });
+            closeBtn.addEventListener('click',()=>{isOpen=false;win.classList.remove('open');btn.classList.remove('open')});
+
+            function greet(){
+                const h=new Date().getHours();
+                const timeGreeting=h<12?'Bonjour':h<18?'Bon après-midi':'Bonsoir';
+                return timeGreeting+' ! 👋 Je suis l\'assistant de <strong>'+name+'</strong>. '+
+                    (sector?'En tant que spécialiste en <strong>'+sector+'</strong>, ':'')+
+                    'je peux vous renseigner sur nos services, nos horaires ou vous aider à prendre rendez-vous. Comment puis-je vous aider ?';
+            }
+
+            function addBotMsg(text){
+                const d=document.createElement('div');d.className='chatbot-msg bot';d.innerHTML=text;
+                msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+            }
+            function addUserMsg(text){
+                const d=document.createElement('div');d.className='chatbot-msg user';d.textContent=text;
+                msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+            }
+            function showTyping(){
+                const d=document.createElement('div');d.className='chatbot-typing';d.id='typing-indicator';
+                d.innerHTML='<span></span><span></span><span></span>';msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+            }
+            function hideTyping(){const t=document.getElementById('typing-indicator');if(t)t.remove()}
+
+            function getReply(msg){
+                const m=msg.toLowerCase();
+                if(m.match(/hour|horaire|ouvert|ferme|quand|samedi|dimanche|lundi|mardi|mercredi|jeudi|vendredi|heure/))
+                    return '🕐 Nos horaires d\'ouverture :<br><br>• <strong>Lundi – Vendredi</strong> : 08h00 – 18h00<br>• <strong>Samedi</strong> : 09h00 – 14h00<br>• <strong>Dimanche</strong> : Fermé<br><br>'+phone?'N\'hésitez pas à nous appeler au <a href="tel:'+phone.replace(/[^0-9+]/g,'')+'">'+phone+'</a> pour toute urgence.':'N\'hésitez pas à nous contacter pour toute urgence.';
+
+                if(m.match(/service|prestation|quoi|propos|faire|offre|propos/)){
+                    let sList=services.length>0?services.map(s=>'• '+s).join('<br>'):'• Consultation\n• Service professionnel\n• Accompagnement personnalisé';
+                    return '✨ Voici nos principales prestations :<br><br>'+sList+'<br><br>Vous souhaitez en savoir plus sur l\'une de ces prestations ?';
+                }
+
+                if(m.match(/contact|telephone|tel|appel|mail|email|joindre|parler|écrire/)){
+                    let r='📞 Voici nos coordonnées :<br><br>';
+                    if(phone)r+='• <strong>Téléphone</strong> : <a href="tel:'+phone.replace(/[^0-9+]/g,'')+'">'+phone+'</a><br>';
+                    if(email)r+='• <strong>Email</strong> : <a href="mailto:'+email+'">'+email+'</a><br>';
+                    if(address)r+='• <strong>Adresse</strong> : '+address+(city?', '+city:'')+'<br>';
+                    r+='<br>Nous sommes disponibles pour répondre à toutes vos questions !';
+                    return r;
+                }
+
+                if(m.match(/adresse|situ|local|trouver|venir|où|map|plan|direction|gps/)){
+                    let r='📍 Vous nous trouverez ici :<br><br>';
+                    if(address)r+='<strong>'+address+(city?', '+city:'')+'</strong><br><br>';
+                    if(address)r+='📍 <a href="https://maps.google.com/?q='+encodeURIComponent(address+(city?', '+city:''))+'" target="_blank">Voir sur Google Maps</a><br><br>';
+                    r+='Nous vous attendons avec plaisir ! 😊';
+                    return r;
+                }
+
+                if(m.match(/tarif|prix|coût|combien|cher|gratuit|devis|budget|payement|paiement/))
+                    return '💰 Concernant nos tarifs :<br><br>Chaque prestation est unique et tarifée selon vos besoins spécifiques. Je vous invite à nous contacter pour obtenir un <strong>devis gratuit et personnalisé</strong>.<br><br>'+phone?'Appelez-nous au <a href="tel:'+phone.replace(/[^0-9+]/g,'')+'">'+phone+'</a> ou envoyez-nous un message pour recevoir votre devis sous 24h.':'Envoyez-nous un message et nous vous répondrons avec un devis détaillé sous 24h.';
+
+                if(m.match(/rendez|rdv|réser|book|prendre|disponib|planning|agenda/))
+                    return '📅 Pour prendre rendez-vous :<br><br>Vous pouvez nous contacter directement :<br><br>'+
+                        (phone?'• 📞 Par téléphone : <a href="tel:'+phone.replace(/[^0-9+]/g,'')+'">'+phone+'</a><br>':'')+
+                        (email?'• ✉️ Par email : <a href="mailto:'+email+'">'+email+'</a><br>':'')+
+                        '<br>Nous ferons notre mieux pour vous proposer un créneau qui vous convient !';
+
+                if(m.match(/avis|note|google|réputation|satisf|opinion|témoignage/))
+                    return '⭐ '+name+' est noté <strong>'+rating+'/5</strong> sur Google basé sur <strong>'+reviews+' avis</strong> de clients vérifiés !<br><br>Nos clients apprécient particulièrement la qualité de notre service et notre professionnalisme. Consultez nos avis pour vous en convaincre ! 😊';
+
+                if(m.match(/merci|remerci|parfait|super|excellent|bravo/))
+                    return 'Avec plaisir ! 😊 N\'hésitez pas si vous avez d\'autres questions. Nous sommes toujours là pour vous aider.';
+
+                if(m.match(/salut|bonjour|bonsoir|hello|hey|coucou|bonne nuit/))
+                    return greet();
+
+                if(m.match(/qui|présentation|histoire|établi|créé|depuis|fondateur|team|équipe/))
+                    return '🏢 <strong>'+name+'</strong> est un établissement de renom'+(city?' situé à '+city:'')+'. '+
+                        (sector?'Spécialiste en '+sector+', ':'')+
+                        'nous mettons un point d\'honneur à offrir un service de qualité à chaque client. '+
+                        'Notre équipe professionnelle et passionnée est à votre entière disposition. '+
+                        (rating?'Notre réputation Google de '+rating+'/5 témoigne de notre engagement.':'');
+
+                if(m.match(/urgence|urgent|vite|rapidement|maintenant|directement/))
+                    return '🚨 Pour une urgence :<br><br>'+
+                        (phone?'<strong>Appelez-nous directement</strong> au <a href="tel:'+phone.replace(/[^0-9+]/g,'')+'">'+phone+'</a><br><br>':'')+
+                        'Notre équipe est réactive et fera tout son possible pour répondre à votre situation dans les meilleurs délais.';
+
+                return 'Merci pour votre message ! 😊 Je vais transmettre votre demande à notre équipe qui vous répondra très rapidement.<br><br>En attendant, vous pouvez aussi :<br>'+
+                    (phone?'• 📞 Nous appeler : <a href="tel:'+phone.replace(/[^0-9+]/g,'')+'">'+phone+'</a><br>':'')+
+                    (email?'• ✉️ Nous écrire : <a href="mailto:'+email+'">'+email+'</a><br>':'')+
+                    '• 📋 Remplir notre <a href="#contact">formulaire de contact</a>';
+            }
+
+            function handleSend(){
+                const msg=input.value.trim();if(!msg)return;
+                addUserMsg(msg);input.value='';
+                showTyping();
+                setTimeout(()=>{hideTyping();addBotMsg(getReply(msg))},800+Math.random()*700);
+            }
+
+            sendBtn.addEventListener('click',handleSend);
+            input.addEventListener('keydown',e=>{if(e.key==='Enter')handleSend()});
+            quickBtns.addEventListener('click',e=>{
+                if(e.target.tagName==='BUTTON'){
+                    const msg=e.target.dataset.msg;
+                    if(msg){addUserMsg(msg);showTyping();setTimeout(()=>{hideTyping();addBotMsg(getReply(msg))},800+Math.random()*700)}
+                }
+            });
+
+            setTimeout(()=>{badge.style.display='none';addBotMsg('Besoin d\'aide ? Je suis là pour vous renseigner sur nos services, horaires ou pour prise de rendez-vous. 😊')},5000);
+        })();
+    </script>
 
     <div class="privacy-overlay" id="privacy-modal">
         <div class="privacy-modal">
