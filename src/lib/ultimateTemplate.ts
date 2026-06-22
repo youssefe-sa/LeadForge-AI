@@ -872,20 +872,28 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
   const fontPair = combinedHash % 4;
   const headingFont = fontPair === 0 ? "'DM Sans'" : fontPair === 1 ? "'Plus Jakarta Sans'" : fontPair === 2 ? "'Playfair Display'" : "'Cormorant Garamond'";
 
+  const leadVariant = combinedHash % 5;
+  const decoRotation = (combinedHash * 7) % 360;
+  const decoScale = 0.8 + ((combinedHash * 3) % 40) / 100;
+  const accentOpacity = 0.04 + ((combinedHash * 11) % 6) / 100;
+  const sectionShape = combinedHash % 3;
+
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <link rel="icon" type="image/svg+xml" href="${faviconDataUrl}">
     <title>${companyName} - ${content.sector} à ${city}</title>
     <meta name="description" content="${heroSubtitle}">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
     <link rel="canonical" href="${website || '#'}">
     <meta property="og:type" content="website">
     <meta property="og:title" content="${companyName} - ${content.sector}">
     <meta property="og:description" content="${heroSubtitle}">
     <meta property="og:image" content="${heroImage}">
+    <meta property="og:image:width" content="1920">
+    <meta property="og:image:height" content="1080">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${companyName}">
     <meta name="twitter:description" content="${heroSubtitle}">
@@ -896,17 +904,18 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     <link rel="alternate" hreflang="fr" href="${website || '#'}">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"${companyName}","description":"${heroSubtitle}","image":"${heroImage}","telephone":"${phone}","email":"${email}","address":{"@type":"PostalAddress","streetAddress":"${address}","addressLocality":"${city}","addressCountry":"FR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"${rating || 5}","reviewCount":"${reviews || 42}"}}}</script>
     <style>
-        :root{--primary:${primaryColor};--primary-rgb:${primaryRgb};--secondary:${secondaryColor};--accent:${accentColor};--bg:#fafaf9;--surface:#fff;--text:#1a1a2e;--text-s:#555770;--text-t:#8b8da3;--border:#e8e8ef;--border-l:#f2f2f7;--dark:#1a2744;--dark-rgb:26,39,68}
+        :root{--primary:${primaryColor};--primary-rgb:${primaryRgb};--secondary:${secondaryColor};--accent:${accentColor};--bg:#fafaf9;--surface:#fff;--text:#1a1a2e;--text-s:#555770;--text-t:#8b8da3;--border:#e8e8ef;--border-l:#f2f2f7;--dark:#1a2744;--dark-rgb:26,39,68;--deco-rotation:${decoRotation}deg;--deco-scale:${decoScale};--accent-opacity:${accentOpacity};--section-shape:${sectionShape}}
         *{margin:0;padding:0;box-sizing:border-box}
         html{scroll-behavior:smooth;font-size:16px}
         body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
         img{max-width:100%;height:auto;display:block}
         h1,h2,h3,h4,h5{font-family:${headingFont},'DM Sans',sans-serif;line-height:1.25;font-weight:700;letter-spacing:-0.02em}
-        .container{max-width:1200px;margin:0 auto;padding:0 24px}
+        .container{max-width:1400px;margin:0 auto;padding:0 32px}
+        @media(max-width:768px){.container{padding:0 20px}}
 
         .navbar{position:fixed;top:36px;left:0;right:0;z-index:100;padding:12px 0;transition:all .4s cubic-bezier(.4,0,.2,1)}
         .navbar.scrolled{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:10px 0;box-shadow:0 2px 30px rgba(0,0,0,.08)}
-        .navbar-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+        .navbar-inner{max-width:1400px;margin:0 auto;padding:0 32px;display:flex;justify-content:space-between;align-items:center}
         .navbar-brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--text);transition:color .3s}
         .navbar:not(.scrolled) .navbar-brand{color:#fff}
         .navbar-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;box-shadow:0 4px 15px rgba(var(--primary-rgb),.3);flex-shrink:0}
@@ -931,7 +940,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;background:var(--dark)}
         .hero-bg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.6;transition:opacity .6s}
         .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(var(--dark-rgb),.7) 0%,rgba(var(--dark-rgb),.5) 40%,rgba(var(--dark-rgb),.8) 100%)}
-        .hero-inner{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:130px 24px 80px;width:100%;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:center}
+        .hero-inner{position:relative;z-index:10;max-width:1400px;margin:0 auto;padding:130px 32px 80px;width:100%;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:center}
         .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:8px 20px;border-radius:100px;color:#fff;font-size:.8rem;font-weight:600;margin-bottom:24px;letter-spacing:.8px;text-transform:uppercase;backdrop-filter:blur(10px)}
         .hero h1{font-size:clamp(2.5rem,5.5vw,4.2rem);font-weight:800;color:#fff;margin-bottom:20px;letter-spacing:-.03em;line-height:1.1}
         .hero h1 em{font-style:normal;color:var(--accent);position:relative}
@@ -955,7 +964,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .hero-card .btn-pri{width:100%;justify-content:center;margin-top:18px}
         .hero-card-note{text-align:center;font-size:.78rem;color:rgba(255,255,255,.4);margin-top:12px}
         @media(max-width:900px){.hero-inner{grid-template-columns:1fr;padding:110px 20px 60px}.hero-card{display:none}.hero-actions{flex-direction:column;align-items:stretch}.btn-pri,.btn-sec{justify-content:center}}
-        @media(max-width:480px){.hero h1{font-size:2rem}.hero-sub{font-size:1rem}.hero-badge{font-size:.7rem;padding:6px 16px}.hero-rating-text{font-size:.8rem}}
+        @media(max-width:480px){.hero h1{font-size:2rem}.hero-sub{font-size:1rem}.hero-badge{font-size:.7rem;padding:6px 16px}.hero-rating-text{font-size:.8rem}.hero-inner{padding:100px 16px 40px}}
 
         .trust-bar{background:#fff;border-bottom:1px solid var(--border);padding:22px 0}
         .trust-inner{display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap}
@@ -978,7 +987,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
 
         .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
         .about-img{border-radius:20px;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.12)}
-        .about-img img{width:100%;height:420px;object-fit:cover;display:block}
+        .about-img img{width:100%;height:480px;object-fit:cover;display:block}
         .about-badge{position:absolute;bottom:24px;right:24px;background:var(--primary);color:#fff;padding:20px 28px;border-radius:16px;text-align:center;box-shadow:0 12px 32px rgba(var(--primary-rgb),.35)}
         .about-badge-num{font-size:2rem;font-weight:800;line-height:1}
         .about-badge-text{font-size:.72rem;text-transform:uppercase;letter-spacing:1.2px;opacity:.85;margin-top:4px}
@@ -1009,7 +1018,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--primary);transform:scaleX(0);transition:transform .35s;transform-origin:left}
         .svc-card:hover{border-color:var(--primary);box-shadow:0 12px 40px rgba(var(--primary-rgb),.1);transform:translateY(-6px)}
         .svc-card:hover::before{transform:scaleX(1)}
-        .svc-card-img{width:100%;height:180px;object-fit:cover;display:block;transition:transform .5s}
+        .svc-card-img{width:100%;height:200px;object-fit:cover;display:block;transition:transform .5s}
+        @media(min-width:1200px){.svc-card-img{height:220px}}
         .svc-card:hover .svc-card-img{transform:scale(1.05)}
         .svc-card-body{padding:28px}
         .svc-icon{width:48px;height:48px;border-radius:12px;background:rgba(var(--primary-rgb),.08);display:flex;align-items:center;justify-content:center;color:var(--primary);margin-bottom:14px}
@@ -1028,7 +1038,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .why-stat-num{font-size:1.85rem;font-weight:800;color:var(--accent);line-height:1}
         .why-stat-label{font-size:.78rem;color:rgba(255,255,255,.5);margin-top:8px;text-transform:uppercase;letter-spacing:1.2px}
         .why-img{position:relative;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)}
-        .why-img img{width:100%;height:420px;object-fit:cover;display:block}
+        .why-img img{width:100%;height:480px;object-fit:cover;display:block}
         .why-img-badge{position:absolute;bottom:24px;right:24px;background:var(--primary);color:#fff;padding:20px 28px;border-radius:16px;text-align:center;box-shadow:0 12px 32px rgba(0,0,0,.3)}
         .why-img-badge-num{font-size:2.2rem;font-weight:800;line-height:1}
         .why-img-badge-text{font-size:.72rem;text-transform:uppercase;letter-spacing:1.2px;opacity:.85;margin-top:4px}
@@ -1042,7 +1052,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         @media(max-width:768px){.guar-grid{grid-template-columns:1fr 1fr;gap:16px}.guar-card{padding:24px 14px}.guar-icon{width:48px;height:48px}}
         @media(max-width:480px){.guar-grid{grid-template-columns:1fr 1fr;gap:12px}.guar-card{padding:20px 12px}.guar-card h3{font-size:.84rem}}
 
-        .gal-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:260px 260px;gap:12px}
+        .gal-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:300px 300px;gap:12px}
+        @media(min-width:1200px){.gal-grid{grid-template-rows:360px 360px}}
         .gal-item{border-radius:14px;overflow:hidden;position:relative;background:var(--border-l)}
         .gal-main{grid-row:1/-1}
         .gal-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.25,1,.5,1)}
@@ -1141,7 +1152,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .reveal{opacity:0;transform:translateY(35px);transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1)}
         .reveal.active{opacity:1;transform:translateY(0)}
         .reveal-d1{transition-delay:.12s}.reveal-d2{transition-delay:.24s}.reveal-d3{transition-delay:.36s}
-        @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.stat-item{animation:none;opacity:1}}
+        @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.stat-item{animation:none;opacity:1}.deco-circle,.deco-diamond,.deco-line,.deco-dot{animation:none!important}.hero-badge{animation:none!important}.cta-banner::before,.cta-banner::after{animation:none!important}}
         @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
         .hero-badge{animation:float 3s ease-in-out infinite}
         @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
@@ -1168,6 +1179,43 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .guar-card:hover .guar-icon{transform:scale(1.1);background:var(--primary);color:#fff}
         .section-dark::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 50%,rgba(var(--primary-rgb),.08) 0%,transparent 50%);pointer-events:none}
         .section-dark{position:relative;overflow:hidden}
+
+        .section-deco{position:absolute;pointer-events:none;z-index:0}
+        .deco-circle{border-radius:50%;background:radial-gradient(circle,rgba(var(--primary-rgb),var(--accent-opacity)) 0%,transparent 70%);animation:decoFloat 12s ease-in-out infinite}
+        .deco-diamond{width:120px;height:120px;background:linear-gradient(135deg,rgba(var(--primary-rgb),.03),rgba(var(--primary-rgb),.06));transform:rotate(var(--deco-rotation));animation:decoSpin 20s linear infinite}
+        .deco-line{height:2px;background:linear-gradient(90deg,transparent,rgba(var(--primary-rgb),.12),transparent);animation:decoSlide 8s ease-in-out infinite}
+        .deco-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:decoPulse 3s ease-in-out infinite}
+        @keyframes decoFloat{0%,100%{transform:translateY(0) scale(var(--deco-scale))}50%{transform:translateY(-20px) scale(calc(var(--deco-scale) * 1.05))}}
+        @keyframes decoSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        @keyframes decoSlide{0%,100%{transform:translateX(-30px);opacity:.3}50%{transform:translateX(30px);opacity:.7}}
+        @keyframes decoPulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
+
+        .svc-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(to top,rgba(var(--primary-rgb),.02),transparent);pointer-events:none;border-radius:0 0 18px 18px;opacity:0;transition:opacity .4s}
+        .svc-card:hover::after{opacity:1}
+        .svc-icon{transition:all .3s}
+        .svc-card:hover .svc-icon{transform:scale(1.1) rotate(5deg);box-shadow:0 4px 16px rgba(var(--primary-rgb),.2)}
+
+        .about-text{position:relative}
+        .about-text::before{content:'';position:absolute;top:-20px;left:-20px;width:60px;height:60px;border:3px solid rgba(var(--primary-rgb),.08);border-radius:50%;animation:decoPulse 4s ease-in-out infinite}
+
+        .why-text::after{content:'';position:absolute;top:50%;right:-30px;width:200px;height:200px;border:1px solid rgba(255,255,255,.05);border-radius:50%;transform:translateY(-50%);animation:decoFloat 15s ease-in-out infinite;pointer-events:none}
+
+        .proc-num{transition:all .4s cubic-bezier(.4,0,.2,1)}
+        .proc-step:hover .proc-num{background:var(--primary);color:#fff;border-color:var(--primary);transform:scale(1.15) rotate(5deg);box-shadow:0 0 30px rgba(var(--primary-rgb),.3)}
+
+        .test-card{position:relative;overflow:hidden}
+        .test-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:0;background:var(--primary);transition:height .4s;border-radius:0 0 4px 4px}
+        .test-card:hover::before{height:100%}
+
+        .gal-item::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--primary-rgb),0),rgba(var(--primary-rgb),.1));opacity:0;transition:opacity .5s;pointer-events:none}
+        .gal-item:hover::after{opacity:1}
+
+        .trust-item{transition:all .3s}
+        .trust-item:hover{transform:translateY(-2px);color:var(--primary)}
+        .trust-item:hover i{transform:scale(1.2)}
+
+        .section-alt{position:relative}
+        .section-alt::before{content:'';position:absolute;top:0;right:0;width:300px;height:300px;background:radial-gradient(circle,rgba(var(--primary-rgb),.03) 0%,transparent 70%);pointer-events:none}
         .privacy-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;justify-content:center;align-items:center;padding:24px}
         .privacy-overlay.open{display:flex}
         .privacy-modal{background:#fff;border-radius:20px;max-width:700px;width:100%;max-height:80vh;overflow-y:auto;padding:40px;position:relative;-webkit-overflow-scrolling:touch}
@@ -1276,7 +1324,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     </div>
 
     <section class="section" id="services">
-        <div class="container">
+        <div class="container" style="position:relative">
+            <div class="section-deco deco-circle" style="width:200px;height:200px;top:-60px;right:${leadVariant % 2 === 0 ? '-80px' : 'auto'};left:${leadVariant % 2 !== 0 ? '-80px' : 'auto'};animation-delay:${leadVariant}s"></div>
+            ${leadVariant % 2 === 0 ? '<div class="section-deco deco-line" style="width:180px;top:40%;left:-40px;animation-delay:2s"></div>' : ''}
             <div class="section-hdr reveal">
                 <span class="section-label">${content.servicesTitle || 'Ce que nous proposons'}</span>
                 <h2>Nos Services</h2>
@@ -1307,7 +1357,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     </section>
 
     <section class="section section-alt" id="about">
-        <div class="container">
+        <div class="container" style="position:relative">
+            <div class="section-deco deco-diamond" style="top:-40px;${leadVariant % 3 === 0 ? 'left:-30px' : leadVariant % 3 === 1 ? 'right:-30px' : 'left:50%;margin-left:-60px'};animation-delay:${leadVariant * 2}s"></div>
+            ${leadVariant > 1 ? '<div class="section-deco deco-dot" style="top:20%;right:10%;animation-delay:1.5s"></div>' : ''}
             <div class="about-grid">
                 <div class="about-img reveal">
                     <img src="${getImg(1)}" ${imgErr(1)} alt="${companyName}">
@@ -1359,7 +1411,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     </div>
 
     <section class="section section-alt" id="process">
-        <div class="container">
+        <div class="container" style="position:relative">
+            <div class="section-deco deco-circle" style="width:160px;height:160px;bottom:-40px;${leadVariant % 2 === 0 ? 'right:-60px' : 'left:-60px'};animation-delay:${leadVariant + 3}s"></div>
             <div class="section-hdr reveal">
                 <span class="section-label">Comment ça marche</span>
                 <h2>Un Accompagnement Sur Mesure</h2>
@@ -1375,7 +1428,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     </section>
 
     <section class="section">
-        <div class="container">
+        <div class="container" style="position:relative">
+            ${leadVariant % 2 === 0 ? '<div class="section-deco deco-line" style="width:200px;bottom:20%;right:-60px;animation-delay:3s"></div>' : ''}
+            <div class="section-deco deco-dot" style="top:10%;${leadVariant % 2 === 0 ? 'left:5%' : 'right:5%'};animation-delay:${leadVariant}s"></div>
             <div class="section-hdr reveal">
                 <span class="section-label">Découvrir</span>
                 <h2>${content.galleryTitle || 'Nos Réalisations'}</h2>
