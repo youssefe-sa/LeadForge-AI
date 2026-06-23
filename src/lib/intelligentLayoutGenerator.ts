@@ -110,9 +110,7 @@ export class IntelligentLayoutGenerator {
       gmailSmtpPort: Number(process.env.GMAIL_SMTP_PORT) || 587,
       gmailSmtpSecure: true,
       whopDepositLink: '',
-      whopFinalPaymentLink: '',
-      whopDepositLinkEn: '',
-      whopFinalPaymentLinkEn: ''
+      whopFinalPaymentLink: ''
     };
   }
 

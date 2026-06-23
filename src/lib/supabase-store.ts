@@ -108,10 +108,8 @@ export interface ApiConfig {
   gmailSmtpFromEmail: string;
   gmailSmtpSecure: boolean;
   // Payment Configuration
-  whopDepositLink: string;
-  whopFinalPaymentLink: string;
-  whopDepositLinkEn: string;
-  whopFinalPaymentLinkEn: string;
+  whopDepositLink: string; // Lien pour paiement 46$ (dépôt)
+  whopFinalPaymentLink: string; // Lien pour paiement 100$ (paiement final)
 }
 
 export interface ApiStatus {
@@ -158,8 +156,6 @@ export const defaultApiConfig: ApiConfig = {
   // Payment defaults
   whopDepositLink: '',
   whopFinalPaymentLink: '',
-  whopDepositLinkEn: '',
-  whopFinalPaymentLinkEn: '',
 };
 
 export const defaultEmailTemplates: EmailTemplate[] = [
