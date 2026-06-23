@@ -401,12 +401,18 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
       whyNeeded: 'OBLIGATOIRE. Permet aux clients de payer pour les sites web générés. Sans ces liens, aucun paiement ne peut être effectué.',
       freeInfo: '💰 CONFIGURATION REQUISE — Créez vos produits sur Whop et copiez les liens ici.',
       fields: [
-        { key: 'whopDepositLink', label: 'Lien paiement 46$ (dépôt)', masked: false, placeholder: 'https://whop.com/products/...',
+        { key: 'whopDepositLink', label: 'Lien paiement 46$ (dépôt) — EUR', masked: false, placeholder: 'https://whop.com/products/...',
           helpUrl: 'https://whop.com/dashboard',
-          helpText: 'whop.com → Dashboard → Products → Copier le lien du produit de 46$' },
-        { key: 'whopFinalPaymentLink', label: 'Lien paiement 100$ (final)', masked: false, placeholder: 'https://whop.com/products/...',
+          helpText: 'whop.com → Dashboard → Products → Copier le lien du produit de 46€' },
+        { key: 'whopFinalPaymentLink', label: 'Lien paiement 100$ (final) — EUR', masked: false, placeholder: 'https://whop.com/products/...',
           helpUrl: 'https://whop.com/dashboard',
-          helpText: 'whop.com → Dashboard → Products → Copier le lien du produit de 100$' },
+          helpText: 'whop.com → Dashboard → Products → Copier le lien du produit de 100€' },
+        { key: 'whopDepositLinkEn', label: 'Lien paiement 46$ (dépôt) — USD', masked: false, placeholder: 'https://whop.com/products/...',
+          helpUrl: 'https://whop.com/dashboard',
+          helpText: 'Produit en USD pour les leads anglophones' },
+        { key: 'whopFinalPaymentLinkEn', label: 'Lien paiement 100$ (final) — USD', masked: false, placeholder: 'https://whop.com/products/...',
+          helpUrl: 'https://whop.com/dashboard',
+          helpText: 'Produit en USD pour les leads anglophones' },
       ],
       testFn: async (c) => {
         const issues = [];

@@ -293,7 +293,9 @@ export const configService = {
         gmailSmtpFromEmail: '',
         gmailSmtpSecure: false,
         whopDepositLink: '',
-        whopFinalPaymentLink: ''
+        whopFinalPaymentLink: '',
+        whopDepositLinkEn: '',
+        whopFinalPaymentLinkEn: ''
       };
     }
 
@@ -314,7 +316,9 @@ export const configService = {
       gmailSmtpFromEmail: data.gmail_smtp_from_email || '',
       gmailSmtpSecure: data.gmail_smtp_secure || false,
       whopDepositLink: data.whop_deposit_link || '',
-      whopFinalPaymentLink: data.whop_final_payment_link || ''
+      whopFinalPaymentLink: data.whop_final_payment_link || '',
+      whopDepositLinkEn: data.whop_deposit_link_en || '',
+      whopFinalPaymentLinkEn: data.whop_final_payment_link_en || '',
     };
   },
 
@@ -335,6 +339,8 @@ export const configService = {
       gmail_smtp_secure: Boolean(config.gmailSmtpSecure),
       whop_deposit_link: config.whopDepositLink || null,
       whop_final_payment_link: config.whopFinalPaymentLink || null,
+      whop_deposit_link_en: config.whopDepositLinkEn || null,
+      whop_final_payment_link_en: config.whopFinalPaymentLinkEn || null,
       unsplash_key: config.unsplashKey || null,
       pexels_key: config.pexelsKey || null,
     };

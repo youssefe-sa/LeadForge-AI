@@ -84,8 +84,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (!targetUrl) {
-         targetUrl = isFinal ? config?.whop_final_payment_link : config?.whop_deposit_link;
-         if (!targetUrl) targetUrl = config?.whop_deposit_link || '/';
+         const isEn = (lead?.city || '').toLowerCase().match(/london|new york|manhattan|brooklyn|chicago|los angeles|san francisco|miami|boston|seattle|austin|denver|atlanta|houston|toronto|vancouver|sydney|melbourne|berlin|munich|amsterdam|barcelona|madrid|rome|milan|dubai|singapore|tokyo|hong kong/);
+         if (isEn) {
+           targetUrl = isFinal ? config?.whop_final_payment_link_en : config?.whop_deposit_link_en;
+         } else {
+           targetUrl = isFinal ? config?.whop_final_payment_link : config?.whop_deposit_link;
+         }
+         if (!targetUrl) targetUrl = config?.whop_deposit_link || config?.whop_deposit_link_en || '/';
       }
     } 
     else if (trackType === 'devis_clicked') {
