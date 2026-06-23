@@ -199,8 +199,12 @@ export interface UltimateContent {
 const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
   primary: string; secondary: string; accent: string; background: string;
   services: Array<{ name: string; description: string; features: string[] }>;
+  servicesEn?: Array<{ name: string; description: string; features: string[] }>;
   guarantees: Array<{ title: string; icon: string }>;
-  heroTitle: string; heroSubtitle: string; aboutText: string; ctaText: string;
+  heroTitle: string; heroTitleEn?: string;
+  heroSubtitle: string; heroSubtitleEn?: string;
+  aboutText: string; aboutTextEn?: string;
+  ctaText: string; ctaTextEn?: string;
 }> = {
   plomberie: {
     primary: '#0f766e', secondary: '#115e59', accent: '#14b8a6', background: '#f0fdfa',
@@ -218,9 +222,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'Devis Gratuit', icon: 'file-text' },
       { title: 'Artisan Qualifié', icon: 'badge-check' }
     ],
-    heroTitle: 'Artisan Plombier', heroSubtitle: "De la fuite d'eau à la rénovation complète, un savoir-faire au service de vos installations",
-    aboutText: "Plombier chauffagiste depuis plus de 15 ans, je mets mon savoir-faire au service de vos installations. Artisan passionné, je garantis un travail soigné, des délais respectés et des tarifs transparents.",
-    ctaText: 'Demander un devis gratuit'
+    heroTitle: 'Artisan Plombier', heroTitleEn: 'Plumbing Expert',
+    heroSubtitle: "De la fuite d'eau à la rénovation complète, un savoir-faire au service de vos installations", heroSubtitleEn: 'From leak repair to complete renovation, expertise for your plumbing systems',
+    aboutText: "Plombier chauffagiste depuis plus de 15 ans, je mets mon savoir-faire au service de vos installations. Artisan passionné, je garantis un travail soigné, des délais respectés et des tarifs transparents.", aboutTextEn: 'Plumber and heating specialist for over 15 years. I bring my expertise to your installations with quality work, respected deadlines, and transparent pricing.',
+    ctaText: 'Demander un devis gratuit', ctaTextEn: 'Get a Free Quote'
   },
   electricien: {
     primary: '#1e40af', secondary: '#1e3a8a', accent: '#2563eb', background: '#f8fafc',
@@ -238,9 +243,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'Intervention < 2h', icon: 'clock' },
       { title: 'Devis Gratuit', icon: 'file-text' }
     ],
-    heroTitle: 'Électricien Agréé', heroSubtitle: "Des installations sûres, conformes et durables pour votre habitat et votre entreprise",
-    aboutText: "Électricien certifié Consuel avec 15 ans d'expérience. Je sécurise votre habitat grâce à des installations conformes et durables. Artisan sérieux, intervention rapide et devis transparent.",
-    ctaText: 'Contactez-nous'
+    heroTitle: 'Électricien Agréé', heroTitleEn: 'Certified Electrician',
+    heroSubtitle: "Des installations sûres, conformes et durables pour votre habitat et votre entreprise", heroSubtitleEn: 'Safe, compliant, and durable installations for your home and business',
+    aboutText: "Électricien certifié Consuel avec 15 ans d'expérience. Je sécurise votre habitat grâce à des installations conformes et durables. Artisan sérieux, intervention rapide et devis transparent.", aboutTextEn: 'Consuel-certified electrician with 15 years of experience. I secure your home with compliant and durable installations. Professional work, fast response, and transparent quotes.',
+    ctaText: 'Contactez-nous', ctaTextEn: 'Contact Us'
   },
   coiffeur: {
     primary: '#6b21a8', secondary: '#581c87', accent: '#7c3aed', background: '#faf5ff',
@@ -258,9 +264,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'Formation Continue', icon: 'scissors' },
       { title: 'Satisfait ou Refait', icon: 'heart' }
     ],
-    heroTitle: 'Coiffeur Visagiste', heroSubtitle: "L'art de sublimer vos cheveux avec passion et expertise",
-    aboutText: "Coiffeur passionné depuis 15 ans, je crée des looks qui vous ressemblent. Spécialiste du visagisme et des techniques modernes, je veille à la santé de vos cheveux avec des produits naturels et de qualité.",
-    ctaText: 'Prendre rendez-vous'
+    heroTitle: 'Coiffeur Visagiste', heroTitleEn: 'Hair Stylist',
+    heroSubtitle: "L'art de sublimer vos cheveux avec passion et expertise", heroSubtitleEn: 'The art of enhancing your hair with passion and expertise',
+    aboutText: "Coiffeur passionné depuis 15 ans, je crée des looks qui vous ressemblent. Spécialiste du visagisme et des techniques modernes, je veille à la santé de vos cheveux avec des produits naturels et de qualité.", aboutTextEn: 'Passionate hair stylist for 15 years, I create looks that suit you. Specialist in face-shaping and modern techniques, I care for your hair with natural, quality products.',
+    ctaText: 'Prendre rendez-vous', ctaTextEn: 'Book Appointment'
   },
   restaurant: {
     primary: '#c2410c', secondary: '#9a3412', accent: '#ea580c', background: '#fff7ed',
@@ -278,9 +285,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'Avis 4.8/5', icon: 'star' },
       { title: 'Parking Gratuit', icon: 'car' }
     ],
-    heroTitle: 'Restaurant Traditionnel', heroSubtitle: "Cuisine authentique et accueil chaleureux depuis 2009",
-    aboutText: "Chef passionné depuis 15 ans, je cuisine avec cœur des plats généreux et savoureux. Produits frais du marché, recettes authentiques et ambiance conviviale vous attendent.",
-    ctaText: 'Réserver une table'
+    heroTitle: 'Restaurant Traditionnel', heroTitleEn: 'Traditional Restaurant',
+    heroSubtitle: "Cuisine authentique et accueil chaleureux depuis 2009", heroSubtitleEn: 'Authentic cuisine and warm hospitality since 2009',
+    aboutText: "Chef passionné depuis 15 ans, je cuisine avec cœur des plats généreux et savoureux. Produits frais du marché, recettes authentiques et ambiance conviviale vous attendent.", aboutTextEn: 'Passionate chef for 15 years, cooking generous and flavorful dishes with heart. Fresh market produce, authentic recipes, and a welcoming atmosphere await you.',
+    ctaText: 'Réserver une table', ctaTextEn: 'Reserve a Table'
   },
   garage: {
     primary: '#166534', secondary: '#14532d', accent: '#059669', background: '#f0fdf4',
@@ -298,9 +306,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'Équipe Qualifiée', icon: 'clock' },
       { title: 'Véhicule de Courtoisie', icon: 'car' }
     ],
-    heroTitle: 'Garage Automobile', heroSubtitle: "Mécanicien passionné, votre véhicule entre de bonnes mains",
-    aboutText: "Mécanicien automobile depuis 15 ans, j'entretiens et répare toutes marques avec passion. Diagnostic précis, devis transparents et respect des délais.",
-    ctaText: 'Demendez un RDV'
+    heroTitle: 'Garage Automobile', heroTitleEn: 'Auto Garage',
+    heroSubtitle: "Mécanicien passionné, votre véhicule entre de bonnes mains", heroSubtitleEn: 'Passionate mechanic, your vehicle in good hands',
+    aboutText: "Mécanicien automobile depuis 15 ans, j'entretiens et répare toutes marques avec passion. Diagnostic précis, devis transparents et respect des délais.", aboutTextEn: 'Automotive mechanic for 15 years, I maintain and repair all brands with passion. Accurate diagnostics, transparent quotes, and respected deadlines.',
+    ctaText: 'Demendez un RDV', ctaTextEn: 'Book an Appointment'
   },
   nettoyage: {
     primary: '#059669', secondary: '#047857', accent: '#10b981', background: '#f0fdf4',
@@ -318,9 +327,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'Intervention Fiable', icon: 'clock' },
       { title: 'Assurance RC Pro', icon: 'shield-check' }
     ],
-    heroTitle: 'Société de Nettoyage', heroSubtitle: "Propreté professionnelle et écologique pour vos espaces",
-    aboutText: "Entreprise de nettoyage depuis 15 ans, nos équipes formées interviennent avec rigueur et discrétion. Produits écolabels, matériel professionnel et engagement qualité.",
-    ctaText: 'Demander un devis'
+    heroTitle: 'Société de Nettoyage', heroTitleEn: 'Cleaning Company',
+    heroSubtitle: "Propreté professionnelle et écologique pour vos espaces", heroSubtitleEn: 'Professional and eco-friendly cleanliness for your spaces',
+    aboutText: "Entreprise de nettoyage depuis 15 ans, nos équipes formées interviennent avec rigueur et discrétion. Produits écolabels, matériel professionnel et engagement qualité.", aboutTextEn: 'Cleaning company for 15 years, our trained teams work with precision and discretion. Eco-label products, professional equipment, and quality commitment.',
+    ctaText: 'Demander un devis', ctaTextEn: 'Request a Quote'
   },
   jardin: {
     primary: '#14532d', secondary: '#166534', accent: '#15803d', background: '#f0fdf4',
@@ -338,9 +348,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'Conseils Saisonniers', icon: 'sun' },
       { title: 'Paysagiste Qualifié', icon: 'tree-deciduous' }
     ],
-    heroTitle: 'Jardinier Paysagiste', heroSubtitle: "Création et entretien de jardins uniques et harmonieux",
-    aboutText: "Paysagiste passionné depuis 15 ans, je conçois et entretiens des espaces verts qui vivent au rythme des saisons.",
-    ctaText: 'Demander un devis'
+    heroTitle: 'Jardinier Paysagiste', heroTitleEn: 'Landscaper',
+    heroSubtitle: "Création et entretien de jardins uniques et harmonieux", heroSubtitleEn: 'Creation and maintenance of unique, harmonious gardens',
+    aboutText: "Paysagiste passionné depuis 15 ans, je conçois et entretiens des espaces verts qui vivent au rythme des saisons.", aboutTextEn: 'Passionate landscaper for 15 years, I design and maintain green spaces that live in harmony with the seasons.',
+    ctaText: 'Demander un devis', ctaTextEn: 'Request a Quote'
   },
   fitness: {
     primary: '#dc2626', secondary: '#b91c1c', accent: '#ef4444', background: '#fef2f2',
@@ -358,9 +369,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'Sans Engagement', icon: 'badge-check' },
       { title: 'Accès 6h-23h', icon: 'clock' }
     ],
-    heroTitle: 'Coach Sportif', heroSubtitle: "Votre coach personnel pour atteindre vos objectifs fitness",
-    aboutText: "Coach sportif diplômé d'État avec 15 ans d'expérience. Programmes personnalisés pour perdre du poids, gagner en muscle ou préparer une compétition.",
-    ctaText: 'Essai offert'
+    heroTitle: 'Coach Sportif', heroTitleEn: 'Fitness Coach',
+    heroSubtitle: "Votre coach personnel pour atteindre vos objectifs fitness", heroSubtitleEn: 'Your personal coach to reach your fitness goals',
+    aboutText: "Coach sportif diplômé d'État avec 15 ans d'expérience. Programmes personnalisés pour perdre du poids, gagner en muscle ou préparer une compétition.", aboutTextEn: 'State-certified fitness coach with 15 years of experience. Personalized programs for weight loss, muscle gain, or competition preparation.',
+    ctaText: 'Essai offert', ctaTextEn: 'Free Trial'
   },
   medical: {
     primary: '#1e40af', secondary: '#1e3a8a', accent: '#2563eb', background: '#eff6ff',
@@ -378,9 +390,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'RDV sous 48h', icon: 'calendar' },
       { title: 'Équipe Pluridisciplinaire', icon: 'users' }
     ],
-    heroTitle: 'Cabinet Médical', heroSubtitle: "Votre santé entre les mains de professionnels qualifiés",
-    aboutText: "Médecin généraliste depuis 15 ans, je vous accueille dans un cabinet moderne et chaleureux. Écoute, diagnostic précis et suivi personnalisé.",
-    ctaText: 'Prendre rendez-vous'
+    heroTitle: 'Cabinet Médical', heroTitleEn: 'Medical Practice',
+    heroSubtitle: "Votre santé entre les mains de professionnels qualifiés", heroSubtitleEn: 'Your health in the hands of qualified professionals',
+    aboutText: "Médecin généraliste depuis 15 ans, je vous accueille dans un cabinet moderne et chaleureux. Écoute, diagnostic précis et suivi personnalisé.", aboutTextEn: 'General practitioner for 15 years, welcoming you in a modern, warm practice. Listening, accurate diagnosis, and personalized follow-up.',
+    ctaText: 'Prendre rendez-vous', ctaTextEn: 'Book Appointment'
   },
   avocat: {
     primary: '#1e3a8a', secondary: '#172554', accent: '#2563eb', background: '#f8fafc',
@@ -398,9 +411,10 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { title: 'Défense Déterminée', icon: 'sword' },
       { title: 'Honoraires Transparent', icon: 'file-text' }
     ],
-    heroTitle: 'Avocat à la Cour', heroSubtitle: "Conseil juridique personnalisé et défense de vos droits",
-    aboutText: "Avocat inscrit au Barreau depuis 15 ans, je défends vos intérêts avec rigueur et détermination. Chaque dossier mérite une stratégie sur mesure.",
-    ctaText: 'Prendre rendez-vous'
+    heroTitle: 'Avocat à la Cour', heroTitleEn: 'Attorney at Law',
+    heroSubtitle: "Conseil juridique personnalisé et défense de vos droits", heroSubtitleEn: 'Personalized legal advice and defense of your rights',
+    aboutText: "Avocat inscrit au Barreau depuis 15 ans, je défends vos intérêts avec rigueur et détermination. Chaque dossier mérite une stratégie sur mesure.", aboutTextEn: 'Bar-certified attorney for 15 years, defending your interests with rigor and determination. Every case deserves a tailored strategy.',
+    ctaText: 'Prendre rendez-vous', ctaTextEn: 'Book Appointment'
   },
   default: {
     primary: '#1e293b', secondary: '#334155', accent: '#475569', background: '#f8fafc',
@@ -412,15 +426,24 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
       { name: 'Qualité Garantie', description: 'Un engagement sur le résultat', features: ['Contrôle qualité', 'Corrections incluses', 'SAV réactif'] },
       { name: 'Tarifs Clairs', description: 'Des honoraires transparents', features: ['Devis préalable', 'Pas de surprise', 'Facilités de paiement'] }
     ],
+    servicesEn: [
+      { name: 'Tailored Service', description: 'Services adapted to your needs', features: ['Personalized study', 'Detailed quote', 'Attentive listening'] },
+      { name: 'Professional Service', description: 'Careful, quality work', features: ['Adapted equipment', 'Modern techniques', 'Standards compliance'] },
+      { name: 'Consulting & Support', description: 'End-to-end guidance', features: ['Complete diagnosis', 'Relevant solutions', 'Personalized follow-up'] },
+      { name: 'Responsiveness', description: 'A service at your pace', features: ['Fast response', 'Flexible hours', 'Efficient handling'] },
+      { name: 'Quality Guaranteed', description: 'A commitment to results', features: ['Quality control', 'Corrections included', 'Responsive support'] },
+      { name: 'Clear Pricing', description: 'Transparent fees', features: ['Prior quote', 'No surprises', 'Payment options'] }
+    ],
     guarantees: [
       { title: 'Équipe Qualifiée', icon: 'badge-check' },
       { title: 'Devis Clair', icon: 'file-text' },
       { title: 'Réactivité', icon: 'clock' },
       { title: 'Satisfaction Client', icon: 'heart' }
     ],
-    heroTitle: 'Notre Établissement', heroSubtitle: "Un service de qualité, à l'écoute de vos besoins",
-    aboutText: "Notre équipe met un point d'honneur à offrir un service personnalisé et de qualité. Avec des années d'expérience, nous mettons notre expertise au service de votre satisfaction.",
-    ctaText: 'Contactez-nous'
+    heroTitle: 'Notre Établissement', heroTitleEn: 'Our Business',
+    heroSubtitle: "Un service de qualité, à l'écoute de vos besoins", heroSubtitleEn: 'Quality service, attentive to your needs',
+    aboutText: "Notre équipe met un point d'honneur à offrir un service personnalisé et de qualité. Avec des années d'expérience, nous mettons notre expertise au service de votre satisfaction.", aboutTextEn: 'Our team is committed to delivering personalized, quality service. With years of experience, we put our expertise at your service.',
+    ctaText: 'Contactez-nous', ctaTextEn: 'Contact Us'
   }
 };
 
@@ -989,10 +1012,10 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   const address = lead.address || (city ? (lang === 'en' ? `Downtown, ${city}` : `Centre Ville, ${city}`) : (lang === 'en' ? 'USA' : 'France'));
   const rating = lead.googleRating || 5;
   const reviews = lead.googleReviews || 42;
-  const description = generateAboutText(aiContent?.aboutText || lead.description || template.aboutText, lead);
-  const heroTitle = aiContent?.heroTitle || template.heroTitle;
-  const heroSubtitle = aiContent?.heroSubtitle || `${template.heroSubtitle}${city ? (lang === 'en' ? ' in ' : ' à ') + city : ''}`;
-  let ctaText = aiContent?.cta || template.ctaText || (lang === 'en' ? 'Contact Us' : 'Demander un devis');
+  const description = generateAboutText(aiContent?.aboutText || lead.description || (lang === 'en' ? template.aboutTextEn : template.aboutText), lead);
+  const heroTitle = aiContent?.heroTitle || (lang === 'en' ? template.heroTitleEn : template.heroTitle);
+  const heroSubtitle = aiContent?.heroSubtitle || `${lang === 'en' ? template.heroSubtitleEn : template.heroSubtitle}${city ? (lang === 'en' ? ' in ' : ' à ') + city : ''}`;
+  let ctaText = aiContent?.cta || (lang === 'en' ? template.ctaTextEn : template.ctaText) || (lang === 'en' ? 'Contact Us' : 'Contactez-nous');
   if (ctaText.length > 50) ctaText = ctaText.substring(0, 47) + '...';
 
   const computeHash = (str: string): number => {
@@ -1010,17 +1033,18 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   const emailHash = computeHash(email || 'x');
   const combinedHash = (nameHash * 7 + cityHash * 13 + sectorHash * 23 + phoneHash * 31 + emailHash * 37) % 100000;
   
-  const sloganVariations = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance"];
-  const finalSlogan = aiContent?.slogan || sloganVariations[combinedHash % sloganVariations.length];
+  const sloganVariationsFr = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance"];
+  const sloganVariationsEn = ["Excellence at your service", "The art of everyday perfection", "Premium tailored solutions", "Excellence & Passion", "Your trusted partner"];
+  const finalSlogan = aiContent?.slogan || (lang === 'en' ? sloganVariationsEn[combinedHash % sloganVariationsEn.length] : sloganVariationsFr[combinedHash % sloganVariationsFr.length]);
 
   const sectorImages = await getSectorImagesAsync(lead.sector);
 
-  // Hero/À propos/Galerie : uniquement des images Pexels/Unsplash (légales, fiables)
+  // Hero/About/Gallery: only Pexels/Unsplash images (legal, reliable)
   const heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
 
   const allImages = sectorImages.filter(s => s !== heroImage).slice(0, 4);
 
-  let finalServices = template.services;
+  let finalServices = (lang === 'en' ? template.servicesEn : undefined) || template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
     finalServices = aiContent.services.map((s: any, idx: number) => {
       let features = s.features;
