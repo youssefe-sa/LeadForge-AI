@@ -1037,7 +1037,7 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   const sloganVariationsEn = ["Excellence at your service", "The art of everyday perfection", "Premium tailored solutions", "Excellence & Passion", "Your trusted partner"];
   const finalSlogan = aiContent?.slogan || (lang === 'en' ? sloganVariationsEn[combinedHash % sloganVariationsEn.length] : sloganVariationsFr[combinedHash % sloganVariationsFr.length]);
 
-  const sectorImages = await getSectorImagesAsync(lead.sector);
+  const sectorImages = await getSectorImagesAsync(lead.sector, combinedHash);
 
   // Hero/About/Gallery: only Pexels/Unsplash images (legal, reliable)
   const heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
@@ -1080,13 +1080,13 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   while (testimonials.length < 6) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 6);
 
-  // Récupérer une image Pexels dédiée pour chaque service — requête exacte, pas sectorielle
+  // Récupérer une image Pexels dédiée pour chaque service — requête exacte avec nom du lead pour varier
   const serviceImages: string[] = [];
   const usedServiceImages = new Set<string>([heroImage]);
   for (const service of finalServices) {
     try {
       const query = getServiceImageQuery(service.name);
-      const imgs = await fetchServiceImages(`${lead.sector} ${query}`, 4);
+      const imgs = await fetchServiceImages(`${lead.sector} ${query} ${lead.name.split(' ')[0] || ''}`, 4);
       let picked = imgs.find(img => !usedServiceImages.has(img));
       if (!picked) picked = sectorImages.find(img => !usedServiceImages.has(img)) || heroImage;
       serviceImages.push(picked);
@@ -1110,7 +1110,7 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   // Compléter avec des requêtes Pexels dédiées galerie si besoin
   if (galleryImages.length < 5) {
     try {
-      const extra = await fetchServiceImages(`${lead.sector} professional results portfolio`, 5);
+      const extra = await fetchServiceImages(`${lead.sector} professional results portfolio ${lead.name.split(' ')[0] || ''}`, 5);
       for (const img of extra) {
         if (galleryImages.length >= 5) break;
         if (!usedServiceImages.has(img)) {

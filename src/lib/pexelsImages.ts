@@ -130,6 +130,7 @@ const serviceImagesCache: Record<string, string[]> = {};
  * Cache par requête exacte pour éviter les appels répétés.
  */
 export async function fetchServiceImages(query: string, count: number = 4): Promise<string[]> {
+  // Cache key includes full query to avoid cross-lead duplication
   const cacheKey = `svc_${query}`;
   if (serviceImagesCache[cacheKey]) {
     return serviceImagesCache[cacheKey];
@@ -165,10 +166,11 @@ export async function fetchServiceImages(query: string, count: number = 4): Prom
 /**
  * Récupère toutes les images uniques d'un secteur via l'API Pexels
  * 5 requêtes × 4 images = jusqu'à 20 images uniques
+ * Utilise un offset basé sur le hash du lead pour varier les résultats
  */
-export async function fetchSectorImagesFromAPI(sector: string): Promise<string[]> {
+export async function fetchSectorImagesFromAPI(sector: string, leadHash: number = 0): Promise<string[]> {
   const normalizedSector = (sector || '').toLowerCase().trim();
-  const cacheKey = `sector_${normalizedSector}`;
+  const cacheKey = `sector_${normalizedSector}_${leadHash % 5}`;
 
   if (imagesCache[cacheKey]) {
     return imagesCache[cacheKey];
@@ -195,10 +197,14 @@ export async function fetchSectorImagesFromAPI(sector: string): Promise<string[]
   else if (normalizedSector.includes('médec') || normalizedSector.includes('medical') || normalizedSector.includes('sant') || normalizedSector.includes('dentiste') || normalizedSector.includes('kiné')) queries = SECTOR_PEXEL_QUERIES.medical;
   else if (normalizedSector.includes('avocat') || normalizedSector.includes('jurid') || normalizedSector.includes('droit') || normalizedSector.includes('notaire')) queries = SECTOR_PEXEL_QUERIES.avocat;
 
-  console.log(`🖼️ Pexels: Récupération d'images pour "${sector}" (${queries.length} requêtes)`);
+  // Offset les requêtes basé sur le hash du lead pour varier les résultats
+  const offset = leadHash % queries.length;
+  const offsetQueries = [...queries.slice(offset), ...queries.slice(0, offset)];
+
+  console.log(`🖼️ Pexels: Récupération d'images pour "${sector}" (${offsetQueries.length} requêtes, offset ${offset})`);
 
   const allImages: string[] = [];
-  for (const query of queries) {
+  for (const query of offsetQueries) {
     const imgs = await fetchPexelsSearch(query, 4);
     allImages.push(...imgs);
   }
@@ -313,8 +319,8 @@ const STATIC_FALLBACK: Record<string, string[]> = {
 /**
  * Récupère les images d'un secteur (API Pexels d'abord, fallback statique)
  */
-export async function getSectorImagesAsync(sector: string): Promise<string[]> {
-  const apiImages = await fetchSectorImagesFromAPI(sector);
+export async function getSectorImagesAsync(sector: string, leadHash: number = 0): Promise<string[]> {
+  const apiImages = await fetchSectorImagesFromAPI(sector, leadHash);
   if (apiImages.length >= 5) return apiImages;
 
   // Fallback statique
