@@ -339,13 +339,11 @@ export const configService = {
       gmail_smtp_secure: Boolean(config.gmailSmtpSecure),
       whop_deposit_link: config.whopDepositLink || null,
       whop_final_payment_link: config.whopFinalPaymentLink || null,
+      whop_deposit_link_en: config.whopDepositLinkEn || null,
+      whop_final_payment_link_en: config.whopFinalPaymentLinkEn || null,
       unsplash_key: config.unsplashKey || null,
       pexels_key: config.pexelsKey || null,
     };
-
-    // Tentative d'ajouter les colonnes EN (peuvent ne pas exister dans l'ancien schéma)
-    if (config.whopDepositLinkEn) row.whop_deposit_link_en = config.whopDepositLinkEn;
-    if (config.whopFinalPaymentLinkEn) row.whop_final_payment_link_en = config.whopFinalPaymentLinkEn;
 
     console.log('🚀 Updating api_config (id=1):', row);
 
