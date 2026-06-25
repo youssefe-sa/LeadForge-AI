@@ -127,17 +127,17 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
 
     // ── STEP 2 — Scraping pages contact du site web ──
     const currentWebsite = updates.website || lead.website;
-    if (hasSerper && currentWebsite) {
-      setStep('🌐 Scraping pages contact du site web...');
+    if (currentWebsite) {
+      setStep('🌐 Scraping direct du site web...');
       try {
-        const siteContact = await scrapeWebsiteForContact(apiConfig.serperKey, currentWebsite, lead.name);
+        const siteContact = await scrapeWebsiteForContact(apiConfig.serperKey || '', currentWebsite, lead.name);
         if (siteContact.email && !updates.email && !lead.email) {
           updates.email = siteContact.email;
-          addLog(`✅ Email trouvé via site web : ${siteContact.email}`);
+          addLog(`✅ Email trouvé via scraping : ${siteContact.email}`);
         }
         if (siteContact.phone && !updates.phone && !lead.phone) {
           updates.phone = siteContact.phone;
-          addLog(`✅ Téléphone trouvé via site web : ${siteContact.phone}`);
+          addLog(`✅ Téléphone trouvé via scraping : ${siteContact.phone}`);
         }
         if (siteContact.services.length > 0) {
           const existingTags = updates.tags || lead.tags || [];
@@ -145,11 +145,11 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
           llmContext.websiteContent = siteContact.services.join(' | ');
           addLog(`✅ Services extraits : ${siteContact.services.slice(0, 3).join(', ')}`);
         }
-        if (!siteContact.email && !siteContact.phone) addLog('ℹ️ Site web : pas de contact trouvé dans les pages indexées');
+        if (!siteContact.email && !siteContact.phone) addLog('ℹ️ Site web : aucun contact trouvé');
       } catch (error) {
         addLog(`⚠️ Site web : échec scraping (${error instanceof Error ? error.message : 'erreur'})`);
       }
-    } else if (!currentWebsite) {
+    } else {
       addLog('ℹ️ Pas de site web — scraping ignoré');
     }
 

@@ -1613,53 +1613,69 @@ const snippetsText = (organic: unknown[] | undefined): string => {
 export async function scrapeWebsiteForContact(
   serperKey: string,
   website: string,
-  _leadName: string
+  leadName: string
 ): Promise<{ email: string; phone: string; services: string[] }> {
   const result = { email: '', phone: '', services: [] as string[] };
-  if (!serperKey || !website) return result;
+  if (!website) return result;
 
   const domain = website.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '');
-  const allText: string[] = [];
 
-  // Stratégie 1 : page contact
+  // Stratégie A : Fetch HTTP réel du site via endpoint server-side (prioritaire)
   try {
-    const r = await serperFetch(serperKey, 'search', { q: `site:${domain} (contact OR "nous contacter" OR "contactez-nous")`, gl: 'fr', hl: 'fr', num: 5 });
-    if (r?.organic && Array.isArray(r.organic)) allText.push(snippetsText(r.organic));
-  } catch { /* continue */ }
-
-  // Stratégie 2 : pages légales / à propos
-  try {
-    const r = await serperFetch(serperKey, 'search', { q: `site:${domain} ("mentions légales" OR "about" OR "à propos" OR "qui sommes")`, gl: 'fr', hl: 'fr', num: 5 });
-    if (r?.organic && Array.isArray(r.organic)) allText.push(snippetsText(r.organic));
-  } catch { /* continue */ }
-
-  // Stratégie 3 : homepage complète indexée
-  try {
-    const r = await serperFetch(serperKey, 'search', { q: `site:${domain}`, gl: 'fr', hl: 'fr', num: 8 });
-    if (r?.organic && Array.isArray(r.organic)) {
-      allText.push(snippetsText(r.organic));
-      // Extraire les services depuis les titres de pages
-      const titles = r.organic.map((x: unknown) => {
-        if (x && typeof x === 'object') return safeStr((x as Record<string, unknown>).title);
-        return '';
-      }).filter((t: string) => t.length > 3 && t.length < 60);
-      result.services = titles.slice(0, 5);
+    const baseUrl = website.startsWith('http') ? website : `https://${website}`;
+    const res = await fetch('/api/scrape-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: baseUrl, leadName }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.bestEmail) {
+        result.email = data.bestEmail;
+        console.log(`✅ [Direct Scraping] Email trouvé: ${data.bestEmail} (${data.pagesScanned} pages scannées)`);
+      }
+      if (data.phones?.length > 0 && !result.phone) {
+        result.phone = data.phones[0];
+      }
     }
-  } catch { /* continue */ }
-
-  const fullText = allText.join(' \n ');
-
-  // Extraire l'email et le téléphone via Regex (avec validation domaine)
-  if (!result.email) {
-    const extracted = extractEmail(fullText);
-    if (extracted) {
-      result.email = extracted;
-    }
+  } catch (err) {
+    console.warn('[Direct Scraping] Échec:', (err as Error).message);
   }
-  if (!result.phone) result.phone = extractPhone(fullText);
 
-  // Garder le texte pour le donner au LLM plus tard
-  (result as any).rawScrapedText = fullText.substring(0, 3000);
+  // Stratégie B : Serper snippets (fallback si pas encore d'email)
+  if (!result.email && serperKey) {
+    const allText: string[] = [];
+
+    try {
+      const r = await serperFetch(serperKey, 'search', { q: `site:${domain} (contact OR "nous contacter" OR "contactez-nous")`, gl: 'fr', hl: 'fr', num: 5 });
+      if (r?.organic && Array.isArray(r.organic)) allText.push(snippetsText(r.organic));
+    } catch { /* continue */ }
+
+    try {
+      const r = await serperFetch(serperKey, 'search', { q: `site:${domain} ("mentions légales" OR "about" OR "à propos" OR "qui sommes")`, gl: 'fr', hl: 'fr', num: 5 });
+      if (r?.organic && Array.isArray(r.organic)) allText.push(snippetsText(r.organic));
+    } catch { /* continue */ }
+
+    try {
+      const r = await serperFetch(serperKey, 'search', { q: `site:${domain}`, gl: 'fr', hl: 'fr', num: 8 });
+      if (r?.organic && Array.isArray(r.organic)) {
+        allText.push(snippetsText(r.organic));
+        const titles = r.organic.map((x: unknown) => {
+          if (x && typeof x === 'object') return safeStr((x as Record<string, unknown>).title);
+          return '';
+        }).filter((t: string) => t.length > 3 && t.length < 60);
+        result.services = titles.slice(0, 5);
+      }
+    } catch { /* continue */ }
+
+    const fullText = allText.join(' \n ');
+    if (!result.email) {
+      const extracted = extractEmail(fullText);
+      if (extracted) result.email = extracted;
+    }
+    if (!result.phone) result.phone = extractPhone(fullText);
+    (result as any).rawScrapedText = fullText.substring(0, 3000);
+  }
 
   return result;
 }
@@ -1758,17 +1774,18 @@ export async function deepSearchContact(
   apiConfig: ApiConfig
 ): Promise<{ email: string; phone: string }> {
   const result = { email: '', phone: '' };
-  if (!serperKey) return result;
 
   const allSnippets: string[] = [];
 
-  // Strategy 0 : scraping pages du site web
+  // Strategy 0 : scraping direct du site web (fonctionne sans Serper)
   if (lead.website) {
     const siteContact = await scrapeWebsiteForContact(serperKey, lead.website, lead.name);
     if (siteContact.email) result.email = siteContact.email;
     if (siteContact.phone) result.phone = siteContact.phone;
     if (result.email && result.phone) return result;
   }
+
+  if (!serperKey) return result;
 
   // Strategy 1 : recherche site:domain generique
   if (lead.website && (!result.email || !result.phone)) {
