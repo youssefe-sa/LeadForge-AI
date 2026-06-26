@@ -3,8 +3,6 @@ import { Lead } from '../../supabase-store';
 import { getUiStrings } from '../data/ui-strings';
 import { getSectorFallbackReviews } from '../data/fallback-reviews';
 import { getProcessSteps } from '../data/process-steps';
-import { renderGallery, renderFAQ, renderHours, renderContactMap, renderWhatsAppFloat, renderStickyCTA, renderTestimonialsCarousel, renderStatsCounter, renderTrustBar } from '../sections';
-import { SHARED_STYLES } from '../shared-styles';
 
 export const classicLayout: LayoutModule = {
   id: 'classic',
@@ -53,7 +51,6 @@ export const classicLayout: LayoutModule = {
     .contact-item { background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 12px; }
     footer { background: var(--secondary); color: white; text-align: center; padding: 2rem 0; }
     @media (max-width: 768px) { .hero h1 { font-size: 2rem; } }
-    ${SHARED_STYLES}
   </style>
 </head>
 <body>
@@ -123,16 +120,6 @@ export const classicLayout: LayoutModule = {
     </div>
   </section>
 
-  ${renderGallery(images, content.galleryTitle || (lang === 'en' ? 'Our Gallery' : 'Nos R\u00e9alisations'))}
-  ${renderFAQ(lead.sector, lang)}
-  ${renderHours(lang, lead)}
-  ${renderStatsCounter(extractYears(lead), lead.googleRating || 4.9, lead.googleReviews || 0, lang)}
-  ${renderTestimonialsCarousel(content.testimonials, lang === 'en' ? 'Client Reviews' : 'Avis Clients', lang)}
-  ${renderContactMap(lead, ui)}
-  ${renderTrustBar(lang)}
-  ${renderWhatsAppFloat(lead.phone || '')}
-  ${renderStickyCTA(lead.phone || '', content.ctaText)}
-
   <footer>
     <div class="container">
       <p>&copy; ${new Date().getFullYear()} ${escapeHtml(content.heroTitle)}. ${escapeHtml(ui.footerContact)}</p>
@@ -142,14 +129,6 @@ export const classicLayout: LayoutModule = {
 </html>`;
   }
 };
-
-function extractYears(lead: Lead): string {
-  if (lead.description) {
-    const match = lead.description.match(/(\d+)\s*ans?\s+d['']exp[e\u00e9]rience/i);
-    if (match) return match[1];
-  }
-  return '15';
-}
 
 function detectLanguage(lead: Lead): 'fr' | 'en' {
   const city = (lead.city || '').toLowerCase();
