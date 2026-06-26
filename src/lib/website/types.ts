@@ -41,15 +41,6 @@ export interface LayoutModule {
   render(lead: Lead, content: WebsiteContent, images: WebsiteImages, palette: Palette): string;
 }
 
-export interface FAQItem {
-  question: string;
-  answer: string;
-}
-
-export interface BusinessHours {
-  [day: string]: { open: string; close: string } | null;
-}
-
 export interface UiStrings {
   lang: string; hreflang: string;
   navAbout: string; navServices: string; navWhy: string; navAvis: string; navContact: string;
