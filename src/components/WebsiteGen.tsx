@@ -326,11 +326,30 @@ Retourne UNIQUEMENT le HTML complet.`;
     const sector = (lead.sector || '').toLowerCase();
     const sectorServices: Record<string, string[]> = {
       restaurant: ['Cuisine gastronomique', 'Service traiteur', 'Événements privés', 'Menu dégustation', 'Vins et boissons', 'Brunch dominical'],
+      boulangerie: ['Boulangerie artisanale', 'Pâtisserie maison', 'Viennoiseries fraîches', 'Commandes événementielles', 'Pain de tradition', 'Créations sur mesure'],
       coiffeur: ['Coupe moderne', 'Coloration professionnelle', 'Soin capillaire', 'Extension cheveux', 'Coiffure homme', 'Soins barbe'],
-      plomberie: ['Dépannage urgence', 'Installation sanitaire', 'Chauffage', 'Plomberie générale', 'Diagnostic fuite', 'Rénovation salle de bain'],
-      garage: ['Diagnostic moteur', 'Révision complète', 'Pneumatique', 'Carrosserie', 'Vidange', 'Contrôle technique'],
+      plomberie: ['Dépannage urgence 24h/24', 'Installation sanitaire', 'Chauffage & chaudière', 'Détection de fuites', 'Rénovation salle de bain', 'Entretien annuel'],
+      electricien: ['Mise aux normes', 'Dépannage électrique', 'Installation complète', 'Domotique & smart home', 'Éclairage LED', 'Bornes de recharge'],
+      garage: ['Diagnostic moteur', 'Révision complète', 'Pneumatiques', 'Carrosserie', 'Climatisation', 'Contrôle technique'],
       hôtel: ['Chambres premium', 'Service petit-déjeuner', 'Salle de réunion', 'Navette aéroport', 'Concierge', 'Restaurant gastronomique'],
-      default: ['Consultation', 'Service standard', 'Solution premium', 'Support client', 'Maintenance', 'Formation']
+      dentiste: ['Blanchiment dentaire', 'Implants & couronnes', 'Orthodontie', 'Soins préventifs', 'Détartrage professionnel', 'Chirurgie orale'],
+      médecin: ['Consultation généraliste', 'Bilan de santé', 'Vaccination', 'Suivi médical', 'Examens biologiques', 'Télémédecine'],
+      kiné: ['Rééducation articulaire', 'Massage thérapeutique', 'Rééducation respiratoire', 'Rééducation périnéale', 'Kiné du sport', 'Ostéopathie'],
+      avocat: ['Droit de la famille', 'Droit du travail', 'Droit pénal', 'Droit des affaires', 'Droit immobilier', 'Médiation'],
+      notaire: ['Actes de vente', 'Successions & donations', 'Conventions matrimoniales', 'Création de société', 'Conseil patrimonial', 'Testaments'],
+      jardin: ['Création de jardins', 'Tonte & entretien', 'Élagage & abattage', 'Terrasses & clôtures', 'Arrosage automatique', 'Potager & verger'],
+      paysage: ['Aménagement paysager', 'Plantation & végétalisation', 'Éclairage extérieur', 'Piscines & bassins', 'Murets & pavages', 'Arrosage goutte-à-goutte'],
+      fitness: ['Coaching personnel', 'Cours collectifs', 'Musculation libre', 'Cardio zone', 'Préparation physique', 'Espace bien-être'],
+      nettoyage: ['Nettoyage de bureaux', 'Nettoyage vitres', 'Grand nettoyage', 'Désinfection', 'Nettoyage industriel', 'Remise en état'],
+      peintre: ['Peinture intérieure', 'Peinture extérieure', 'Revêtement mural', 'Décoration artistique', 'Rénovation façade', 'Conseil couleur'],
+      menuisier: ['Menuiserie sur mesure', 'Pose de parquet', 'Façades & portes', 'Escaliers', 'Ébénisterie', 'Restauration bois'],
+      serrurier: ['Ouverture de porte', 'Serrure de sécurité', 'Blindage de porte', 'Dépannage urgent', 'Installation coffre-fort', 'Contrôle d\'accès'],
+      transport: ['Déménagement', 'Livraison express', 'Transport professionnel', 'Logistique', 'Portage de charges lourdes', 'Stockage'],
+      immobilier: ['Achat immobilier', 'Vente immobilière', 'Location', 'Gestion locative', 'Estimation', 'Conseil investissement'],
+      photo: ['Portrait professionnel', 'Photographie événementielle', 'Reportage mariage', 'Photo produit', 'Retouche numérique', 'Book modèle'],
+      fleuriste: ['Bouquets sur mesure', 'Décoration événementielle', 'Plantes d\'intérieur', 'Couronnes & gerbes', 'Abonnement floral', 'Conseil jardinage'],
+      spa: ['Massage relaxant', 'Soin du visage', 'Gommage corps', 'Manucure & pédicure', 'Épilation', 'Routine bien-être'],
+      default: ['Consultation', 'Service professionnel', 'Devis gratuit', 'Accompagnement', 'Maintenance', 'Suivi personnalisé']
     };
 
     const getServices = () => {
@@ -362,7 +381,9 @@ Retourne UNIQUEMENT le HTML complet.`;
       aboutText: lead.description || `${lead.name} ${isEn ? 'is a' : 'est un'} ${lead.sector || (isEn ? 'business' : 'établissement')}${lead.city ? (isEn ? ` located in ${lead.city}` : ` situé à ${lead.city}`) : ''}. ${isEn ? 'Our team is committed to delivering quality service, attentive to your needs.' : 'Notre équipe met un point d\'honneur à offrir un service de qualité, à l\'écoute de vos besoins.'}`,
       services: getServices().map((name, i) => ({ 
         name, 
-        description: `${name} — ${isEn ? 'a service designed to meet your expectations with care and professionalism.' : 'un service pensé pour répondre à vos attentes avec soin et professionnalisme.'}`,
+        description: isEn
+          ? `${name} — Professional ${sector || 'service'} tailored to your specific needs with expertise and dedication.`
+          : `${name} — Prestation ${sector || 'professionnelle'} adaptée à vos besoins avec expertise et dévouement.`,
         icon: ['✦', '◆', '●', '◇', '○', '▹'][i] 
       })),
       cta: isEn ? 'Contact Us' : 'Contactez-nous',
@@ -371,17 +392,36 @@ Retourne UNIQUEMENT le HTML complet.`;
       aboutTitle: isEn ? 'Our Business' : 'Notre Établissement',
       servicesTitle: isEn ? 'Our Services' : 'Nos Services',
       contactTitle: 'Contact',
-      whyChooseUs: isEn ? [
-        'Qualified team that listens',
-        'Clear and transparent quotes',
-        'Customer satisfaction first',
-        'A service adapted to your needs'
-      ] : [
-        'Équipe qualifiée et à l\'écoute',
-        'Devis clair et transparent',
-        'Satisfaction client prioritaire',
-        'Un service adapté à vos besoins'
-      ],
+      whyChooseUs: (() => {
+        const s = sector;
+        if (s.includes('dent') || s.includes('médec') || s.includes('kiné') || s.includes('sant')) return isEn
+          ? ['State-of-the-art medical equipment', 'Sterile and comfortable environment', 'Gentle and pain-free care', 'Flexible appointment scheduling']
+          : ['Équipement médical de dernière génération', 'Environnement stérile et confortable', 'Soins doux et sans douleur', 'Horaires flexibles et sans attendre'];
+        if (s.includes('restau') || s.includes('cuisin') || s.includes('boulanger') || s.includes('traiteur')) return isEn
+          ? ['Fresh, locally sourced ingredients', 'Authentic homemade recipes', 'Warm and welcoming atmosphere', 'Seasonal and creative menu']
+          : ['Produits frais et locaux', 'Recettes authentiques faites maison', 'Ambiance chaleureuse et accueil', 'Menu créatif et de saison'];
+        if (s.includes('coiff') || s.includes('barb') || s.includes('salon') || s.includes('beauté') || s.includes('spa')) return isEn
+          ? ['Expert stylists with latest trends', 'Premium quality products', 'Relaxing and modern salon', 'Personalized consultation']
+          : ['Coiffeurs experts des dernières tendances', 'Produits de qualité premium', 'Salon moderne et relaxant', 'Consultation personnalisée'];
+        if (s.includes('garage') || s.includes('mécan') || s.includes('auto')) return isEn
+          ? ['Certified and experienced mechanics', 'Transparent diagnosis and quotes', 'Original and quality parts', 'Quick turnaround time']
+          : ['Mécaniciens certifiés et expérimentés', 'Diagnostic et devis transparents', 'Pièces originales et de qualité', 'Délais d\'intervention rapides'];
+        if (s.includes('avocat') || s.includes('jurid') || s.includes('notaire') || s.includes('droit')) return isEn
+          ? ['Confidentiality and discretion', 'Deep legal expertise', 'Personalized case follow-up', 'Clear and understandable advice']
+          : ['Confidentialité et discrétion', 'Expertise juridique approfondie', 'Suivi personnalisé de votre dossier', 'Conseils clairs et compréhensibles'];
+        if (s.includes('jardin') || s.includes('paysag') || s.includes('espace vert')) return isEn
+          ? ['Certified and passionate landscapers', 'Adapted to local climate', 'Ecological and sustainable approach', 'Guaranteed plant health']
+          : ['Paysagistes certifiés et passionnés', 'Adapté au climat local', 'Approche écologique et durable', 'Santé des plantes garantie'];
+        if (s.includes('plomb') || s.includes('électric') || s.includes('electric') || s.includes('peintre') || s.includes('menuis') || s.includes('serrur')) return isEn
+          ? ['Qualified and certified tradespeople', 'Guaranteed workmanship', 'Transparent and fair pricing', 'Fast emergency response']
+          : ['Artisans qualifiés et certifiés', 'Travail garanti décennal', 'Tarifs transparents et justes', 'Intervention urgence rapide'];
+        if (s.includes('nettoy') || s.includes('clean') || s.includes('ménage')) return isEn
+          ? ['Eco-friendly certified products', 'Trained and reliable staff', 'Flexible scheduling', 'Quality inspection after each visit']
+          : ['Produits certifiés écologiques', 'Personnel formé et fiable', 'Horaires flexibles', 'Contrôle qualité après chaque passage'];
+        return isEn
+          ? ['Expert team with years of experience', 'Transparent quotes with no hidden fees', 'Customer satisfaction guaranteed', 'Tailored solutions for every need']
+          : ['Équipe experte avec des années d\'expérience', 'Devis transparent sans frais cachés', 'Satisfaction client garantie', 'Solutions adaptées à chaque besoin'];
+      })(),
       // 🎨 VARIATIONS UNIQUES
       heroStyle: heroStyles[hash % heroStyles.length],
       layoutStyle: layoutStyles[(hash + 1) % layoutStyles.length],
