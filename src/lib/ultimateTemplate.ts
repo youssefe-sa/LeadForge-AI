@@ -5,6 +5,7 @@ import { getSectorImages, getSectorImagesAsync, getServiceImageQuery, fetchSecto
 import { getImagesForLead } from './pexelsApi';
 import { isImageBlocked, filterImages, isStockImage } from './imageFilters';
 import { getSectorConfig } from './sectorConfig';
+import { getCuratedImages, getCuratedServiceImage, getCuratedPool } from './curatedImages';
 
 // ── AVIS FALLBACK SECTORIELS ──
 const SECTOR_FALLBACK_REVIEWS: Record<string, Array<{ author: string; text: string; rating: number; date: string }>> = {
@@ -957,45 +958,19 @@ export function generateUltimateSite(lead: any, aiContent?: any): string {
   const sloganVariations = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance"];
   const finalSlogan = aiContent?.slogan || sloganVariations[combinedHash % sloganVariations.length];
 
-  const sectorImages = getSectorImages(lead.sector);
+  // IMAGES CURATÉES — garanties sectorielles
+  const curatedPool = getCuratedPool(lead.sector);
+  const heroImage = curatedPool.hero[((combinedHash * 2654435761) >>> 0) % curatedPool.hero.length];
+  const combinedImages = curatedPool.about;
+  const allImages = [heroImage, ...curatedPool.services.slice(0, 4)];
 
-  // Hero/À propos/Galerie : uniquement des images Pexels/Unsplash (légales, fiables)
-  // Les images scrapées du lead ne servent JAMAIS pour ces emplacements critiques
-  const heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
+  // Service images: curated pool
+  const serviceImages: string[] = finalServices.map((s, i) =>
+    getCuratedServiceImage(lead.sector, s.name, i)
+  );
 
-  const combinedImages = sectorImages.filter(s => s !== heroImage).slice(0, 4);
-  const allImages = [heroImage, ...combinedImages].slice(0, 5);
-
-  // Images par service — dédupliquées, fallback alterné si doublon
-  const serviceImages: string[] = [];
-  const usedServiceImages = new Set<string>([heroImage]);
-  for (let i = 0; i < finalServices.length; i++) {
-    const candidate = sectorImages[i % sectorImages.length];
-    if (!usedServiceImages.has(candidate)) {
-      serviceImages.push(candidate);
-      usedServiceImages.add(candidate);
-    } else {
-      const alt = sectorImages.find(img => !usedServiceImages.has(img)) || candidate;
-      serviceImages.push(alt);
-      usedServiceImages.add(alt);
-    }
-  }
-
-  // Pool galerie distinct — pioche le reliquat non utilisé
-  const galleryImages: string[] = [];
-  for (const img of sectorImages) {
-    if (galleryImages.length >= 5) break;
-    if (!usedServiceImages.has(img)) {
-      galleryImages.push(img);
-      usedServiceImages.add(img);
-    }
-  }
-  // Compléter si besoin avec des images du pool qui ne sont pas hero
-  while (galleryImages.length < 5) {
-    const remaining = sectorImages.filter(img => !galleryImages.includes(img) && img !== heroImage);
-    if (remaining.length === 0) break;
-    galleryImages.push(remaining[galleryImages.length % remaining.length]);
-  }
+  // Gallery: curated gallery images
+  const galleryImages = curatedPool.gallery.slice(0, 5);
 
   const socialLinks = lead.socialLinks || {};
   const content: UltimateContent = {
@@ -1087,11 +1062,15 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
     accentOnDark = lightenHex(rawAccent, factor);
   }
 
-  // Hero/About/Gallery: images uniques par lead grâce au hash combiné
-  const heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
+  // IMAGES CURATÉES — garanties sectorielles, pas de Pexels API
+  const curatedPool = getCuratedPool(lead.sector);
+  const curatedAll = [...curatedPool.hero, ...curatedPool.services, ...curatedPool.about, ...curatedPool.gallery];
 
-  // Gallery: images différentes du hero, avec un pool élargi
-  const allImages = sectorImages.filter(s => s !== heroImage).slice(0, 6);
+  // Hero: hash-based selection from curated hero pool
+  const heroImage = curatedPool.hero[((combinedHash * 2654435761) >>> 0) % curatedPool.hero.length];
+
+  // About/Why: curated about images
+  const allImages = curatedPool.about;
 
   let finalServices = (lang === 'en' ? template.servicesEn : undefined) || template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
@@ -1129,47 +1108,14 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   while (testimonials.length < 6) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 6);
 
-  // Récupérer une image Pexels dédiée pour chaque service — requête exacte avec nom du lead pour varier
-  const serviceImages: string[] = [];
-  const usedServiceImages = new Set<string>([heroImage]);
-  for (let i = 0; i < finalServices.length; i++) {
-    const service = finalServices[i];
-    try {
-      const query = getServiceImageQuery(service.name);
-      // Ajouter l'index du service + nom du lead pour garantir l'unicité
-      const imgs = await fetchServiceImages(`${lead.sector} ${query} ${lead.name.split(' ')[0] || ''} ${i}`, 4, lead.sector);
-      let picked = imgs.find(img => !usedServiceImages.has(img));
-      if (!picked) picked = sectorImages.find(img => !usedServiceImages.has(img)) || heroImage;
-      serviceImages.push(picked);
-      usedServiceImages.add(picked);
-    } catch {
-      const fallback = sectorImages.find(img => !usedServiceImages.has(img)) || heroImage;
-      serviceImages.push(fallback);
-      usedServiceImages.add(fallback);
-    }
-  }
+  // Service images: curated pool, one per service
+  const serviceImages: string[] = finalServices.map((s, i) =>
+    getCuratedServiceImage(lead.sector, s.name, i)
+  );
 
-  // Pool galerie distinct — pioche le reliquat du pool sectoriel non utilisé
-  const galleryImages: string[] = [];
-  for (const img of sectorImages) {
-    if (galleryImages.length >= 5) break;
-    if (!usedServiceImages.has(img) && img !== heroImage) {
-      galleryImages.push(img);
-    }
-  }
-  // Compléter avec des requêtes Pexels dédiées galerie si besoin
-  if (galleryImages.length < 5) {
-    try {
-      const extra = await fetchServiceImages(`${lead.sector} professional results portfolio ${lead.name.split(' ')[0] || ''}`, 5, lead.sector);
-      for (const img of extra) {
-        if (galleryImages.length >= 5) break;
-        if (!usedServiceImages.has(img)) {
-          galleryImages.push(img);
-          usedServiceImages.add(img);
-        }
-      }
-    } catch {}
-  }
+  // Gallery: curated gallery images
+  const galleryImages = curatedPool.gallery.slice(0, 5);
+
 
   const socialLinks = lead.socialLinks || {};
   const content: UltimateContent = {
@@ -1220,7 +1166,8 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
   const allImgs = content.allImages || [];
   const usedImages = new Set<string>();
   
-  const heroSectorFallback = getSectorImages(content.sector);
+  const curatedPool = getCuratedPool(content.sector);
+  const heroSectorFallback = curatedPool.hero;
   const heroImgErr = `onerror="this.onerror=null;this.src='${heroSectorFallback[(companyHash + 1) % heroSectorFallback.length]}';this.style.opacity='0.7'"`;
   
   const getImg = (slot: number): string => {
@@ -1230,7 +1177,10 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
       usedImages.add(selected);
       return selected;
     }
-    const fallbackPool = [...combinedImages, ...allImgs].filter(img => img && img.startsWith('https://'));
+    // Fallback to curated images
+    const curatedPool = getCuratedPool(content.sector);
+    const curatedFallback = [...curatedPool.hero, ...curatedPool.services, ...curatedPool.about];
+    const fallbackPool = curatedFallback.filter(img => img && img.startsWith('https://'));
     if (fallbackPool.length > 0) return fallbackPool[slot % fallbackPool.length];
     return emergencyFallback;
   };
