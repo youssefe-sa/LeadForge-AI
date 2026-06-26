@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, safeStr, proxyImg } from '../lib/supabase-store';
-import { generateUltimateSite, generateUltimateSiteAsync, detectLanguage } from '../lib/ultimateTemplate';
+import { generateSite as generateSiteNew } from '../lib/website/unificateur';
+import { generateUltimateSiteAsync, detectLanguage } from '../lib/ultimateTemplate';
 import { useWebsiteGenState, websiteGenState } from '../lib/websitegen-state';
 import { supabase } from '../lib/supabase';
 
@@ -522,105 +523,46 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
     return content;
   };
 
-  // ── GENERATE SITE — TEMPLATE PREMIUM PROFESSIONNEL ──
-  const generateSite = async (lead: Lead): Promise<string> => {
-    console.log(`🔧 generateSite called for: ${lead.name}`);
-    updateProgress({ step: '📝 Génération du contenu...' });
+  // ── GENERATE SITE — MODULARE ENGINES ──
+  const generateSite = async (lead: Lead) => {
+    updateProgress({ step: `Génération du site pour ${lead.name}...` });
     
-    try {
-      console.log(`🔧 Starting content generation for ${lead.name}`);
-      // Contenu riche puis template premium (hero image, secteur, galerie, WhatsApp)
-      const content = await generateContent(lead);
-      console.log(`✅ Content generated for ${lead.name}`);
-      
-      updateProgress({ step: '🖼️ API Pexels + Storage...' });
-      
-      // Les images sont maintenant gérées par generateUltimateSiteAsync
-      // PRIORITÉ 1: Images réelles du lead
-      // PRIORITÉ 2: API Pexels dynamique → Supabase Storage
-      
-      updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
-      const html = await generateUltimateSiteAsync(lead, content);
-      console.log(`✅ HTML generated for ${lead.name}`);
-      
-      updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
-      const fileName = `${lead.id}.html`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('websites')
-        .upload(fileName, html, {
-          contentType: 'text/html',
-          cacheControl: '3600',
-          upsert: true
-        });
-        
-      if (uploadError) {
-        throw new Error(`Erreur d'hébergement: ${uploadError.message}`);
-      }
-
-      // Obtenir l'URL publique
-      const { data: publicUrlData } = supabase.storage
-        .from('websites')
-        .getPublicUrl(fileName);
-        
-      const siteUrl = publicUrlData.publicUrl;
-      console.log(`✅ Site hébergé avec succès: ${siteUrl}`);
-      
-      const baseUrl = 'https://www.services-siteup.online';
-      const cleanUrl = `${baseUrl}/api/sites/${lead.id}`;
-      
-      console.log(`🔧 Updating lead ${lead.id} in Supabase...`);
-      // Mettre à jour le lead avec les données du site (sans gonfler la colonne siteHtml)
-      await updateLead(lead.id, {
-        siteGenerated: true, 
-        siteHtml: '', // On vide siteHtml pour ne pas alourdir la DB
-        siteUrl: cleanUrl,
-        landingUrl: cleanUrl,
-        stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
-      });
-      
-      console.log(`✅ Site généré avec succès pour: ${lead.name}`);
-      
-      return html; // Retourner le code HTML
-      
-    } catch (e) {
-      console.error(`❌ Erreur lors de la génération du site pour ${lead.name}:`, e);
-      updateProgress({ step: '🔄 Fallback template...' });
-      
-      try {
-        console.log(`🔄 Using fallback template for ${lead.name}`);
-        const emergencyHtml = await generateUltimateSiteAsync(lead);
-        updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
-        
-        const fileName = `${lead.id}.html`;
-        await supabase.storage.from('websites').upload(fileName, emergencyHtml, { contentType: 'text/html', cacheControl: '3600', upsert: true });
-        const { data: publicUrlData } = supabase.storage.from('websites').getPublicUrl(fileName);
-        const siteUrl = publicUrlData.publicUrl;
-        
-        return emergencyHtml; // Retourner le code HTML de fallback
-        const baseUrl = 'https://www.services-siteup.online';
-        const cleanUrl = `${baseUrl}/api/sites/${lead.id}`;
-        
-        await updateLead(lead.id, {
-          siteGenerated: true, 
-          siteHtml: '',
-          siteUrl: cleanUrl,
-          landingUrl: cleanUrl,
-          stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
-        });
-        
-        console.log(`🔄 Site fallback généré pour: ${lead.name}`);
-      } catch (fallbackError) {
-        console.error(`❌ Erreur critique - même le fallback a échoué pour ${lead.name}:`, fallbackError);
-        // Marquer quand même comme traité pour éviter les boucles infinies
-        await updateLead(lead.id, {
-          siteGenerated: true,
-          stage: 'site_generated',
-        });
-      }
+    if (!lead.id) {
+      console.log('❌ Lead sans ID, ignoré');
+      return;
     }
     
-    // Retour par défaut en cas d'erreur
-    return await generateUltimateSiteAsync(lead);
+    try {
+      const html = await generateSiteNew(lead, apiConfig);
+      
+      if (!html || html.length < 500) {
+        throw new Error('HTML generated is too short or empty');
+      }
+      
+      await updateLead(lead.id, {
+        siteHtml: html,
+        siteGenerated: true,
+        siteUrl: lead.website || '',
+        landingUrl: lead.website || '',
+      });
+      
+      console.log(`✅ Site généré pour ${lead.name} (${(html.length / 1024).toFixed(1)} KB)`);
+    } catch (err) {
+      console.log(`❌ Erreur pour ${lead.name}: ${err}`);
+      try {
+        const { generateUltimateSite } = await import('../lib/ultimateTemplate');
+        const html = generateUltimateSite(lead);
+        if (html) {
+          await updateLead(lead.id, {
+            siteHtml: html,
+            siteGenerated: true,
+          });
+          console.log(`✅ Fallback réussi pour ${lead.name}`);
+        }
+      } catch (fallbackErr) {
+        console.log(`❌ Fallback également échoué pour ${lead.name}: ${fallbackErr}`);
+      }
+    }
   };
 
   // ── EMERGENCY TEMPLATE (100% FOOLPROOF) ──
@@ -874,10 +816,10 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
       updateProgress({ current: 1, total: 1, name: lead.name, step: '📥 Génération du code HTML...' });
       
       // Récupérer le code HTML généré
-      const htmlContent = await generateSite(lead);
+      const htmlContent = await generateSiteNew(lead, apiConfig);
       
       // Créer un blob et déclencher le téléchargement
-      const blob = new Blob([htmlContent as string], { type: 'text/html;charset=utf-8' });
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
