@@ -95,12 +95,16 @@ export async function fetchImages(lead: Lead, apiConfig: ApiConfig): Promise<Web
     ...filteredStatic
   ])];
 
+  if (allImages.length === 0) {
+    return { hero: '', gallery: [], services: [] };
+  }
+
   const offset = leadHash % Math.max(allImages.length, 1);
   const rotated = [...allImages.slice(offset), ...allImages.slice(0, offset)];
 
   return {
-    hero: rotated[0] || filteredStatic[0] || '',
-    gallery: rotated.slice(0, 6),
-    services: rotated.slice(0, 6)
+    hero: rotated[0] || '',
+    gallery: rotated.slice(1, 7),
+    services: rotated.slice(7, 13)
   };
 }
