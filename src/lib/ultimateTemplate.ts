@@ -194,6 +194,7 @@ export interface UltimateContent {
     youtube?: string;
     tiktok?: string;
   };
+  accentOnDark?: string;
 }
 
 const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
@@ -449,18 +450,20 @@ const SECTOR_ULTIMATE_TEMPLATES: Record<string, {
 
 function getUltimateTemplate(sector: string) {
   const s = (sector || '').toLowerCase();
-  if (s.includes('nettoyag') || s.includes('propreté') || s.includes('ménage')) return SECTOR_ULTIMATE_TEMPLATES.nettoyage;
-  if (s.includes('jardin') || s.includes('paysag') || s.includes('espaces verts')) return SECTOR_ULTIMATE_TEMPLATES.jardin;
-  if (s.includes('coach') || s.includes('sport') || s.includes('fitness') || s.includes('salle')) return SECTOR_ULTIMATE_TEMPLATES.fitness;
-  if (s.includes('médec') || s.includes('clinique') || s.includes('dentiste') || s.includes('santé')) return SECTOR_ULTIMATE_TEMPLATES.medical;
-  if (s.includes('avocat') || s.includes('notaire') || s.includes('juridi') || s.includes('droit')) return SECTOR_ULTIMATE_TEMPLATES.avocat;
-  if (s.includes('électricien') || s.includes('electricien') || s.includes('electric')) return SECTOR_ULTIMATE_TEMPLATES.electricien;
-  if (s.includes('plomb') || s.includes('chauffage') || s.includes('clim')) return SECTOR_ULTIMATE_TEMPLATES.plomberie;
-  if (s.includes('coiff') || s.includes('barb') || s.includes('salon')) return SECTOR_ULTIMATE_TEMPLATES.coiffeur;
-  if (s.includes('restaurant') || s.includes('cuisin') || s.includes('traiteur')) return SECTOR_ULTIMATE_TEMPLATES.restaurant;
-  if (s.includes('garage') || s.includes('mécan') || s.includes('auto') || s.includes('carrosserie')) return SECTOR_ULTIMATE_TEMPLATES.garage;
-  if (s.includes('beauté') || s.includes('esthétique') || s.includes('spa')) return SECTOR_ULTIMATE_TEMPLATES.coiffeur;
-  if (s.includes('boulanger') || s.includes('pâtissier')) return SECTOR_ULTIMATE_TEMPLATES.restaurant;
+  if (s.includes('nettoyag') || s.includes('propreté') || s.includes('ménage') || s.includes('menage') || s.includes('menager') || s.includes('hygiène') || s.includes('hygiene')) return SECTOR_ULTIMATE_TEMPLATES.nettoyage;
+  if (s.includes('jardin') || s.includes('paysag') || s.includes('espaces verts') || s.includes('espace vert') || s.includes('pépinière') || s.includes('arbori') || s.includes('arrosage')) return SECTOR_ULTIMATE_TEMPLATES.jardin;
+  if (s.includes('coach') || s.includes('sport') || s.includes('fitness') || s.includes('salle') || s.includes('musculation') || s.includes('yoga') || s.includes('crossfit') || s.includes('boxe')) return SECTOR_ULTIMATE_TEMPLATES.fitness;
+  if (s.includes('médec') || s.includes('clinique') || s.includes('dentiste') || s.includes('santé') || s.includes('sante') || s.includes('kiné') || s.includes('pharmac') || s.includes('opticien') || s.includes('infirm') || s.includes('ostéo') || s.includes('sage-femme')) return SECTOR_ULTIMATE_TEMPLATES.medical;
+  if (s.includes('avocat') || s.includes('notaire') || s.includes('juridi') || s.includes('droit') || s.includes('cabinet d\'avocat') || s.includes('huissier')) return SECTOR_ULTIMATE_TEMPLATES.avocat;
+  if (s.includes('électricien') || s.includes('electricien') || s.includes('electric') || s.includes('électri') || s.includes('electri')) return SECTOR_ULTIMATE_TEMPLATES.electricien;
+  if (s.includes('plomb') || s.includes('chauffage') || s.includes('clim') || s.includes('chaud') || s.includes('pompe à chaleur') || s.includes('pompe a chaleur')) return SECTOR_ULTIMATE_TEMPLATES.plomberie;
+  if (s.includes('coiff') || s.includes('barb') || s.includes('salon') || s.includes('beauté') || s.includes('beaute') || s.includes('esthétique') || s.includes('esthetique') || s.includes('spa') || s.includes('ongle') || s.includes('tatou')) return SECTOR_ULTIMATE_TEMPLATES.coiffeur;
+  if (s.includes('restaurant') || s.includes('cuisin') || s.includes('traiteur') || s.includes('boulanger') || s.includes('pâtissier') || s.includes('patisserie') || s.includes('pizzeria') || s.includes('café') || s.includes('cafe') || s.includes('brasserie') || s.includes('bar ') || s.includes('glacier') || s.includes('poissonnerie') || s.includes('boucherie') || s.includes('charcuterie')) return SECTOR_ULTIMATE_TEMPLATES.restaurant;
+  if (s.includes('garage') || s.includes('mécan') || s.includes('mecan') || s.includes('auto') || s.includes('carrosserie') || s.includes('pneu') || s.includes('véhicule') || s.includes('vehicule') || s.includes('camion') || s.includes('moto')) return SECTOR_ULTIMATE_TEMPLATES.garage;
+  if (s.includes('peintre') || s.includes('platrier') || s.includes('couvreur') || s.includes('maçon') || s.includes('macon') || s.includes('rénov') || s.includes('renov') || s.includes('isolation') || s.includes('terrassement') || s.includes('menuisier') || s.includes('charpentier') || s.includes('serrurier') || s.includes('vitrerie') || s.includes('démol') || s.includes('demol')) return SECTOR_ULTIMATE_TEMPLATES.electricien;
+  if (s.includes('transport') || s.includes('livraison') || s.includes('logistique') || s.includes('déménage') || s.includes('demenage') || s.includes('taxi') || s.includes('vTC') || s.includes('vtc') || s.includes('chauffeur')) return SECTOR_ULTIMATE_TEMPLATES.garage;
+  if (s.includes('immobili') || s.includes('agent immo') || s.includes('propriété') || s.includes('propriete') || s.includes('syndic')) return SECTOR_ULTIMATE_TEMPLATES.default;
+  if (s.includes('photo') || s.includes('vidéo') || s.includes('video') || s.includes('mariage') || s.includes('traiteur') || s.includes('fleuriste') || s.includes('fleur')) return SECTOR_ULTIMATE_TEMPLATES.restaurant;
   return SECTOR_ULTIMATE_TEMPLATES.default;
 }
 
@@ -1032,12 +1035,53 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   const phoneHash = computeHash(phone || '0');
   const emailHash = computeHash(email || 'x');
   const combinedHash = (nameHash * 7 + cityHash * 13 + sectorHash * 23 + phoneHash * 31 + emailHash * 37) % 100000;
-  
+
   const sloganVariationsFr = ["L'excellence à votre service", "L'art de la perfection au quotidien", "Solutions premium sur-mesure", "Excellence & Passion", "Votre partenaire de confiance"];
   const sloganVariationsEn = ["Excellence at your service", "The art of everyday perfection", "Premium tailored solutions", "Excellence & Passion", "Your trusted partner"];
   const finalSlogan = aiContent?.slogan || (lang === 'en' ? sloganVariationsEn[combinedHash % sloganVariationsEn.length] : sloganVariationsFr[combinedHash % sloganVariationsFr.length]);
 
   const sectorImages = await getSectorImagesAsync(lead.sector, combinedHash);
+
+  // Lighten accent for dark backgrounds — WCAG AA contrast ≥ 4.5:1
+  const hexToRgb = (hex: string) => {
+    const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+    return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [0, 0, 0];
+  };
+  const luminance = (r: number, g: number, b: number) => {
+    const a = [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+  };
+  const contrastRatio = (l1: number, l2: number) => {
+    const lighter = Math.max(l1, l2);
+    const darker = Math.min(l1, l2);
+    return (lighter + 0.05) / (darker + 0.05);
+  };
+  const lightenHex = (hex: string, factor: number) => {
+    const [r, g, b] = hexToRgb(hex);
+    return `rgb(${Math.min(255, Math.round(r + (255 - r) * factor))}, ${Math.min(255, Math.round(g + (255 - g) * factor))}, ${Math.min(255, Math.round(b + (255 - b) * factor))})`;
+  };
+
+  const darkBg = '#1a2744';
+  const darkRgbArr = hexToRgb(darkBg);
+  const darkLum = luminance(darkRgbArr[0], darkRgbArr[1], darkRgbArr[2]);
+  const rawAccent = template.accent || '#6366f1';
+  let accentOnDark = rawAccent;
+  const accentRgbArr = hexToRgb(rawAccent);
+  const accentLum = luminance(accentRgbArr[0], accentRgbArr[1], accentRgbArr[2]);
+  if (contrastRatio(accentLum, darkLum) < 3.0) {
+    let factor = 0.1;
+    const lightenLum = (h: string, f: number) => {
+      const a = hexToRgb(h);
+      const lr = Math.min(255, Math.round(a[0] + (255 - a[0]) * f));
+      const lg = Math.min(255, Math.round(a[1] + (255 - a[1]) * f));
+      const lb = Math.min(255, Math.round(a[2] + (255 - a[2]) * f));
+      return luminance(lr, lg, lb);
+    };
+    while (contrastRatio(lightenLum(rawAccent, factor), darkLum) < 4.5 && factor < 0.85) {
+      factor += 0.05;
+    }
+    accentOnDark = lightenHex(rawAccent, factor);
+  }
 
   // Hero/About/Gallery: images uniques par lead grâce au hash combiné
   const heroImage = sectorImages[((combinedHash * 2654435761) >>> 0) % sectorImages.length];
@@ -1128,14 +1172,14 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
     companyName, sector: lead.sector || (lang === 'en' ? 'Professional' : 'Professionnel'), city, description, lang, phone, email, address,
     website: lead.website || '', rating, reviews, services: finalServices, serviceImages, galleryImages, testimonials,
     heroTitle, heroSubtitle, aboutText: description, ctaText, slogan: finalSlogan, heroImage, allImages,
-    socialLinks
+    socialLinks, accentOnDark
   };
 
   return buildUltimateHTML(content, template, allImages, combinedHash % 4);
 }
 
 function buildUltimateHTML(content: UltimateContent, template: any, combinedImages: string[] = [], layoutVariant: number = 0): string {
-  const { companyName, heroTitle, heroSubtitle, aboutText, services, serviceImages, galleryImages, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages, galleryTitle, aboutTitle, servicesTitle } = content;
+  const { companyName, heroTitle, heroSubtitle, aboutText, services, serviceImages, galleryImages, testimonials, phone, email, address, website, city, ctaText, rating, reviews, slogan, heroImage, allImages, galleryTitle, aboutTitle, servicesTitle, accentOnDark } = content;
   const lang = content.lang || 'fr';
   const ui = UI[lang];
   const primaryColor = template.primary;
@@ -1221,7 +1265,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
     <link rel="alternate" hreflang="${ui.hreflang}" href="${website || '#'}">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"${companyName}","description":"${heroSubtitle}","image":"${heroImage}","telephone":"${phone}","email":"${email}","address":{"@type":"PostalAddress","streetAddress":"${address}","addressLocality":"${city}","addressCountry":"FR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"${rating || 5}","reviewCount":"${reviews || 42}"}}}</script>
     <style>
-        :root{--primary:${primaryColor};--primary-rgb:${primaryRgb};--secondary:${secondaryColor};--accent:${accentColor};--bg:#fafaf9;--surface:#fff;--text:#1a1a2e;--text-s:#555770;--text-t:#8b8da3;--border:#e8e8ef;--border-l:#f2f2f7;--dark:#1a2744;--dark-rgb:26,39,68;--deco-rotation:${decoRotation}deg;--deco-scale:${decoScale};--accent-opacity:${accentOpacity};--section-shape:${sectionShape}}
+        :root{--primary:${primaryColor};--primary-rgb:${primaryRgb};--secondary:${secondaryColor};--accent:${accentColor};--accent-dark:${accentOnDark};--bg:#fafaf9;--surface:#fff;--text:#1a1a2e;--text-s:#555770;--text-t:#8b8da3;--border:#e8e8ef;--border-l:#f2f2f7;--dark:#1a2744;--dark-rgb:26,39,68;--deco-rotation:${decoRotation}deg;--deco-scale:${decoScale};--accent-opacity:${accentOpacity};--section-shape:${sectionShape}}
         *{margin:0;padding:0;box-sizing:border-box}
         html{scroll-behavior:smooth;font-size:16px}
         body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
@@ -1260,7 +1304,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .hero-inner{position:relative;z-index:10;max-width:1400px;margin:0 auto;padding:130px 32px 80px;width:100%;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:center}
         .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:8px 20px;border-radius:100px;color:#fff;font-size:.8rem;font-weight:600;margin-bottom:24px;letter-spacing:.8px;text-transform:uppercase;backdrop-filter:blur(10px)}
         .hero h1{font-size:clamp(2.5rem,5.5vw,4.2rem);font-weight:800;color:#fff;margin-bottom:20px;letter-spacing:-.03em;line-height:1.1}
-        .hero h1 em{font-style:normal;color:var(--accent);position:relative}
+        .hero h1 em{font-style:normal;color:var(--accent-dark);position:relative}
         .hero-sub{font-size:1.15rem;color:rgba(255,255,255,.8);max-width:540px;margin-bottom:36px;line-height:1.8}
         .hero-actions{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:40px}
         .btn-pri{display:inline-flex;align-items:center;gap:10px;background:var(--primary);color:#fff;padding:16px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.95rem;transition:all .3s;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(var(--primary-rgb),.3)}
@@ -1297,9 +1341,9 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .section-hdr h2{font-size:clamp(1.8rem,4vw,2.85rem);font-weight:800;margin-bottom:18px;letter-spacing:-.03em}
         .section-hdr p{font-size:1.1rem;color:var(--text-s);max-width:580px;margin:0 auto;line-height:1.7}
         .section-dark .section-hdr h2{color:#fff}
-        .section-dark .section-hdr p{color:rgba(255,255,255,.6)}
+        .section-dark .section-hdr p{color:rgba(255,255,255,.75)}
         .section-label{display:inline-block;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--primary);margin-bottom:14px}
-        .section-dark .section-label{color:var(--accent)}
+        .section-dark .section-label{color:var(--accent-dark)}
         @media(max-width:768px){.section{padding:60px 0}.section-dark{padding:60px 0}.section-hdr{margin-bottom:40px}.section-hdr p{font-size:1rem}}
 
         .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
@@ -1348,7 +1392,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
 
         .why-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
         .why-text h2{font-size:clamp(1.55rem,3vw,2.3rem);font-weight:800;color:#fff;margin-bottom:18px;letter-spacing:-.02em}
-        .why-text>p{color:rgba(255,255,255,.65);margin-bottom:36px;font-size:1.02rem;line-height:1.8}
+        .why-text>p{color:rgba(255,255,255,.75);margin-bottom:36px;font-size:1.02rem;line-height:1.8}
         .why-stats{display:grid;grid-template-columns:1fr 1fr;gap:18px}
         .why-stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:24px;text-align:center;transition:all .3s}
         .why-stat:hover{background:rgba(255,255,255,.12);transform:translateY(-3px)}
@@ -1434,7 +1478,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
         .contact-card{background:var(--dark);border-radius:18px;padding:32px;color:#fff}
         .contact-card-item{display:flex;align-items:center;gap:14px;margin-bottom:16px;font-size:.92rem;color:rgba(255,255,255,.75)}
         .contact-card-item:last-child{margin-bottom:0}
-        .contact-card-item i{color:var(--accent)}
+        .contact-card-item i{color:var(--accent-dark)}
         .contact-card-item a{color:inherit;text-decoration:none;transition:color .2s}
         .contact-card-item a:hover{color:#fff}
         .contact-map{border-radius:18px;overflow:hidden;border:1px solid var(--border);min-height:280px}
@@ -1622,7 +1666,7 @@ function buildUltimateHTML(content: UltimateContent, template: any, combinedImag
                 <div class="hero-hours">
                     <div class="hero-hours-row"><span class="hero-hours-day">${ui.monLunVen}</span><span class="hero-hours-time">08h00 – 18h00</span></div>
                     <div class="hero-hours-row"><span class="hero-hours-day">${ui.monSam}</span><span class="hero-hours-time">09h00 – 14h00</span></div>
-                    <div class="hero-hours-row"><span class="hero-hours-day">${ui.monDim}</span><span class="hero-hours-time" style="color:var(--accent)">${ui.monDimUrg}</span></div>
+                        <div class="hero-hours-row"><span class="hero-hours-day">${ui.monDim}</span><span class="hero-hours-time" style="color:var(--accent-dark)">${ui.monDimUrg}</span></div>
                 </div>
                 ${phone ? `<a href="tel:${cleanPhoneLink}" class="btn-pri"><i data-lucide="phone" width="16"></i> ${phone}</a>` : ''}
                 <div class="hero-card-note">${ui.heroNote}</div>

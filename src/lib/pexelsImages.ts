@@ -79,6 +79,62 @@ const SECTOR_PEXEL_QUERIES: Record<string, string[]> = {
     'legal documents contract signing',
     'justice library law books'
   ],
+  boulangerie: [
+    'bakery bread pastry display',
+    'artisan baking oven fresh bread',
+    'pastry chef cake decorating',
+    'bakery interior counter display',
+    'fresh croissants pastries'
+  ],
+  peintre: [
+    'painter wall interior renovation',
+    'house painting professional tools',
+    'paint roller wall color modern',
+    'interior design painting renovation',
+    'construction worker painting'
+  ],
+  menuisier: [
+    'carpenter workshop wood furniture',
+    'woodworking tools craftsmanship',
+    'custom wood furniture workshop',
+    'cabinet maker joinery professional',
+    'wood workshop tools craft'
+  ],
+  serrurier: [
+    'locksmith professional lock repair',
+    'security door lock modern',
+    'key cutting locksmith tools',
+    'home security system lock',
+    'locksmith opening door repair'
+  ],
+  transport: [
+    'delivery truck logistics warehouse',
+    'cargo transport shipping professional',
+    'moving company boxes furniture',
+    'freight truck delivery service',
+    'logistics warehouse organization'
+  ],
+  immobilier: [
+    'real estate modern house exterior',
+    'property agent showing house',
+    'modern apartment building architecture',
+    'real estate keys house sale',
+    'luxury home interior design'
+  ],
+  photo: [
+    'photographer studio professional camera',
+    'wedding photography event celebration',
+    'portrait photography studio lighting',
+    'professional camera equipment photography',
+    'event photography candid moment'
+  ],
+  fleuriste: [
+    'flower shop arrangement bouquet',
+    'florist working flowers arrangement',
+    'wedding flowers floral decoration',
+    'fresh flowers bouquet colorful',
+    'flower shop interior display'
+  ],
   default: [
     'modern office workspace professional',
     'business meeting team collaboration',
@@ -187,17 +243,24 @@ export async function fetchSectorImagesFromAPI(sector: string, leadHash: number 
 
   // Requêtes spécifiques par mot-clé — élargies pour couvrir plus de secteurs
   if (normalizedSector.includes('plomb')) queries = SECTOR_PEXEL_QUERIES.plomberie;
-  else if (normalizedSector.includes('électri') || normalizedSector.includes('electri')) queries = SECTOR_PEXEL_QUERIES.electricien;
-  else if (normalizedSector.includes('coiff') || normalizedSector.includes('hair') || normalizedSector.includes('barber') || normalizedSector.includes('salon')) queries = SECTOR_PEXEL_QUERIES.coiffeur;
+  else if (normalizedSector.includes('électri') || normalizedSector.includes('electri') || normalizedSector.includes('domotique')) queries = SECTOR_PEXEL_QUERIES.electricien;
+  else if (normalizedSector.includes('coiff') || normalizedSector.includes('hair') || normalizedSector.includes('barber') || normalizedSector.includes('salon') || normalizedSector.includes('beauté') || normalizedSector.includes('esthétique') || normalizedSector.includes('spa') || normalizedSector.includes('ongle') || normalizedSector.includes('tatou')) queries = SECTOR_PEXEL_QUERIES.coiffeur;
   else if (normalizedSector.includes('restaurant') || normalizedSector.includes('chef') || normalizedSector.includes('cuisine') || normalizedSector.includes('boulanger') || normalizedSector.includes('traiteur') || normalizedSector.includes('pizzeria') || normalizedSector.includes('café') || normalizedSector.includes('brasserie')) queries = SECTOR_PEXEL_QUERIES.restaurant;
-  else if (normalizedSector.includes('garage') || normalizedSector.includes('mécan') || normalizedSector.includes('mecan') || normalizedSector.includes('auto') || normalizedSector.includes('pneu') || normalizedSector.includes('carrosserie')) queries = SECTOR_PEXEL_QUERIES.garage;
+  else if (normalizedSector.includes('garage') || normalizedSector.includes('mécan') || normalizedSector.includes('mecan') || normalizedSector.includes('auto') || normalizedSector.includes('pneu') || normalizedSector.includes('carrosserie') || normalizedSector.includes('moto') || normalizedSector.includes('camion')) queries = SECTOR_PEXEL_QUERIES.garage;
   else if (normalizedSector.includes('nettoy') || normalizedSector.includes('clean') || normalizedSector.includes('ménage') || normalizedSector.includes('menage') || normalizedSector.includes('menager') || normalizedSector.includes('hygiène')) queries = SECTOR_PEXEL_QUERIES.nettoyage;
   else if (normalizedSector.includes('jardin') || normalizedSector.includes('paysag') || normalizedSector.includes('espace vert') || normalizedSector.includes('pépinière') || normalizedSector.includes('arbori')) queries = SECTOR_PEXEL_QUERIES.jardin;
-  else if (normalizedSector.includes('fitness') || normalizedSector.includes('gym') || normalizedSector.includes('sport') || normalizedSector.includes('coach') || normalizedSector.includes('musculation') || normalizedSector.includes('yoga')) queries = SECTOR_PEXEL_QUERIES.fitness;
-  else if (normalizedSector.includes('médec') || normalizedSector.includes('medical') || normalizedSector.includes('sant') || normalizedSector.includes('dentiste') || normalizedSector.includes('kiné') || normalizedSector.includes('pharmac') || normalizedSector.includes('infirm') || normalizedSector.includes('opticien')) queries = SECTOR_PEXEL_QUERIES.medical;
+  else if (normalizedSector.includes('fitness') || normalizedSector.includes('gym') || normalizedSector.includes('sport') || normalizedSector.includes('coach') || normalizedSector.includes('musculation') || normalizedSector.includes('yoga') || normalizedSector.includes('crossfit') || normalizedSector.includes('boxe')) queries = SECTOR_PEXEL_QUERIES.fitness;
+  else if (normalizedSector.includes('médec') || normalizedSector.includes('medical') || normalizedSector.includes('sant') || normalizedSector.includes('dentiste') || normalizedSector.includes('kiné') || normalizedSector.includes('pharmac') || normalizedSector.includes('infirm') || normalizedSector.includes('opticien') || normalizedSector.includes('ostéo')) queries = SECTOR_PEXEL_QUERIES.medical;
   else if (normalizedSector.includes('avocat') || normalizedSector.includes('jurid') || normalizedSector.includes('droit') || normalizedSector.includes('notaire') || normalizedSector.includes('cabinet')) queries = SECTOR_PEXEL_QUERIES.avocat;
-  else if (normalizedSector.includes('immobili') || normalizedSector.includes('agent') || normalizedSector.includes('propriété')) queries = SECTOR_PEXEL_QUERIES.default;
-  else if (normalizedSector.includes('peintre') || normalizedSector.includes('maçon') || normalizedSector.includes('platrier') || normalizedSector.includes('couvreur') || normalizedSector.includes('rénov')) queries = SECTOR_PEXEL_QUERIES.default;
+  else if (normalizedSector.includes('boulanger') || normalizedSector.includes('pâtiss') || normalizedSector.includes('patis') || normalizedSector.includes('viennoiserie') || normalizedSector.includes('pâtisserie')) queries = SECTOR_PEXEL_QUERIES.boulangerie;
+  else if (normalizedSector.includes('peintre') || normalizedSector.includes('décor') || normalizedSector.includes('decor') || normalizedSector.includes('revêtement') || normalizedSector.includes('revetement') || normalizedSector.includes('tapisserie')) queries = SECTOR_PEXEL_QUERIES.peintre;
+  else if (normalizedSector.includes('menuis') || normalizedSector.includes('ébénist') || normalizedSector.includes('ebenist') || normalizedSector.includes('charpent') || normalizedSector.includes('parquet') || normalizedSector.includes('bois')) queries = SECTOR_PEXEL_QUERIES.menuisier;
+  else if (normalizedSector.includes('serrur') || normalizedSector.includes('sécurit') || normalizedSector.includes('securit') || normalizedSector.includes('alarme')) queries = SECTOR_PEXEL_QUERIES.serrurier;
+  else if (normalizedSector.includes('transport') || normalizedSector.includes('livraison') || normalizedSector.includes('logistiq') || normalizedSector.includes('déménag') || normalizedSector.includes('demenag') || normalizedSector.includes('taxi') || normalizedSector.includes('vtc')) queries = SECTOR_PEXEL_QUERIES.transport;
+  else if (normalizedSector.includes('immobili') || normalizedSector.includes('immo') || normalizedSector.includes('syndic')) queries = SECTOR_PEXEL_QUERIES.immobilier;
+  else if (normalizedSector.includes('photo') || normalizedSector.includes('vidéo') || normalizedSector.includes('video') || normalizedSector.includes('mariage')) queries = SECTOR_PEXEL_QUERIES.photo;
+  else if (normalizedSector.includes('fleur') || normalizedSector.includes('flore') || normalizedSector.includes('jardin')) queries = SECTOR_PEXEL_QUERIES.fleuriste;
+  else if (normalizedSector.includes('platri') || normalizedSector.includes('couvr') || normalizedSector.includes('maçon') || normalizedSector.includes('macon') || normalizedSector.includes('isolation') || normalizedSector.includes('rénov') || normalizedSector.includes('renov') || normalizedSector.includes('terrassement') || normalizedSector.includes('charpent') || normalizedSector.includes('vitrerie')) queries = SECTOR_PEXEL_QUERIES.peintre;
 
   // Offset les requêtes basé sur le hash du lead pour varier les résultats
   const offset = leadHash % queries.length;
