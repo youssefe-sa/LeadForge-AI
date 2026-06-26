@@ -1,4 +1,8 @@
 import { LayoutModule } from '../types';
+import { Lead } from '../../supabase-store';
+import { getUiStrings } from '../data/ui-strings';
+import { renderGallery, renderFAQ, renderHours, renderContactMap, renderWhatsAppFloat, renderStickyCTA, renderTestimonialsCarousel, renderStatsCounter, renderTrustBar } from '../sections';
+import { SHARED_STYLES } from '../shared-styles';
 
 export const boldLayout: LayoutModule = {
   id: 'bold',
@@ -84,6 +88,7 @@ export const boldLayout: LayoutModule = {
       section { padding: 3rem 1.5rem; }
       .counters { grid-template-columns: 1fr 1fr; }
     }
+    ${SHARED_STYLES}
   </style>
 </head>
 <body>
@@ -166,6 +171,16 @@ export const boldLayout: LayoutModule = {
     </div>
   </section>
 
+  ${renderGallery(images, content.galleryTitle || (lang === 'en' ? 'Our Gallery' : 'Nos R\u00e9alisations'))}
+  ${renderFAQ(lead.sector, lang)}
+  ${renderHours(lang, lead)}
+  ${renderStatsCounter(extractYears(lead), lead.googleRating || 4.9, lead.googleReviews || 0, lang)}
+  ${renderTestimonialsCarousel(content.testimonials, lang === 'en' ? 'Client Reviews' : 'Avis Clients', lang)}
+  ${renderContactMap(lead, getUiStrings(lang))}
+  ${renderTrustBar(lang)}
+  ${renderWhatsAppFloat(lead.phone || '')}
+  ${renderStickyCTA(lead.phone || '', content.ctaText)}
+
   <footer>
     <p>&copy; ${new Date().getFullYear()} ${escapeHtml(content.heroTitle)}.</p>
   </footer>
@@ -186,6 +201,14 @@ export const boldLayout: LayoutModule = {
 </html>`;
   }
 };
+
+function extractYears(lead: Lead): string {
+  if (lead.description) {
+    const match = lead.description.match(/(\d+)\s*ans?\s+d['']exp[e\u00e9]rience/i);
+    if (match) return match[1];
+  }
+  return '15';
+}
 
 function escapeHtml(text: string): string {
   if (!text) return '';
