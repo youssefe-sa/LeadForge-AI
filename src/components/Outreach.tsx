@@ -1,3 +1,4 @@
+import { logger } from '../lib/logger';
 import { useState, useEffect } from 'react';
 import { Lead, ApiConfig, EmailTemplate, callLLM, useScheduledEmails, ScheduledEmail } from '../lib/supabase-store';
 import { supabase } from '../lib/supabase';
@@ -109,7 +110,7 @@ export default function Outreach({ leads, updateLead, apiConfig, templates }: Pr
   const hasLLM = !!(apiConfig.groqKey || apiConfig.geminiKey || apiConfig.nvidiaKey || apiConfig.openrouterKey);
 
   // LOG DIAGNOSTIC
-  console.log('🔍 Outreach Dashboard:', {
+  logger.log('🔍 Outreach Dashboard:', {
     leadsCount: leads.length,
     scheduledCount: scheduled.length,
     hasSmtp: hasGmailSmtp
@@ -701,7 +702,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       try {
         updateData.variables = extractedVariables;
       } catch (e) {
-        console.log('Colonne variables non disponible, sauvegarde sans variables');
+        logger.log('Colonne variables non disponible, sauvegarde sans variables');
       }
 
       const { error } = await supabase
@@ -712,7 +713,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       if (error) {
         // Si l'erreur concerne la colonne variables, réessayer sans
         if (error.message?.includes('variables') || error.code === 'PGRST204') {
-          console.log('Erreur colonne variables, sauvegarde sans cette colonne');
+          logger.log('Erreur colonne variables, sauvegarde sans cette colonne');
           const { error: retryError } = await supabase
             .from('email_templates')
             .update({
@@ -742,7 +743,7 @@ JSON: {"subject": "sujet personnalisé", "body": "corps personnalisé avec les l
       }, 2000);
 
     } catch (error: any) {
-      console.error('Erreur sauvegarde template:', error);
+      logger.error('Erreur sauvegarde template:', error);
       setSaveError(`Erreur lors de la sauvegarde: ${error.message || 'Erreur inconnue'}`);
       setLogs(prev => [...prev, `Erreur sauvegarde template: ${error.message}`]);
     } finally {

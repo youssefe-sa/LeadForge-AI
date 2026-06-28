@@ -3,6 +3,7 @@
 // Affiche les notifications pour les erreurs API (rate limit, crédits épuisés)
 // ============================================================
 
+import { logger } from '../lib/logger';
 import React, { useEffect, useState } from 'react';
 import { X, AlertTriangle, AlertCircle, Info, RefreshCw } from 'lucide-react';
 import { eventBus, LeadForgeEvents } from '../lib/events';
@@ -27,7 +28,7 @@ export function NotificationContainer() {
     const checkAndClearErrors = () => {
       const status = apiErrorState.getStatus();
       if (status.totalErrors > 0) {
-        console.log('🧹 Clearing old API errors on component mount');
+        logger.log('🧹 Clearing old API errors on component mount');
         apiErrorState.reset();
         setNotifications([]);
       }
@@ -96,7 +97,7 @@ export function NotificationContainer() {
   const handleReset = () => {
     apiErrorState.reset();
     setNotifications([]);
-    console.log('🔄 Notifications reset - API errors cleared');
+    logger.log('🔄 Notifications reset - API errors cleared');
   };
 
   if (notifications.length === 0) return null;

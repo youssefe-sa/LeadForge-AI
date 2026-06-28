@@ -1,3 +1,4 @@
+import { logger } from '../lib/logger';
 import { useState, useMemo, useEffect } from 'react';
 import {
   Lead, ApiConfig, calculateScore,
@@ -62,7 +63,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     
     // Debug: Log toutes les données du lead sélectionné
     if (lead) {
-      console.log('🔍 Selected Lead Data:', {
+      logger.log('🔍 Selected Lead Data:', {
         id: lead.id,
         name: lead.name,
         sector: lead.sector,
@@ -287,7 +288,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     const promptLead = { ...lead, ...updates };
     updates.generatedPrompt = generateWebsitePrompt(promptLead);
 
-    console.log('🎯 FINAL UPDATES TO RETURN:', updates);
+    logger.log('🎯 FINAL UPDATES TO RETURN:', updates);
     return updates;
   };
 
@@ -299,7 +300,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     apiErrorState.startAgent('scorer-batch');
 
     // Tester les APIs avant de lancer les agents
-    console.log('🔍 Test des APIs avant le lancement des agents...');
+    logger.log('🔍 Test des APIs avant le lancement des agents...');
     const apiTestReport = await testAllApis(apiConfig);
     
     if (!apiTestReport.canProceed) {
@@ -324,7 +325,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       return;
     }
 
-    console.log('✅ Tests API réussis - Lancement des agents...');
+    logger.log('✅ Tests API réussis - Lancement des agents...');
     startProcessing('batch-enrichment', 'scorer-batch');
     updateProgress({ current: 0, total: toScore.length, name: '', step: '' });
     setLogs([`🚀 Début de l'enrichissement de ${toScore.length} leads...`]);
@@ -403,7 +404,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     apiErrorState.startAgent('scorer-filtered');
 
     // Tester les APIs avant de lancer les agents filtrés
-    console.log('🔍 Test des APIs avant le lancement des agents filtrés...');
+    logger.log('🔍 Test des APIs avant le lancement des agents filtrés...');
     const apiTestReport = await testAllApis(apiConfig);
     
     if (!apiTestReport.canProceed) {
@@ -428,7 +429,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       return;
     }
 
-    console.log('✅ Tests API réussis - Lancement des agents filtrés...');
+    logger.log('✅ Tests API réussis - Lancement des agents filtrés...');
     startProcessing('filtered-enrichment', 'scorer-filtered');
     updateProgress({ current: 0, total: toScore.length, name: '', step: '' });
     setLogs([`🚀 Début de l'enrichissement de ${toScore.length} leads filtrés...`]);
@@ -498,7 +499,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
 
   const scoreOne = async (lead: Lead) => {
     // Tester les APIs avant de lancer l'agent
-    console.log('🔍 Test des APIs avant le lancement de l\'agent individuel...');
+    logger.log('🔍 Test des APIs avant le lancement de l\'agent individuel...');
     const apiTestReport = await testAllApis(apiConfig);
     
     if (!apiTestReport.canProceed) {
@@ -522,17 +523,17 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
       return;
     }
 
-    console.log('✅ Tests API réussis - Lancement de l\'agent individuel...');
+    logger.log('✅ Tests API réussis - Lancement de l\'agent individuel...');
     startProcessing('single-enrichment', 'scorer-single');
     const setStep = (step: string) => updateProgress({ current: 1, total: 1, name: lead.name, step });
     setStep('Démarrage...');
     setLogs(prev => [...prev, `⚙️ Enrichissement: ${lead.name || lead.email}...`]);
     const updates = await enrichLead(lead, setStep);
-    console.log('💾 Updates before save:', updates);
+    logger.log('💾 Updates before save:', updates);
     
     // CRITIQUE: await updateLead pour garantir que le state est mis à jour
     await updateLead(lead.id, updates);
-    console.log('✅ updateLead completed, stats will update via useEffect');
+    logger.log('✅ updateLead completed, stats will update via useEffect');
     
     const t = tempMap[updates.temperature || ''];
     const reviewsCount = (updates.googleReviewsData || []).length;
@@ -649,7 +650,7 @@ export default function Scorer({ leads, updateLead, apiConfig }: Props) {
     const leadsWithReviews = leads.filter(l => (l.googleReviewsData || []).length > 0).length;
     
     setStats({ scored, unscored, byTemp, topSectors, leadsWithReviews });
-    console.log('📊 STATS UPDATED:', { scored: scored.length, veryHot: byTemp.very_hot, hot: byTemp.hot });
+    logger.log('📊 STATS UPDATED:', { scored: scored.length, veryHot: byTemp.very_hot, hot: byTemp.hot });
   }, [leads]);
   
   const { scored: scoredLeads, unscored: unscoredLeads, byTemp: tempStats, topSectors: sectorStats, leadsWithReviews: reviewsCount } = stats;

@@ -1,3 +1,4 @@
+import { logger } from '../lib/logger';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Lead, ApiConfig, callLLM, callLLMForWebsite, generateWebsitePrompt, safeStr, proxyImg } from '../lib/supabase-store';
 import { generateUltimateSite, generateUltimateSiteAsync, detectLanguage } from '../lib/ultimateTemplate';
@@ -105,13 +106,13 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
   }, [leads]);
 
   // Debug pour comprendre pourquoi la génération ne marche pas
-  console.log('🔍 WebsiteGen Debug:');
-  console.log('🔍 Total leads:', leads.length);
-  console.log('🔍 Leads with score > 0:', leads.filter(l => l.score > 0).length);
-  console.log('🔍 Leads not generated:', leads.filter(l => !l.siteGenerated).length);
-  console.log('🔍 Enriched (score > 0 && !siteGenerated):', enriched.length);
-  console.log('🔍 Generated:', generated.length);
-  console.log('🔍 Has LLM:', hasLLM);
+  logger.log('🔍 WebsiteGen Debug:');
+  logger.log('🔍 Total leads:', leads.length);
+  logger.log('🔍 Leads with score > 0:', leads.filter(l => l.score > 0).length);
+  logger.log('🔍 Leads not generated:', leads.filter(l => !l.siteGenerated).length);
+  logger.log('🔍 Enriched (score > 0 && !siteGenerated):', enriched.length);
+  logger.log('🔍 Generated:', generated.length);
+  logger.log('🔍 Has LLM:', hasLLM);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages, chatLoading]);
 
@@ -119,7 +120,7 @@ export default function WebsiteGen({ leads, updateLead, apiConfig, loadLeads }: 
   // Cleanup retiré temporairement pour éviter l'interruption des générations en React Strict Mode
   useEffect(() => {
     return () => {
-      console.log('🛑 WebsiteGen unmounted.');
+      logger.log('🛑 WebsiteGen unmounted.');
       // stopProcessing() retiré car causait l'arrêt immédiat lors des re-renders !
     }
   }, []);
@@ -244,7 +245,7 @@ Retourne UNIQUEMENT le HTML complet.`;
       if (pattern.test(html)) {
         // Log uniquement en développement
         if (process.env.NODE_ENV === 'development') {
-          console.warn('Contenu invalide détecté, rejet du HTML');
+          logger.warn('Contenu invalide détecté, rejet du HTML');
         }
         return null;
       }
@@ -263,7 +264,7 @@ Retourne UNIQUEMENT le HTML complet.`;
     if (!hasRequiredElements) {
       // Log uniquement en développement
       if (process.env.NODE_ENV === 'development') {
-        console.warn('Structure HTML incomplète');
+        logger.warn('Structure HTML incomplète');
       }
       return null;
     }
@@ -491,7 +492,7 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
             try {
               data = JSON.parse(cleanJsonStr);
             } catch (parseError) {
-              console.warn('⚠️ JSON Parse failed. Tentative de Self-Correction...', parseError);
+              logger.warn('⚠️ JSON Parse failed. Tentative de Self-Correction...', parseError);
               const repairPrompt = `Corrige ce JSON invalide pour qu'il soit parfaitement parsable. Ne renvoie QUE le JSON:\n${cleanJsonStr.substring(0, 1000)}`;
               const repairResponse = await callLLM(apiConfig, repairPrompt, 'Expert JSON. Renvoie UNIQUEMENT le JSON réparé.');
               const repairedMatch = (repairResponse || '').match(/\{[\s\S]*\}/);
@@ -517,21 +518,21 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
             if (Array.isArray(data.whyChooseUs)) content.whyChooseUs = data.whyChooseUs.map((w: unknown) => safeStr(w)).filter(Boolean);
           }
         }
-      } catch (e) { console.error('💥 Erreur finale generateContent:', e); }
+      } catch (e) { logger.error('💥 Erreur finale generateContent:', e); }
     }
     return content;
   };
 
   // ── GENERATE SITE — TEMPLATE PREMIUM PROFESSIONNEL ──
   const generateSite = async (lead: Lead): Promise<string> => {
-    console.log(`🔧 generateSite called for: ${lead.name}`);
+    logger.log(`🔧 generateSite called for: ${lead.name}`);
     updateProgress({ step: '📝 Génération du contenu...' });
     
     try {
-      console.log(`🔧 Starting content generation for ${lead.name}`);
+      logger.log(`🔧 Starting content generation for ${lead.name}`);
       // Contenu riche puis template premium (hero image, secteur, galerie, WhatsApp)
       const content = await generateContent(lead);
-      console.log(`✅ Content generated for ${lead.name}`);
+      logger.log(`✅ Content generated for ${lead.name}`);
       
       updateProgress({ step: '🖼️ API Pexels + Storage...' });
       
@@ -541,7 +542,7 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
       
       updateProgress({ step: '🎨 Génération du site ULTIMATE...' });
       const html = await generateUltimateSiteAsync(lead, content);
-      console.log(`✅ HTML generated for ${lead.name}`);
+      logger.log(`✅ HTML generated for ${lead.name}`);
       
       updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
       const fileName = `${lead.id}.html`;
@@ -563,12 +564,12 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
         .getPublicUrl(fileName);
         
       const siteUrl = publicUrlData.publicUrl;
-      console.log(`✅ Site hébergé avec succès: ${siteUrl}`);
+      logger.log(`✅ Site hébergé avec succès: ${siteUrl}`);
       
       const baseUrl = 'https://www.services-siteup.online';
       const cleanUrl = `${baseUrl}/api/sites/${lead.id}`;
       
-      console.log(`🔧 Updating lead ${lead.id} in Supabase...`);
+      logger.log(`🔧 Updating lead ${lead.id} in Supabase...`);
       // Mettre à jour le lead avec les données du site (sans gonfler la colonne siteHtml)
       await updateLead(lead.id, {
         siteGenerated: true, 
@@ -578,16 +579,16 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
         stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
       });
       
-      console.log(`✅ Site généré avec succès pour: ${lead.name}`);
+      logger.log(`✅ Site généré avec succès pour: ${lead.name}`);
       
       return html; // Retourner le code HTML
       
     } catch (e) {
-      console.error(`❌ Erreur lors de la génération du site pour ${lead.name}:`, e);
+      logger.error(`❌ Erreur lors de la génération du site pour ${lead.name}:`, e);
       updateProgress({ step: '🔄 Fallback template...' });
       
       try {
-        console.log(`🔄 Using fallback template for ${lead.name}`);
+        logger.log(`🔄 Using fallback template for ${lead.name}`);
         const emergencyHtml = await generateUltimateSiteAsync(lead);
         updateProgress({ step: '☁️ Hébergement Cloud (Storage)...' });
         
@@ -608,9 +609,9 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
           stage: lead.stage === 'new' || lead.stage === 'enriched' ? 'site_generated' : lead.stage,
         });
         
-        console.log(`🔄 Site fallback généré pour: ${lead.name}`);
+        logger.log(`🔄 Site fallback généré pour: ${lead.name}`);
       } catch (fallbackError) {
-        console.error(`❌ Erreur critique - même le fallback a échoué pour ${lead.name}:`, fallbackError);
+        logger.error(`❌ Erreur critique - même le fallback a échoué pour ${lead.name}:`, fallbackError);
         // Marquer quand même comme traité pour éviter les boucles infinies
         await updateLead(lead.id, {
           siteGenerated: true,
@@ -709,16 +710,16 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
   };
 
   const generateBatch = async () => {
-    console.log('🚀 generateBatch called!');
-    console.log('🚀 enriched.length:', enriched.length);
-    console.log('🚀 isProcessing:', isProcessing);
+    logger.log('🚀 generateBatch called!');
+    logger.log('🚀 enriched.length:', enriched.length);
+    logger.log('🚀 isProcessing:', isProcessing);
     
     if (enriched.length === 0) {
-      console.log('❌ No enriched leads to process');
+      logger.log('❌ No enriched leads to process');
       return;
     }
     
-    console.log('✅ Starting batch generation...');
+    logger.log('✅ Starting batch generation...');
     startProcessing('website-generation', 'websitegen-batch');
     
     let processedCount = 0;
@@ -732,7 +733,7 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         // Recharger les données depuis Supabase
-        console.log('🔄 Checking for new leads...');
+        logger.log('🔄 Checking for new leads...');
         await loadLeads();
         
         // Attendre encore un peu pour la synchronisation
@@ -742,13 +743,13 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
         const currentLeads = leadsRef.current.filter(l => l.score > 0 && !l.siteGenerated);
         const newLeadsToProcess = currentLeads.filter(l => !processedLeadIds.has(l.id));
         
-        console.log(`📊 Status: Total leads=${leadsRef.current.length}, Score>0=${leadsRef.current.filter(l => l.score > 0).length}, Enriched=${currentLeads.length}, New to process=${newLeadsToProcess.length}`);
-        console.log(`📋 Processed IDs: ${Array.from(processedLeadIds).slice(0, 3)}...`);
-        console.log(`🔄 No new leads count: ${noNewLeadsCount}/3`);
+        logger.log(`📊 Status: Total leads=${leadsRef.current.length}, Score>0=${leadsRef.current.filter(l => l.score > 0).length}, Enriched=${currentLeads.length}, New to process=${newLeadsToProcess.length}`);
+        logger.log(`📋 Processed IDs: ${Array.from(processedLeadIds).slice(0, 3)}...`);
+        logger.log(`🔄 No new leads count: ${noNewLeadsCount}/3`);
         
         if (newLeadsToProcess.length === 0) {
           noNewLeadsCount++;
-          console.log(`⏱️ No new leads found (${noNewLeadsCount}/3), waiting 5 seconds...`);
+          logger.log(`⏱️ No new leads found (${noNewLeadsCount}/3), waiting 5 seconds...`);
           await new Promise(resolve => setTimeout(resolve, 5000));
           continue;
         } else {
@@ -758,22 +759,22 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
         // Traiter les nouveaux leads
         for (const currentLead of newLeadsToProcess) {
           if (!websiteGenState.getState().isProcessing) {
-            console.log('⏹️ Processing stopped, exiting loop');
+            logger.log('⏹️ Processing stopped, exiting loop');
             break;
           }
           
           processedLeadIds.add(currentLead.id);
           processedCount++;
           
-          console.log(`🔄 Processing lead ${processedCount}: ${currentLead.name}`);
+          logger.log(`🔄 Processing lead ${processedCount}: ${currentLead.name}`);
           
           // Vérifier si la génération est en pause dynamiquement !
           while (websiteGenState.getState().isPaused) {
-            console.log('⏸️ Generation paused, waiting...');
+            logger.log('⏸️ Generation paused, waiting...');
             updateProgress({ step: '⏸️ En pause', current: processedCount, total: processedLeadIds.size, name: currentLead.name });
             await new Promise(resolve => setTimeout(resolve, 1000));
             if (!websiteGenState.getState().isProcessing) {
-              console.log('⏹️ Processing stopped during pause');
+              logger.log('⏹️ Processing stopped during pause');
               return;
             }
           }
@@ -790,21 +791,21 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
             if (!websiteGenState.getState().isProcessing) return;
             
             await generateSite(currentLead);
-            console.log(`✅ Lead ${currentLead.name} traité avec succès`);
+            logger.log(`✅ Lead ${currentLead.name} traité avec succès`);
             
             // Recharger pour voir le déplacement de la table en direct
             await loadLeads();
             
           } catch (error) {
-            console.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
+            logger.error(`❌ Erreur lors du traitement de ${currentLead.name}:`, error);
           }
           
           // Délai réactif entre les sites : permet l'arrêt instantané via bouton !
-          console.log(`⏱️ Waiting ${batchDelay}ms before next lead...`);
+          logger.log(`⏱️ Waiting ${batchDelay}ms before next lead...`);
           let waited = 0;
           while (waited < batchDelay) {
             if (!websiteGenState.getState().isProcessing) {
-              console.log('⏹️ Processing stopped during delay interval');
+              logger.log('⏹️ Processing stopped during delay interval');
               return;
             }
             await new Promise(r => setTimeout(r, 500));
@@ -813,11 +814,11 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
         }
       }
       
-      console.log('✅ Maximum no-new-leads count reached or no more leads to process');
+      logger.log('✅ Maximum no-new-leads count reached or no more leads to process');
     } catch (error) {
-      console.error('💥 Error in generateBatch loop:', error);
+      logger.error('💥 Error in generateBatch loop:', error);
     } finally {
-      console.log(`🏁 Batch generation completed. Total processed: ${processedCount}`);
+      logger.log(`🏁 Batch generation completed. Total processed: ${processedCount}`);
       stopProcessing();
     }
   };
@@ -849,7 +850,7 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
           try {
             newContent = { ...currentContent, ...JSON.parse(cleanStr) };
           } catch(e) {
-            console.error('Chat AI parse error. Utilisation du contenu de base.', e);
+            logger.error('Chat AI parse error. Utilisation du contenu de base.', e);
           }
         }
       }
@@ -889,7 +890,7 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
       
       updateProgress({ step: '✅ Code téléchargé avec succès' });
     } catch (error) {
-      console.error('Erreur lors du téléchargement du code:', error);
+      logger.error('Erreur lors du téléchargement du code:', error);
       updateProgress({ step: '❌ Erreur lors du téléchargement' });
     } finally {
       stopProcessing();
@@ -924,7 +925,7 @@ Tout en français. Contenu ORIGINAL et SPÉCIFIQUE au secteur "${lead.sector || 
         setTimeout(() => setPreviewId(previewLead.id), 100);
       }, 500);
     } catch (error) {
-      console.error('Erreur lors du changement de palette:', error);
+      logger.error('Erreur lors du changement de palette:', error);
       updateProgress({ step: '❌ Erreur lors du changement de palette' });
     } finally {
       stopProcessing();

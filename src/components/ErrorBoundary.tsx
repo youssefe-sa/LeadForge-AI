@@ -1,3 +1,4 @@
+import { logger } from '../lib/logger';
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
@@ -29,7 +30,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
     // Log l'erreur en développement uniquement
     if (process.env.NODE_ENV === 'development') {
-      console.error('ErrorBoundary caught an error:', error, errorInfo);
+      logger.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }
 

@@ -3,6 +3,7 @@
 // Teste les APIs avant le lancement des agents
 // ============================================================
 
+import { logger } from './logger';
 import { ApiConfig } from './supabase-store';
 
 export interface ApiTestResult {
@@ -145,7 +146,7 @@ export async function testAllApis(config: ApiConfig): Promise<ApiTestReport> {
   const results: ApiTestResult[] = [];
 
   const defaultLlm = config.defaultLlm || 'groq';
-  console.log(`🔧 API Testing: Default LLM is ${defaultLlm}`);
+  logger.log(`🔧 API Testing: Default LLM is ${defaultLlm}`);
 
   // Tester Serper + le LLM par défaut en parallèle
   const [serperResult, defaultLlmResult] = await Promise.all([
@@ -173,7 +174,7 @@ export async function testAllApis(config: ApiConfig): Promise<ApiTestReport> {
 
   if (!canProceed) {
     const failing = results.filter(r => r.status === 'error').map(r => `❌ ${r.service}: ${r.message}`).join('\n');
-    console.warn(`⚠️ Tests API échoués:\n${failing}`);
+    logger.warn(`⚠️ Tests API échoués:\n${failing}`);
   }
 
   return { success: canProceed, results, canProceed };

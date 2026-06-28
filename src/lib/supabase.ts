@@ -1,3 +1,4 @@
+import { logger } from './logger';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -171,7 +172,7 @@ export const leadsService = {
   },
 
   async update(id: string, updates: Database['public']['Tables']['leads']['Update']) {
-    console.log('🔧 Supabase update attempt for ID:', id);
+    logger.log('🔧 Supabase update attempt for ID:', id);
 
     // Nettoyer explicitement les valeurs "undefined" avant l'envoi pour éviter tout problème avec Supabase
     const cleanUpdates = Object.fromEntries(
@@ -186,11 +187,11 @@ export const leadsService = {
       .single();
 
     if (error) {
-      console.error('❌ Supabase update error:', error);
+      logger.error('❌ Supabase update error:', error);
       throw error;
     }
 
-    console.log('✅ Supabase update successful:', data);
+    logger.log('✅ Supabase update successful:', data);
     return data;
   },
 
@@ -231,7 +232,7 @@ export const leadsService = {
 
     // Debug seulement en développement
     if (process.env.NODE_ENV === 'development') {
-      console.log('All leads for campaigns:', data);
+      logger.log('All leads for campaigns:', data);
     }
 
     // Grouper par campagne et compter les leads
@@ -258,7 +259,7 @@ export const leadsService = {
     });
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Campaigns grouped:', campaigns);
+      logger.log('Campaigns grouped:', campaigns);
     }
 
     return Object.values(campaigns);
@@ -339,7 +340,7 @@ export const configService = {
       pexels_key: config.pexelsKey || null,
     };
 
-    console.log('🚀 Updating api_config (id=1):', row);
+    logger.log('🚀 Updating api_config (id=1):', row);
 
     const { error } = await supabase
       .from('api_config')
@@ -347,7 +348,7 @@ export const configService = {
       .eq('id', 1);
 
     if (error) {
-      console.error('❌ Supabase Update Error:', error);
+      logger.error('❌ Supabase Update Error:', error);
       throw error;
     }
     return { message: 'Configuration saved successfully' };

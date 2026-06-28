@@ -1,3 +1,4 @@
+import { logger } from './logger';
 // Pexels Images Service — Images professionnelles par secteur
 // 20 images UNIQUES par secteur, récupérées via l'API Pexels
 
@@ -307,7 +308,7 @@ export async function fetchSectorImagesFromAPI(sector: string, leadHash: number 
   const offset = leadHash % queries.length;
   const offsetQueries = [...queries.slice(offset), ...queries.slice(0, offset)];
 
-  console.log(`🖼️ Pexels: Récupération d'images pour "${sector}" (${offsetQueries.length} requêtes, offset ${offset})`);
+  logger.log(`🖼️ Pexels: Récupération d'images pour "${sector}" (${offsetQueries.length} requêtes, offset ${offset})`);
 
   const allImages: string[] = [];
   for (const query of offsetQueries) {
@@ -317,7 +318,7 @@ export async function fetchSectorImagesFromAPI(sector: string, leadHash: number 
 
   // Dédupliquer
   const unique = [...new Set(allImages)];
-  console.log(`✅ Pexels: ${unique.length} images uniques pour "${sector}"`);
+  logger.log(`✅ Pexels: ${unique.length} images uniques pour "${sector}"`);
 
   imagesCache[cacheKey] = unique;
   return unique;

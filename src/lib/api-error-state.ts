@@ -3,6 +3,7 @@
 // Gestion des erreurs API (rate limit, crédits épuisés) et arrêt des agents
 // ============================================================
 
+import { logger } from './logger';
 import { eventBus, LeadForgeEvents } from './events';
 
 // Types d'erreurs API
@@ -45,20 +46,20 @@ class ApiErrorState {
       this.stopAllAgents();
     }
 
-    console.log(`[ApiErrorState] Error recorded: ${error.service} - ${error.type}`, apiError);
+    logger.log(`[ApiErrorState] Error recorded: ${error.service} - ${error.type}`, apiError);
   }
 
   // Démarrer un agent
   startAgent(agentId: string): void {
     this.activeAgents.add(agentId);
     this.agentsStopped = false;
-    console.log(`[ApiErrorState] Agent started: ${agentId}`);
+    logger.log(`[ApiErrorState] Agent started: ${agentId}`);
   }
 
   // Arrêter un agent spécifique
   stopAgent(agentId: string): void {
     this.activeAgents.delete(agentId);
-    console.log(`[ApiErrorState] Agent stopped: ${agentId}`);
+    logger.log(`[ApiErrorState] Agent stopped: ${agentId}`);
   }
 
   // Arrêter tous les agents
@@ -75,7 +76,7 @@ class ApiErrorState {
         timestamp: Date.now(),
       });
 
-      console.log(`[ApiErrorState] All agents stopped due to API error: ${agentIds.join(', ')}`);
+      logger.log(`[ApiErrorState] All agents stopped due to API error: ${agentIds.join(', ')}`);
     }
   }
 
@@ -118,7 +119,7 @@ class ApiErrorState {
   reset(): void {
     this.agentsStopped = false;
     this.errors = []; // Vider complètement les erreurs
-    console.log('[ApiErrorState] State reset - All errors cleared');
+    logger.log('[ApiErrorState] State reset - All errors cleared');
   }
 
   // Obtenir le statut actuel

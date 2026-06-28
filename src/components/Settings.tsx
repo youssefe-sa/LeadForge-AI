@@ -1,3 +1,4 @@
+import { logger } from '../lib/logger';
 import { useState, useEffect } from 'react';
 import { ApiConfig, ApiStatus, useApiConfig, LlmProvider } from '../lib/supabase-store';
 import SimpleSerperGenerator from './SimpleSerperGenerator';
@@ -54,7 +55,7 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
 
   // Debug: afficher la configuration
   useEffect(() => {
-    console.log('Settings - Config actuelle:', JSON.stringify(config, null, 2));
+    logger.log('Settings - Config actuelle:', JSON.stringify(config, null, 2));
   }, [config]);
 
   const toggleVisible = (key: string) => {
@@ -65,7 +66,7 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
   useEffect(() => {
     const handleConfigUpdate = (event: CustomEvent) => {
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔧 API Config updated event received:', event.detail);
+        logger.log('🔧 API Config updated event received:', event.detail);
       }
       // Mise à jour locale immédiate
       setLocalConfig(prev => ({ ...prev, ...event.detail }));
@@ -97,7 +98,7 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
         }
       });
       
-      console.log(`💾 Sauvegarde de la section ${sectionId}:`, updates);
+      logger.log(`💾 Sauvegarde de la section ${sectionId}:`, updates);
       await updateConfig(updates);
       
       // Petit délai pour l'effet visuel
@@ -105,7 +106,7 @@ export default function Settings({ config, updateConfig, statuses, setStatus, on
         setSavingSections(prev => ({ ...prev, [sectionId]: false }));
       }, 800);
     } catch (error) {
-      console.error(`❌ Erreur lors de la sauvegarde de ${sectionId}:`, error);
+      logger.error(`❌ Erreur lors de la sauvegarde de ${sectionId}:`, error);
       setSavingSections(prev => ({ ...prev, [sectionId]: false }));
       alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
     }

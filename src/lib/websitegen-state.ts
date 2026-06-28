@@ -3,6 +3,7 @@
 // Suit l'état de processing pour Website Generator à travers toute l'application
 // ============================================================
 
+import { logger } from './logger';
 import * as React from 'react';
 
 export interface WebsiteGenState {
@@ -55,7 +56,7 @@ class WebsiteGenStateManager {
       agentId,
     };
 
-    console.log(`🚀 WebsiteGen Processing started: ${taskName}`);
+    logger.log(`🚀 WebsiteGen Processing started: ${taskName}`);
     this.notify();
   }
 
@@ -75,7 +76,7 @@ class WebsiteGenStateManager {
       progress: { current: 0, total: 0, name: '', step: '' },
     };
 
-    console.log(`🏁 WebsiteGen Processing stopped: ${taskName}`);
+    logger.log(`🏁 WebsiteGen Processing stopped: ${taskName}`);
     this.notify();
   }
 
@@ -88,7 +89,7 @@ class WebsiteGenStateManager {
   pauseProcessing(): void {
     if (this.state.isProcessing && !this.state.isPaused) {
       this.state.isPaused = true;
-      console.log(`⏸️ WebsiteGen Processing paused: ${this.state.currentTask}`);
+      logger.log(`⏸️ WebsiteGen Processing paused: ${this.state.currentTask}`);
       this.notify();
     }
   }
@@ -97,7 +98,7 @@ class WebsiteGenStateManager {
   resumeProcessing(): void {
     if (this.state.isProcessing && this.state.isPaused) {
       this.state.isPaused = false;
-      console.log(`▶️ WebsiteGen Processing resumed: ${this.state.currentTask}`);
+      logger.log(`▶️ WebsiteGen Processing resumed: ${this.state.currentTask}`);
       this.notify();
     }
   }

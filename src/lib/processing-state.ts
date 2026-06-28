@@ -3,6 +3,7 @@
 // Suit l'état de processing à travers toute l'application
 // ============================================================
 
+import { logger } from './logger';
 import * as React from 'react';
 import { eventBus, LeadForgeEvents } from './events';
 
@@ -56,7 +57,7 @@ class ProcessingStateManager {
       agentId,
     };
 
-    console.log(`🚀 Processing started: ${taskName}`);
+    logger.log(`🚀 Processing started: ${taskName}`);
     this.notify();
 
     // Émettre un événement global
@@ -83,7 +84,7 @@ class ProcessingStateManager {
       progress: { current: 0, total: 0, name: '', step: '' },
     };
 
-    console.log(`🏁 Processing stopped: ${taskName}`);
+    logger.log(`🏁 Processing stopped: ${taskName}`);
     this.notify();
 
     // Émettre un événement global
@@ -102,7 +103,7 @@ class ProcessingStateManager {
   pauseProcessing(): void {
     if (this.state.isProcessing && !this.state.isPaused) {
       this.state.isPaused = true;
-      console.log(`⏸️ Processing paused: ${this.state.currentTask}`);
+      logger.log(`⏸️ Processing paused: ${this.state.currentTask}`);
       this.notify();
 
       // Émettre un événement global
@@ -117,7 +118,7 @@ class ProcessingStateManager {
   resumeProcessing(): void {
     if (this.state.isProcessing && this.state.isPaused) {
       this.state.isPaused = false;
-      console.log(`▶️ Processing resumed: ${this.state.currentTask}`);
+      logger.log(`▶️ Processing resumed: ${this.state.currentTask}`);
       this.notify();
 
       // Émettre un événement global

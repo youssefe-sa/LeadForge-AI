@@ -1,3 +1,4 @@
+import { logger } from '../lib/logger';
 import { useState } from 'react';
 import { configService } from '../lib/supabase';
 
@@ -52,9 +53,9 @@ export default function SimpleSerperGenerator({ onClose }: { onClose: () => void
     // Sauvegarder aussi dans Supabase
     try {
       await configService.update({ serperKey: apiKey });
-      console.log('✅ Clé Serper sauvegardée dans Supabase');
+      logger.log('✅ Clé Serper sauvegardée dans Supabase');
     } catch (err) {
-      console.error('❌ Erreur sauvegarde Supabase:', err);
+      logger.error('❌ Erreur sauvegarde Supabase:', err);
     }
     
     // Dispatch event pour synchroniser avec Settings

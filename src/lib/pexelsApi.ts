@@ -1,6 +1,7 @@
 // Service API Pexels dynamique avec recherche sectorielle
 // Télécharge les images dans Supabase Storage pour persistance
 
+import { logger } from './logger';
 import { supabase } from './supabase';
 import { isImageBlocked, BLOCKED_KEYWORDS, BLOCKED_DOMAINS } from './imageFilters';
 
@@ -50,7 +51,7 @@ interface PexelsSearchResponse {
  */
 export async function searchPexelsImages(sector: string, perPage: number = 10): Promise<string[]> {
   if (!PEXELS_API_KEY) {
-    console.warn('⚠️ Clé API Pexels non configurée');
+    logger.warn('⚠️ Clé API Pexels non configurée');
     return [];
   }
 
@@ -94,7 +95,7 @@ export async function searchPexelsImages(sector: string, perPage: number = 10): 
     return filteredPhotos.map(photo => photo.src.large || photo.src.medium);
     
   } catch (error) {
-    console.error('❌ Erreur recherche Pexels:', error);
+    logger.error('❌ Erreur recherche Pexels:', error);
     return [];
   }
 }
@@ -142,11 +143,11 @@ export async function downloadAndStoreImage(
       .from('site-images')
       .getPublicUrl(fileName);
     
-    console.log(`✅ Image stockée: ${publicUrlData.publicUrl}`);
+    logger.log(`✅ Image stockée: ${publicUrlData.publicUrl}`);
     return publicUrlData.publicUrl;
     
   } catch (error) {
-    console.error('❌ Erreur stockage image:', error);
+    logger.error('❌ Erreur stockage image:', error);
     return null;
   }
 }
@@ -176,7 +177,7 @@ export async function getImagesForLead(
       return !isImageBlocked(img);
     });
   
-  console.log(`🖼️ ${leadId}: ${rawLeadImages.length} images réelles trouvées`);
+  logger.log(`🖼️ ${leadId}: ${rawLeadImages.length} images réelles trouvées`);
   
   // Si on a assez d'images réelles, les utiliser
   if (rawLeadImages.length >= count) {
@@ -185,7 +186,7 @@ export async function getImagesForLead(
   
   // 2. Compléter avec l'API Pexels
   const neededImages = count - rawLeadImages.length;
-  console.log(`🔍 Recherche de ${neededImages} images sur Pexels API...`);
+  logger.log(`🔍 Recherche de ${neededImages} images sur Pexels API...`);
   
   const pexelsUrls = await searchPexelsImages(sector, neededImages + 5); // +5 pour avoir de la marge si certaines échouent
   
@@ -201,7 +202,7 @@ export async function getImagesForLead(
   // 4. Combiner: réelles + stockées
   const combinedImages = [...rawLeadImages, ...storedUrls];
   
-  console.log(`✅ ${leadId}: ${rawLeadImages.length} réelles + ${storedUrls.length} Pexels stockées = ${combinedImages.length} total`);
+  logger.log(`✅ ${leadId}: ${rawLeadImages.length} réelles + ${storedUrls.length} Pexels stockées = ${combinedImages.length} total`);
   
   return combinedImages.slice(0, count);
 }

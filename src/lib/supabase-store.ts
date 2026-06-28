@@ -1,6 +1,7 @@
 // ============================================================
 // LeadForge AI — Supabase Store (Cloud persistence)
 // ============================================================
+import { logger } from './logger';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { leadsService, configService, templatesService, campaignsService, Database, supabase } from './supabase';
 import { isImageBlocked } from './imageFilters';
@@ -321,7 +322,7 @@ function mapLeadToSupabaseLead(lead: Lead): Database['public']['Tables']['leads'
     })
   );
 
-  console.log('🧹 Cleaned data for Supabase:', cleanData);
+  logger.log('🧹 Cleaned data for Supabase:', cleanData);
   return cleanData;
 }
 
@@ -356,7 +357,7 @@ export function useLeads() {
     const channel = supabase
       .channel('leads-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload) => {
-        console.log('⚡ Changement Realtime détecté:', payload);
+        logger.log('⚡ Changement Realtime détecté:', payload);
         loadLeads();
       })
       .subscribe();
@@ -371,7 +372,7 @@ export function useLeads() {
     // Importer eventBus localement pour éviter les dépendances circulaires
     import('./events').then(({ eventBus, LeadForgeEvents }) => {
       const handleDataChange = () => {
-        console.log('useLeads: Événement reçu, rechargement des données...');
+        logger.log('useLeads: Événement reçu, rechargement des données...');
         setRefreshTrigger(prev => prev + 1);
         loadLeads();
       };
@@ -452,11 +453,11 @@ export function useLeads() {
       }
 
       // Force reload leads to get the new data
-      console.log(`Added ${toAdd.length} leads, reloading...`);
+      logger.log(`Added ${toAdd.length} leads, reloading...`);
       await loadLeads();
       
       if (duplicates.length > 0) {
-        console.warn('Duplicates skipped:', duplicates);
+        logger.warn('Duplicates skipped:', duplicates);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add leads');
@@ -466,7 +467,7 @@ export function useLeads() {
   }, [leads, loadLeads]);
 
   const updateLead = useCallback(async (id: string, updates: Partial<Lead>) => {
-    console.log('💾 updateLead called:', { id, updates });
+    logger.log('💾 updateLead called:', { id, updates });
     setLoading(true);
     setError(null);
     
@@ -476,17 +477,17 @@ export function useLeads() {
         throw new Error(`Lead with id ${id} not found`);
       }
       
-      console.log('💾 Current lead found:', currentLead);
+      logger.log('💾 Current lead found:', currentLead);
       
       const mergedLead = { ...currentLead, ...updates };
-      console.log('💾 Merged lead for Supabase:', mergedLead);
+      logger.log('💾 Merged lead for Supabase:', mergedLead);
       
       const supabaseData = mapLeadToSupabaseLead(mergedLead);
-      console.log('💾 Supabase mapped data:', supabaseData);
+      logger.log('💾 Supabase mapped data:', supabaseData);
       
       // Mettre à jour dans Supabase
       const updatedLead = await leadsService.update(id, supabaseData);
-      console.log('� Supabase update successful');
+      logger.log('� Supabase update successful');
       
       // Mettre à jour le state local avec les données fraîches de Supabase
       setLeads(currentLeads => {
@@ -494,7 +495,7 @@ export function useLeads() {
         if (index !== -1) {
           const updatedLeads = [...currentLeads];
           updatedLeads[index] = updatedLead;
-          console.log('� Local state updated via functional setLeads:', updatedLeads[index]);
+          logger.log('� Local state updated via functional setLeads:', updatedLeads[index]);
           return updatedLeads;
         }
         return currentLeads;
@@ -503,20 +504,20 @@ export function useLeads() {
       // DIAGNOSTIC: Vérifier que les données sont bien dans Supabase
       setTimeout(async () => {
         try {
-          console.log('🔍 DIAGNOSTIC: Vérification des données dans Supabase...');
+          logger.log('🔍 DIAGNOSTIC: Vérification des données dans Supabase...');
           const freshData = await leadsService.getById(id);
-          console.log('🔍 Données fraîches depuis Supabase:', freshData);
-          console.log('🔍 google_rating dans Supabase:', freshData?.google_rating);
-          console.log('🔍 google_maps_url dans Supabase:', freshData?.google_maps_url);
-          console.log('🔍 description dans Supabase:', freshData?.description);
-          console.log('🔍 logo dans Supabase:', freshData?.logo);
+          logger.log('🔍 Données fraîches depuis Supabase:', freshData);
+          logger.log('🔍 google_rating dans Supabase:', freshData?.google_rating);
+          logger.log('🔍 google_maps_url dans Supabase:', freshData?.google_maps_url);
+          logger.log('🔍 description dans Supabase:', freshData?.description);
+          logger.log('🔍 logo dans Supabase:', freshData?.logo);
         } catch (err) {
-          console.error('🔍 Erreur lors de la vérification:', err);
+          logger.error('🔍 Erreur lors de la vérification:', err);
         }
       }, 2000);
       
     } catch (err) {
-      console.error('💾 Update error:', err);
+      logger.error('💾 Update error:', err);
       
       // Ne pas bloquer l'interface utilisateur en cas d'erreur de base de données
       // Mettre à jour le state local même si la base de données échoue
@@ -528,7 +529,7 @@ export function useLeads() {
           if (index !== -1) {
             const updatedLeads = [...currentLeads];
             updatedLeads[index] = mergedLead;
-            console.log('💾 Local state updated despite DB error:', updatedLeads[index]);
+            logger.log('💾 Local state updated despite DB error:', updatedLeads[index]);
             return updatedLeads;
           }
           return currentLeads;
@@ -578,7 +579,7 @@ export function useCampaigns() {
       const campaignsData = await leadsService.getCampaigns();
       setCampaigns(campaignsData);
       setInitialized(true);
-      console.log('useCampaigns: Campagnes chargées:', campaignsData.length);
+      logger.log('useCampaigns: Campagnes chargées:', campaignsData.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load campaigns');
       setInitialized(true); // Marquer comme initialisé même en cas d'erreur
@@ -600,7 +601,7 @@ export function useCampaigns() {
     const channel = supabase
       .channel('campaigns-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload) => {
-        console.log('⚡ [Campaigns] Realtime change detected in leads:', payload);
+        logger.log('⚡ [Campaigns] Realtime change detected in leads:', payload);
         loadCampaigns();
       })
       .subscribe();
@@ -615,7 +616,7 @@ export function useCampaigns() {
     // Importer eventBus localement pour éviter les dépendances circulaires
     import('./events').then(({ eventBus, LeadForgeEvents }) => {
       const handleDataChange = () => {
-        console.log('useCampaigns: Événement reçu, rechargement des campagnes...');
+        logger.log('useCampaigns: Événement reçu, rechargement des campagnes...');
         setInitialized(false); // Forcer le rechargement
         setRefreshTrigger(prev => prev + 1); // Déclencher le rechargement via useEffect
       };
@@ -650,7 +651,7 @@ export function useCampaigns() {
     setError(null);
     try {
       await leadsService.deleteByCampaign(campaignName);
-      console.log('useCampaigns: Campagne supprimée:', campaignName);
+      logger.log('useCampaigns: Campagne supprimée:', campaignName);
       setRefreshTrigger(prev => prev + 1); // Déclencher le rechargement
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete campaign');
@@ -661,7 +662,7 @@ export function useCampaigns() {
   }, []);
 
   const forceReloadCampaigns = useCallback(() => {
-    console.log('useCampaigns: Force rechargement des campagnes');
+    logger.log('useCampaigns: Force rechargement des campagnes');
     setRefreshTrigger(prev => prev + 1); // Déclenche le rechargement via useEffect
   }, []);
 
@@ -684,9 +685,9 @@ export function useApiConfig() {
     setLoading(true);
     setError(null);
     try {
-      console.log('Loading config from Supabase...');
+      logger.log('Loading config from Supabase...');
       const supabaseConfig = await configService.get();
-      console.log('Config loaded:', supabaseConfig);
+      logger.log('Config loaded:', supabaseConfig);
       setConfig(supabaseConfig);
       // Injecter la clé Pexels dans le module pexelsImages
       if (supabaseConfig.pexelsKey) {
@@ -694,7 +695,7 @@ export function useApiConfig() {
         setPexelsApiKey(supabaseConfig.pexelsKey);
       }
     } catch (err) {
-      console.error('Failed to load config:', err);
+      logger.error('Failed to load config:', err);
       setError(err instanceof Error ? err.message : 'Failed to load config');
     } finally {
       setLoading(false);
@@ -711,7 +712,7 @@ export function useApiConfig() {
     const channel = supabase
       .channel('api-config-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'api_config' }, (payload) => {
-        console.log('⚡ API Config Realtime Change:', payload);
+        logger.log('⚡ API Config Realtime Change:', payload);
         loadConfig();
       })
       .subscribe();
@@ -786,7 +787,7 @@ export function useEmailTemplates() {
     const channel = supabase
       .channel('templates-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'email_templates' }, (payload) => {
-        console.log('⚡ Templates Realtime Change:', payload);
+        logger.log('⚡ Templates Realtime Change:', payload);
         loadTemplates();
       })
       .subscribe();
@@ -924,7 +925,7 @@ async function enforceRateLimit(promptLength: number = 0): Promise<void> {
   // Si on dépasse la limite, attendre la fin de la minute
   if (tokensUsedInMinute + estimatedTokens > GROQ_TPM_LIMIT - GROQ_TPM_BUFFER) {
     const waitTime = 60000 - (now - tokensResetTimestamp) + 1000; // +1s de marge
-    console.log(`⏳ TPM Limit proche (${tokensUsedInMinute}/${GROQ_TPM_LIMIT}), attente de ${waitTime}ms...`);
+    logger.log(`⏳ TPM Limit proche (${tokensUsedInMinute}/${GROQ_TPM_LIMIT}), attente de ${waitTime}ms...`);
     await new Promise(resolve => setTimeout(resolve, waitTime));
     tokensUsedInMinute = 0;
     tokensResetTimestamp = Date.now();
@@ -933,7 +934,7 @@ async function enforceRateLimit(promptLength: number = 0): Promise<void> {
   // Délai minimum entre requêtes
   if (timeSinceLastCall < RATE_LIMIT_DELAY_MS) {
     const waitTime = RATE_LIMIT_DELAY_MS - timeSinceLastCall;
-    console.log(`⏳ Rate limiting: attente de ${waitTime}ms avant la prochaine requête...`);
+    logger.log(`⏳ Rate limiting: attente de ${waitTime}ms avant la prochaine requête...`);
     await new Promise(resolve => setTimeout(resolve, waitTime));
   }
   
@@ -950,7 +951,7 @@ function extractRetryDelay(error: any): number | null {
     const value = parseFloat(match[1]);
     const unit = match[2].toLowerCase();
     const delayMs = unit === 's' ? value * 1000 : value;
-    console.log(`⏳ Temps d'attente extrait de l'erreur: ${delayMs}ms`);
+    logger.log(`⏳ Temps d'attente extrait de l'erreur: ${delayMs}ms`);
     return delayMs;
   }
   return null;
@@ -982,7 +983,7 @@ async function retryWithBackoff<T>(
         const safeDelay = suggestedDelay < 10000
           ? Math.max(suggestedDelay + 1000, 62000 - (Date.now() % 60000)) // attendre le reset de la minute
           : suggestedDelay + 1000;
-        console.log(`⏳ Rate limit Groq — attente ${Math.round(safeDelay/1000)}s pour reset TPM (tentative ${attempt + 1}/${maxRetries})...`);
+        logger.log(`⏳ Rate limit Groq — attente ${Math.round(safeDelay/1000)}s pour reset TPM (tentative ${attempt + 1}/${maxRetries})...`);
         await new Promise(resolve => setTimeout(resolve, safeDelay));
         // Reset le compteur interne après l'attente
         tokensUsedInMinute = 0;
@@ -990,7 +991,7 @@ async function retryWithBackoff<T>(
       } else {
         // Fallback: backoff exponentiel
         const delay = BASE_DELAY_MS * Math.pow(2, attempt);
-        console.log(`⏳ Retry dans ${delay}ms (tentative ${attempt + 1}/${maxRetries})...`);
+        logger.log(`⏳ Retry dans ${delay}ms (tentative ${attempt + 1}/${maxRetries})...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
@@ -1009,7 +1010,7 @@ function isRateLimitError(error: any): boolean {
 
 // --- LLM API CALLS ---
 export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: string): Promise<string> {
-  console.log('🧠 callLLM: Starting LLM call');
+  logger.log('🧠 callLLM: Starting LLM call');
   const truncatedPrompt = prompt.slice(0, 4000);
 
   const messages = [
@@ -1043,7 +1044,7 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
   };
 
   const defaultLlm = config.defaultLlm || 'groq';
-  console.log('🎯 LLM: Default provider is:', defaultLlm);
+  logger.log('🎯 LLM: Default provider is:', defaultLlm);
 
   const providers = [
     { id: 'groq', key: config.groqKey, model: 'llama-3.1-8b-instant', maxTokens: 1024 },
@@ -1061,25 +1062,25 @@ export async function callLLM(config: ApiConfig, prompt: string, systemPrompt?: 
     .filter(p => p.key)
     .map(p => () => callProvider(p.id, p.key, p.model, p.maxTokens));
 
-  console.log(`🔄 LLM: Provider order: ${ordered.filter(p => p.key).map(p => p.id).join(' → ')}`);
+  logger.log(`🔄 LLM: Provider order: ${ordered.filter(p => p.key).map(p => p.id).join(' → ')}`);
 
   for (let i = 0; i < providerOrder.length; i++) {
     try {
-      console.log(`🧪 LLM: Trying provider ${i + 1}/${providerOrder.length}`);
+      logger.log(`🧪 LLM: Trying provider ${i + 1}/${providerOrder.length}`);
       const result = await providerOrder[i]();
       if (result) {
-        console.log(`✅ LLM: Provider ${i + 1} succeeded`);
+        logger.log(`✅ LLM: Provider ${i + 1} succeeded`);
         return result;
       }
     } catch (err: any) {
       const msg = String(err?.message || err).toLowerCase();
       const isTransient = msg.includes('failed to fetch') || msg.includes('cors') || msg.includes('network') || isRateLimitError(err);
       if (!isTransient) throw err;
-      console.warn(`⚠️ LLM provider ${i + 1} indisponible, essai du suivant...`);
+      logger.warn(`⚠️ LLM provider ${i + 1} indisponible, essai du suivant...`);
     }
   }
 
-  console.error('❌ callLLM: No LLM available (configure Gemini, NVIDIA NIM, OpenRouter or Groq)');
+  logger.error('❌ callLLM: No LLM available (configure Gemini, NVIDIA NIM, OpenRouter or Groq)');
   return '';
 }
 
@@ -1138,25 +1139,25 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
     providerOrder.push(() => callProvider(p.id, p.key, p.model, p.maxTokens));
   }
 
-  console.log(`🎯 callLLMForWebsite: Default=${defaultLlm}, ${providerOrder.length} providers configured`);
+  logger.log(`🎯 callLLMForWebsite: Default=${defaultLlm}, ${providerOrder.length} providers configured`);
 
   for (let i = 0; i < providerOrder.length; i++) {
     try {
-      console.log(`🧪 Website LLM: Trying provider ${i + 1}/${providerOrder.length}`);
+      logger.log(`🧪 Website LLM: Trying provider ${i + 1}/${providerOrder.length}`);
       const result = await providerOrder[i]();
       if (result) {
-        console.log(`✅ Website LLM: Provider ${i + 1} succeeded`);
+        logger.log(`✅ Website LLM: Provider ${i + 1} succeeded`);
         return result;
       }
     } catch (err: any) {
       const msg = String(err?.message || err).toLowerCase();
       const isTransient = msg.includes('failed to fetch') || msg.includes('cors') || msg.includes('network') || isRateLimitError(err);
       if (!isTransient) throw err;
-      console.warn(`⚠️ Website LLM provider ${i + 1} indisponible, essai du suivant...`);
+      logger.warn(`⚠️ Website LLM provider ${i + 1} indisponible, essai du suivant...`);
     }
   }
 
-  console.error('❌ callLLMForWebsite: No LLM available (configurez une clé API)');
+  logger.error('❌ callLLMForWebsite: No LLM available (configurez une clé API)');
   return '';
 }
 
@@ -1164,18 +1165,18 @@ export async function callLLMForWebsite(config: ApiConfig, prompt: string, syste
 async function serperFetch(apiKey: string, endpoint: string, body: Record<string, unknown>): Promise<Record<string, unknown> | null> {
   // ... (rest of the code remains the same)
   if (!apiKey) {
-    console.error('❌ serperFetch: No API key provided');
+    logger.error('❌ serperFetch: No API key provided');
     return null;
   }
   
   // Vérifier si les agents sont arrêtés avant l'appel
   if (apiErrorState.areAgentsStopped()) {
-    console.log('🛑 serperFetch: Agents arrêtés - Annulation de l\'appel');
+    logger.log('🛑 serperFetch: Agents arrêtés - Annulation de l\'appel');
     return null;
   }
   
   const url = `https://google.serper.dev/${endpoint}`;
-  console.log(`🔍 serperFetch: ${endpoint} - Query:`, body.q || body);
+  logger.log(`🔍 serperFetch: ${endpoint} - Query:`, body.q || body);
   
   try {
     const res = await fetch(url, {
@@ -1184,15 +1185,15 @@ async function serperFetch(apiKey: string, endpoint: string, body: Record<string
       body: JSON.stringify(body),
     });
     
-    console.log(`📡 serperFetch: ${endpoint} - Status: ${res.status} ${res.statusText}`);
+    logger.log(`📡 serperFetch: ${endpoint} - Status: ${res.status} ${res.statusText}`);
     
     if (res.ok) {
       const data = await res.json();
-      console.log(`✅ serperFetch: ${endpoint} - Success, keys:`, Object.keys(data));
+      logger.log(`✅ serperFetch: ${endpoint} - Success, keys:`, Object.keys(data));
       return data;
     } else {
       const errorText = await res.text();
-      console.error(`❌ serperFetch: ${endpoint} - HTTP ${res.status}:`, errorText);
+      logger.error(`❌ serperFetch: ${endpoint} - HTTP ${res.status}:`, errorText);
       
       // Détecter et enregistrer l'erreur API
       const error = { status: res.status, message: errorText };
@@ -1201,13 +1202,13 @@ async function serperFetch(apiKey: string, endpoint: string, body: Record<string
         apiErrorState.recordError(apiError);
         // Arrêter immédiatement si crédits épuisés ou rate limit
         if (apiError.type === 'credits_exhausted' || apiError.type === 'rate_limit') {
-          console.log('🛑 serperFetch: Arrêt immédiat -', apiError.type);
+          logger.log('🛑 serperFetch: Arrêt immédiat -', apiError.type);
           throw new Error(`API Error: ${apiError.type} - ${apiError.message}`);
         }
       }
     }
   } catch (error) {
-    console.error(`❌ serperFetch: ${endpoint} - Exception:`, error);
+    logger.error(`❌ serperFetch: ${endpoint} - Exception:`, error);
     
     // Si c'est une erreur de crédits ou rate limit, propager l'erreur
     if (error instanceof Error && (error.message.includes('credits_exhausted') || error.message.includes('rate_limit'))) {
@@ -1229,7 +1230,7 @@ export async function enrichWithSerper(apiKey: string, lead: Lead): Promise<Part
   const updates: Partial<Lead> = {};
   const query = `${lead.name} ${lead.city || ''} ${lead.sector || ''}`.trim();
 
-  console.log(`🔍 Enrichment query: "${query}"`);
+  logger.log(`🔍 Enrichment query: "${query}"`);
 
   // 1. Places search (prioritaire pour les données locales)
   try {
@@ -1305,15 +1306,15 @@ export async function enrichWithSerper(apiKey: string, lead: Lead): Promise<Part
 
           if (realImgs.length > 0) {
             updates.images = realImgs;
-            console.log(`✅ Photos réelles trouvées sur Google Maps : ${realImgs.length}`);
+            logger.log(`✅ Photos réelles trouvées sur Google Maps : ${realImgs.length}`);
           }
 
-          console.log(`✅ Places data extracted: rating=${updates.googleRating}, reviews=${updates.googleReviews}, cid=${cid}`);
+          logger.log(`✅ Places data extracted: rating=${updates.googleRating}, reviews=${updates.googleReviews}, cid=${cid}`);
         }
       }
     }
   } catch (error) {
-    console.error('❌ Places search failed:', error);
+    logger.error('❌ Places search failed:', error);
   }
 
   // 2. Images search (plus agressif)
@@ -1345,7 +1346,7 @@ export async function enrichWithSerper(apiKey: string, lead: Lead): Promise<Part
       }
     }
   } catch (error) {
-    console.error('❌ Images search failed:', error);
+    logger.error('❌ Images search failed:', error);
   }
 
   // 3. Web search pour snippets + knowledge graph
@@ -1406,10 +1407,10 @@ export async function enrichWithSerper(apiKey: string, lead: Lead): Promise<Part
       }
     }
   } catch (error) {
-    console.error('❌ Web search failed:', error);
+    logger.error('❌ Web search failed:', error);
   }
 
-  console.log(`📊 Final updates:`, Object.keys(updates).length, 'fields updated');
+  logger.log(`📊 Final updates:`, Object.keys(updates).length, 'fields updated');
   return updates;
 }
 
@@ -1444,7 +1445,7 @@ export async function fetchSerperReviews(apiKey: string, cid: string): Promise<L
 
 // --- EXTRACT REVIEWS FROM SEARCH (AMÉLIORÉ) ---
 export async function extractReviewsFromSearch(serperKey: string, lead: Lead, apiConfig: ApiConfig): Promise<Lead['googleReviewsData']> {
-  console.log(`🔍 Extracting reviews for: ${lead.name}`);
+  logger.log(`🔍 Extracting reviews for: ${lead.name}`);
   
   // 1. Recherche directe avec plusieurs requêtes
   const searchQueries = [
@@ -1474,7 +1475,7 @@ export async function extractReviewsFromSearch(serperKey: string, lead: Lead, ap
         allSnippets.push(...snippets);
       }
     } catch (error) {
-      console.error(`❌ Search failed for query: ${query}`, error);
+      logger.error(`❌ Search failed for query: ${query}`, error);
     }
   }
 
@@ -1482,13 +1483,13 @@ export async function extractReviewsFromSearch(serperKey: string, lead: Lead, ap
   const uniqueSnippets = [...new Set(allSnippets)];
   
   if (uniqueSnippets.length < 20) {
-    console.log('❌ Not enough snippets for review extraction');
+    logger.log('❌ Not enough snippets for review extraction');
     return [];
   }
 
   // 2. Extraction par LLM avec un meilleur prompt
   if (!apiConfig.groqKey) {
-    console.log('❌ No LLM available for review extraction');
+    logger.log('❌ No LLM available for review extraction');
     return [];
   }
 
@@ -1500,19 +1501,19 @@ ${uniqueSnippets.slice(0, 1500).join('\n')}
 JSON: [{"author":"","rating":5,"text":""}]`;
 
   try {
-    console.log('🧠 Sending LLM request for review extraction...');
-    console.log('🧠 Prompt length:', prompt.length);
-    console.log('🧠 Available snippets:', uniqueSnippets.length);
+    logger.log('🧠 Sending LLM request for review extraction...');
+    logger.log('🧠 Prompt length:', prompt.length);
+    logger.log('🧠 Available snippets:', uniqueSnippets.length);
     
     const response = await callLLM(apiConfig, prompt, 'Tu es un expert en extraction d\'avis clients. Retourne UNIQUEMENT du JSON valide.');
     
-    console.log('🧠 Raw LLM response:', response);
-    console.log('🧠 Response length:', response?.length || 0);
+    logger.log('🧠 Raw LLM response:', response);
+    logger.log('🧠 Response length:', response?.length || 0);
     
     if (response && response.trim() && response !== '{}') {
       try {
         const cleaned = response.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
-        console.log('🧠 Cleaned response:', cleaned);
+        logger.log('🧠 Cleaned response:', cleaned);
         
         const reviews = JSON.parse(cleaned);
         if (Array.isArray(reviews)) {
@@ -1529,18 +1530,18 @@ JSON: [{"author":"","rating":5,"text":""}]`;
             }))
             .filter(r => r.text.length > 10);
           
-          console.log(`✅ Extracted ${validReviews.length} valid reviews`);
+          logger.log(`✅ Extracted ${validReviews.length} valid reviews`);
           return validReviews;
         }
       } catch (parseError) {
-        console.error('❌ Failed to parse LLM response:', parseError);
-        console.log('Raw response:', response);
+        logger.error('❌ Failed to parse LLM response:', parseError);
+        logger.log('Raw response:', response);
       }
     } else {
-      console.error('❌ LLM returned empty or invalid response');
+      logger.error('❌ LLM returned empty or invalid response');
     }
   } catch (error) {
-    console.error('❌ LLM extraction failed:', error);
+    logger.error('❌ LLM extraction failed:', error);
   }
 
   return [];
@@ -1632,14 +1633,14 @@ export async function scrapeWebsiteForContact(
       const data = await res.json();
       if (data.bestEmail) {
         result.email = data.bestEmail;
-        console.log(`✅ [Direct Scraping] Email trouvé: ${data.bestEmail} (${data.pagesScanned} pages scannées)`);
+        logger.log(`✅ [Direct Scraping] Email trouvé: ${data.bestEmail} (${data.pagesScanned} pages scannées)`);
       }
       if (data.phones?.length > 0 && !result.phone) {
         result.phone = data.phones[0];
       }
     }
   } catch (err) {
-    console.warn('[Direct Scraping] Échec:', (err as Error).message);
+    logger.warn('[Direct Scraping] Échec:', (err as Error).message);
   }
 
   // Stratégie B : Serper snippets (fallback si pas encore d'email)
@@ -1733,7 +1734,7 @@ Réponds UNIQUEMENT en JSON valide sans markdown, sans explication :
     if (!response) return {};
     const cleaned = response.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
 
-    console.log(`[LLM Extract] Response for "${lead.name}":`, cleaned.substring(0, 500));
+    logger.log(`[LLM Extract] Response for "${lead.name}":`, cleaned.substring(0, 500));
 
     const data = JSON.parse(cleaned) as Record<string, unknown>;
     const updates: Partial<Lead> = {};
@@ -1743,9 +1744,9 @@ Réponds UNIQUEMENT en JSON valide sans markdown, sans explication :
       const emailValid = validateEmailAdvanced(emailCandidate);
       if (emailValid.valid && isEmailDomainValid(emailCandidate)) {
         updates.email = emailCandidate;
-        console.log(`[LLM Extract] Email accepted for "${lead.name}": ${emailCandidate}`);
+        logger.log(`[LLM Extract] Email accepted for "${lead.name}": ${emailCandidate}`);
       } else {
-        console.log(`[LLM Extract] Email REJECTED for "${lead.name}": ${emailCandidate} — reason: ${emailValid.reason || 'domaine invalide'}`);
+        logger.log(`[LLM Extract] Email REJECTED for "${lead.name}": ${emailCandidate} — reason: ${emailValid.reason || 'domaine invalide'}`);
       }
     }
     if (data.phone && typeof data.phone === 'string' && !data.phone.toUpperCase().includes('NONE') && data.phone.length > 6)
@@ -1868,15 +1869,15 @@ export async function deepSearchContact(
       const response = await callLLM(apiConfig, prompt, 'Réponds UNIQUEMENT en JSON valide.');
       if (response) {
         const cleaned = response.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
-        console.log(`[DeepSearch LLM] Response for "${lead.name}":`, cleaned.substring(0, 300));
+        logger.log(`[DeepSearch LLM] Response for "${lead.name}":`, cleaned.substring(0, 300));
         const data = JSON.parse(cleaned);
         if (data.email && data.email.includes('@') && !data.email.toUpperCase().includes('NONE')) {
           const emailCandidate = data.email.toLowerCase();
           if (validateEmailAdvanced(emailCandidate).valid && isEmailDomainValid(emailCandidate)) {
             result.email = emailCandidate;
-            console.log(`[DeepSearch LLM] Email accepted for "${lead.name}": ${result.email}`);
+            logger.log(`[DeepSearch LLM] Email accepted for "${lead.name}": ${result.email}`);
           } else {
-            console.log(`[DeepSearch LLM] Email REJECTED for "${lead.name}": ${emailCandidate}`);
+            logger.log(`[DeepSearch LLM] Email REJECTED for "${lead.name}": ${emailCandidate}`);
           }
         }
         if (data.phone && data.phone.length > 6 && !data.phone.toUpperCase().includes('NONE')) {
@@ -1884,7 +1885,7 @@ export async function deepSearchContact(
         }
       }
     } catch (err) {
-      console.error('❌ LLM contact extraction failed:', err);
+      logger.error('❌ LLM contact extraction failed:', err);
     }
   }
 
@@ -1899,7 +1900,7 @@ export async function deepSearchEmail(serperKey: string, lead: Lead, apiConfig: 
 
 // --- SEARCH LEAD IMAGES (Logo + Website) AMÉLIORÉ ---
 export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{ logo: string; websiteImages: string[] }> {
-  console.log(`🖼️ Searching images for: ${lead.name}`);
+  logger.log(`🖼️ Searching images for: ${lead.name}`);
   
   const result = { logo: '', websiteImages: [] as string[] };
   if (!serperKey) return result;
@@ -1923,7 +1924,7 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
             // Toutes les requêtes contiennent "logo" → prendre le premier résultat valide
             if (url && url.startsWith('http') && !result.logo) {
               result.logo = url;
-              console.log(`✅ Logo found: ${url}`);
+              logger.log(`✅ Logo found: ${url}`);
               break;
             }
           }
@@ -1931,7 +1932,7 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
         if (result.logo) break;
       }
     } catch (error) {
-      console.error(`❌ Logo search failed for query: ${query}`, error);
+      logger.error(`❌ Logo search failed for query: ${query}`, error);
     }
   }
 
@@ -1939,7 +1940,7 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
   if (lead.website) {
     try {
       const domain = lead.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-      console.log(`🌐 Searching website images for domain: ${domain}`);
+      logger.log(`🌐 Searching website images for domain: ${domain}`);
       
       const domainName = domain.replace(/^www\./, '').split('.')[0];
       const imgResult = await serperFetch(serperKey, 'images', { q: `${lead.name} ${domainName}`, gl: 'fr', hl: 'fr', num: 12 });
@@ -1960,10 +1961,10 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
             result.websiteImages.push(url);
           }
         }
-        console.log(`✅ Found ${result.websiteImages.length} website images`);
+        logger.log(`✅ Found ${result.websiteImages.length} website images`);
       }
     } catch (error) {
-      console.error('❌ Website images search failed:', error);
+      logger.error('❌ Website images search failed:', error);
     }
   }
 
@@ -1971,7 +1972,7 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
   //    → Source de photos volées à des concurrents + images non pertinentes
   //    → Remplacé par les images Pexels spécifiques par service (imageAgent.ts / pexelsImages.ts)
   //    → Seules les images du site web du lead (étape 2) et les images Pexels sont utilisées
-  console.log(`ℹ️ Étape 3 désactivée: images professionnelles via Google Images générique`);
+  logger.log(`ℹ️ Étape 3 désactivée: images professionnelles via Google Images générique`);
 
   // 4. Logo par défaut depuis knowledge graph si pas trouvé
   if (!result.logo && lead.website) {
@@ -1982,15 +1983,15 @@ export async function searchLeadImages(serperKey: string, lead: Lead): Promise<{
         const kgImage = safeStr(kg.imageUrl);
         if (kgImage && kgImage.startsWith('http')) {
           result.logo = kgImage;
-          console.log(`✅ Knowledge Graph logo: ${kgImage}`);
+          logger.log(`✅ Knowledge Graph logo: ${kgImage}`);
         }
       }
     } catch (error) {
-      console.error('❌ Knowledge Graph logo search failed:', error);
+      logger.error('❌ Knowledge Graph logo search failed:', error);
     }
   }
 
-  console.log(`📊 Final image results: logo=${!!result.logo}, websiteImages=${result.websiteImages.length}`);
+  logger.log(`📊 Final image results: logo=${!!result.logo}, websiteImages=${result.websiteImages.length}`);
   return result;
 }
 
@@ -2100,7 +2101,7 @@ export function calculateScore(lead: Lead): { score: number; temperature: Lead['
 // --- UTILITY FUNCTIONS ---
 export function mapColumns(data: any[], headers: string[]): Partial<Lead>[] {
   if (!headers || !Array.isArray(headers)) {
-    console.error('mapColumns: headers is not an array', headers);
+    logger.error('mapColumns: headers is not an array', headers);
     return [];
   }
   
@@ -2127,7 +2128,7 @@ export function mapColumns(data: any[], headers: string[]): Partial<Lead>[] {
     return acc;
   }, {} as Record<string, number>);
 
-  console.log('Header mapping:', headerMap);
+  logger.log('Header mapping:', headerMap);
 
   for (const row of data) {
     const lead: Partial<Lead> = {};
@@ -2169,7 +2170,7 @@ export function mapColumns(data: any[], headers: string[]): Partial<Lead>[] {
       mapped.push(lead);
     }
   }
-  console.log('Final mapped leads:', mapped);
+  logger.log('Final mapped leads:', mapped);
   return mapped;
 }
 

@@ -1,3 +1,4 @@
+import { logger } from './logger';
 // ============================================================
 // LeadForge AI — Email Validation Store (localStorage)
 // Persistance locale sans migration DB
@@ -25,7 +26,7 @@ function saveAll(data: Record<string, EmailValidationRecord>): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {
-    console.warn('[EmailValidation] Failed to save to localStorage');
+    logger.warn('[EmailValidation] Failed to save to localStorage');
   }
 }
 

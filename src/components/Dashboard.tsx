@@ -1,3 +1,4 @@
+import { logger } from '../lib/logger';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
@@ -140,7 +141,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
   // Écouter les événements de synchronisation
   useEffect(() => {
     const handleDataChange = () => {
-      console.log('Dashboard: Événement de synchronisation reçu, rafraîchissement...');
+      logger.log('Dashboard: Événement de synchronisation reçu, rafraîchissement...');
       loadLeads(); // Recharger les données depuis Supabase
       forceReloadCampaigns(); // Recharger les campagnes
     };
@@ -172,7 +173,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
   // Synchroniser l'état local des campagnes
   useEffect(() => {
     setCampaignsCount(campaigns.length);
-    console.log('Dashboard: Campagnes synchronisées:', campaigns.length);
+    logger.log('Dashboard: Campagnes synchronisées:', campaigns.length);
   }, [campaigns]);
 
   // Always get fresh lead data from leads array
@@ -234,7 +235,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
       }
 
       const searchTerms = decodeURIComponent(searchMatch[1]).replace('+', ' ');
-      console.log('Termes de recherche extraits:', searchTerms);
+      logger.log('Termes de recherche extraits:', searchTerms);
 
       // Extraire le mot-clé et la localisation depuis les termes de recherche
       const searchParts = searchTerms.split(' ');
@@ -260,27 +261,27 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
         }
       }
       
-      console.log('Mot-clé extrait:', keyword);
-      console.log('Localisation extraite:', location);
+      logger.log('Mot-clé extrait:', keyword);
+      logger.log('Localisation extraite:', location);
 
       // Utiliser la même fonction de scraping existante
       const results = await fetchRealGoogleMapsData(keyword, location);
-      console.log('=== DIAGNOSTIC scraping par lien ===');
-      console.log('results from API:', results);
-      console.log('results type:', typeof results);
-      console.log('Array.isArray(results):', Array.isArray(results));
-      console.log('results length:', results?.length);
+      logger.log('=== DIAGNOSTIC scraping par lien ===');
+      logger.log('results from API:', results);
+      logger.log('results type:', typeof results);
+      logger.log('Array.isArray(results):', Array.isArray(results));
+      logger.log('results length:', results?.length);
       
       setScrapingResults(results);
-      console.log('scrapingResults après setScrapingResults:', scrapingResults);
+      logger.log('scrapingResults après setScrapingResults:', scrapingResults);
       
       setImportStatus(`${results.length} entreprises trouvées`);
       
       // Ouvrir le modal de campagne après 2 secondes
       setTimeout(() => {
-        console.log('=== DIAGNOSTIC avant ouverture modal ===');
-        console.log('scrapingResults dans setTimeout:', scrapingResults);
-        console.log('scrapingResults length dans setTimeout:', scrapingResults?.length);
+        logger.log('=== DIAGNOSTIC avant ouverture modal ===');
+        logger.log('scrapingResults dans setTimeout:', scrapingResults);
+        logger.log('scrapingResults length dans setTimeout:', scrapingResults?.length);
         
         setLinkScrapingModalOpen(false);
         setCampaignName(''); // Réinitialiser le nom de campagne
@@ -289,7 +290,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
       }, 2000);
 
     } catch (error: unknown) {
-      console.error('Erreur scraping lien:', error);
+      logger.error('Erreur scraping lien:', error);
       setImportStatus('Erreur lors du scraping: ' + (error as Error).message);
     } finally {
       setIsScraping(false);
@@ -314,7 +315,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
 
       const query = encodeURIComponent(`${scrapingKeyword} ${scrapingLocation}`);
       const searchUrl = `https://www.google.com/maps/search/${query}`;
-      console.log('URL de recherche:', searchUrl);
+      logger.log('URL de recherche:', searchUrl);
 
       // Étape 2: Utilisation d'une API de scraping (simulation plus réaliste)
       setImportStatus('Recherche sur Google Maps...');
@@ -345,7 +346,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
       }, 1500);
 
     } catch (error: unknown) {
-      console.error('Erreur scraping:', error);
+      logger.error('Erreur scraping:', error);
       setImportStatus('Erreur lors du scraping: ' + (error as Error).message);
     } finally {
       setIsScraping(false);
@@ -355,26 +356,26 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
   // Fonction de scraping avec l'API Serper.dev et configuration Supabase
   const fetchRealGoogleMapsData = async (keyword: string, location: string): Promise<any[]> => {
     try {
-      console.log(`Recherche réelle: ${keyword} à ${location}`);
+      logger.log(`Recherche réelle: ${keyword} à ${location}`);
       
       // Récupérer la configuration depuis Supabase
-      console.log('Récupération de la configuration depuis Supabase...');
+      logger.log('Récupération de la configuration depuis Supabase...');
       const config = await configService.get();
-      console.log('Configuration récupérée:', config);
+      logger.log('Configuration récupérée:', config);
       
       const serperKey = config?.serperKey;
       
       if (!serperKey) {
-        console.error('Configuration:', config);
+        logger.error('Configuration:', config);
         throw new Error('Clé API Serper.dev non configurée dans Supabase. Veuillez configurer la clé dans les paramètres.');
       }
       
-      console.log('Clé Serper trouvée, longueur:', serperKey.length);
-      console.log('Début de la requête Serper.dev...');
+      logger.log('Clé Serper trouvée, longueur:', serperKey.length);
+      logger.log('Début de la requête Serper.dev...');
       
       // Utiliser l'API Serper.dev Places endpoint
       const query = `${keyword} ${location}`;
-      console.log('Query:', query);
+      logger.log('Query:', query);
       
       const response = await fetch('https://google.serper.dev/places', {
         method: 'POST',
@@ -390,25 +391,25 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
         })
       });
 
-      console.log('Status de la réponse:', response.status, response.statusText);
+      logger.log('Status de la réponse:', response.status, response.statusText);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Erreur HTTP:', response.status, errorText);
+        logger.error('Erreur HTTP:', response.status, errorText);
         throw new Error(`Erreur API Serper: ${response.status} - ${response.statusText} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Résultats Serper.dev bruts:', data);
+      logger.log('Résultats Serper.dev bruts:', data);
       
       if (!data.places || !Array.isArray(data.places)) {
-        console.error('Format de réponse invalide:', data);
+        logger.error('Format de réponse invalide:', data);
         throw new Error('Format de réponse invalide de l\'API Serper.dev');
       }
       
       // Conversion des résultats en format Lead
       const leads = data.places.map((result: any) => {
-        console.log('Traitement du résultat:', result);
+        logger.log('Traitement du résultat:', result);
         return {
           id: crypto.randomUUID(),
           name: result.title || result.name || '',
@@ -430,43 +431,43 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
         };
       });
 
-      console.log(`${leads.length} entreprises trouvées via Serper.dev`);
-      console.log('Leads générés:', leads);
+      logger.log(`${leads.length} entreprises trouvées via Serper.dev`);
+      logger.log('Leads générés:', leads);
       return leads;
       
     } catch (error) {
-      console.error('Erreur détaillée lors du scraping Serper.dev:', error);
+      logger.error('Erreur détaillée lors du scraping Serper.dev:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-      console.error('Message d\'erreur:', errorMessage);
+      logger.error('Message d\'erreur:', errorMessage);
       throw new Error(`Erreur Serper.dev: ${errorMessage}`);
     }
   };
 
   // --- FILE PARSING ---
   const parseFile = useCallback((file: File) => {
-    console.log('Début import fichier:', file.name, file.size, file.type);
+    logger.log('Début import fichier:', file.name, file.size, file.type);
     setPendingFile(file);
     setCampaignName(''); // Réinitialiser le nom de campagne
     setCampaignModalOpen(true);
   }, []);
 
   const executeImport = useCallback(() => {
-    console.log('=== DIAGNOSTIC executeImport ===');
-    console.log('pendingFile:', pendingFile);
-    console.log('scrapingResults:', scrapingResults);
-    console.log('scrapingResults length:', scrapingResults?.length);
-    console.log('scrapingResults type:', typeof scrapingResults);
-    console.log('Array.isArray(scrapingResults):', Array.isArray(scrapingResults));
-    console.log('campaignName:', campaignName);
-    console.log('campaignName.trim():', campaignName.trim());
-    console.log('campaignName.trim() length:', campaignName.trim().length);
+    logger.log('=== DIAGNOSTIC executeImport ===');
+    logger.log('pendingFile:', pendingFile);
+    logger.log('scrapingResults:', scrapingResults);
+    logger.log('scrapingResults length:', scrapingResults?.length);
+    logger.log('scrapingResults type:', typeof scrapingResults);
+    logger.log('Array.isArray(scrapingResults):', Array.isArray(scrapingResults));
+    logger.log('campaignName:', campaignName);
+    logger.log('campaignName.trim():', campaignName.trim());
+    logger.log('campaignName.trim() length:', campaignName.trim().length);
     
     // Vérifier si on a des données à importer (fichier OU résultats de scraping)
     const hasData = pendingFile || (scrapingResults && scrapingResults.length > 0);
-    console.log('hasData:', hasData);
+    logger.log('hasData:', hasData);
     
     if (!hasData) {
-      console.error('DIAGNOSTIC: Aucune donnée trouvée - pendingFile:', !!pendingFile, 'scrapingResults:', scrapingResults);
+      logger.error('DIAGNOSTIC: Aucune donnée trouvée - pendingFile:', !!pendingFile, 'scrapingResults:', scrapingResults);
       alert('Aucune donnée à importer');
       return;
     }
@@ -478,7 +479,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
 
     // Si on a des résultats de scraping, les convertir en fichier JSON
     if (!pendingFile && scrapingResults && scrapingResults.length > 0) {
-      console.log('Utilisation des résultats de scraping');
+      logger.log('Utilisation des résultats de scraping');
       const jsonData = scrapingResults.map(result => ({
         name: result.name || '',
         email: result.email || '',
@@ -498,7 +499,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
       }));
       
       // Importer directement les données JSON
-      console.log('Importation des données de scraping:', jsonData);
+      logger.log('Importation des données de scraping:', jsonData);
       
       // Ajouter les leads
       addLeads(jsonData);
@@ -522,24 +523,24 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
     }
 
     const file = pendingFile;
-    console.log('Début import campagne:', campaignName);
+    logger.log('Début import campagne:', campaignName);
     setImporting(true);
     setImportProgress(0);
     setImportStatus('Analyse du fichier...');
     if (!file) return;
     const ext = file.name.split('.').pop()?.toLowerCase();
-    console.log('Extension détectée:', ext);
+    logger.log('Extension détectée:', ext);
 
     if (ext === 'json') {
       // Gestion des fichiers JSON (scraping)
-      console.log('Parsing JSON...');
+      logger.log('Parsing JSON...');
       setImportStatus('Parsing JSON...');
       
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
           const jsonData = JSON.parse(e.target?.result as string);
-          console.log('JSON parsing complete:', jsonData);
+          logger.log('JSON parsing complete:', jsonData);
           
           const totalRows = Array.isArray(jsonData) ? jsonData.length : 0;
           setImportTotal(totalRows);
@@ -572,7 +573,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
             setImportStatus(`Importation de ${mappedLeads.length} leads...`);
             
             setTimeout(() => {
-              console.log('Mapped leads from JSON:', mappedLeads);
+              logger.log('Mapped leads from JSON:', mappedLeads);
               addLeads(mappedLeads);
               setImportProgress(100);
               setImportStatus('Importation terminée!');
@@ -604,7 +605,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
             }, 1000);
           });
         } catch (error) {
-          console.error('JSON parsing error:', error);
+          logger.error('JSON parsing error:', error);
           setImportStatus('Erreur: Format JSON invalide');
           setImporting(false);
         }
@@ -612,17 +613,17 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
       reader.readAsText(file!);
       
     } else if (ext === 'csv' || ext === 'txt') {
-      console.log('Parsing CSV/TXT...');
+      logger.log('Parsing CSV/TXT...');
       setImportStatus('Parsing CSV...');
       Papa.parse(file!, {
         header: true,
         skipEmptyLines: true,
         complete: (results) => {
-          console.log('CSV parsing complete:', results);
+          logger.log('CSV parsing complete:', results);
           const headers = results.meta.fields || [];
-          console.log('Headers:', headers);
+          logger.log('Headers:', headers);
           if (!headers || !Array.isArray(headers)) {
-            console.error('CSV parsing: no headers found');
+            logger.error('CSV parsing: no headers found');
             setImporting(false);
             return;
           }
@@ -646,7 +647,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
             setImportStatus(`Importation de ${leadsWithCampaign.length} leads...`);
             
             setTimeout(() => {
-              console.log('Mapped leads:', leadsWithCampaign);
+              logger.log('Mapped leads:', leadsWithCampaign);
               addLeads(leadsWithCampaign);
               setImportProgress(100);
               setImportStatus('Importation terminée!');
@@ -681,7 +682,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
           }, 300);
         },
         error: (error) => { 
-          console.error('CSV parsing error:', error);
+          logger.error('CSV parsing error:', error);
           setImporting(false); 
           alert('Erreur de parsing CSV: ' + error); 
         },
@@ -744,7 +745,7 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
       };
       reader.readAsBinaryString(file!);
     } else {
-      console.error('Format non supporté:', ext);
+      logger.error('Format non supporté:', ext);
       alert('Format non supporté. Utilisez CSV, TXT, XLS ou XLSX.');
       setImporting(false);
     }
@@ -782,8 +783,8 @@ export default function Dashboard({ leads, addLeads, updateLead, deleteLeads, lo
   const campaignList = allCampaigns.filter(c => typeof c === 'string');
   
   // Debug pour voir les données
-  console.log('campaigns from hook:', campaigns);
-  console.log('campaignList:', campaignList);
+  logger.log('campaigns from hook:', campaigns);
+  logger.log('campaignList:', campaignList);
 
   const stats = {
     total: leads.length,

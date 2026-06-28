@@ -1,3 +1,4 @@
+import { logger } from '../lib/logger';
 import { useState, useEffect } from 'react';
 import { useCampaigns, useLeads, Lead } from '../lib/supabase-store';
 import { eventBus, LeadForgeEvents } from '../lib/events';
@@ -28,7 +29,7 @@ export default function Campaigns({ leads }: Props) {
   // Écouter les événements de synchronisation
   useEffect(() => {
     const handleDataChange = () => {
-      console.log('Campaigns: Événement de synchronisation reçu, rafraîchissement...');
+      logger.log('Campaigns: Événement de synchronisation reçu, rafraîchissement...');
       setRefreshKey(prev => prev + 1);
     };
 
