@@ -6,6 +6,7 @@ import { getImagesForLead } from './pexelsApi';
 import { isImageBlocked, filterImages, isStockImage } from './imageFilters';
 import { getSectorConfig } from './sectorConfig';
 import { getCuratedImages, getCuratedServiceImage, getCuratedPool } from './curatedImages';
+import { fetchValidatedSectorImages, fetchValidatedServiceImage } from './sectorImageFetch';
 import { UI } from './template/ui';
 import { getProcessSteps, getGuarantees, getHeroBadge, getGalleryDesc, getPrivacyContent, generateFeaturesFromService, generateAboutText, capitalizeCity, getLogoInfo, detectLanguage, isEnglishText } from './template/helpers';
 export { detectLanguage };
@@ -599,15 +600,28 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
     accentOnDark = lightenHex(rawAccent, factor);
   }
 
-  // IMAGES CURATÉES — garanties sectorielles, pas de Pexels API
+  // IMAGES VALIDÉES via Pexels API avec contrôle alt-text strict
+  const pexelsKey = ''; // Will be passed from lead config or env
+  // Extract service names for dynamic image queries
+  const serviceNames = (template.services || []).map((s: any) => s.name || '');
+
+  let validatedImages: string[] = [];
+  try {
+    const storedConfig = JSON.parse(localStorage.getItem('leadforge_api_config') || '{}');
+    const apiKey = storedConfig.pexelsKey || '';
+    if (apiKey) {
+      validatedImages = await fetchValidatedSectorImages(apiKey, lead.sector, serviceNames, 10);
+    }
+  } catch { /* fallback below */ }
+
+  // Fallback to curated images if Pexels fails
   const curatedPool = getCuratedPool(lead.sector);
-  const curatedAll = [...curatedPool.hero, ...curatedPool.services, ...curatedPool.about, ...curatedPool.gallery];
+  const heroPool = validatedImages.length >= 3 ? validatedImages : curatedPool.hero;
+  const servicePool = validatedImages.length >= 3 ? validatedImages : curatedPool.services;
+  const galleryPool = validatedImages.length >= 3 ? validatedImages : curatedPool.gallery;
 
-  // Hero: hash-based selection from curated hero pool
-  const heroImage = curatedPool.hero[((combinedHash * 2654435761) >>> 0) % curatedPool.hero.length];
-
-  // About/Why: curated about images
-  const allImages = curatedPool.about;
+  const heroImage = heroPool[((combinedHash * 2654435761) >>> 0) % heroPool.length];
+  const allImages = validatedImages.length >= 3 ? validatedImages.slice(0, 4) : curatedPool.about;
 
   let finalServices = (lang === 'en' ? template.servicesEn : undefined) || template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
@@ -645,13 +659,13 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   while (testimonials.length < 6) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 6);
 
-  // Service images: curated pool, one per service
+  // Service images: use validated pool or curated fallback
   const serviceImages: string[] = finalServices.map((s, i) =>
-    getCuratedServiceImage(lead.sector, s.name, i)
+    servicePool[i % servicePool.length] || heroImage
   );
 
-  // Gallery: curated gallery images
-  const galleryImages = curatedPool.gallery.slice(0, 5);
+  // Gallery: use validated pool or curated fallback
+  const galleryImages = galleryPool.slice(0, 5);
 
 
   const socialLinks = lead.socialLinks || {};
