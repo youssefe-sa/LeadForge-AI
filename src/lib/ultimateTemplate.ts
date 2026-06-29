@@ -606,29 +606,60 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
 
   // IMAGES — séparation stricte : Pexels (stock) vs scrapées (Google Maps)
   const serviceNames = (template.services || []).map((s: any) => s.name || '');
-  
-  // Images scrapées du lead (Google Maps) — contiennent souvent textes/logos/téléphones
+
+  // Images scrapées du lead (Google Maps) — contiennent souvent des logos
   const scrapedImages = [
     ...(lead.images || []),
     ...(lead.websiteImages || []),
   ].filter(img => img && typeof img === 'string' && img.startsWith('http'));
 
-  // Images Pexels propres (sans texte, sans logo) — pour hero/services/about
+  // Filtrer les logos parmi les images scrapées (garder pour galerie seulement)
+  const isLikelyLogo = (url: string): boolean => {
+    const low = url.toLowerCase();
+    // Google Maps profile photos are usually square/cropped logos
+    if (low.includes('lh3.googleusercontent.com') && (low.includes('s120') || low.includes('s64') || low.includes('w120') || low.includes('w64'))) return true;
+    // Common logo patterns
+    if (low.includes('/logo') || low.includes('favicon') || low.includes('icon')) return true;
+    return false;
+  };
+  const realPhotos = scrapedImages.filter(img => !isLikelyLogo(img));
+  const allScraped = scrapedImages;
+
+  // Images Pexels propres (sans texte, sans logo) — UNIQUEMENT Pexels, pas de logos scrapés
   let pexelsImages: string[] = [];
   try {
     const storedConfig = JSON.parse(localStorage.getItem('leadforge_api_config') || '{}');
     const apiKey = storedConfig.pexelsKey || '';
     if (apiKey) {
-      pexelsImages = await fetchSectorImagesDynamic(apiKey, lead.sector, serviceNames, scrapedImages, 10, combinedHash);
+      // PAS de scrapedImages ici — elles contiennent des logos
+      pexelsImages = await fetchSectorImagesDynamic(apiKey, lead.sector, serviceNames, [], 12, combinedHash);
     }
   } catch { /* fallback below */ }
 
-  // Hero/Services/About : toujours Pexels (images propres, sans texte)
-  // Gallery : images scrapées du lead (montrant le vrai business)
+  // Hero : TOUJOURS Pexels (jamais logo scrapé)
+  // Fallbacks sectoriels Unsplash quand pas de clé Pexels
+  const UNSPLASH_FALLBACKS: Record<string, string[]> = {
+    vtc: ['https://images.unsplash.com/photo-1563720223185-11003d516935?w=1200&q=80', 'https://images.unsplash.com/photo-1549317661-bd32c8ce0afe?w=1200&q=80'],
+    plomberie: ['https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=1200&q=80', 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=80'],
+    electricien: ['https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=1200&q=80', 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80'],
+    coiffeur: ['https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=80'],
+    restaurant: ['https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80', 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80'],
+    garage: ['https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=1200&q=80', 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200&q=80'],
+    nettoyage: ['https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&q=80', 'https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=1200&q=80'],
+    jardin: ['https://images.unsplash.com/photo-1558904541-efa843a96f01?w=1200&q=80', 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&q=80'],
+    fitness: ['https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80', 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=80'],
+    medical: ['https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80', 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&q=80'],
+    avocat: ['https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=80', 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1200&q=80'],
+    boulangerie: ['https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&q=80', 'https://images.unsplash.com/photo-1555507036-ab1f4038024a?w=1200&q=80'],
+  };
+  const fallbackPool = UNSPLASH_FALLBACKS[lead.sector?.toLowerCase() || ''] || UNSPLASH_FALLBACKS['vtc'];
+
   const heroImage = pexelsImages.length > 0
     ? pexelsImages[((combinedHash * 2654435761) >>> 0) % pexelsImages.length]
-    : scrapedImages.length > 0 ? scrapedImages[0] : '';
-  const allImages = pexelsImages.length > 0 ? pexelsImages.slice(0, 4) : scrapedImages.slice(0, 2);
+    : fallbackPool[combinedHash % fallbackPool.length];
+
+  // allImages : Pexels pour hero/about/approach, fallback si pas de Pexels
+  const allImages = pexelsImages.length > 0 ? pexelsImages.slice(0, 6) : fallbackPool;
 
   let finalServices = (lang === 'en' ? template.servicesEn : undefined) || template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
@@ -666,13 +697,17 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   while (testimonials.length < 6) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 6);
 
-  // Service images : Pexels stock (propres, sans texte)
+  // Service images : TOUJOURS Pexels (images pro, sans texte/logo)
   const serviceImages: string[] = finalServices.map((s, i) =>
-    pexelsImages[i % pexelsImages.length] || heroImage
+    pexelsImages[i % pexelsImages.length] || heroImage || fallbackPool[i % fallbackPool.length]
   );
 
-  // Gallery : images scrapées du lead (montrant le vrai business)
-  const galleryImages = scrapedImages.slice(0, 5);
+  // Gallery : images scrapées du lead (photos du vrai business, pas les logos)
+  const galleryImages = realPhotos.length > 0
+    ? realPhotos.slice(0, 5)
+    : pexelsImages.length > 0
+      ? pexelsImages.slice(0, 5)
+      : allScraped.slice(0, 5);
 
 
   const socialLinks = lead.socialLinks || {};
