@@ -604,32 +604,31 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
     accentOnDark = lightenHex(rawAccent, factor);
   }
 
-  // IMAGES 100% DYNAMIQUES — sector name + service names + lead's own images
+  // IMAGES — séparation stricte : Pexels (stock) vs scrapées (Google Maps)
   const serviceNames = (template.services || []).map((s: any) => s.name || '');
-  // Collect all images from the lead (scraped from Google Maps, website, etc.)
-  const leadImages = [
+  
+  // Images scrapées du lead (Google Maps) — contiennent souvent textes/logos/téléphones
+  const scrapedImages = [
     ...(lead.images || []),
     ...(lead.websiteImages || []),
-    ...(lead.logo ? [lead.logo] : []),
   ].filter(img => img && typeof img === 'string' && img.startsWith('http'));
 
-  let dynamicImages: string[] = [];
+  // Images Pexels propres (sans texte, sans logo) — pour hero/services/about
+  let pexelsImages: string[] = [];
   try {
     const storedConfig = JSON.parse(localStorage.getItem('leadforge_api_config') || '{}');
     const apiKey = storedConfig.pexelsKey || '';
-    dynamicImages = await fetchSectorImagesDynamic(apiKey, lead.sector, serviceNames, leadImages, 10);
-  } catch {
-    // If Pexels fails, use lead's own images
-    dynamicImages = leadImages;
-  }
+    if (apiKey) {
+      pexelsImages = await fetchSectorImagesDynamic(apiKey, lead.sector, serviceNames, scrapedImages, 10, combinedHash);
+    }
+  } catch { /* fallback below */ }
 
-  // If still no images, use lead images as ultimate fallback
-  if (dynamicImages.length === 0) dynamicImages = leadImages;
-
-  const heroImage = dynamicImages.length > 0
-    ? dynamicImages[((combinedHash * 2654435761) >>> 0) % dynamicImages.length]
-    : '';
-  const allImages = dynamicImages.slice(0, 4);
+  // Hero/Services/About : toujours Pexels (images propres, sans texte)
+  // Gallery : images scrapées du lead (montrant le vrai business)
+  const heroImage = pexelsImages.length > 0
+    ? pexelsImages[((combinedHash * 2654435761) >>> 0) % pexelsImages.length]
+    : scrapedImages.length > 0 ? scrapedImages[0] : '';
+  const allImages = pexelsImages.length > 0 ? pexelsImages.slice(0, 4) : scrapedImages.slice(0, 2);
 
   let finalServices = (lang === 'en' ? template.servicesEn : undefined) || template.services;
   if (aiContent?.services && Array.isArray(aiContent.services) && aiContent.services.length > 0) {
@@ -667,13 +666,13 @@ export async function generateUltimateSiteAsync(lead: any, aiContent?: any): Pro
   while (testimonials.length < 6) testimonials.push(fallbackReviews[testimonials.length % fallbackReviews.length]);
   testimonials = testimonials.slice(0, 6);
 
-  // Service images: from dynamic pool
+  // Service images : Pexels stock (propres, sans texte)
   const serviceImages: string[] = finalServices.map((s, i) =>
-    dynamicImages[i % dynamicImages.length] || heroImage
+    pexelsImages[i % pexelsImages.length] || heroImage
   );
 
-  // Gallery: from dynamic pool
-  const galleryImages = dynamicImages.slice(0, 5);
+  // Gallery : images scrapées du lead (montrant le vrai business)
+  const galleryImages = scrapedImages.slice(0, 5);
 
 
   const socialLinks = lead.socialLinks || {};
